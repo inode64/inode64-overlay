@@ -12,7 +12,7 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/abbbi/virtnbdbackup/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 x86"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="Backup utility for libvirt kvm / qemu with incremental backup support via NBD"

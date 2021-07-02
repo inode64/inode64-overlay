@@ -12,7 +12,7 @@ USE_PHP="php7-3 php7-4 php8-0"
 
 inherit php-ext-pecl-r3
 
-KEYWORDS="~arm amd64 ~x86"
+KEYWORDS="~amd64 ~arm ~x86"
 
 DESCRIPTION="Provides support for CIFS/SMB via samba's libsmbclient libary"
 LICENSE="BSD-2"

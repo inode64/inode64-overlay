@@ -14,17 +14,18 @@ SRC_URI="https://download.libguestfs.org/libnbd/1.6-stable/${P}.tar.gz"
 LICENSE="LGPL-2 LGPL-2+"
 SLOT="0"
 
-KEYWORDS="amd64 x86"
-IUSE="fuse go python ocaml +ssl"
+KEYWORDS="~amd64 ~x86"
+IUSE="fuse go ocaml python +ssl"
 
 REQUIRED_USE="
 	python? ( ${PYTHON_REQUIRED_USE} )
 	"
 COMMON_DEPEND="
 	dev-libs/libxml2:2=
-	python? ( ${PYTHON_DEPS} )
 	fuse? ( sys-fs/fuse:3= )
+	go? ( dev-lang/go )
 	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
+	python? ( ${PYTHON_DEPS} )
 	ssl? ( net-libs/gnutls )
 	"
 DEPEND="${COMMON_DEPEND}
@@ -42,12 +43,11 @@ src_prepare() {
 src_configure() {
 	econf \
 		--disable-static \
-		$(use_with ssl gnutls) \
-		$(use_enable python) \
 		$(use_enable fuse) \
-		$(use_enable ocaml) \
 		$(use_enable go golang) \
-		$(use_enable fuse)
+		$(use_enable ocaml) \
+		$(use_enable python) \
+		$(use_with ssl gnutls)
 }
 
 src_install() {
