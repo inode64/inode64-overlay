@@ -9,14 +9,15 @@ HOMEPAGE="https://guacamole.apache.org/"
 
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
+	KEYWORDS=""
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-client.git"
 else
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS=""
 IUSE="ldap +mysql postgres"
 REQUIRED_USE="|| ( ldap mysql postgres )"
 DEPEND="dev-java/maven-bin"
@@ -34,7 +35,7 @@ GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
 
 src_compile() {
-	HOME="${WORKDIR}" mvn package -Drat.skip=true
+	mvn package -Drat.skip=true -Dmaven.repo.local="${T}"
 }
 
 src_install() {
