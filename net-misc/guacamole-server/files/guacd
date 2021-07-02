@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+DAEMON="/usr/sbin/guacd"
+PIDFILE="/run/guacamole/guacd.pid"
+
+depend() {
+    use net
+}
+
+start() {
+    checkpath -q -d -m 0755 -o guacamole:guacamole /run/guacamole/
+    ebegin "Starting Guacamole server"
+    start-stop-daemon --start --user guacamole:guacamole --exec "${DAEMON}" -- -p "${PIDFILE}"
+    eend $? "Failed to start Guacamole server"
+}
+
+stop() {
+    ebegin "Stopping Guacamole server"
+    start-stop-daemon --stop --pidfile "${PIDFILE}"
+    eend $? "Failed to stop Guacamole server"
+}
