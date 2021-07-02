@@ -9,14 +9,15 @@ HOMEPAGE="https://guacamole.apache.org/"
 
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
+	KEYWORDS=""
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-client.git"
 else
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
 IUSE="ldap +mysql postgres"
 REQUIRED_USE="|| ( ldap mysql postgres )"
 DEPEND="dev-java/maven-bin"
@@ -43,7 +44,7 @@ src_install() {
 	#doins extensions/guacamole-auth-totp/target/guacamole-auth-totp-${MY_PV}.jar
 	doins extensions/guacamole-auth-quickconnect/target/guacamole-auth-quickconnect-${MY_PV}.jar
 	#doins extensions/guacamole-auth-openid/target/guacamole-auth-openid-${MY_PV}.jar
-####	doins extensions/guacamole-auth-header/target/guacamole-auth-header-${MY_PV}.jar
+	doins extensions/guacamole-auth-header/target/guacamole-auth-header-${MY_PV}.jar
 	#doins extensions/guacamole-auth-duo/target/guacamole-auth-duo-${MY_PV}.jar
 
 	if use mysql || use postgres; then
