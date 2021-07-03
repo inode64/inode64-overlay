@@ -115,5 +115,5 @@ src_install() {
 	elog "See https://guacamole.apache.org/doc/gug/configuring-guacamole.html for a basic setup"
 	elog "or https://guacamole.apache.org/doc/gug/jdbc-auth.html for a database for authentication and host definitions."
 	elog
-	elog "Please install www-server/apache or www-servre/nginx for a proxying Guacamole see: https://guacamole.apache.org/doc/gug/proxying-guacamole.html"
+	elog "Please install www-server/apache or www-server/nginx for a proxying Guacamole see: https://guacamole.apache.org/doc/gug/proxying-guacamole.html"
 }
