@@ -36,6 +36,7 @@ fping
 freeipmi
 fribidi
 fsnotifier
+gentoolkit
 guac
 guacadmin
 guacd
@@ -115,4 +116,3 @@ Xrender
 Xtst
 ZENDEXT
 zstd
-
