@@ -12,6 +12,7 @@ distutils
 dmaven
 dodir
 doenvd
+doexe
 doinitd
 doins
 dosym
@@ -29,6 +30,7 @@ enplug
 eroot
 ethtool
 eutils
+exeinto
 FILESDIR
 fowners
 fperms
