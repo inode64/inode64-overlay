@@ -8,5 +8,6 @@
       <name>F.Javier Félix</name>
     </owner>
     <source type="git">https://github.com/inode64/inode64-overlay.git</source>
+    <feed>https://github.com/inode64/inode64-overlay/commits/main.atom</feed>
   </repo>
 </repositories>
