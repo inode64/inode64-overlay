@@ -315,9 +315,9 @@ pkg_postinst() {
 		if use postgres; then
 			einfo
 			einfo "For postgresql:"
-			einfo "  su postgres -c '/usr/lib/bareos/create_bareos_database postgresql'"
-			einfo "  su postgres -c '/usr/lib/bareos/make_bareos_tables postgresql'"
-			einfo "  su postgres -c '/usr/lib/bareos/grant_bareos_privileges postgresql'"
+			einfo "  su postgres -c '/usr/lib/bareos/scripts/create_bareos_database postgresql'"
+			einfo "  su postgres -c '/usr/lib/bareos/scripts/make_bareos_tables postgresql'"
+			einfo "  su postgres -c '/usr/lib/bareos/scripts/grant_bareos_privileges postgresql'"
 		fi
 		if use mysql; then
 			einfo
@@ -329,9 +329,9 @@ pkg_postinst() {
 			einfo "    user=root"
 			einfo "    password=YourPasswordForAccessingMysqlAsRoot"
 			einfo "  before running:"
-			einfo "  /usr/lib/bareos/create_bareos_database mysql"
-			einfo "  /usr/lib/bareos/make_bareos_tables mysql"
-			einfo "  /usr/lib/bareos/grant_bareos_privileges mysql"
+			einfo "  /usr/lib/bareos/scripts/create_bareos_database mysql"
+			einfo "  /usr/lib/bareos/scripts/make_bareos_tables mysql"
+			einfo "  /usr/lib/bareos/scripts/grant_bareos_privileges mysql"
 		fi
 		einfo
 	fi
