@@ -31,7 +31,9 @@ src_compile() {
 }
 
 src_install() {
-	echo -e "\nadvanced:\n  network_key: $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" >> data/configuration.yaml
+	local key=$(s="";for((i=1;i<=16;i++)); do printf '%s' "${s}0x$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 2|head -n 1)"; s=", "; done)
+
+	echo -e "\nadvanced:\n  network_key: [ ${key} ]" >> data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >> data/configuration.yaml
 
 	npm ci --production --progress false
