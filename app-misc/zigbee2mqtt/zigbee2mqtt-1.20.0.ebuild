@@ -11,7 +11,7 @@ SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 ~x64"
+KEYWORDS="amd64"
 
 DEPEND=""
 RDEPEND="
@@ -19,7 +19,7 @@ RDEPEND="
 	net-libs/nodejs
 "
 BDEPEND="
-	=net-libs/nodejs-16[npm]
+	net-libs/nodejs[npm]
 "
 
 # To enable download packages
@@ -31,27 +31,33 @@ src_compile() {
 }
 
 src_install() {
-	local key=$(s="";for((i=1;i<=16;i++)); do printf '%s' "${s}0x$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 2|head -n 1)"; s=", "; done)
+	local key=$(
+		s=""
+		for ((i = 1; i <= 16; i++)); do
+			printf '%s' "${s}0x$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 2 | head -n 1)"
+			s=", "
+		done
+	)
 
-	echo -e "\nadvanced:\n  network_key: [ ${key} ]" >> data/configuration.yaml
-	echo -e "  log_directory: /var/log/${PN}" >> data/configuration.yaml
+	echo -e "\nadvanced:\n  network_key: [ ${key} ]" >>data/configuration.yaml
+	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	npm ci --production --progress false
 
-        keepdir /var/log/${PN}
+	keepdir /var/log/${PN}
 
-        insinto /var/lib/${PN}
+	insinto /var/lib/${PN}
 	doins data/configuration.yaml
 
-        insinto /opt/${PN}
+	insinto /opt/${PN}
 	doins -r images lib node_modules
 	doins *.js *.json
 
 	dodoc *.md
 
-        doinitd "${FILESDIR}"/${PN}
-        systemd_dounit "${FILESDIR}/${PN}.service"
+	doinitd "${FILESDIR}"/${PN}
+	systemd_dounit "${FILESDIR}/${PN}.service"
 
-        dodir /etc/env.d
-        echo "CONFIG_PROTECT=/var/lib/${PN}/configuration.yaml" >> "${ED}"/etc/env.d/90${PN} || die
+	dodir /etc/env.d
+	echo "CONFIG_PROTECT=/var/lib/${PN}/configuration.yaml" >>"${ED}"/etc/env.d/90${PN} || die
 }
