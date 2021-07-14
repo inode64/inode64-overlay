@@ -14,8 +14,8 @@ SLOT="0"
 KEYWORDS="amd64"
 
 RDEPEND="
-	acct-group/guacamole
-	acct-user/guacamole
+	acct-group/zigbee2mqtt
+	acct-user/zigbee2mqtt
 	app-misc/mosquitto
 	net-libs/nodejs
 "
