@@ -43,7 +43,7 @@ src_install() {
 	insinto /usr/$(get_libdir)/node_modules/${PN}
 	doins -r bin lib node_modules pres
 	doins *.js *.json
-	fperms 750 /usr/$(get_libdir)/node_modules/${PN}/bin/*
+	fperms +x /usr/$(get_libdir)/node_modules/${PN}/bin/{pm2,pm2-dev,pm2-docker,pm2-runtime}
 
 	dodoc *.md
 }
