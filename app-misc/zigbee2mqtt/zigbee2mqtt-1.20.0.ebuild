@@ -8,6 +8,7 @@ inherit systemd
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
 SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz"
+COMMIT="41b67fdd07792a6c6569341d980ec60c1456c2d7"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -46,6 +47,7 @@ src_install() {
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	npm ci --production --progress false
+	echo "{\"hash\": \"${COMMIT}\"}" > .hash.json
 
 	keepdir /var/log/${PN}
 
