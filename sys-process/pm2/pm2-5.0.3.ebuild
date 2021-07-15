@@ -46,4 +46,7 @@ src_install() {
 	fperms +x /usr/$(get_libdir)/node_modules/${PN}/bin/{pm2,pm2-dev,pm2-docker,pm2-runtime}
 
 	dodoc *.md
+
+        doinitd "${FILESDIR}"/${PN}
+        systemd_dounit "${FILESDIR}/${PN}.service"
 }
