@@ -60,6 +60,7 @@ src_install() {
 
 	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}
 	fowners zigbee2mqtt:zigbee2mqtt /var/log/${PN}
+	fowners -R zigbee2mqtt:zigbee2mqtt /opt/${PN}
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
