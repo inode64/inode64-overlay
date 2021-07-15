@@ -56,7 +56,7 @@ src_install() {
 
 	insinto /opt/${PN}
 	doins -r images lib node_modules
-	doins *.js *.json
+	doins *.js *.json .hash.json
 
 	dodoc *.md
 
