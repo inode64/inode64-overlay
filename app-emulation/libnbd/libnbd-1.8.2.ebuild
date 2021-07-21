@@ -22,7 +22,7 @@ REQUIRED_USE="
 	"
 COMMON_DEPEND="
 	dev-libs/libxml2:2=
-	fuse? ( sys-fs/fuse:3= )
+	fuse? ( sys-fs/fuse:3 )
 	go? ( dev-lang/go )
 	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
 	python? ( ${PYTHON_DEPS} )
