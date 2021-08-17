@@ -1,0 +1,8 @@
+#%PAM-1.0
+-auth       [success=done new_authtok_reqd=done user_unknown=die default=ignore]    pam_cockpit_cert.so
+auth        include     system-remote-login
+auth        optional    pam_ssh_add.so
+account     include     system-remote-login
+password    include     system-remote-login
+session     optional    pam_ssh_add.so
+session     include     system-remote-login

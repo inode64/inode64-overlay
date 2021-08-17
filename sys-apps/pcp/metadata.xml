@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription lang="en">
+	</longdescription>
+	<maintainer>
+		<email>u0x004a@gmail.com</email>
+		<name>J. García</name>
+	</maintainer>
+	<use>
+		<flag name="ssp"> Enable gcc stack-protector</flag>
+		<flag name="pie"> Build position-independent-executable</flag>
+		<flag name="infiniband"> Support for inifiniband metrics</flag>
+		<flag name="discovery"> Support for service discovery</flag>
+		<flag name="systemd"> Support for systemd services</flag>
+		<flag name="python"> Support for tools requiring Python</flag>
+		<flag name="papi"> Support for  PAPI </flag>
+		<flag name="perfevent"> Perfevent pmda</flag>
+		<flag name="manager"> Support for daemon manager</flag>
+		<flag name="webapi"> Enable REST API daemon</flag>
+		<flag name="doc"> Enable building of the PCP books</flag>
+	</use>
+</pkgmetadata>
