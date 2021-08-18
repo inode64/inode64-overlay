@@ -8,7 +8,7 @@ inherit autotools eutils pam systemd
 DESCRIPTION="Server Administration Web Interface "
 HOMEPAGE="http://cockpit-project.org/"
 
-if [[ ${PV} == 9999* ]] ; then
+if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/cockpit-project/cockpit.git"
 	KEYWORDS=""
@@ -30,6 +30,7 @@ BDEPEND="
 	>=net-libs/libssh-0.8.5[server]
 	>=sys-apps/systemd-235[policykit]
 	>=sys-auth/polkit-0.105[systemd]
+	virtual/libcrypt
 	doc? (
 		app-text/xmlto
 	)
@@ -77,20 +78,20 @@ src_configure() {
 		"--with-cockpit-user=cockpit-ws"
 		"--with-cockpit-ws-instance-user=cockpit-wsinstance"
 		"--with-cockpit-group=cockpit-ws"
-		"--localstatedir=${ROOT}/var")
+		"--localstatedir=${EPREFIX}/var")
 	econf "${myconf[@]}"
 }
 
-src_install(){
+src_install() {
 	emake DESTDIR="${D}" install || die "emake install failed"
 
-	if ! use selinux ; then
-    	rm -rf "${D}"/usr/share/cockpit/selinux
-    	rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml
-    fi
+	if ! use selinux; then
+		rm -rf "${D}"/usr/share/cockpit/selinux
+		rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml
+	fi
 
-    rm -rf "${D}"/usr/share/cockpit/{packagekit,playground,sosreport}
-    rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
+	rm -rf "${D}"/usr/share/cockpit/{packagekit,playground,sosreport}
+	rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
 
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
