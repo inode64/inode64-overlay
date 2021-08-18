@@ -30,7 +30,6 @@ BDEPEND="
 	>=net-libs/libssh-0.8.5[server]
 	>=sys-apps/systemd-235[policykit]
 	>=sys-auth/polkit-0.105[systemd]
-	virtual/libcrypt
 	doc? (
 		app-text/xmlto
 	)
@@ -62,6 +61,7 @@ RDEPEND="${DEPEND}
 	dev-libs/libgudev
 	net-libs/glib-networking[ssl]
 	virtual/krb5
+	virtual/libcrypt
 "
 
 src_prepare() {
