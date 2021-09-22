@@ -18,11 +18,13 @@ IUSE=""
 RESTRICT="network-sandbox"
 
 GEMS_DEPEND="
-		dev-ruby/eventmachine
+		=dev-ruby/eventmachine-1.0.9.1
 		dev-ruby/mail
 		dev-ruby/rack
 		dev-ruby/sinatra
+		dev-ruby/skinny
 		dev-ruby/sqlite3
+		=www-server/thin-1.5.1
 "
 
 ruby_add_rdepend "${GEMS_DEPEND}"
