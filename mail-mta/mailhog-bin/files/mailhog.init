@@ -10,12 +10,20 @@ logfile=/var/log/${RC_SVCNAME}.log
 
 command="/usr/bin/mailhog-bin"
 command_args="${MAILHOG_OPTS} \
-	--smtp-bind-addr=${MAILHOG_SMTP:=0.0.0.0:1025} \
-	--ui-bind-addr=${MAILHOG_WEB:=0.0.0.0:8025}"
+	-smtp-bind-addr=${MAILHOG_SMTP:=0.0.0.0:1025} \
+	-ui-bind-addr=${MAILHOG_WEB:=0.0.0.0:8025} \
+	-api-bind-addr=${MAILHOG_WEB:=0.0.0.0:8025} \
+"
 command_user="${MAILHOG_USER:-nobody}:${MAILHOG_GROUP:-nobody}"
+command_background="true"
 start_stop_daemon_args="\
 	--stdout=${logfile} \
-	--stderr=${logfile}"
+	--stderr=${logfile} \
+"
+
+start_pre() {
+	checkpath -f -o ${MAILHOG_USER} -m 644 ${logfile}
+}
 
 depend() {
 	need net
