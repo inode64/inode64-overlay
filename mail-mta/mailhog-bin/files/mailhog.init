@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+# Copyright 1999-2021 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="MailHog"
+description="Runs an SMTP server, catches and displays email in a web interface."
+
+pidfile=/run/${RC_SVCNAME}.pid
+logfile=/var/log/${RC_SVCNAME}.log
+
+command="/usr/bin/mailhog-bin"
+command_args="${MAILHOG_OPTS} \
+	--smtp-bind-addr=${MAILHOG_SMTP:=0.0.0.0:1025} \
+	--ui-bind-addr=${MAILHOG_WEB:=0.0.0.0:8025}"
+command_user="${MAILHOG_USER:-nobody}:${MAILHOG_GROUP:-nobody}"
+start_stop_daemon_args="\
+	--stdout=${logfile} \
+	--stderr=${logfile}"
+
+depend() {
+	need net
+}
