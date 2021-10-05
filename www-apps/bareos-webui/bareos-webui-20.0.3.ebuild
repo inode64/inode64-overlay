@@ -17,14 +17,12 @@ SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/Release/${MY_PV}.tar.gz ->
 RESTRICT="mirror"
 
 LICENSE="AGPL-3"
-
 KEYWORDS="~amd64 ~x86"
 
 IUSE="mysql +postgres"
-
 DEPEND=""
 RDEPEND="${DEPEND}
-	dev-lang/php[mysql?,pdo,postgres?]
+	dev-lang/php[bzip2,ctype,curl,fileinfo,filter,gd,iconv,intl,json,mhash,mysql?,nls,pdo,postgres?,session,simplexml,ssl,xml,xmlreader,xmlwriter,zip]
 	virtual/httpd-php
 "
 need_httpd_cgi
@@ -42,19 +40,20 @@ src_install() {
 	webapp_server_configfile nginx "${S}/install/nginx/bareos-webui.conf" bareos-webui.include
 	webapp_server_configfile apache "${S}/install/apache/bareos-webui.conf" bareos-webui.conf
 
-	insinto "${MY_HTDOCSDIR#${EPREFIX}}"
-	pushd "${BUILD_DIR}" > /dev/null || die
-	DESTDIR="${D}/${MY_HTDOCSDIR#${EPREFIX}}" ${CMAKE_MAKEFILE_GENERATOR} install "$@" || die "died running ${CMAKE_MAKEFILE_GENERATOR} install"
-	popd > /dev/null || die
+	insinto "${MY_HTDOCSDIR}"
+	pushd "${BUILD_DIR}" >/dev/null || die
+	DESTDIR="${D}/${MY_HTDOCSDIR}" ${CMAKE_MAKEFILE_GENERATOR} install "$@" || die "died running ${CMAKE_MAKEFILE_GENERATOR} install"
+	popd >/dev/null || die
 
-	webapp_configfile "${MY_HTDOCSDIR#${EPREFIX}}"/bareos-webui/config/application.config.php
-	webapp_configfile "${MY_HTDOCSDIR#${EPREFIX}}"/bareos-webui/config/autoload/global.php
+	mv "${D}/${MY_HTDOCSDIR}"/usr/share/bareos-webui/* "${D}/${MY_HTDOCSDIR}"/
+	rmdir "${D}/${MY_HTDOCSDIR}"/usr/share/bareos-webui
 
-	mv "${D}/${MY_HTDOCSDIR#${EPREFIX}}"/bareos-webui/* "${D}/${MY_HTDOCSDIR#${EPREFIX}}"/
-	rmdir "${D}/${MY_HTDOCSDIR#${EPREFIX}}"/bareos-webui
-	find "${D}/${MY_HTDOCSDIR#${EPREFIX}}" -type f -name '*.in' -delete
+	webapp_configfile "${MY_HTDOCSDIR}"/config/application.config.php
+	webapp_configfile "${MY_HTDOCSDIR}"/config/autoload/global.php
 
-	mv "${D}/${MY_HTDOCSDIR#${EPREFIX}}/etc" "${D}/etc"
+	find "${D}/${MY_HTDOCSDIR}" -type f -name '*.in' -delete
+
+	mv "${D}/${MY_HTDOCSDIR}/etc" "${D}/etc"
 	rm -rf "${D}/etc/httpd"
 
 	webapp_src_install
