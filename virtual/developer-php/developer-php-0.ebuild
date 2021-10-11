@@ -8,7 +8,7 @@ SLOT="${PV}"
 KEYWORDS="~amd64"
 
 RDEPEND="
-		( || dev-util/phpstorm app-editors/vscode)
+		|| ( dev-util/phpstorm app-editors/vscode )
 		dev-lang/php
 		dev-php/composer
 		dev-php/xdebug
