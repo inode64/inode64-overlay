@@ -5,25 +5,25 @@ EAPI=8
 inherit check-reqs
 
 PKG_NAME="DaVinci_Resolve_Studio_${PV}_Linux"
-PKG_HOME="/opt/resolve/${PN}"
+PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
 KEYWORDS="~amd64"
-DESCRIPTION="Professional A/V post-production software suite from Blackmagic Design. Studio edition"
+DESCRIPTION="Professional A/V post-production software suite from Blackmagic Design"
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
-RESTRICT="mirror"
+RESTRICT="mirror strip"
+
+DEPEND="
+		virtual/libcrypt
+"
+RDEPEND="${DEPEND}"
 
 LICENSE=""
-SLOT="17"
+SLOT="0"
 IUSE=""
 
-DOCS=(
-	${PKG_MOUNT}/docs/PDaVinci_Resolve_Manual.pdf
-	${PKG_MOUNT}/docs/ReadMe.html ${PKG_MOUNT}/docs/Welcome.txt
-	"${PKG_MOUNT}/Technical Documentation/DaVinci Remote Panel.txt"
-	"${PKG_MOUNT}/Technical Documentation/User Configuration folders and customization.txt"
-)
+QA_PREBUILT=""
 
 S="${WORKDIR}"
 
@@ -41,4 +41,31 @@ pkg_setup() {
 src_unpack() {
 	default
 	./${PKG_NAME}.run --appimage-extract
+}
+
+src_install() {
+	cd ${PKG_MOUNT}
+	insinto "${PKG_HOME}"
+	doins -r {bin,BlackmagicRAWPlayer,BlackmagicRAWSpeedTest,Control,'DaVinci Control Panels Setup',Fusion,graphics,libs,LUT,Onboarding,plugins,UI_Resource}
+
+	diropts -m 0777
+	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
+
+	fperms +x "${PKG_HOME}/BlackmagicRAWPlayer/BlackmagicRAWPlayer"
+	fperms +x "${PKG_HOME}/BlackmagicRAWSpeedTest/BlackmagicRAWSpeedTest"
+	fperms +x "${PKG_HOME}/DaVinci Control Panels Setup/DaVinci Control Panels Setup"
+	fperms +x "${PKG_HOME}"/LUT/{GenLut,GenOutputLut}
+	fperms +x "${PKG_HOME}/Onboarding/DaVinci_Resolve_Welcome"
+	fperms +x "${PKG_HOME}/Onboarding/libexec/QtWebEngineProcess"
+
+	fperms +x "${PKG_HOME}"/bin/{BMDPanelFirmware,DaVinciPanelDaemon,DaVinciRemoteAdvPanel.sh,DaVinciRemotePanel.sh,OFXLoader,ShowDpxHeader,TestIO,VstScanner,bmdpaneld,libusb-1.0.so.0.1.0,resolve,run_bmdpaneld}
+
+	find -iname *.so*| while read file; do
+		fperms +x "${PKG_HOME}/${file}"
+	done
+
+	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
+	dodoc 'Technical Documentation'/{'DaVinci Remote Panel.txt','User Configuration folders and customization.txt'}
+
+	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
 }
