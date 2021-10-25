@@ -15,7 +15,47 @@ SRC_URI="${PKG_NAME}.zip"
 RESTRICT="mirror strip"
 
 DEPEND="
-		virtual/libcrypt
+		app-arch/brotli
+		app-arch/lz4
+		app-arch/zstd
+		app-crypt/argon2
+		app-crypt/libmd
+		dev-cpp/tbb
+		dev-libs/fribidi
+		dev-libs/glib
+		dev-libs/icu
+		dev-libs/json-c
+		dev-libs/libbsd
+		dev-libs/libgpg-error
+		dev-libs/libltdl
+		dev-libs/libunistring
+		dev-libs/nspr
+		dev-libs/nss
+		dev-libs/ocl-icd
+		dev-libs/xmlsec
+		gnome-base/librsvg
+		media-gfx/graphite2
+		media-libs/alsa-lib
+		media-libs/flac
+		media-libs/harfbuzz
+		media-libs/libogg
+		media-libs/libsndfile
+		media-libs/libvorbis
+		media-libs/opus
+		media-sound/pulseaudio
+		net-dns/libidn2
+		net-libs/libasyncns
+		net-libs/nghttp2
+        sys-apps/dbus
+        virtual/libcrypt4
+        virtual/opengl
+        x11-libs/libX11
+        x11-libs/libxcb
+        x11-libs/libXext
+        x11-libs/libXfixes
+		x11-libs/libXrender
+		x11-libs/libXtst
+		|| ( x11-drivers/nvidia-drivers dev-libs/amdgpu-pro-opencl )
 "
 RDEPEND="${DEPEND}"
 
@@ -45,8 +85,12 @@ src_unpack() {
 
 src_install() {
 	cd ${PKG_MOUNT}
+
 	insinto "${PKG_HOME}"
 	doins -r {bin,BlackmagicRAWPlayer,BlackmagicRAWSpeedTest,Control,'DaVinci Control Panels Setup',Fusion,graphics,libs,LUT,Onboarding,plugins,UI_Resource}
+
+	insinto "${PKG_HOME}"/share
+	doins share/{default-config.dat,default_cm_config.bin,log-conf.xml}
 
 	diropts -m 0777
 	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
