@@ -13,7 +13,7 @@ DESCRIPTION="Professional A/V post-production software suite from Blackmagic Des
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
 RESTRICT="mirror strip"
-IUSE="nvidia amdgpu"
+IUSE="bundled-libs nvidia amdgpu"
 
 DEPEND="
 		amdgpu? ( x11-drivers/amdgpu-pro-opencl )
@@ -22,7 +22,6 @@ DEPEND="
 		app-arch/zstd
 		app-crypt/argon2
 		app-crypt/libmd
-		dev-cpp/tbb
 		dev-libs/fribidi
 		dev-libs/glib
 		dev-libs/icu
@@ -34,7 +33,6 @@ DEPEND="
 		dev-libs/nspr
 		dev-libs/nss
 		dev-libs/ocl-icd
-		dev-libs/xmlsec
 		gnome-base/librsvg
 		media-gfx/graphite2
 		media-libs/alsa-lib
@@ -44,13 +42,13 @@ DEPEND="
 		media-libs/libsndfile
 		media-libs/libvorbis
 		media-libs/opus
-		media-sound/pulseaudio
+		media-sound/pulseaudio[qt5]
 		net-dns/libidn2
 		net-libs/libasyncns
         net-libs/nghttp2
         nvidia? ( x11-drivers/nvidia-drivers )
         sys-apps/dbus
-        virtual/libcrypt4
+        virtual/libcrypt
         virtual/opengl
         x11-libs/libX11
         x11-libs/libxcb
@@ -58,6 +56,17 @@ DEPEND="
 		x11-libs/libXfixes
 		x11-libs/libXrender
 		x11-libs/libXtst
+		!bundled-libs? (
+				dev-cpp/tbb
+				dev-libs/apr
+				dev-libs/xmlsec
+				media-gfx/graphviz[qt5]
+				media-libs/freeglut
+				media-libs/soxr
+				media-sound/id3
+				media-video/ffmpeg
+				net-misc/curl
+		)
 "
 RDEPEND="${DEPEND}"
 
@@ -84,7 +93,19 @@ src_unpack() {
 
 src_prepare() {
 	default
-	sed -i -e "s|RESOLVE_INSTALL_LOCATION|/opt/${PKG_HOME}|g" "${PKG_MOUNT}"/share/*.desktop "${PKG_MOUNT}"/share/*.directory
+	cd ${PKG_MOUNT}
+
+	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory
+
+	# Remove 32bits apps
+	rm LUT/GenOutputLut \
+		LUT/GenLut || die
+
+	if use !bundled-libs; then
+			rm bin/libusb* || die
+			rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
+			rm -rf libs/pkgconfig || die
+	fi
 }
 
 src_install() {
@@ -102,11 +123,13 @@ src_install() {
 	fperms +x "${PKG_HOME}/BlackmagicRAWPlayer/BlackmagicRAWPlayer"
 	fperms +x "${PKG_HOME}/BlackmagicRAWSpeedTest/BlackmagicRAWSpeedTest"
 	fperms +x "${PKG_HOME}/DaVinci Control Panels Setup/DaVinci Control Panels Setup"
-	fperms +x "${PKG_HOME}"/LUT/{GenLut,GenOutputLut}
 	fperms +x "${PKG_HOME}/Onboarding/DaVinci_Resolve_Welcome"
 	fperms +x "${PKG_HOME}/Onboarding/libexec/QtWebEngineProcess"
 
-	fperms +x "${PKG_HOME}"/bin/{BMDPanelFirmware,DaVinciPanelDaemon,DaVinciRemoteAdvPanel.sh,DaVinciRemotePanel.sh,OFXLoader,ShowDpxHeader,TestIO,VstScanner,bmdpaneld,libusb-1.0.so.0.1.0,resolve,run_bmdpaneld}
+	fperms +x "${PKG_HOME}"/bin/{BMDPanelFirmware,DaVinciPanelDaemon,DaVinciRemoteAdvPanel.sh,DaVinciRemotePanel.sh,OFXLoader,ShowDpxHeader,TestIO,VstScanner,bmdpaneld,resolve,run_bmdpaneld}
+	if use bundled-libs; then
+		fperms +x "${PKG_HOME}"/bin/{libusb-1.0.so.0.1.0}
+	fi
 
 	find -iname *.so*| while read file; do
 		fperms +x "${PKG_HOME}/${file}"
@@ -126,8 +149,8 @@ src_install() {
     newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
     newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
 
-#	insinto /usr/share/applications
-#	doins share/*.desktop
+	# todo missing mime file
+	#newmenu share/defaults.lists resolve.lists
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
