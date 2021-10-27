@@ -26,6 +26,7 @@ BDEPEND="dev-util/patchelf"
 COMMON="
 	>=virtual/opencl-3
 	x11-libs/libdrm[libkms]
+	utils? ( dev-util/cunit )
 "
 DEPEND="${COMMON}"
 RDEPEND="${COMMON}
@@ -84,8 +85,8 @@ multilib_src_install() {
 	doins "${T}/${SUPER_PN}-${ABI}.icd"
 
 	if use utils; then
-		insinto "/opt/amdgpu/bin"
-		doins -r opt/amdgpu/bin
+		exeinto "/opt/amdgpu/bin"
+		doexe opt/amdgpu/bin/*
 	fi
 }
 

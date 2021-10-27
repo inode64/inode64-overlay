@@ -8,6 +8,35 @@ PKG_NAME="DaVinci_Resolve_Studio_${PV}_Linux"
 PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
+LIBS_SYM="
+		libcdt.so
+		libcgraph.so
+		libcurl.so
+		libgvc.so
+		libpathplan.so
+		libxdot.so
+		libxmlsec1-openssl.so
+		libxmlsec1.so
+"
+LIBS_REMOVE="
+		libapr*
+		libav*
+		libcdt*
+		libcgraph*
+		libcrypto*
+		libcurl*
+		libglut*
+		libgvc.so*
+		libid3*
+		libpathplan*
+		libsoxr*
+		libssl*
+		libtbbmalloc*
+		libxcb*
+		libxdot*
+		libxmlsec*
+"
+
 KEYWORDS="~amd64"
 DESCRIPTION="Professional A/V post-production software suite from Blackmagic Design"
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
@@ -103,7 +132,7 @@ src_prepare() {
 
 	if use !bundled-libs; then
 		rm bin/libusb* || die
-		rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
+		rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libid3*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
 		rm -rf libs/pkgconfig || die
 	fi
 }
@@ -116,9 +145,6 @@ src_install() {
 
 	insinto "${PKG_HOME}"/share
 	doins share/{default-config.dat,default_cm_config.bin,log-conf.xml}
-
-	diropts -m 0777
-	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
 
 	fperms +x "${PKG_HOME}/BlackmagicRAWPlayer/BlackmagicRAWPlayer"
 	fperms +x "${PKG_HOME}/BlackmagicRAWSpeedTest/BlackmagicRAWSpeedTest"
@@ -138,8 +164,6 @@ src_install() {
 	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
 	dodoc 'Technical Documentation'/{'DaVinci Remote Panel.txt','User Configuration folders and customization.txt'}
 
-	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
-
 	insinto "$(get_udevdir)"/rules.d
 	doins share/etc/udev/rules.d/*.rules
 
@@ -149,7 +173,7 @@ src_install() {
 	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
 	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
 
-	newmenu "${FILESDIR}"/defaults.lists com.blackmagicdesign.lists
+	newmenu "${FILESDIR}"/defaults.list com.blackmagicdesign.list
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
@@ -159,6 +183,14 @@ src_install() {
 
 	insinto /usr/share/mime/packages/
 	doins share/{blackmagicraw.xml,resolve.xml}
+
+	diropts -m 0777
+	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
+	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
+
+	for _lib in "${LIBS_SYM}"; do
+		dosym -r "/usr/$(get_libdir)/${_lib}" "${PKG_HOME}/lib/${_lib}"
+	done
 }
 
 pkg_preinst() {
