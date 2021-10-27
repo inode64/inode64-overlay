@@ -1,0 +1,5 @@
+[Default Applications]
+application/x-resolveproj=com.blackmagicdesign.resolve.desktop
+application/x-resolvebin=com.blackmagicdesign.resolve.desktop
+application/x-resolvetimeline=com.blackmagicdesign.resolve.desktop
+application/x-resolvetemplatebundle=com.blackmagicdesign.resolve.desktop
