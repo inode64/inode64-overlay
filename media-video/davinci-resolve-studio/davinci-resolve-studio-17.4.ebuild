@@ -70,7 +70,7 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
-LICENSE=""
+LICENSE="Blackmagic"
 SLOT="0"
 
 S="${WORKDIR}"
