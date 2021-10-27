@@ -16,7 +16,7 @@ RESTRICT="mirror strip"
 IUSE="bundled-libs nvidia amdgpu"
 
 DEPEND="
-		amdgpu? ( x11-drivers/amdgpu-pro-opencl )
+		amdgpu? ( dev-libs/amdgpu-pro-opencl )
 		app-arch/brotli
 		app-arch/lz4
 		app-arch/zstd
