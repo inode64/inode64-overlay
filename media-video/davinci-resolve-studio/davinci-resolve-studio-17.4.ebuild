@@ -45,13 +45,13 @@ DEPEND="
 		media-sound/pulseaudio[qt5]
 		net-dns/libidn2
 		net-libs/libasyncns
-        net-libs/nghttp2
-        nvidia? ( x11-drivers/nvidia-drivers )
-        sys-apps/dbus
-        virtual/libcrypt
-        virtual/opengl
-        x11-libs/libX11
-        x11-libs/libxcb
+		net-libs/nghttp2
+		nvidia? ( x11-drivers/nvidia-drivers )
+		sys-apps/dbus
+		virtual/libcrypt
+		virtual/opengl
+		x11-libs/libX11
+		x11-libs/libxcb
 		x11-libs/libXext
 		x11-libs/libXfixes
 		x11-libs/libXrender
@@ -149,7 +149,7 @@ src_install() {
 	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
 	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
 
-	newmenu ${FILESDIR}/defaults.lists com.blackmagicdesign.lists
+	newmenu "${FILESDIR}"/defaults.lists com.blackmagicdesign.lists
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
