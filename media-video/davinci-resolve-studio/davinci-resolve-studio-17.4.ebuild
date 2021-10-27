@@ -102,9 +102,9 @@ src_prepare() {
 		LUT/GenLut || die
 
 	if use !bundled-libs; then
-			rm bin/libusb* || die
-			rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
-			rm -rf libs/pkgconfig || die
+		rm bin/libusb* || die
+		rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
+		rm -rf libs/pkgconfig || die
 	fi
 }
 
@@ -131,7 +131,7 @@ src_install() {
 		fperms +x "${PKG_HOME}"/bin/{libusb-1.0.so.0.1.0}
 	fi
 
-	find -iname *.so*| while read file; do
+	find -iname *.so* | while read file; do
 		fperms +x "${PKG_HOME}/${file}"
 	done
 
@@ -143,14 +143,13 @@ src_install() {
 	insinto "$(get_udevdir)"/rules.d
 	doins share/etc/udev/rules.d/*.rules
 
-    newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
-    newmenu share/DaVinciResolve.desktop com.blackmagicdesign.resolve.desktop
-    newmenu share/DaVinciResolveCaptureLogs.desktop com.blackmagicdesign.resolve-CaptureLogs.desktop
-    newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
-    newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
+	newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
+	newmenu share/DaVinciResolve.desktop com.blackmagicdesign.resolve.desktop
+	newmenu share/DaVinciResolveCaptureLogs.desktop com.blackmagicdesign.resolve-CaptureLogs.desktop
+	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
+	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
 
-	# todo missing mime file
-	#newmenu share/defaults.lists resolve.lists
+	newmenu ${FILESDIR}/defaults.lists com.blackmagicdesign.lists
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
@@ -163,14 +162,14 @@ src_install() {
 }
 
 pkg_preinst() {
-        xdg_pkg_preinst
+	xdg_pkg_preinst
 }
 
 pkg_postinst() {
-		udev_reload
-        xdg_pkg_postinst
+	udev_reload
+	xdg_pkg_postinst
 }
 
 pkg_postrm() {
-        xdg_pkg_postrm
+	xdg_pkg_postrm
 }
