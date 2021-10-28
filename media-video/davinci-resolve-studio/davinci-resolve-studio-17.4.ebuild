@@ -9,32 +9,39 @@ PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
 LIBS_SYM="
+		libapr-1.so
+		libaprutil-1.so
 		libcdt.so
 		libcgraph.so
+		libcrypto.so.1.1
 		libcurl.so
+		libglut.so.3
 		libgvc.so
 		libpathplan.so
+		libsoxr.so
+		libssl.so.1.1
+		libtbbmalloc.so.2
+		libtbbmalloc_proxy.so.2
+		libxcb-icccm.so.4
+		libxcb-image.so.0
+		libxcb-keysyms.so.1
+		libxcb-randr.so.0
+		libxcb-render-util.so.0
+		libxcb-render.so.0
+		libxcb-shape.so.0
+		libxcb-shm.so.0
+		libxcb-sync.so.1
+		libxcb-util.so.1
+		libxcb-xfixes.so.0
+		libxcb-xinerama.so.0
+		libxcb-xinput.so.0
+		libxcb-xkb.so.1
+		libxcb.so.1
 		libxdot.so
 		libxmlsec1-openssl.so
 		libxmlsec1.so
-"
-LIBS_REMOVE="
-		libapr*
-		libav*
-		libcdt*
-		libcgraph*
-		libcrypto*
-		libcurl*
-		libglut*
-		libgvc.so*
-		libid3*
-		libpathplan*
-		libsoxr*
-		libssl*
-		libtbbmalloc*
-		libxcb*
-		libxdot*
-		libxmlsec*
+		graphviz/libgvplugin_core.so.6.0.0
+		graphviz/libgvplugin_dot_layout.so.6
 "
 
 KEYWORDS="~amd64"
@@ -71,7 +78,7 @@ DEPEND="
 		media-libs/libsndfile
 		media-libs/libvorbis
 		media-libs/opus
-		media-sound/pulseaudio[qt5]
+		media-sound/pulseaudio
 		net-dns/libidn2
 		net-libs/libasyncns
 		net-libs/nghttp2
@@ -92,8 +99,6 @@ DEPEND="
 				media-gfx/graphviz[qt5]
 				media-libs/freeglut
 				media-libs/soxr
-				media-sound/id3
-				media-video/ffmpeg
 				net-misc/curl
 		)
 "
@@ -132,7 +137,9 @@ src_prepare() {
 
 	if use !bundled-libs; then
 		rm bin/libusb* || die
-		rm libs/{libapr*,libav*,libcrypto*,libcurl*,libglut*,libid3*,libsoxr*,libssl*,libtbbmalloc*,libxcb*,libxmlsec*} || die
+		for _lib in ${LIBS_SYM}; do
+			rm libs/${_lib} || die
+		done
 		rm -rf libs/pkgconfig || die
 	fi
 }
@@ -157,9 +164,9 @@ src_install() {
 		fperms +x "${PKG_HOME}"/bin/{libusb-1.0.so.0.1.0}
 	fi
 
-	find -iname *.so* | while read file; do
-		fperms +x "${PKG_HOME}/${file}"
-	done
+	#find -iname *.so* | while read file; do
+	#	fperms +x "${PKG_HOME}/${file}"
+	#done
 
 	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
 	dodoc 'Technical Documentation'/{'DaVinci Remote Panel.txt','User Configuration folders and customization.txt'}
@@ -188,9 +195,12 @@ src_install() {
 	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
 
-	for _lib in "${LIBS_SYM}"; do
-		dosym -r "/usr/$(get_libdir)/${_lib}" "${PKG_HOME}/lib/${_lib}"
-	done
+	if use !bundled-libs; then
+		dosym -r /usr/$(get_libdir)/libusb-1.0.so.0.1.0 ${PKG_HOME}/bin/libusb-1.0.so.0.1.0
+		for _lib in ${LIBS_SYM}; do
+			dosym -r /usr/$(get_libdir)/${_lib} ${PKG_HOME}/libs/${_lib}
+		done
+	fi
 }
 
 pkg_preinst() {
