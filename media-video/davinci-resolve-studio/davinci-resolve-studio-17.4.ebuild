@@ -41,7 +41,7 @@ LIBS_SYM="
 		libxmlsec1-openssl.so
 		libxmlsec1.so
 		graphviz/libgvplugin_core.so.6.0.0
-		graphviz/libgvplugin_dot_layout.so.6
+		graphviz/libgvplugin_dot_layout.so.6.0.0
 "
 
 KEYWORDS="~amd64"
@@ -49,7 +49,7 @@ DESCRIPTION="Professional A/V post-production software suite from Blackmagic Des
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
 RESTRICT="mirror strip"
-IUSE="bundled-libs nvidia amdgpu"
+IUSE="bundled-libs nvidia amdgpu developer"
 
 DEPEND="
 		amdgpu? ( dev-libs/amdgpu-pro-opencl )
@@ -96,7 +96,7 @@ DEPEND="
 				dev-cpp/tbb
 				dev-libs/apr
 				dev-libs/xmlsec
-				media-gfx/graphviz[qt5]
+				media-gfx/graphviz
 				media-libs/freeglut
 				media-libs/soxr
 				net-misc/curl
@@ -108,6 +108,22 @@ LICENSE="Blackmagic"
 SLOT="0"
 
 S="${WORKDIR}"
+
+include_dir() {
+	local _dir
+	local exe
+
+	_dir="$1"
+
+	doins -r "${_dir}"
+	# Set permissions for executables and libraries
+	find "${_dir}" -type f -name "*.so" | while read exe; do
+		fperms +x "${PKG_HOME}"/"${exe}"
+	done
+	find "${_dir}" -type f -executable | while read exe; do
+		fperms +x "${PKG_HOME}"/"${exe}"
+	done
+}
 
 pkg_pretend() {
 	CHECKREQS_DISK_BUILD="13G"
@@ -122,6 +138,8 @@ pkg_setup() {
 
 src_unpack() {
 	default
+
+	# Extract the archive from squashfs
 	./${PKG_NAME}.run --appimage-extract
 }
 
@@ -129,12 +147,14 @@ src_prepare() {
 	default
 	cd ${PKG_MOUNT}
 
+	# Set installation directory
 	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory
 
 	# Remove 32bits apps
 	rm LUT/GenOutputLut \
 		LUT/GenLut || die
 
+	# Revemo bundled libraries
 	if use !bundled-libs; then
 		rm bin/libusb* || die
 		for _lib in ${LIBS_SYM}; do
@@ -142,45 +162,36 @@ src_prepare() {
 		done
 		rm -rf libs/pkgconfig || die
 	fi
+
+	# Remove license files
+	rm "BlackmagicRAWSpeedTest/Third Party Licenses.rtf"
+	rm "BlackmagicRAWPlayer/Third Party Licenses.rtf"
+
+	# Fix categories
+	sed -i -e 's|=Video|=AudioVideo|g' share/*.desktop
 }
 
 src_install() {
 	cd ${PKG_MOUNT}
 
 	insinto "${PKG_HOME}"
-	doins -r {bin,BlackmagicRAWPlayer,BlackmagicRAWSpeedTest,Control,'DaVinci Control Panels Setup',Fusion,graphics,libs,LUT,Onboarding,plugins,UI_Resource}
+	local _dir
+	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Control "DaVinci Control Panels Setup" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
+		include_dir "${_dir}"
+	done
+
+	if use developer; then
+		include_dir Developer
+	fi
 
 	insinto "${PKG_HOME}"/share
 	doins share/{default-config.dat,default_cm_config.bin,log-conf.xml}
 
-	fperms +x "${PKG_HOME}/BlackmagicRAWPlayer/BlackmagicRAWPlayer"
-	fperms +x "${PKG_HOME}/BlackmagicRAWSpeedTest/BlackmagicRAWSpeedTest"
-	fperms +x "${PKG_HOME}/DaVinci Control Panels Setup/DaVinci Control Panels Setup"
-	fperms +x "${PKG_HOME}/Onboarding/DaVinci_Resolve_Welcome"
-	fperms +x "${PKG_HOME}/Onboarding/libexec/QtWebEngineProcess"
-
-	fperms +x "${PKG_HOME}"/bin/{BMDPanelFirmware,DaVinciPanelDaemon,DaVinciRemoteAdvPanel.sh,DaVinciRemotePanel.sh,OFXLoader,ShowDpxHeader,TestIO,VstScanner,bmdpaneld,resolve,run_bmdpaneld}
-	if use bundled-libs; then
-		fperms +x "${PKG_HOME}"/bin/{libusb-1.0.so.0.1.0}
-	fi
-
-	#find -iname *.so* | while read file; do
-	#	fperms +x "${PKG_HOME}/${file}"
-	#done
-
 	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
-	dodoc 'Technical Documentation'/{'DaVinci Remote Panel.txt','User Configuration folders and customization.txt'}
+	dodoc "Technical Documentation"/{"DaVinci Remote Panel.txt","User Configuration folders and customization.txt"}
 
 	insinto "$(get_udevdir)"/rules.d
 	doins share/etc/udev/rules.d/*.rules
-
-	newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
-	newmenu share/DaVinciResolve.desktop com.blackmagicdesign.resolve.desktop
-	newmenu share/DaVinciResolveCaptureLogs.desktop com.blackmagicdesign.resolve-CaptureLogs.desktop
-	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
-	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
-
-	newmenu "${FILESDIR}"/defaults.list com.blackmagicdesign.list
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
@@ -196,11 +207,46 @@ src_install() {
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
 
 	if use !bundled-libs; then
-		dosym -r /usr/$(get_libdir)/libusb-1.0.so.0.1.0 ${PKG_HOME}/bin/libusb-1.0.so.0.1.0
+		dosym -r /usr/$(get_libdir)/libusb-1.0.so ${PKG_HOME}/bin/libusb-1.0.so
 		for _lib in ${LIBS_SYM}; do
 			dosym -r /usr/$(get_libdir)/${_lib} ${PKG_HOME}/libs/${_lib}
 		done
 	fi
+
+	# Install desktop shortcut
+	newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
+	newmenu share/DaVinciResolve.desktop com.blackmagicdesign.resolve.desktop
+	newmenu share/DaVinciResolveCaptureLogs.desktop com.blackmagicdesign.resolve-CaptureLogs.desktop
+	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
+	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
+
+	newmenu "${FILESDIR}"/defaults.list com.blackmagicdesign.list
+
+	# Installing Application icons
+	newicon -s 64 graphics/DV_Resolve.png  DaVinci-Resolve.png
+	newicon -s 64 graphics/DV_ResolveProj.png DaVinci-ResolveProj.png
+	newicon -s 64 graphics/DV_ServerAccess.png DaVinci-ResolveDbKey.png
+	newicon -s 48 graphics/blackmagicraw-speedtest_48x48_apps.png blackmagicraw-speedtest.png
+	newicon -s 48 graphics/blackmagicraw-player_48x48_apps.png blackmagicraw-player.png
+	newicon -s 48 -c mimetypes graphics/application-x-braw-clip_48x48_mimetypes.png application-x-braw-clip.png
+	newicon -s 48 -c mimetypes graphics/
+
+
+    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_Resolve.png"        DaVinci-Resolve 2>&1 >> /dev/null
+    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_ResolveProj.png"    DaVinci-ResolveProj 2>&1 >> /dev/null
+    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_ServerAccess.png"   DaVinci-ResolveDbKey 2>&1 >> /dev/null
+
+    xdg-icon-resource install --size 48 "${INSTALL_DIR}/graphics/blackmagicraw-speedtest_48x48_apps.png"    blackmagicraw-speedtest 2>&1 >> /dev/null
+    xdg-icon-resource install --size 48 "${INSTALL_DIR}/graphics/blackmagicraw-player_48x48_apps.png"    blackmagicraw-player 2>&1 >> /dev/null
+    xdg-icon-resource install --size 48 --context mimetypes "${INSTALL_DIR}/graphics/application-x-braw-clip_48x48_mimetypes.png" application-x-braw-clip 2>&1  >> /dev/null
+
+    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveBin.png" application-x-resolvebin 2>&1  >> /dev/null
+    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveProj.png" application-x-resolveproj 2>&1  >> /dev/null
+    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveTimeline.png" application-x-resolvetimeline 2>&1  >> /dev/null
+    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ServerAccess.png" application-x-resolvedbkey 2>&1  >> /dev/null
+    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_TemplateBundle.png" application-x-resolvetemplatebundle 2>&1  >> /dev/null
+
+
 }
 
 pkg_preinst() {
