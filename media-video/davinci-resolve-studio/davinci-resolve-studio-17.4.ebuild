@@ -9,6 +9,8 @@ PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
 LIBS_SYM="
+		graphviz/libgvplugin_core.so.6.0.0
+		graphviz/libgvplugin_dot_layout.so.6.0.0
 		libapr-1.so
 		libaprutil-1.so
 		libcdt.so
@@ -40,8 +42,6 @@ LIBS_SYM="
 		libxdot.so
 		libxmlsec1-openssl.so
 		libxmlsec1.so
-		graphviz/libgvplugin_core.so.6.0.0
-		graphviz/libgvplugin_dot_layout.so.6.0.0
 "
 
 KEYWORDS="~amd64"
@@ -49,7 +49,7 @@ DESCRIPTION="Professional A/V post-production software suite from Blackmagic Des
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
 RESTRICT="mirror strip"
-IUSE="bundled-libs nvidia amdgpu developer"
+IUSE="amdgpu bundled-libs developer nvidia"
 
 DEPEND="
 		amdgpu? ( dev-libs/amdgpu-pro-opencl )
@@ -87,11 +87,11 @@ DEPEND="
 		virtual/libcrypt
 		virtual/opengl
 		x11-libs/libX11
-		x11-libs/libxcb
 		x11-libs/libXext
 		x11-libs/libXfixes
 		x11-libs/libXrender
 		x11-libs/libXtst
+		x11-libs/libxcb
 		!bundled-libs? (
 				dev-cpp/tbb
 				dev-libs/apr
@@ -226,27 +226,16 @@ src_install() {
 	newicon -s 64 graphics/DV_Resolve.png  DaVinci-Resolve.png
 	newicon -s 64 graphics/DV_ResolveProj.png DaVinci-ResolveProj.png
 	newicon -s 64 graphics/DV_ServerAccess.png DaVinci-ResolveDbKey.png
+
 	newicon -s 48 graphics/blackmagicraw-speedtest_48x48_apps.png blackmagicraw-speedtest.png
 	newicon -s 48 graphics/blackmagicraw-player_48x48_apps.png blackmagicraw-player.png
-	newicon -s 48 -c mimetypes graphics/application-x-braw-clip_48x48_mimetypes.png application-x-braw-clip.png
-	newicon -s 48 -c mimetypes graphics/
+	newicon -s 48 -c mimetypes graphics/application-x-braw-clip_48x48_mimetypes.png application-x-braw-clip
 
-
-    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_Resolve.png"        DaVinci-Resolve 2>&1 >> /dev/null
-    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_ResolveProj.png"    DaVinci-ResolveProj 2>&1 >> /dev/null
-    xdg-icon-resource install --size 64 "${INSTALL_DIR}/graphics/DV_ServerAccess.png"   DaVinci-ResolveDbKey 2>&1 >> /dev/null
-
-    xdg-icon-resource install --size 48 "${INSTALL_DIR}/graphics/blackmagicraw-speedtest_48x48_apps.png"    blackmagicraw-speedtest 2>&1 >> /dev/null
-    xdg-icon-resource install --size 48 "${INSTALL_DIR}/graphics/blackmagicraw-player_48x48_apps.png"    blackmagicraw-player 2>&1 >> /dev/null
-    xdg-icon-resource install --size 48 --context mimetypes "${INSTALL_DIR}/graphics/application-x-braw-clip_48x48_mimetypes.png" application-x-braw-clip 2>&1  >> /dev/null
-
-    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveBin.png" application-x-resolvebin 2>&1  >> /dev/null
-    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveProj.png" application-x-resolveproj 2>&1  >> /dev/null
-    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ResolveTimeline.png" application-x-resolvetimeline 2>&1  >> /dev/null
-    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_ServerAccess.png" application-x-resolvedbkey 2>&1  >> /dev/null
-    xdg-icon-resource install --size 64 --context mimetypes "${INSTALL_DIR}/graphics/DV_TemplateBundle.png" application-x-resolvetemplatebundle 2>&1  >> /dev/null
-
-
+	newicon -s 64 -c mimetypes graphics/DV_ResolveBin.png application-x-resolvebin
+	newicon -s 64 -c mimetypes graphics/DV_ResolveProj.png application-x-resolveproj
+	newicon -s 64 -c mimetypes graphics/DV_ResolveTimeline.png application-x-resolvetimeline
+	newicon -s 64 -c mimetypes graphics/DV_ServerAccess.png application-x-resolvedbkey
+	newicon -s 64 -c mimetypes graphics/DV_TemplateBundle.png application-x-resolvetemplatebundle
 }
 
 pkg_preinst() {
