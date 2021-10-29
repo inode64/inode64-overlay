@@ -223,19 +223,26 @@ src_install() {
 	newmenu "${FILESDIR}"/defaults.list com.blackmagicdesign.list
 
 	# Installing Application icons
-	newicon -s 64 graphics/DV_Resolve.png  DaVinci-Resolve.png
-	newicon -s 64 graphics/DV_ResolveProj.png DaVinci-ResolveProj.png
-	newicon -s 64 graphics/DV_ServerAccess.png DaVinci-ResolveDbKey.png
+	local res
+	for res in 64 128; do
+		newicon -s ${res} graphics/DV_Resolve.png  DaVinci-Resolve.png
+    	newicon -s ${res} graphics/DV_ResolveProj.png DaVinci-ResolveProj.png
+    	newicon -s ${res} graphics/DV_ServerAccess.png DaVinci-ResolveDbKey.png
+	done
 
-	newicon -s 48 graphics/blackmagicraw-speedtest_48x48_apps.png blackmagicraw-speedtest.png
-	newicon -s 48 graphics/blackmagicraw-player_48x48_apps.png blackmagicraw-player.png
-	newicon -s 48 -c mimetypes graphics/application-x-braw-clip_48x48_mimetypes.png application-x-braw-clip
+	for res in 48 256; do
+		newicon -s ${res} graphics/blackmagicraw-speedtest_${res}x${res}_apps.png blackmagicraw-speedtest.png
+		newicon -s ${res} graphics/blackmagicraw-player_${res}x${res}_apps.png blackmagicraw-player.png
+		newicon -s ${res} -c mimetypes graphics/application-x-braw-clip_${res}x${res}_mimetypes.png application-x-braw-clip
+	done
 
-	newicon -s 64 -c mimetypes graphics/DV_ResolveBin.png application-x-resolvebin
-	newicon -s 64 -c mimetypes graphics/DV_ResolveProj.png application-x-resolveproj
-	newicon -s 64 -c mimetypes graphics/DV_ResolveTimeline.png application-x-resolvetimeline
-	newicon -s 64 -c mimetypes graphics/DV_ServerAccess.png application-x-resolvedbkey
-	newicon -s 64 -c mimetypes graphics/DV_TemplateBundle.png application-x-resolvetemplatebundle
+	for res in 64 128; do
+		newicon -s ${res} -c mimetypes graphics/DV_ResolveBin.png application-x-resolvebin
+		newicon -s ${res} -c mimetypes graphics/DV_ResolveProj.png application-x-resolveproj
+		newicon -s ${res} -c mimetypes graphics/DV_ResolveTimeline.png application-x-resolvetimeline
+		newicon -s ${res} -c mimetypes graphics/DV_ServerAccess.png application-x-resolvedbkey
+		newicon -s ${res} -c mimetypes graphics/DV_TemplateBundle.png application-x-resolvetemplatebundle
+	done
 }
 
 pkg_preinst() {
