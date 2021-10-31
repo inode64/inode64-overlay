@@ -1,6 +1,10 @@
 # Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# TODO:
+#	remove qt5 library in bundled mode (numerous errors and coredumps to open applications)
+#	Panel Daemon is don't installed
+
 EAPI=8
 inherit check-reqs desktop udev xdg
 
@@ -8,72 +12,6 @@ PKG_NAME="DaVinci_Resolve_Studio_${PV}_Linux"
 PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
-LIBS_SYM_QT="
-	BlackmagicRAWPlayer/lib/libQt5Core.so.5
-	BlackmagicRAWPlayer/lib/libQt5DBus.so.5
-	BlackmagicRAWPlayer/lib/libQt5Gui.so.5
-	BlackmagicRAWPlayer/lib/libQt5Multimedia.so.5
-	BlackmagicRAWPlayer/lib/libQt5Network.so.5
-	BlackmagicRAWPlayer/lib/libQt5Widgets.so.5
-	BlackmagicRAWPlayer/lib/libQt5XcbQpa.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5Core.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5DBus.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5Gui.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5Multimedia.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5Network.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5Widgets.so.5
-	BlackmagicRAWSpeedTest/lib/libQt5XcbQpa.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libQt5Core.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libQt5Gui.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libQt5Network.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libQt5Widgets.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libQt5Core.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libQt5Gui.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libQt5Network.so.5
-	DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libQt5Widgets.so.5
-	DaVinci Control Panels Setup/libQt5Core.so.5
-	DaVinci Control Panels Setup/libQt5DBus.so.5
-	DaVinci Control Panels Setup/libQt5Gui.so.5
-	DaVinci Control Panels Setup/libQt5Network.so.5
-	DaVinci Control Panels Setup/libQt5Widgets.so.5
-	DaVinci Control Panels Setup/libQt5XcbQpa.so.5
-	Onboarding/lib/libQt5Core.so.5
-	Onboarding/lib/libQt5DBus.so.5
-	Onboarding/lib/libQt5Gui.so.5
-	Onboarding/lib/libQt5Network.so.5
-	Onboarding/lib/libQt5Positioning.so.5
-	Onboarding/lib/libQt5Qml.so.5
-	Onboarding/lib/libQt5Quick.so.5
-	Onboarding/lib/libQt5WebChannel.so.5
-	Onboarding/lib/libQt5WebEngine.so.5
-	Onboarding/lib/libQt5WebEngineCore.so.5
-	Onboarding/lib/libQt5WebEngineWidgets.so.5
-	Onboarding/lib/libQt5WebSockets.so.5
-	Onboarding/lib/libQt5Widgets.so.5
-	Onboarding/lib/libQt5XcbQpa.so.5
-	libs/libQt5Concurrent.so.5
-	libs/libQt5Core.so.5
-	libs/libQt5DBus.so.5
-	libs/libQt5Gui.so.5
-	libs/libQt5Multimedia.so.5
-	libs/libQt5Network.so.5
-	libs/libQt5OpenGL.so.5
-	libs/libQt5Sql.so.5
-	libs/libQt5Svg.so.5
-	libs/libQt5WebSockets.so.5
-	libs/libQt5Widgets.so.5
-	libs/libQt5X11Extras.so.5
-	libs/libQt5XcbQpa.so.5
-	libs/libQt5Xml.so.5
-	libs/libQt5XmlPatterns.so.5
-"
-LIBS_SYM_QT_PLUGINS="
-	DaVinci Control Panels Setup/plugins
-	Onboarding/plugins
-	BlackmagicRAWSpeedTest/plugins
-	libs/plugins
-	BlackmagicRAWPlayer/plugins
-"
 LIBS_SYM="
 	DaVinci Control Panels Setup/libavahi-client.so.3
 	DaVinci Control Panels Setup/libavahi-common.so.3
@@ -164,14 +102,6 @@ DEPEND="
 		dev-cpp/tbb
 		dev-libs/apr
 		dev-libs/xmlsec
-		dev-qt/qtimageformats
-		dev-qt/qtmultimedia
-		dev-qt/qtnetwork[connman]
-		dev-qt/qtpositioning
-		dev-qt/qtsingleapplication
-		dev-qt/qtwebengine
-		dev-qt/qtwebsockets
-		dev-qt/qtxmlpatterns
 		media-gfx/graphviz
 		media-libs/freeglut
 		media-libs/soxr
@@ -234,22 +164,15 @@ src_prepare() {
 	# Remove bundled libraries
 	if use !bundled-libs; then
 		local remove
-		echo "${LIBS_SYM} ${LIBS_SYM_QT}" | while read remove; do
+		echo "${LIBS_SYM}" | while read remove; do
 			if [ "${remove}" ]; then
 				rm "${remove}" || die
-			fi
-		done
-		echo "${LIBS_SYM_QT_PLUGINS}" | while read remove; do
-			if [ "${remove}" ]; then
-				rm -rf "${remove}" || die
 			fi
 		done
 
 		rm -rf libs/pkgconfig || die
 
 		# remove some libraries
-		rm libs/libQtSingleApplication_debug.so || die
-		rm libs/libQtSingleApplication.so || die
 		rm libs/libsoxr.so* || die
 
 		rm	libs/graphviz/libgvplugin_core.so.6.0.0 || die
@@ -317,18 +240,7 @@ src_install() {
 				dosym -r "/usr/$(get_libdir)/${_libname}" "${PKG_HOME}/${_lib}" || die
 			fi
 		done
-		echo "${LIBS_SYM_QT}" | while read _lib; do
-			if [ "${_lib}" ]; then
-				_libname=$(basename "${_lib}")
-				dosym -r "/usr/$(get_libdir)/${_libname}" "${PKG_HOME}/${_lib}" || die
-			fi
-		done
-		echo "${LIBS_SYM_QT_PLUGINS}" | while read _lib; do
-			if [ "${_lib}" ]; then
-				dosym -r "/usr/$(get_libdir)/qt5/plugins" "${PKG_HOME}/${_lib}" || die
-			fi
-		done
-		dosym -r /usr/$(get_libdir)/libQt5Solutions_SingleApplication-2.6.so.1.0.0 "${PKG_HOME}"/libs/libQtSingleApplication.so || die
+
 		dosym -r /usr/$(get_libdir)/libsoxr.so "${PKG_HOME}"/libs/libsoxr.so || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0 "${PKG_HOME}"/libs/libsoxr.so.0 || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0.1.2 "${PKG_HOME}"/libs/libsoxr.so.0.1.3 || die
