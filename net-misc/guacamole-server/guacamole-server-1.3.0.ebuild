@@ -20,7 +20,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="encode pulseaudio rdp ssh telnet vnc vorbis webp"
 REQUIRED_USE="pulseaudio? ( vnc )"
 RDEPEND="
-	<app-text/ghostscript-gpl-9.54[-X]
+	<app-text/ghostscript-gpl-9.54.0[-X]
 	net-analyzer/openbsd-netcat
 	ssh? (
 		media-fonts/dejavu
