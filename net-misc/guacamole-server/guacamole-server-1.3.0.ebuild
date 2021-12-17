@@ -17,10 +17,10 @@ fi
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="encode pulseaudio rdp ssh telnet vnc vorbis webp"
+IUSE="encode print pulseaudio rdp ssh telnet vnc vorbis webp"
 REQUIRED_USE="pulseaudio? ( vnc )"
 RDEPEND="
-	<app-text/ghostscript-gpl-9.54.0[-X]
+	print? ( =app-text/ghostscript-gpl-9.53.3-r5[-X] )
 	net-analyzer/openbsd-netcat
 	ssh? (
 		media-fonts/dejavu
@@ -39,7 +39,7 @@ DEPEND="${RDEPEND}
 	virtual/jpeg:0
 	dev-libs/ossp-uuid
 	encode? ( media-video/ffmpeg )
-	rdp? ( <net-misc/freerdp-2.3.0 )
+	rdp? ( net-misc/freerdp )
 	ssh? (
 		net-libs/libssh2
 		x11-libs/pango )
@@ -57,6 +57,7 @@ DEPEND="${RDEPEND}
 PATCHES=(
 	# From https://issues.apache.org/jira/browse/GUACAMOLE-997
 	"${FILESDIR}"/rdp-read-request.diff
+	"${FILESDIR}"/VerifyCertificateEx.path
 )
 
 src_prepare() {
@@ -70,6 +71,10 @@ src_configure() {
 
 	if use ssh || use telnet; then
 		myconf="--with-terminal --with-pango"
+	fi
+
+	if use rdp; then
+		myconf="--enable-allow-freerdp-snapshots"
 	fi
 
 	econf ${myconf} \
