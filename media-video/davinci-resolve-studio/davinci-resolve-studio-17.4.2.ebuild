@@ -23,7 +23,6 @@ LIBS_SYM="
 	libs/libcgraph.so.6.0.0
 	libs/libcrypto.so.1.1
 	libs/libcurl.so
-	libs/libglut.so.3
 	libs/libgvc.so.6.0.0
 	libs/libgvpr.so.2.0.0
 	libs/libpathplan.so.4.0.0
