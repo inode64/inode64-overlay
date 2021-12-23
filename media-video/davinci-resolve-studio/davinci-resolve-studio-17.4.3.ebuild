@@ -178,7 +178,8 @@ src_prepare() {
 		# remove some libraries
 		rm libs/libsoxr.so* || die
 
-		rm -rf libs/graphviz || die
+		rm libs/graphviz/libgvplugin_core.so.6.0.0 || die
+		rm libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
 
 		rm "DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libusb-1.0.so.0" || die
 		rm "DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libusb-1.0.so.0" || die
@@ -246,7 +247,8 @@ src_install() {
 		dosym -r /usr/$(get_libdir)/libsoxr.so "${PKG_HOME}"/libs/libsoxr.so || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0 "${PKG_HOME}"/libs/libsoxr.so.0 || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0.1.2 "${PKG_HOME}"/libs/libsoxr.so.0.1.3 || die
-		dosym -r /usr/$(get_libdir)/graphviz "${PKG_HOME}"/libs/graphviz || die
+        dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0	"${PKG_HOME}"/libs/graphviz/libgvplugin_core.so.6.0.0 || die
+        dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0 "${PKG_HOME}"/libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
 	fi
 
 	# Install desktop shortcut
