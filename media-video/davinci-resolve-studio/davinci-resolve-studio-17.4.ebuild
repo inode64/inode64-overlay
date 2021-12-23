@@ -163,7 +163,6 @@ src_prepare() {
 		LUT/GenLut \
 		BlackmagicRAWPlayer/BlackmagicRawAPI/libgcc_s.so.1 \
 		BlackmagicRAWSpeedTest/BlackmagicRawAPI/libgcc_s.so.1 || die
-    rm
 
 	# Remove bundled libraries
 	if use !bundled-libs; then
