@@ -4,6 +4,7 @@
 # TODO:
 #	remove qt5 library in bundled mode (numerous errors and coredumps to open applications)
 #	Panel Daemon is don't installed
+#   amdgpu isn't tested
 
 EAPI=8
 inherit check-reqs desktop udev xdg
@@ -54,10 +55,9 @@ DESCRIPTION="Professional A/V post-production software suite from Blackmagic Des
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
 RESTRICT="mirror strip"
-IUSE="amdgpu bundled-libs developer nvidia"
+IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 
 DEPEND="
-	amdgpu? ( dev-libs/amdgpu-pro-opencl )
 	app-arch/brotli
 	app-arch/lz4
 	app-arch/zstd
@@ -88,7 +88,6 @@ DEPEND="
 	net-dns/libidn2
 	net-libs/libasyncns
 	net-libs/nghttp2
-	nvidia? ( x11-drivers/nvidia-drivers )
 	sys-apps/dbus
 	virtual/libcrypt
 	virtual/opengl
@@ -108,6 +107,8 @@ DEPEND="
 		net-dns/avahi
 		net-misc/curl
 	)
+	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
+    video_cards_nvidia? ( x11-drivers/nvidia-drivers )
 "
 RDEPEND="${DEPEND}"
 
