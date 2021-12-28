@@ -27,13 +27,10 @@ pkg_pretend() {
 
 	check_extra_config
 }
-
-#src_prepare() {
-#	default
-#
-#	mv "${S}"/${MY_HPSSACLI_BASEDIR}/ssacli.license "${S}"/license.txt || die "Renaming ssacli.license failed!"
-#	mv "${S}"/${MY_HPSSACLI_BASEDIR}/ssacli*.txt "${S}"/readme.txt || die "Renaming ssacli*.txt failed!"
-#}
+src_prepare() {
+	default
+	gunzip usr/man/man8/ssacli.8.gz || die
+}
 
 src_install() {
 	insinto ${MY_HPSSACLI_BASEDIR}
@@ -48,5 +45,5 @@ src_install() {
 	doins usr/share/smartupdate/ssacli/component.xml
 
 	doman usr/man/man8/ssacli.8.gz
-	dodoc ${MY_HPSSACLI_BASEDIR}/ssacli.license ${MY_HPSSACLI_BASEDIR}/ssacli*.txt
+	dodoc ${MY_HPSSACLI_BASEDIR}/ssacli*.txt
 }
