@@ -44,6 +44,6 @@ src_install() {
 	insinto /usr/share/smartupdate/ssacli/
 	doins usr/share/smartupdate/ssacli/component.xml
 
-	doman usr/man/man8/ssacli.8.gz
+	doman usr/man/man8/ssacli.8
 	dodoc ${MY_HPSSACLI_BASEDIR}/ssacli*.txt
 }
