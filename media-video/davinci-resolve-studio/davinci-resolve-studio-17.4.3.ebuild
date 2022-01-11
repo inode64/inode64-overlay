@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # TODO:
@@ -108,7 +108,7 @@ DEPEND="
 		net-misc/curl
 	)
 	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
-    video_cards_nvidia? ( x11-drivers/nvidia-drivers )
+	video_cards_nvidia? ( x11-drivers/nvidia-drivers )
 "
 RDEPEND="${DEPEND}"
 
@@ -247,8 +247,8 @@ src_install() {
 		dosym -r /usr/$(get_libdir)/libsoxr.so "${PKG_HOME}"/libs/libsoxr.so || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0 "${PKG_HOME}"/libs/libsoxr.so.0 || die
 		dosym -r /usr/$(get_libdir)/libsoxr.so.0.1.2 "${PKG_HOME}"/libs/libsoxr.so.0.1.3 || die
-        dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0	"${PKG_HOME}"/libs/graphviz/libgvplugin_core.so.6.0.0 || die
-        dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0 "${PKG_HOME}"/libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
+		dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0	"${PKG_HOME}"/libs/graphviz/libgvplugin_core.so.6.0.0 || die
+		dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0 "${PKG_HOME}"/libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
 	fi
 
 	# Install desktop shortcut
