@@ -35,6 +35,7 @@ DEPEND=""
 src_prepare() {
 	eapply "${FILESDIR}"/${PN}-7.1-gentoo.diff
 	eapply "${FILESDIR}"/${P}-mime.patch
+	eapply "${FILESDIR}"/${P}-Only-look-for-configuration-in-dedicated-awstats-dir.patch
 
 	# change default installation directory
 	find . -type f -exec sed \
