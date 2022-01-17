@@ -8,7 +8,7 @@ HOMEPAGE="https://github.com/inode64/glus"
 
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
-	KEYWORDS=""
+	KEYWORDS="~amd64 ~x86"
 	EGIT_REPO_URI="https://github.com/inode64/glus.git"
 else
 	KEYWORDS="~amd64 ~x86"
