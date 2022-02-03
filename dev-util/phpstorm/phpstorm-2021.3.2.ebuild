@@ -62,7 +62,6 @@ src_prepare() {
 	default
 
 	local remove_me=(
-		bin/fsnotifier
 		help/ReferenceCardForMac.pdf
 		lib/pty4j-native/linux/aarch64
 		lib/pty4j-native/linux/arm
