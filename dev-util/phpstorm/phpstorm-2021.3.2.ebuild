@@ -4,6 +4,9 @@
 EAPI=8
 inherit desktop wrapper
 
+MY_PV="213.6777.58"
+MY_PN="PhpStorm"
+
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
 HOMEPAGE="https://www.jetbrains.com/phpstorm"
 SRC_URI="https://download.jetbrains.com/webide/${MY_PN}-${PV}.tar.gz"
@@ -15,8 +18,6 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
-MY_PV="213.6777.58"
-MY_PN="PhpStorm"
 
 BDEPEND="dev-util/patchelf"
 
@@ -59,6 +60,7 @@ QA_PREBUILT="opt/${P}/*"
 
 src_prepare() {
 	default
+	
 	local remove_me=(
 		bin/fsnotifier
 		bin/phpstorm.vmoptions
