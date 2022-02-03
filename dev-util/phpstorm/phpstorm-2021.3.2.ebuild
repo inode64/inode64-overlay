@@ -71,6 +71,7 @@ src_prepare() {
 		plugins/performanceTesting/bin/libyjpagent.dylib
 		plugins/performanceTesting/bin/libyjpagent.so
 		plugins/remote-dev-server/selfcontained
+		plugins/tailwindcss/server/prebuilds/linux-x64/node.napi.musl.node
 	)
 
 	use amd64 || remove_me+=( lib/pty4j-native/linux/x86_64 )
