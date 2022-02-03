@@ -14,8 +14,8 @@ HPSSACLI_BASEDIR="/opt/hp/hpssacli"
 HPSSACLI_BIN="${HPSSACLI_BASEDIR}/${cmd}.bin"
 
 if pgrep --exact "${cmd}.bin" 1>/dev/null; then
-        echo "Another instance of ${cmd} is running! Stop it first."
-        exit 1
+	echo "Another instance of ${cmd} is running! Stop it first."
+	exit 1
 fi
 
 export LD_LIBRARY_PATH="${HPSSACLI_BASEDIR}"
