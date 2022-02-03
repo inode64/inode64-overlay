@@ -60,7 +60,7 @@ QA_PREBUILT="opt/${P}/*"
 
 src_prepare() {
 	default
-	
+
 	local remove_me=(
 		bin/fsnotifier
 		bin/phpstorm.vmoptions
