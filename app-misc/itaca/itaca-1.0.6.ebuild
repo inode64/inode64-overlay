@@ -32,7 +32,8 @@ src_install() {
 	insinto /usr/$(get_libdir)
 	doins -r usr/lib/itaca
 
-	fperms 755 /usr/$(get_libdir)/itaca/{ITACA,chrome-sandbox,*.so}
+	fperms 755 /usr/$(get_libdir)/itaca/{ITACA,chrome-sandbox}
+	fperms 755 /usr/$(get_libdir)/itaca/*.so
 	fperms 755 /usr/$(get_libdir)/itaca/swiftshader/*.so
 
 	dosym -r /usr/$(get_libdir)/itaca/ITACA /usr/bin/itaca || die
