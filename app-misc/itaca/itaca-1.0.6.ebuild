@@ -32,9 +32,8 @@ src_install() {
 	insinto /usr/$(get_libdir)
 	doins -r usr/lib/itaca
 
-	fperms 755 /usr/$(get_libdir)/itaca/{ITACA,chrome-sandbox}
-	fperms 755 /usr/$(get_libdir)/itaca/*.so
-	fperms 755 /usr/$(get_libdir)/itaca/swiftshader/*.so
+	fperms 0755 /usr/$(get_libdir)/itaca/{ITACA,chrome-sandbox,libEGL.so,libGLESv2.so,libffmpeg.so,libvk_swiftshader.so,libvulkan.so}
+	fperms 0755 /usr/$(get_libdir)/itaca/swiftshader/{libEGL.so,libGLESv2.so}
 
 	dosym -r /usr/$(get_libdir)/itaca/ITACA /usr/bin/itaca || die
 
