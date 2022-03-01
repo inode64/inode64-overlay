@@ -23,4 +23,5 @@ stop() {
     ebegin "Stopping Guacamole server"
     start-stop-daemon --stop --pidfile "${PIDFILE}"
     eend $? "Failed to stop Guacamole server"
+    sleep 1
 }
