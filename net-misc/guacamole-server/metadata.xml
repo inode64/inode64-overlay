@@ -19,5 +19,7 @@
     <use>
         <flag name="ssh">enable support for SSH protocol</flag>
         <flag name="telnet">enable support for telnet protocol</flag>
+        <flag name="print">Support for printing in RDP</flag>
+        <flag name="kubernetes">Support connecting to Kubernetes server</flag>
     </use>
 </pkgmetadata>
