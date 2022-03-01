@@ -20,22 +20,22 @@ KEYWORDS="~amd64 ~x86"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp"
 REQUIRED_USE="pulseaudio? ( vnc )"
 FONTS="
-        media-fonts/dejavu
-		media-fonts/liberation-fonts
-		media-fonts/terminus-font
+	media-fonts/dejavu
+	media-fonts/liberation-fonts
+	media-fonts/terminus-font
 "
 RDEPEND="
 	print? ( app-text/ghostscript-gpl )
 	net-analyzer/openbsd-netcat
 	ssh? ( ${FONTS} )
-	telnet?	( ${FONTS} )
-    kubernetes?	( ${FONTS} )
+	telnet? ( ${FONTS} )
+	kubernetes? ( ${FONTS} )
 "
 DEPEND="${RDEPEND}
 	acct-group/guacamole
 	acct-user/guacamole
 	dev-libs/openssl:0=
-	dev-libs/ossp-uuid
+	|| ( dev-libs/ossp-uuid sys-libs/libuuid )
 	encode? ( media-video/ffmpeg )
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
@@ -48,16 +48,16 @@ DEPEND="${RDEPEND}
 		net-libs/libtelnet
 		x11-libs/pango
 		)
-    virtual/jpeg:0
+	virtual/jpeg:0
 	vnc? (
 		net-libs/libvncserver[threads]
 		pulseaudio? (
-		    media-sound/pulseaudio
-		    )
-        )
-    vorbis? ( media-libs/libvorbis )
+			media-sound/pulseaudio
+			)
+	)
+	vorbis? ( media-libs/libvorbis )
 	webp? ( media-libs/libwebp )
-    x11-libs/cairo
+	x11-libs/cairo
 "
 
 src_prepare() {
@@ -79,7 +79,7 @@ src_configure() {
 
 	econf ${myconf} \
 		$(use_enable encode guacenc) \
-        $(use_enable kubernetes) \
+	$(use_enable kubernetes) \
 		$(use_with pulseaudio pulse) \
 		$(use_with rdp) \
 		$(use_with ssh) \
