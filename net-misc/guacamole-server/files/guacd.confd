@@ -1,0 +1,9 @@
+# Guacamole listen address.
+GUACD_HOST="127.0.0.1"
+
+# Guacamole listen port.
+GUACD_PORT="4822"
+
+# Guacamole log level (trace, debug, info, warning, and error) The default value is info.
+GUACD_LOGLEVEL="info"
+

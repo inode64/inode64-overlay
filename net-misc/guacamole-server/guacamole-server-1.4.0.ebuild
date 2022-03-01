@@ -91,6 +91,9 @@ src_configure() {
 
 src_install() {
 	default
-	doinitd "${FILESDIR}/guacd"
-	systemd_dounit "${FILESDIR}/guacd.service"
+
+	newinitd "${FILESDIR}/guacd.initd" guacd
+	newconfd "${FILESDIR}/guacd.confd" guacd
+
+	systemd_newunit "${FILESDIR}/guacd.service" guacd.service
 }
