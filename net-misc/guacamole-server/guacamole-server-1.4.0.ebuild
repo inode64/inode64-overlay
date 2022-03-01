@@ -19,17 +19,17 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp"
 REQUIRED_USE="pulseaudio? ( vnc )"
+FONTS="
+        media-fonts/dejavu
+		media-fonts/liberation-fonts
+		media-fonts/terminus-font
+"
 RDEPEND="
 	print? ( app-text/ghostscript-gpl )
 	net-analyzer/openbsd-netcat
-	ssh? (
-		media-fonts/dejavu
-		media-fonts/liberation-fonts
-		media-fonts/terminus-font )
-	telnet?	(
-		media-fonts/dejavu
-		media-fonts/liberation-fonts
-		media-fonts/terminus-font )
+	ssh? ( ${FONTS} )
+	telnet?	( ${FONTS} )
+    kubernetes?	( ${FONTS} )
 "
 DEPEND="${RDEPEND}
 	acct-group/guacamole
