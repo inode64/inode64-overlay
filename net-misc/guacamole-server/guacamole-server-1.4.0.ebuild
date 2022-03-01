@@ -61,7 +61,7 @@ DEPEND="${RDEPEND}
 "
 
 src_prepare() {
-	autoreconf -f -i
+	eautoreconf -fi
 	eapply_user
 	default
 }
@@ -79,7 +79,7 @@ src_configure() {
 
 	econf ${myconf} \
 		$(use_enable encode guacenc) \
-	$(use_enable kubernetes) \
+		$(use_enable kubernetes) \
 		$(use_with pulseaudio pulse) \
 		$(use_with rdp) \
 		$(use_with ssh) \
