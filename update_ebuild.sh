@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# For convert go.sum to EGO_SUM
+# cat go.sum |awk '{print $1 " " $2}'|while read line; do echo \"${line}\"; done
+
 find . -name "*.ebuild" | while read -r ebuild; do
 	sed -i '/^# Copyright/d' "${ebuild}"
 	sed -i '/^# Distributed/d' "${ebuild}"
