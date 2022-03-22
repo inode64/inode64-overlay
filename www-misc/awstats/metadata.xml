@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-    <maintainer type="project" proxied="proxy">
-        <email>web-apps@gentoo.org</email>
-        <name>Gentoo Webapps</name>
-    </maintainer>
-    <use>
-        <flag name="geoip2">Enable GeoIP2 API from MaxMind</flag>
-    </use>
+	<maintainer type="project" proxied="proxy">
+		<email>web-apps@gentoo.org</email>
+		<name>Gentoo Webapps</name>
+	</maintainer>
+	<use>
+		<flag name="geoip2">Enable GeoIP2 API from MaxMind</flag>
+	</use>
 </pkgmetadata>

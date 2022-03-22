@@ -110,6 +110,6 @@ src_install() {
 	make_desktop_entry "${PN}" "phpstorm" "${PN}" "Development;IDE;"
 
 	# recommended by: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
-  dodir /usr/lib/sysctl.d/
-  echo "fs.inotify.max_user_watches = 524288" > "${D}/usr/lib/sysctl.d/30-clion-inotify-watches.conf" || die
+	dodir /usr/lib/sysctl.d/
+	echo "fs.inotify.max_user_watches = 524288" > "${D}/usr/lib/sysctl.d/30-clion-inotify-watches.conf" || die
 }

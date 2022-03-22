@@ -31,10 +31,10 @@ src_compile() {
 
 src_install() {
 	npm \
-                --color false \
-                --prefix "${ED}"/usr \
-                --progress false \
-                --verbose \
+		--color false \
+		--prefix "${ED}"/usr \
+		--progress false \
+		--verbose \
 		install -g || die "npm install failed"
 
 	# remove the link to /var/tmp/portage/...
