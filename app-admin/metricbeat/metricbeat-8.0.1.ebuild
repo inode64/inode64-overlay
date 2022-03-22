@@ -1817,7 +1817,6 @@ BDEPEND="dev-util/mage"
 DEPEND="net-libs/libpcap"
 
 S="${WORKDIR}/beats-${PV}"
-MODULES="auditbeat filebeat heartbeat libbeat metricbeat"
 
 pkg_pretend() {
 	CHECKREQS_DISK_BUILD="4G"
@@ -1831,49 +1830,25 @@ pkg_setup() {
 }
 
 src_compile() {
-    local pkg
+    cd ${PN}
+    CGO_ENABLED=0 go build -v -buildmode=pie -trimpath -mod=readonly -modcacherw
 
-    for pkg in ${MODULES}; do
-        CGO_ENABLED=0 go build -v -buildmode=pie -trimpath -mod=readonly -modcacherw -o ${pkg} ./${pkg}
-    done
-
-    for pkg in ${MODULES}; do
-        cd ${pkg}
-        emake update
-        cd ..
-    done
+    emake update
 }
 
 src_install() {
-    local pkg
+    dobin ${PN}/${PN}
 
-    for pkg in ${MODULES}; do
-        dobin ${pkg}/${pkg}
-        keepdir /etc/${pkg}
-        doins ${pkg}/fields.yml
-        if [[ "${pkg}" != "libbeat" ]]; then
-            insinto /etc/${pkg}
-	        doins ${pkg}/${pkg}.yml
-	        doins ${pkg}/${pkg}.reference.yml
-	    fi
-        keepdir /var/lib/${pkg}
-    done
+    insinto /etc/${PN}
+    doins ${PN}/fields.yml
+    doins ${PN}/${PN}.yml
+    doins ${PN}/${PN}.reference.yml
+    doins -r ${PN}/modules.d
 
-    insinto /etc/auditbeat/audit.rules.d
-    newins auditbeat/module/auditd/_meta/audit.rules.d/sample-rules-linux-64bit.conf sample-rules-linux-64bit.conf.disabled
+    keepdir /usr/share/${PN}
+    cp -r ${PN}/modules/ ${S}/usr/share/${PN}/
 
-    insinto /etc/filebeat/
-    doins -r filebeat/modules.d
-    keepdir /usr/share/filebeat/
-    cp -r filebeat/modules/ ${S}/usr/share/filebeat/
-
-    insinto /etc/heartbeat/
-    doins -r heartbeat/monitors.d
-
-    insinto /etc/metricbeat/
-    doins -r metricbeat/modules.d
-    keepdir /usr/share/metricbeat/
-    cp -r metricbeat/modules/ ${S}/usr/share/metricbeat/
+    keepdir /var/lib/${PN}
 
     newconfd "${FILESDIR}/${PN}.confd" ${PN}
 	newinitd "${FILESDIR}/${PN}.initd" ${PN}
