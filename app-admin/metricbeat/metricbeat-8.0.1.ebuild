@@ -10,6 +10,7 @@ HOMEPAGE="https://www.elastic.co/es/beats/metricbeat"
 
 # TODO: Space used 2.5Gb for create a dependency tarball (see go-module.eclass for more info)
 # TODO: packetbeat fail to compile
+# TODO: Fail to compile when "emake update"
 EGO_SUM=(
 "bazil.org/fuse v0.0.0-20160811212531-371fbbdaa898/go.mod"
 "cloud.google.com/go v0.26.0/go.mod"
@@ -1811,7 +1812,7 @@ EGO_PN=github.com/elastic/beats/${PN}
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS=""
 
 BDEPEND="dev-util/mage"
 DEPEND="net-libs/libpcap"
