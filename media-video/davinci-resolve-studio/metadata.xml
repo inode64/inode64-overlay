@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-    <maintainer type="person" proxied="yes">
-        <email>web@inode64.com</email>
-        <name>Fco. Javier Félix</name>
-    </maintainer>
-    <maintainer type="project" proxied="proxy">
-        <email>proxy-maint@gentoo.org</email>
-        <name>Proxy Maintainers</name>
-    </maintainer>
-    <use>
-        <flag name="nvidia">Enable nvidia cuda toolkit for speeding up computations.</flag>
-        <flag name="amdgpu">Enable AMDGPU opencl for speeding up computations.</flag>
-        <flag name="bundled-libs">Use bundled libraries.</flag>
-        <flag name="developer">Include developer examples and documentation.</flag>
-    </use>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<use>
+		<flag name="nvidia">Enable nvidia cuda toolkit for speeding up computations.</flag>
+		<flag name="amdgpu">Enable AMDGPU opencl for speeding up computations.</flag>
+		<flag name="bundled-libs">Use bundled libraries.</flag>
+		<flag name="developer">Include developer examples and documentation.</flag>
+	</use>
 </pkgmetadata>

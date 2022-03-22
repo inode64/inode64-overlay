@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-    <longdescription lang="en">
+	<longdescription lang="en">
 
-    </longdescription>
-    <maintainer>
-        <email>jyo.garcia@yahoo.com</email>
-        <name>J. García</name>
-    </maintainer>
-    <use>
-        <flag name="maintainer-mode">Enables maintaner mode</flag>
-        <flag name="debug">Enables debug information</flag>
-    </use>
+	</longdescription>
+	<maintainer>
+		<email>jyo.garcia@yahoo.com</email>
+		<name>J. García</name>
+	</maintainer>
+	<use>
+		<flag name="maintainer-mode">Enables maintaner mode</flag>
+		<flag name="debug">Enables debug information</flag>
+	</use>
 </pkgmetadata>

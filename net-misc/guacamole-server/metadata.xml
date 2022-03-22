@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-    <maintainer type="person" proxied="yes">
-        <email>web@inode64.com</email>
-        <name>Fco. Javier Félix</name>
-    </maintainer>
-    <maintainer type="project" proxied="proxy">
-        <email>proxy-maint@gentoo.org</email>
-        <name>Proxy Maintainers</name>
-    </maintainer>
-    <longdescription>
-        Guacamole is an HTML5 web application that provides access to desktop
-        environments using remote desktop protocols (such as VNC or RDP).
-        Guacamole is also the project that produces this web application,
-        and provides an API that drives it. This API can be used to power
-        other similar applications or services.
-    </longdescription>
-    <use>
-        <flag name="ssh">enable support for SSH protocol</flag>
-        <flag name="telnet">enable support for telnet protocol</flag>
-        <flag name="print">Support for printing in RDP</flag>
-        <flag name="kubernetes">Support connecting to Kubernetes server</flag>
-    </use>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription>
+		Guacamole is an HTML5 web application that provides access to desktop
+		environments using remote desktop protocols (such as VNC or RDP).
+		Guacamole is also the project that produces this web application,
+		and provides an API that drives it. This API can be used to power
+		other similar applications or services.
+	</longdescription>
+	<use>
+		<flag name="ssh">enable support for SSH protocol</flag>
+		<flag name="telnet">enable support for telnet protocol</flag>
+		<flag name="print">Support for printing in RDP</flag>
+		<flag name="kubernetes">Support connecting to Kubernetes server</flag>
+	</use>
 </pkgmetadata>

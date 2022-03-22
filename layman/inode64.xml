@@ -1,13 +1,13 @@
 <repositories version="1.1" encoding="unicode">
     <repo quality="stable" priority="50">
-        <name>overlay-inode64</name>
-        <description>Server overlay, virtualization, developer tools and misc apps</description>
-        <homepage>https://github.com/inode64/inode64-overlay</homepage>
-        <owner>
-            <email>web@inode64.com</email>
-            <name>F.Javier Félix</name>
-        </owner>
-        <source type="git">https://github.com/inode64/inode64-overlay.git</source>
-        <feed>https://github.com/inode64/inode64-overlay/commits/main.atom</feed>
+	<name>overlay-inode64</name>
+	<description>Server overlay, virtualization, developer tools and misc apps</description>
+	<homepage>https://github.com/inode64/inode64-overlay</homepage>
+	<owner>
+	    <email>web@inode64.com</email>
+	    <name>F.Javier Félix</name>
+	</owner>
+	<source type="git">https://github.com/inode64/inode64-overlay.git</source>
+	<feed>https://github.com/inode64/inode64-overlay/commits/main.atom</feed>
     </repo>
 </repositories>

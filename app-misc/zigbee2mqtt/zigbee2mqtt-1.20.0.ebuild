@@ -43,7 +43,7 @@ src_install() {
 		done
 	)
 
-	echo -e "\nadvanced:\n  network_key: [ ${key} ]" >>data/configuration.yaml
+	echo -e "\nadvanced:\n	network_key: [ ${key} ]" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	npm ci --production --progress false

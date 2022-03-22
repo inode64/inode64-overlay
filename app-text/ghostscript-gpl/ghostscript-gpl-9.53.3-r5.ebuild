@@ -98,7 +98,7 @@ src_prepare() {
 	# Force the include dirs to a neutral location.
 	sed -e "/^ZLIBDIR=/s:=.*:=${T}:" \
 		-i configure.ac || die
-	# Some files depend on zlib.h directly.  Redirect them. #573248
+	# Some files depend on zlib.h directly.	 Redirect them. #573248
 	# Also make sure to not define OPJ_STATIC to avoid linker errors due to
 	# hidden symbols (https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=203327#c1)
 	sed -e '/^zlib_h/s:=.*:=:' \
