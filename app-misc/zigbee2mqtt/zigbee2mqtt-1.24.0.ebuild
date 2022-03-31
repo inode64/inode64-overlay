@@ -12,7 +12,7 @@ COMMIT="41b67fdd07792a6c6569341d980ec60c1456c2d7"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="~amd64"
 
 RDEPEND="
 	acct-group/zigbee2mqtt
@@ -21,20 +21,36 @@ RDEPEND="
 	net-libs/nodejs
 "
 BDEPEND="
+	dev-lang/typescript
 	net-libs/nodejs[npm]
 "
-DEPEND="${PYTHON_DEPS}
-"
+
+NPM_FLAGS=(
+        --audit false
+        --color false
+        --foreground-scripts
+        --global
+        --offline
+        --progress false
+        --save false
+        --verbose
+)
 
 # To enable download packages
 RESTRICT="network-sandbox"
 
 src_compile() {
 	# nothing to compile here
-	:
+
+	npm "${NPM_FLAGS[@]}" pack || die
 }
 
 src_install() {
+    npm "${NPM_FLAGS[@]}" \
+                --prefix "${ED}"/usr \
+                install \
+                ${P}.tgz || die
+
 	local key=$(
 		s=""
 		for ((i = 1; i <= 16; i++)); do

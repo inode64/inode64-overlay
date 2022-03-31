@@ -19,6 +19,6 @@ start() {
 
 stop() {
 	ebegin "Stopping ${SVCNAME}"
-	start-stop-daemon --stop --pidfile /var/run/${SVCNAME}.pid
+	start-stop-daemon --stop --pidfile /run/${SVCNAME}.pid
 	eend $?
 }
