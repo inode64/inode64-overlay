@@ -1831,7 +1831,7 @@ src_compile() {
 }
 
 src_install() {
-	dodir /etc/${PN}
+	insinto /etc/${PN}
 
 	cd ${PN}
 	doins fields.yml
@@ -1848,7 +1848,6 @@ src_install() {
 
 	dodir /usr/share/${PN}
 	cp -r module "${ED}"/usr/share/${PN}
-	cp -r kibana "${ED}"/usr/share/${PN}
 
 	dobin filebeat
 }
