@@ -1813,25 +1813,27 @@ LICENSE="Apache-2.0 BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="test"
+BDEPEND="dev-util/mage"
 
 S="${WORKDIR}/beats-${PV}"
 
 src_prepare() {
 	default
 
-	# avoid Elastic license
-	rm -r x-pack || die
-
 	# use ${PV} instead of git commit id
 	sed -i "s/\(COMMIT_ID=\).*/\1${PV}/g" "${S}/libbeat/scripts/Makefile" || die
 }
 
 src_compile() {
-	emake -C "${S}/filebeat"
+    cd ${PN}
+	emake
+	mage update
 }
 
 src_install() {
 	dodir /etc/${PN}
+
+	cd ${PN}
 	doins fields.yml
 	doins ${PN}.yml
 	doins ${PN}.reference.yml
@@ -1848,7 +1850,7 @@ src_install() {
 	cp -r module "${ED}"/usr/share/${PN}
 	cp -r kibana "${ED}"/usr/share/${PN}
 
-	dobin filebeat/filebeat
+	dobin filebeat
 }
 
 pkg_postinst() {
