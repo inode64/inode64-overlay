@@ -103,7 +103,7 @@ src_install() {
 
 	insinto "${DIR}"
 	doins -r *
-	fperms 755 "${DIR}"/bin/{format.sh,fsnotifier,inspect.sh,ltedit.sh,phpstorm.sh,printenv.py,restart.py}
+	fperms 755 "${DIR}"/bin/{format.sh,fsnotifier,inspect.sh,ltedit.sh,phpstorm.sh,restart.py}
 
 	fperms 755 "${DIR}"/jbr/bin/{jaotc,java,javac,jcmd,jdb,jfr,jhsdb,jjs,jmap,jps,jrunscript,jstack,jstat,keytool,pack200,rmid,rmiregistry,serialver,unpack200}
 	fperms 755 "${DIR}"/jbr/lib/{chrome-sandbox,jcef_helper,jexec,jspawnhelper}
