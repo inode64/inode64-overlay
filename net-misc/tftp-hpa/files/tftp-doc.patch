@@ -1,0 +1,45 @@
+--- tftp-hpa-5.2/tftp/main.c	2013-04-19 09:34:09.737410319 +0200
++++ tftp-hpa-5.2/tftp/main.c	2013-04-19 09:42:53.559946374 +0200
+@@ -195,9 +195,11 @@
+ {
+     fprintf(stderr,
+ #ifdef HAVE_IPV6
+-            "Usage: %s [-4][-6][-v][-l][-m mode] [host [port]] [-c command]\n",
++            "Usage: %s [-4][-6][-v][-V][-l][-m mode] [-R port:port] "
++			"[host [port]] [-c command]\n",
+ #else
+-            "Usage: %s [-v][-l][-m mode] [host [port]] [-c command]\n",
++            "Usage: %s [-v][-V][-l][-m mode] [-R port:port] "
++			"[host [port]] [-c command]\n",
+ #endif
+             program);
+     exit(errcode);
+--- tftp-hpa-5.2/tftpd/tftpd.8.in	2012-11-20 09:43:46.000000000 +0100
++++ tftp-hpa-5.2/tftpd/tftpd.8.in	2013-04-19 09:44:37.399057279 +0200
+@@ -155,7 +155,7 @@
+ .B utimeout
+ option is negotiated.  The default is 1000000 (1 second.)
+ .TP
+-\fB\-\-mapfile\fP \fIremap-file\fP, \fB\-m\fP \fIremap-file\fP
++\fB\-\-map\-file\fP \fIremap-file\fP, \fB\-m\fP \fIremap-file\fP
+ Specify the use of filename remapping.  The
+ .I remap-file
+ is a file containing the remapping rules.  See the section on filename
+@@ -243,7 +243,7 @@ option, but crash with an error if they
+ accepted by the server.
+ .SH "FILENAME REMAPPING"
+ The
+-.B \-\-mapfile
++.B \-\-map\-file
+ option specifies a file which contains filename remapping rules.  Each
+ non-comment line (comments begin with hash marks,
+ .BR # )
+@@ -395,7 +395,7 @@ flag is used to set up a chroot() enviro
+ once a connection has been set up.
+ .PP
+ Finally, the filename remapping
+-.RB ( \-\-mapfile
++.RB ( \-\-map\-file
+ flag) support can be used to provide a limited amount of additional
+ access control.
+ .SH "CONFORMING TO"
