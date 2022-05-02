@@ -1,14 +1,14 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit systemd
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
 SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz"
-COMMIT="41b67fdd07792a6c6569341d980ec60c1456c2d7"
+COMMIT="6f1460e47b430f8e1fe22819da56a238f8c92174"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -30,7 +30,6 @@ NPM_FLAGS=(
 	--color false
 	--foreground-scripts
 	--global
-	--offline
 	--progress false
 	--save false
 	--verbose
@@ -40,13 +39,11 @@ NPM_FLAGS=(
 RESTRICT="network-sandbox"
 
 src_compile() {
-	# nothing to compile here
-
 	npm "${NPM_FLAGS[@]}" pack || die
 }
 
 src_install() {
-    npm "${NPM_FLAGS[@]}" \
+	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
 		install \
 		${P}.tgz || die
@@ -59,29 +56,34 @@ src_install() {
 		done
 	)
 
+	dodir /usr/lib64/node_modules/${PN}/dist
+	cp -r lib "${D}/usr/lib64/node_modules/${PN}" || die
+	cp tsconfig.json "${D}/usr/lib64/node_modules/${PN}" || die
+
+	cd "${D}/usr/lib64/node_modules/${PN}"
+	npm --prefix . install --save-dev || die
+	npm run build || die
+	npm prune --production || die
+
+	echo "{\"hash\": \"${COMMIT}\"}" > dist/.hash.json
+
+	find ${pkgdir} -name "*.d.ts" -delete
+	find ${pkgdir} -name "*.d.ts.map" -delete
+	find ${pkgdir} -name "*.js.map" -delete
+
 	echo -e "\nadvanced:\n	network_key: [ ${key} ]" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
-
-	npm ci --production --progress false
-	echo "{\"hash\": \"${COMMIT}\"}" > .hash.json
 
 	keepdir /var/log/${PN}
 
 	insinto /var/lib/${PN}
 	doins data/configuration.yaml
 
-	insinto /opt/${PN}
-	doins -r images lib node_modules
-	doins *.js *.json .hash.json
-
-	dodoc *.md
-
 	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}
 	fowners zigbee2mqtt:zigbee2mqtt /var/log/${PN}
-	fowners -R zigbee2mqtt:zigbee2mqtt /opt/${PN}
 
-	doinitd "${FILESDIR}"/${PN}
-	systemd_dounit "${FILESDIR}/${PN}.service"
+	doinitd "${FILESDIR}"/${PN}-r1
+	systemd_dounit "${FILESDIR}/${PN}-r1.service"
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
