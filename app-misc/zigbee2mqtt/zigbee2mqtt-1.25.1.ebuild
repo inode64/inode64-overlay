@@ -22,7 +22,7 @@ RDEPEND="
 "
 BDEPEND="
 	dev-lang/typescript
-	net-libs/nodejs[npm]
+	~net-libs/nodejs-16[npm]
 "
 
 NPM_FLAGS=(

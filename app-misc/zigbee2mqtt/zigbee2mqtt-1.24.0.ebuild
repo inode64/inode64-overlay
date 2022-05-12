@@ -22,7 +22,7 @@ RDEPEND="
 "
 BDEPEND="
 	dev-lang/typescript
-	net-libs/nodejs[npm]
+	~net-libs/nodejs-16[npm]
 "
 
 NPM_FLAGS=(
@@ -46,7 +46,7 @@ src_compile() {
 }
 
 src_install() {
-    npm "${NPM_FLAGS[@]}" \
+	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
 		install \
 		${P}.tgz || die
