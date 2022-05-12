@@ -21,7 +21,7 @@ RDEPEND="
 	net-libs/nodejs
 "
 BDEPEND="
-	net-libs/nodejs[npm]
+	~net-libs/nodejs-16[npm]
 "
 DEPEND="${PYTHON_DEPS}
 "
