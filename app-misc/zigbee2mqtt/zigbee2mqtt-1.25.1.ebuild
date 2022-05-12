@@ -18,11 +18,11 @@ RDEPEND="
 	acct-group/zigbee2mqtt
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
-	net-libs/nodejs
+	net-libs/nodejs:0/16
 "
 BDEPEND="
 	dev-lang/typescript
-	~net-libs/nodejs-16[npm]
+	>=net-libs/nodejs-10[npm]
 "
 
 NPM_FLAGS=(
