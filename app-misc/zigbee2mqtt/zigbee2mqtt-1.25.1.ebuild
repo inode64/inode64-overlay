@@ -74,8 +74,8 @@ src_install() {
 	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}
 	fowners zigbee2mqtt:zigbee2mqtt /var/log/${PN}
 
-	doinitd "${FILESDIR}"/${PN}-r1
-	systemd_dounit "${FILESDIR}/${PN}-r1.service"
+	doinitd "${FILESDIR}"/${PN}
+	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
