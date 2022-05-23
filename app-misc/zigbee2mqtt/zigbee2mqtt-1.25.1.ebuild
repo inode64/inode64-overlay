@@ -82,6 +82,6 @@ src_install() {
 
     dodoc *.md
 
-	rm -rf "${ED}"/data || die
-	rm "${ED}"/{update.sh,LICENSE,*.md} || die
+	rm -rf "${ED}"/usr/lib64/node_modules/${PN}/data || die
+	rm "${ED}"/usr/lib64/node_modules/${PN}/{update.sh,LICENSE,*.md} || die
 }
