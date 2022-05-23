@@ -79,4 +79,9 @@ src_install() {
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
+
+    dodoc *.md
+
+	rm -rf "${ED}"/data || die
+	rm "${ED}"/{update.sh,LICENSE,*.md} || die
 }
