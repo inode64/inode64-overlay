@@ -48,14 +48,6 @@ src_install() {
 		install \
 		${P}.tgz || die
 
-	local key=$(
-		s=""
-		for ((i = 1; i <= 16; i++)); do
-			printf '%s' "${s}0x$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 2 | head -n 1)"
-			s=", "
-		done
-	)
-
 	dodir /usr/lib64/node_modules/${PN}/dist
 	cp -r lib "${D}/usr/lib64/node_modules/${PN}" || die
 	cp tsconfig.json "${D}/usr/lib64/node_modules/${PN}" || die
@@ -71,7 +63,7 @@ src_install() {
 	find ${pkgdir} -name "*.d.ts.map" -delete
 	find ${pkgdir} -name "*.js.map" -delete
 
-	echo -e "\nadvanced:\n	network_key: [ ${key} ]" >>data/configuration.yaml
+	echo -e "\nadvanced:\n	network_key: [ GENERATE ]" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	keepdir /var/log/${PN}
