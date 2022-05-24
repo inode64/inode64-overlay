@@ -50,10 +50,12 @@ src_compile() {
 }
 
 src_install() {
+    local DEV=$(node -p "require('./package.json').version")
+
 	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
 		install \
-		${P}.tgz || die
+		${P}-${DEV}.tgz || die
 
 	dodir /usr/lib64/node_modules/${PN}/dist
 	cp -r lib "${D}/usr/lib64/node_modules/${PN}" || die
