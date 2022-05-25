@@ -25,7 +25,7 @@ FONTS="
 	media-fonts/terminus-font
 "
 RDEPEND="
-	print? ( app-text/ghostscript-gpl[-X] )
+	print? ( =app-text/ghostscript-gpl-9.53.3-r5[-X] )
 	net-analyzer/openbsd-netcat
 	ssh? ( ${FONTS} )
 	telnet? ( ${FONTS} )
