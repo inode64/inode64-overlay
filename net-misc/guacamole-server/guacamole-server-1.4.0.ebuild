@@ -59,6 +59,10 @@ DEPEND="${RDEPEND}
 	webp? ( media-libs/libwebp )
 	x11-libs/cairo
 "
+PATCHES=(
+        "${FILESDIR}"/guacamole-876.patch
+        "${FILESDIR}"/guacamole-1115.patch
+)
 
 src_prepare() {
 	eautoreconf -fi
