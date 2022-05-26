@@ -55,7 +55,7 @@ src_install() {
 	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
 		install \
-		${P}-${DEV}.tgz || die
+		${PN}-${DEV}.tgz || die
 
 	dodir /usr/lib64/node_modules/${PN}/dist
 	cp -r lib "${D}/usr/lib64/node_modules/${PN}" || die
