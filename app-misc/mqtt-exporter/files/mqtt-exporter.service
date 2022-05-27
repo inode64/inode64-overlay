@@ -1,0 +1,15 @@
+[Unit]
+Description=MQTT-exporter
+Wants=network-online.target
+After=network-online.target mosquitto.service
+
+[Service]
+Type=simple
+User=mosquitto
+Group=mosquitto
+EnvironmentFile=-/etc/sysconfig/mqtt-exporter
+ExecStart=/usr/bin/python3 /usr/lib64/mqtt-exporter/exporter.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

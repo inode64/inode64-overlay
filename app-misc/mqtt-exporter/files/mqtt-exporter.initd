@@ -1,0 +1,57 @@
+#!/sbin/openrc-run
+# Copyright 2016-2022 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Simple and generic Prometheus exporter for MQTT"
+pidfile=/run/${RC_SVCNAME}.pid
+user="mosquitto"
+group="mosquitto"
+command_user=${user}:${group}
+
+command="/usr/bin/python3"
+command_args=""
+
+if [ ! "${LOG_LEVEL}" ]; then
+    command_args="${command_args} --env LOG_LEVEL=${LOG_LEVEL}"
+fi
+if [ ! "${MQTT_IGNORED_TOPICS}" ]; then
+    command_args="${command_args} --env MQTT_IGNORED_TOPICS=${MQTT_IGNORED_TOPICS}"
+fi
+if [ ! "${MQTT_ADDRESS}" ]; then
+    command_args="${command_args} --env MQTT_ADDRESS=${MQTT_ADDRESS}"
+fi
+if [ ! "${MQTT_PORT}" ]; then
+    command_args="${command_args} --env MQTT_PORT=${MQTT_PORT}"
+fi
+if [ ! "${MQTT_TOPIC}" ]; then
+    command_args="${command_args} --env MQTT_TOPIC=${MQTT_TOPIC}"
+fi
+if [ ! "${MQTT_KEEPALIVE}" ]; then
+    command_args="${command_args} --env MQTT_KEEPALIVE=${MQTT_KEEPALIVE}"
+fi
+if [ ! "${MQTT_USERNAME}" ]; then
+    command_args="${command_args} --env MQTT_USERNAME=${MQTT_USERNAME}"
+fi
+if [ ! "${MQTT_PASSWORD}" ]; then
+    command_args="${command_args} --env MQTT_PASSWORD=${MQTT_PASSWORD}"
+fi
+if [ ! "${PROMETHEUS_PORT}" ]; then
+    command_args="${command_args} --env PROMETHEUS_PORT=${PROMETHEUS_PORT}"
+fi
+if [ ! "${PROMETHEUS_PORT}" ]; then
+    command_args="${command_args} --env PROMETHEUS_PORT=${PROMETHEUS_PORT}"
+fi
+if [ ! "${PROMETHEUS_PREFIX}" ]; then
+    command_args="${command_args} --env PROMETHEUS_PREFIX=${PROMETHEUS_PREFIX}"
+fi
+if [ ! "${ZIGBEE2MQTT_AVAILABILITY}" ]; then
+    command_args="${command_args} --env ZIGBEE2MQTT_AVAILABILITY=${ZIGBEE2MQTT_AVAILABILITY}"
+fi
+
+command_background="true"
+error_log=/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log
+output_log=/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log
+
+depend() {
+        after net mosquitto
+}

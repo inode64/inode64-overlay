@@ -12,7 +12,7 @@ fi
 
 PYTHON_COMPAT=(python3_{8..11})
 
-inherit python-single-r1
+inherit python-single-r1 systemd
 
 DESCRIPTION="Simple and generic Prometheus exporter for MQTT"
 HOMEPAGE="https://github.com/kpetremann/mqtt-exporter"
@@ -23,15 +23,13 @@ KEYWORDS="~amd64"
 
 RDEPEND="
     ${PYTHON_DEPS}
+    acct-user/mosquitto
+    acct-group/mosquitto
     dev-python/paho-mqtt
     dev-python/prometheus_client
 "
 BDEPEND="
 "
-
-pkg_setup() {
-	python-single-r1_pkg_setup
-}
 
 src_prepare() {
 	default
@@ -48,5 +46,8 @@ src_install() {
 	doins -r mqtt_exporter
 
 	dodoc README.md
-	python_optimize
+
+    systemd_dounit "${FILESDIR}"/${PN}.service
+    newinitd "${FILESDIR}"/${PN}.initd ${PN}
+    newconfd "${FILESDIR}"/${PN}.confd ${PN}
 }
