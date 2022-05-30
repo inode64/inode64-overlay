@@ -48,7 +48,7 @@ src_install() {
 	dodoc README.md
 
     keepdir /var/log/${PN}
-    
+
     systemd_dounit "${FILESDIR}"/${PN}.service
     newinitd "${FILESDIR}"/${PN}.initd ${PN}
     newconfd "${FILESDIR}"/${PN}.confd ${PN}
