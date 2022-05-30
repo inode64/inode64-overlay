@@ -43,7 +43,7 @@ checkconfig() {
 
 	local CACHE_SWAP=$(cat ${CONFFILES} 2>/dev/null 3>/dev/null | awk '/^[ \t]*cache_dir[ \t]+/ { if ( $2 == "rock" ) printf "%s/rock ", $3; else if ( $2 == "coss" ) printf "%s/stripe ", $3; else printf "%s/00 ", $3; }')
 	[ -z "$CACHE_SWAP" ] && CACHE_SWAP="/var/cache/squid/00"
-	
+
 	local x
 	for x in $CACHE_SWAP ; do
 		if [ ! -e $x ] ; then
@@ -69,7 +69,7 @@ checkconfig() {
 			break
 		fi
 	done
-	
+
 	return 0
 }
 

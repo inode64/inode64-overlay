@@ -53,5 +53,5 @@ error_log=/var/log/${RC_SVCNAME}/${RC_SVCNAME}_error.log
 output_log=/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log
 
 depend() {
-        after net mosquitto
+	after net mosquitto
 }
