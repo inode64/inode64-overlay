@@ -83,9 +83,6 @@ NUT_PRIVATE_FILES="/etc/nut/{upsd.conf,upsd.users,upsmon.conf}"
 # public files should be 644 root:root, only installed if USE=cgi
 NUT_CGI_FILES="/etc/nut/{{hosts,upsset}.conf,upsstats{,-single}.html}"
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-2.6.2-lowspeed-buffer-size.patch
-)
 
 src_prepare() {
 	default
@@ -96,8 +93,6 @@ src_prepare() {
 
 	sed -e "s:52.nut-usbups.rules:70-nut-usbups.rules:" \
 		-i scripts/udev/Makefile.am || die
-
-	rm ltmain.sh m4/lt* m4/libtool.m4 || die
 
 	sed -e 's:@LIBSSL_LDFLAGS@:@LIBSSL_LIBS@:' \
 		-i lib/libupsclient{.pc,-config}.in || die #361685
