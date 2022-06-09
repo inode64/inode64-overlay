@@ -97,7 +97,8 @@ src_prepare() {
 	sed -e 's:@LIBSSL_LDFLAGS@:@LIBSSL_LIBS@:' \
 		-i lib/libupsclient{.pc,-config}.in || die #361685
 
-	eautoreconf -iv
+    ./autogen.sh
+	eautoreconf
 }
 
 src_configure() {
