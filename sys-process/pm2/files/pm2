@@ -4,7 +4,7 @@
 
 description="Production process manager for Node.js apps with a built-in load balancer."
 
-extra_started_commands="reload list"
+extra_started_commands="reload list update"
 
 PM2=/usr/bin/pm2
 user=${SVCNAME#*.}
@@ -41,8 +41,6 @@ start_post() {
 start() {
 	ebegin "Starting PM2 process manager..."
 	start-stop-daemon --start --user ${user} --exec ${PM2} resurrect --background --pidfile ${pidfile}
-
-	#run_pm2_as_user resurrect
 	eend $?
 }
 
@@ -63,6 +61,12 @@ list() {
 	ebegin "List all processes"
 	run_pm2_as_user list
 	eend $?
+}
+
+update() {
+    ebegin "Updating process"
+    run_pm2_as_user update
+    eend $?
 }
 
 # vim: ts=4
