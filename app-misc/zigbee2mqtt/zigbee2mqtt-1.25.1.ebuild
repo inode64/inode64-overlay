@@ -63,7 +63,9 @@ src_install() {
 	find ${pkgdir} -name "*.d.ts.map" -delete
 	find ${pkgdir} -name "*.js.map" -delete
 
-	echo -e "\nadvanced:\n	network_key: [ GENERATE ]" >>data/configuration.yaml
+	echo -e "\nadvanced:" >>data/configuration.yaml
+	echo -e "  network_key: GENERATE" >>data/configuration.yaml
+	echo -e "  pan_id: GENERATE" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	keepdir /var/log/${PN}
@@ -73,6 +75,7 @@ src_install() {
 
 	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}
 	fowners zigbee2mqtt:zigbee2mqtt /var/log/${PN}
+	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}/configuration.yaml
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
