@@ -15,7 +15,7 @@ KEYWORDS="~amd64"
 
 DEPEND=""
 RDEPEND="
-	net-libs/nodejs
+	net-libs/nodejs:=
 "
 BDEPEND="
 	net-libs/nodejs[npm]

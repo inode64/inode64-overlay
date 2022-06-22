@@ -25,7 +25,7 @@ RDEPEND="
 	acct-group/zigbee2mqtt
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
-	net-libs/nodejs
+	net-libs/nodejs:=
 "
 BDEPEND="
 	dev-lang/typescript
