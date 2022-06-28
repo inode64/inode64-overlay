@@ -1,11 +1,13 @@
 [Unit]
 Description=zigbee2mqtt
 After=network.target
+Wants=mosquitto.service
 
 [Service]
 ExecStart=/usr/bin/zigbee2mqtt
 WorkingDirectory=/var/lib/zigbee2mqtt
 StandardOutput=inherit
+Environment=ZIGBEE2MQTT_DATA=/var/lib/zigbee2mqtt
 # Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
 StandardError=inherit
 Restart=always
