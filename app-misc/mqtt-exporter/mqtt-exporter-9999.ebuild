@@ -22,11 +22,11 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-    ${PYTHON_DEPS}
-    acct-user/mosquitto
-    acct-group/mosquitto
-    dev-python/paho-mqtt
-    dev-python/prometheus_client
+	${PYTHON_DEPS}
+	acct-user/mosquitto
+	acct-group/mosquitto
+	dev-python/paho-mqtt
+	dev-python/prometheus_client
 "
 BDEPEND="
 "
@@ -47,9 +47,9 @@ src_install() {
 
 	dodoc README.md
 
-    keepdir /var/log/${PN}
+	keepdir /var/log/${PN}
 
-    systemd_dounit "${FILESDIR}"/${PN}.service
-    newinitd "${FILESDIR}"/${PN}.initd ${PN}
-    newconfd "${FILESDIR}"/${PN}.confd ${PN}
+	systemd_dounit "${FILESDIR}"/${PN}.service
+	newinitd "${FILESDIR}"/${PN}.initd ${PN}
+	newconfd "${FILESDIR}"/${PN}.confd ${PN}
 }

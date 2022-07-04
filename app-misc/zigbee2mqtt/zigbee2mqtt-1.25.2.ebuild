@@ -4,11 +4,11 @@
 EAPI=8
 
 if [[ ${PV} == *9999* ]]; then
-    EGIT_REPO_URI="https://github.com/Koenkk/zigbee2mqtt"
-    EGIT_BRANCH="dev"
-    inherit git-r3
+	EGIT_REPO_URI="https://github.com/Koenkk/zigbee2mqtt"
+	EGIT_BRANCH="dev"
+	inherit git-r3
 else
-    SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
 inherit systemd
@@ -50,7 +50,7 @@ src_compile() {
 }
 
 src_install() {
-    local DEV=$(node -p "require('./package.json').version")
+	local DEV=$(node -p "require('./package.json').version")
 
 	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
@@ -92,7 +92,7 @@ src_install() {
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
 
-    dodoc *.md
+	dodoc *.md
 
 	rm -rf "${ED}"/usr/lib64/node_modules/${PN}/data || die
 	rm "${ED}"/usr/lib64/node_modules/${PN}/{update.sh,LICENSE,*.md} || die
