@@ -3,10 +3,9 @@
 
 EAPI=8
 
-DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{8..11} )
 
-inherit distutils-r1 git-r3
+inherit python-single-r1 git-r3
 
 # see scripts/download_import_cldr.py
 CLDR_PV=41.0
@@ -23,12 +22,34 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	dev-python/APScheduler[${PYTHON_USEDEP}]
-	dev-python/interruptingcow[${PYTHON_USEDEP}]
-	dev-python/paho-mqtt[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}]
-	dev-python/tenacity[${PYTHON_USEDEP}]
+	${PYTHON_DEPS}
+	dev-lang/python[bluetooth]
+	dev-python/APScheduler
+	dev-python/bluepy
+	dev-python/interruptingcow
+	dev-python/paho-mqtt
+	dev-python/pyyaml
+	dev-python/tenacity
 "
 BDEPEND="
 	${RDEPEND}
 "
+
+src_compile() {
+	python_fix_shebang .
+}
+
+pkg_setup() {
+	python-single-r1_pkg_setup
+}
+
+src_install() {
+	python_optimize
+}
+
+src_install() {
+	insinto /opt/btmqttgateway
+	doins *.py logger.yaml config.yaml.example
+	insinto /opt/btmqttgateway/workers
+	doins workers/*.py
+}
