@@ -83,7 +83,6 @@ NUT_PRIVATE_FILES="/etc/nut/{upsd.conf,upsd.users,upsmon.conf}"
 # public files should be 644 root:root, only installed if USE=cgi
 NUT_CGI_FILES="/etc/nut/{{hosts,upsset}.conf,upsstats{,-single}.html}"
 
-
 src_prepare() {
 	default
 
@@ -97,7 +96,7 @@ src_prepare() {
 	sed -e 's:@LIBSSL_LDFLAGS@:@LIBSSL_LIBS@:' \
 		-i lib/libupsclient{.pc,-config}.in || die #361685
 
-    ./autogen.sh
+	./autogen.sh
 	eautoreconf
 }
 

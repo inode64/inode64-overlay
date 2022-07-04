@@ -91,5 +91,5 @@ src_install() {
 }
 
 pkg_postinst() {
-    einfo "Directory has changed to /srv/tftp to comply with FHS recommendations"
+	einfo "Directory has changed to /srv/tftp to comply with FHS recommendations"
 }
