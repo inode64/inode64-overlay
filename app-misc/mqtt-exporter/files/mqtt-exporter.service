@@ -1,7 +1,7 @@
 [Unit]
 Description=MQTT-exporter
 Wants=network-online.target
-After=network-online.target mosquitto.service
+After=network-online.target mosquitto.service zigbee2mqtt.service
 
 [Service]
 Type=simple
