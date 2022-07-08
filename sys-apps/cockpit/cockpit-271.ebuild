@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit autotools pam systemd tmpfiles
+inherit autotools pam systemd
 
 DESCRIPTION="Server Administration Web Interface "
 HOMEPAGE="http://cockpit-project.org/"
