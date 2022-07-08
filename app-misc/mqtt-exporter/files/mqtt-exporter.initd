@@ -11,6 +11,10 @@ command_user=${user}:${group}
 command="/usr/bin/python3 /usr/lib64/mqtt-exporter/exporter.py"
 command_args_backgroud=""
 
+depend() {
+    after mosquitto zigbee2mqtt
+}
+
 if [ ! "${LOG_LEVEL}" ]; then
     command_args_backgroud="${command_args} --env LOG_LEVEL=${LOG_LEVEL}"
 fi
