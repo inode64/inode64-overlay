@@ -70,6 +70,7 @@ src_prepare() {
 		lib/pty4j-native/linux/arm
 		lib/pty4j-native/linux/mips64el
 		lib/pty4j-native/linux/ppc64le
+		plugins/cwm-plugin/quiche-native/linux-aarch64
 		plugins/performanceTesting/bin/*.dll
 		plugins/performanceTesting/bin/libyjpagent.dylib
 		plugins/performanceTesting/bin/libyjpagent.so
