@@ -15,13 +15,14 @@ LICENSE="LGPL-2 LGPL-2+"
 SLOT="0"
 
 KEYWORDS="~amd64 ~x86"
-IUSE="fuse go ocaml python +ssl"
+IUSE="examples fuse go ocaml python +ssl"
 
 REQUIRED_USE="
 	python? ( ${PYTHON_REQUIRED_USE} )
 	"
 COMMON_DEPEND="
 	dev-libs/libxml2:2=
+	examples ( dev-libs/glib dev-libs/libev )
 	fuse? ( sys-fs/fuse:3 )
 	go? ( dev-lang/go )
 	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
@@ -33,7 +34,7 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	"
 
-DOCS=( README SECURITY TODO )
+DOCS=( README.md SECURITY TODO )
 
 src_prepare() {
 	default
