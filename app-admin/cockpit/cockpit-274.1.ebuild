@@ -1,9 +1,9 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit autotools eutils pam systemd
+inherit autotools pam systemd
 
 DESCRIPTION="Server Administration Web Interface "
 HOMEPAGE="http://cockpit-project.org/"
@@ -20,7 +20,7 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="debug +doc firewalld +networkmanager pcp selinux udisks"
+IUSE="+doc +networkmanager debug firewalld pcp selinux tuned udisks"
 
 BDEPEND="
 	>=app-crypt/mit-krb5-1.11
@@ -45,12 +45,16 @@ DEPEND="
 		net-misc/networkmanager[policykit,systemd]
 	)
 	pcp? (
-		sys-apps/pcp
+		app-metrics/pcp
 	)
 	sys-apps/accountsservice[systemd]
 	udisks? (
 		sys-fs/udisks[lvm,systemd]
 	)
+	tuned? (
+		sys-apps/tuned
+	)
+	virtual/libcrypt:=
 "
 
 RDEPEND="${DEPEND}
@@ -61,7 +65,6 @@ RDEPEND="${DEPEND}
 	dev-libs/libgudev
 	net-libs/glib-networking[ssl]
 	virtual/krb5
-	virtual/libcrypt
 "
 
 src_prepare() {
