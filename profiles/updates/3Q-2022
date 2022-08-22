@@ -1,2 +1,2 @@
-move sys-apps/cockpit add-admin/cockpit
+move sys-apps/cockpit app-admin/cockpit
 move sys-apps/pcp app-metrics/pcp
