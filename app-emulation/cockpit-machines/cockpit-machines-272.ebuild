@@ -26,7 +26,7 @@ DEPEND="
 "
 
 RDEPEND="${DEPEND}
-	>=sys-apps/cockpit-${PV}
+	>=app-admin/cockpit-${PV}
 	app-emulation/libvirt-dbus
 	app-emulation/libvirt[firewalld,policykit]
 	app-emulation/virt-manager[policykit]
