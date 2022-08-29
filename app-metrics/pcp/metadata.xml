@@ -39,6 +39,7 @@
         <flag name="postgresql">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics about the
             PostgreSQL database
         </flag>
+        <flag name="snmp">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from SNMP</flag>
         <flag name="ssp">Build programs with stack smashing protector</flag>
         <flag name="systemd">Support for systemd services</flag>
         <flag name="xls">Customizable performance metrics exporter tool from PCP to XLSX</flag>
