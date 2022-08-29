@@ -54,6 +54,12 @@ RDEPEND="${DEPEND}
 
 src_prepare() {
 	eapply_user
+
+	# gentooify systemd services
+	sed \
+        -e 's:sysconfig/:conf.d/:g' \
+        -e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
+        -i "${S}"/*/*/*.service.in || die
 }
 
 src_configure() {
