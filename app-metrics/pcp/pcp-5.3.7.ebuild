@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=(python3_{7..10})
+PYTHON_COMPAT=(python3_{8..10})
 inherit systemd distutils-r1
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
@@ -20,7 +20,7 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent +pie podman postgresql qt5 selinux snmp +ssp systemd +threads X xls"
+IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgresql qt5 selinux snmp ssp systemd +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 BDEPEND="
@@ -33,17 +33,17 @@ BDEPEND="
 "
 
 DEPEND="
-	activemq?  ( dev-perl/perl-libwww )
-	bind? ( dev-perl/perl-libwww dev-perl/XML-LibXML dev-perl/File-Slurp )
+	activemq?  ( dev-perl/libwww-perl )
+	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? ( dev-python/requests[${PYTHON_USEDEP}] )
 	json? ( dev-python/jsonpointer[${PYTHON_USEDEP}] dev-python/six[${PYTHON_USEDEP}] )
 	libvirt? ( dev-python/libvirt-python[${PYTHON_USEDEP}] dev-python/lxml[${PYTHON_USEDEP}] )
 	mysql? ( dev-perl/DBD-mysql )
-	nginx? ( dev-perl/perl-libwww )
+	nginx? ( dev-perl/libwww-perl )
 	nutcracker? ( dev-perl/YAML-LibYAML virtual/perl-JSON-PP )
 	perfevent? ( dev-libs/libpfm )
 	podman? ( dev-libs/libvarlink )
-	postgresql? ( dev-python/psycopg[${PYTHON_USEDEP}] )
+	postgresql? ( dev-python/psycopg:*[${PYTHON_USEDEP}] )
 	snmp? ( dev-perl/Net-SNMP )
 	xls? ( dev-python/openpyxl[${PYTHON_USEDEP}] )
 "
@@ -54,6 +54,12 @@ RDEPEND="${DEPEND}
 
 src_prepare() {
 	eapply_user
+
+	# gentooify systemd services
+	sed \
+        -e 's:sysconfig/:conf.d/:g' \
+        -e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
+        -i "${S}"/*/*/*.service.in || die
 }
 
 src_configure() {
@@ -85,7 +91,7 @@ src_compile() {
 }
 
 src_install() {
-	DIST_ROOT="${D}" emake install
+	emake DIST_ROOT="${D}" PCP_SYSCONFIG_DIR=/etc/conf.d install
 
 	rm -rf "${D}/var/lib/pcp/testsuite"
 }
