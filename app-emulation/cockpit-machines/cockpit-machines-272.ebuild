@@ -29,6 +29,7 @@ RDEPEND="${DEPEND}
 	>=app-admin/cockpit-${PV}
 	app-emulation/libvirt-dbus
 	app-emulation/libvirt[firewalld,policykit]
+	app-emulation/qemu[usbredir]
 	app-emulation/virt-manager[policykit]
 "
 
