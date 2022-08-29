@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=(python3_{7..10})
+PYTHON_COMPAT=(python3_{8..10})
 inherit systemd distutils-r1
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
@@ -33,13 +33,13 @@ BDEPEND="
 "
 
 DEPEND="
-	activemq?  ( dev-perl/perl-libwww )
-	bind? ( dev-perl/perl-libwww dev-perl/XML-LibXML dev-perl/File-Slurp )
+	activemq?  ( dev-perl/libwww-perl )
+	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? ( dev-python/requests[${PYTHON_USEDEP}] )
 	json? ( dev-python/jsonpointer[${PYTHON_USEDEP}] dev-python/six[${PYTHON_USEDEP}] )
 	libvirt? ( dev-python/libvirt-python[${PYTHON_USEDEP}] dev-python/lxml[${PYTHON_USEDEP}] )
 	mysql? ( dev-perl/DBD-mysql )
-	nginx? ( dev-perl/perl-libwww )
+	nginx? ( dev-perl/libwww-perl )
 	nutcracker? ( dev-perl/YAML-LibYAML virtual/perl-JSON-PP )
 	perfevent? ( dev-libs/libpfm )
 	podman? ( dev-libs/libvarlink )
