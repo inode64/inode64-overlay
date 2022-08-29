@@ -20,7 +20,7 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgresql qt5 selinux snmp ssp systemd +threads X xls"
+IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp systemd +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 BDEPEND="
@@ -43,7 +43,7 @@ DEPEND="
 	nutcracker? ( dev-perl/YAML-LibYAML virtual/perl-JSON-PP )
 	perfevent? ( dev-libs/libpfm )
 	podman? ( dev-libs/libvarlink )
-	postgresql? ( dev-python/psycopg:*[${PYTHON_USEDEP}] )
+	postgres? ( dev-python/psycopg:*[${PYTHON_USEDEP}] )
 	snmp? ( dev-perl/Net-SNMP )
 	xls? ( dev-python/openpyxl[${PYTHON_USEDEP}] )
 "
