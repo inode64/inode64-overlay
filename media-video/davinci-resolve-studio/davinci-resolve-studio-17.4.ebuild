@@ -106,7 +106,7 @@ DEPEND="
 		media-gfx/graphviz
 		media-libs/freeglut
 		media-libs/soxr
-		net-dns/avahi
+		net-dns/avahi[mdnsresponder-compat]
 		net-misc/curl
 	)
 "

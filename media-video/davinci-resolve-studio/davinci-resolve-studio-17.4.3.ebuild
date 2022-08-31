@@ -104,7 +104,7 @@ DEPEND="
 		media-gfx/graphviz
 		media-libs/freeglut
 		media-libs/soxr
-		net-dns/avahi
+		net-dns/avahi[mdnsresponder-compat]
 		net-misc/curl
 	)
 	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
