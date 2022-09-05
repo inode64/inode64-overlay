@@ -11,6 +11,7 @@ RDEPEND="
 		|| ( dev-util/phpstorm app-editors/vscode )
 		dev-lang/php
 		dev-php/composer
+		dev-php/phpunit
 		dev-php/PHP_CodeSniffer
 		dev-php/phpmd
 		dev-php/xdebug
