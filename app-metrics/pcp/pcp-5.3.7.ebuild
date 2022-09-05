@@ -57,9 +57,9 @@ src_prepare() {
 
 	# gentooify systemd services
 	sed \
-        -e 's:sysconfig/:conf.d/:g' \
-        -e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
-        -i "${S}"/*/*/*.service.in || die
+	-e 's:sysconfig/:conf.d/:g' \
+	-e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
+	-i "${S}"/*/*/*.service.in || die
 }
 
 src_configure() {
