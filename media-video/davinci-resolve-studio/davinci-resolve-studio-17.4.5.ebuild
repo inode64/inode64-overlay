@@ -111,6 +111,7 @@ DEPEND="
 	video_cards_nvidia? ( x11-drivers/nvidia-drivers )
 "
 RDEPEND="${DEPEND}"
+BDEPEND="app-arch/unzip"
 
 LICENSE="Blackmagic"
 SLOT="0"

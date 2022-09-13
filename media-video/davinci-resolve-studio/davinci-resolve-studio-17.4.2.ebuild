@@ -110,6 +110,7 @@ DEPEND="
 	)
 "
 RDEPEND="${DEPEND}"
+BDEPEND="app-arch/unzip"
 
 LICENSE="Blackmagic"
 SLOT="0"

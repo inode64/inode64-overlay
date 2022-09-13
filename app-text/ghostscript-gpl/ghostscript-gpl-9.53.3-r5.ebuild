@@ -41,7 +41,7 @@ DEPEND="
 	>=media-libs/openjpeg-2.1.0:2=
 	>=media-libs/tiff-4.0.1:0=
 	>=sys-libs/zlib-1.2.7
-	virtual/jpeg:0
+	media-libs/libjpeg-turbo:0=
 	cups? ( >=net-print/cups-1.3.8 )
 	dbus? ( sys-apps/dbus )
 	gtk? ( || ( x11-libs/gtk+:3 x11-libs/gtk+:2 ) )

@@ -2,8 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=(python3_{8..10})
-inherit systemd distutils-r1
+PYTHON_COMPAT=(python3_{8..11})
+inherit distutils-r1
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
 HOMEPAGE="http://pcp.io"
