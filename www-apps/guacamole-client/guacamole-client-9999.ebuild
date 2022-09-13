@@ -1,9 +1,8 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit eutils
 DESCRIPTION="Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 
@@ -22,10 +21,11 @@ IUSE="ldap +mysql postgres"
 REQUIRED_USE="|| ( ldap mysql postgres )"
 DEPEND="dev-java/maven-bin"
 RDEPEND="${DEPEND}
-	www-servers/tomcat:8.5
-	virtual/jre:1.8
+	ldap? ( net-nds/openldap )
 	postgres? ( dev-java/jdbc-postgresql )
-	ldap? ( net-nds/openldap )"
+	virtual/jre:1.8
+	www-servers/tomcat:8.5
+	"
 
 # To enable Maven access to https://repo.maven.apache.org/maven2
 RESTRICT="network-sandbox"

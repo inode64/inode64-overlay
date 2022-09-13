@@ -31,6 +31,8 @@ RDEPEND="
 BDEPEND="
 "
 
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+
 src_prepare() {
 	default
 }

@@ -30,31 +30,31 @@ RDEPEND="
 	dev-libs/fribidi
 	dev-libs/glib
 	dev-libs/json-c
-	dev-libs/nss
 	dev-libs/libbsd
+	dev-libs/nss
 	dev-libs/openssl:0=
 	dev-libs/wayland
+	media-fonts/dejavu
+	media-gfx/graphite2
 	media-libs/alsa-lib
 	media-libs/fontconfig
 	media-libs/freetype:2=
 	media-libs/harfbuzz
 	media-libs/libglvnd
+	media-libs/libjpeg-turbo:0=
 	media-libs/libpng:0=
-	media-fonts/dejavu
-	media-gfx/graphite2
 	net-libs/gnutls
 	net-print/cups
 	sys-apps/dbus
 	sys-libs/libcap
 	sys-libs/zlib
-	virtual/jpeg:0=
 	x11-libs/libX11
-	x11-libs/libxcb
 	x11-libs/libXext
 	x11-libs/libXi
 	x11-libs/libXrandr
 	x11-libs/libXrender
 	x11-libs/libXtst
+	x11-libs/libxcb
 	x11-libs/pango
 "
 

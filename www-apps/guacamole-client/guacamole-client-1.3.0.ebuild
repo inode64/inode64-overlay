@@ -3,7 +3,6 @@
 
 EAPI=7
 
-inherit eutils
 DESCRIPTION="Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 

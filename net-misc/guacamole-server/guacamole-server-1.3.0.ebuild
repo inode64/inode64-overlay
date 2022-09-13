@@ -8,7 +8,7 @@ DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
 HOMEPAGE="https://guacamole.apache.org/"
 
 if [[ "${PV}" == *9999 ]] ; then
-	inherit autotools git-r3
+	inherit git-r3
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-server.git"
 else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
@@ -34,10 +34,10 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	acct-group/guacamole
 	acct-user/guacamole
-	x11-libs/cairo
-	media-libs/libpng:0=
-	virtual/jpeg:0
 	dev-libs/ossp-uuid
+	media-libs/libjpeg-turbo:0=
+	media-libs/libpng:0=
+	x11-libs/cairo
 	encode? ( media-video/ffmpeg )
 	rdp? ( net-misc/freerdp )
 	ssh? (
