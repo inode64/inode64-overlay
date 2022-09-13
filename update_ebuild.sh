@@ -56,4 +56,4 @@ EOF
 	ebuild "${ebuild}" digest 2>/dev/null
 done
 
-repoman 2>/dev/null
+/usr/bin/pkgcheck scan
