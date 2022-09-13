@@ -10,7 +10,7 @@ KEYWORDS="~amd64"
 RDEPEND="
 		|| ( dev-util/phpstorm dev-util/pycharm-community dev-util/pycharm-professional app-editors/vscode )
 		app-portage/eix
-		app-portage/repoman
+		dev-util/pkgdev
 		dev-util/shellcheck-bin
 		dev-vcs/git
 "
