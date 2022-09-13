@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{8..11} )
 
-inherit autotools bash-completion-r1 python-single-r1
+inherit autotools python-single-r1
 
 DESCRIPTION="NBD client library in userspace"
 HOMEPAGE="https://github.com/libguestfs/libnbd"
@@ -22,7 +22,7 @@ REQUIRED_USE="
 	"
 COMMON_DEPEND="
 	dev-libs/libxml2:2=
-	examples ( dev-libs/glib dev-libs/libev )
+	examples? ( dev-libs/glib dev-libs/libev )
 	fuse? ( sys-fs/fuse:3 )
 	go? ( dev-lang/go )
 	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
