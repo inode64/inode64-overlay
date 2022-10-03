@@ -23,7 +23,7 @@ IUSE="amqp apache2 ipmi ldap nginx postgres radius redis"
 REQUIRED_USE="^^ ( apache2 nginx )"
 
 RDEPEND="
-	>=dev-lang/php-7.4:*[bcmath,cli,curl,fpm,gd,json,mysqli,ldap?,pdo,session,snmp,xml,zip]
+	>=dev-lang/php-7.4:*[bcmath,cli,curl,fpm,gd,json,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
 	>=net-analyzer/fping-4.2[suid,ipv6]
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo

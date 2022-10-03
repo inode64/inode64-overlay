@@ -2,46 +2,46 @@
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
     <longdescription lang="en">
-        Performance Co-Pilot (PCP) provides a framework and services to support system-level performance monitoring and
-        management. It presents a unifying abstraction for all of the performance data in a system, and many tools for
-        interrogating, retrieving and processing that data.
+	Performance Co-Pilot (PCP) provides a framework and services to support system-level performance monitoring and
+	management. It presents a unifying abstraction for all of the performance data in a system, and many tools for
+	interrogating, retrieving and processing that data.
     </longdescription>
     <maintainer type="person" proxied="yes">
-        <email>web@inode64.com</email>
-        <name>Fco. Javier Félix</name>
+	<email>web@inode64.com</email>
+	<name>Fco. Javier Félix</name>
     </maintainer>
     <upstream>
-        <remote-id type="github">performancecopilot/pcp</remote-id>
+	<remote-id type="github">performancecopilot/pcp</remote-id>
     </upstream>
     <use>
-        <flag name="activemq">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from ActiveMQ
-        </flag>
-        <flag name="bind">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from BIND via its
-            REST interface
-        </flag>
-        <flag name="discovery">Support discover PCP services on the network</flag>
-        <flag name="doc">Enable building of the PCP books</flag>
-        <flag name="infiniband">Support for inifiniband metrics</flag>
-        <flag name="influxdb">Customizable performance metrics exporter tool from PCP to InfluxDB</flag>
-        <flag name="json">Customizable performance metrics exporter tool from PCP to JSON</flag>
-        <flag name="libvirt">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from libvirt
-            virtual machines
-        </flag>
-        <flag name="nginx">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from Nginx</flag>
-        <flag name="nutcracker">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from
-            NutCracker (TwemCache)
-        </flag>
-        <flag name="perfevent">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from hardware
-            performance counters using the Linux kernel perf_event API
-        </flag>
-        <flag name="pie">Build programs as Position Independent Executables (a security hardening technique)</flag>
-        <flag name="podman">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from podman</flag>
-        <flag name="postgres">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics about the
-            PostgreSQL database
-        </flag>
-        <flag name="snmp">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from SNMP</flag>
-        <flag name="ssp">Build programs with stack smashing protector</flag>
-        <flag name="systemd">Support for systemd services</flag>
-        <flag name="xls">Customizable performance metrics exporter tool from PCP to XLSX</flag>
+	<flag name="activemq">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from ActiveMQ
+	</flag>
+	<flag name="bind">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from BIND via its
+	    REST interface
+	</flag>
+	<flag name="discovery">Support discover PCP services on the network</flag>
+	<flag name="doc">Enable building of the PCP books</flag>
+	<flag name="infiniband">Support for inifiniband metrics</flag>
+	<flag name="influxdb">Customizable performance metrics exporter tool from PCP to InfluxDB</flag>
+	<flag name="json">Customizable performance metrics exporter tool from PCP to JSON</flag>
+	<flag name="libvirt">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from libvirt
+	    virtual machines
+	</flag>
+	<flag name="nginx">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from Nginx</flag>
+	<flag name="nutcracker">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from
+	    NutCracker (TwemCache)
+	</flag>
+	<flag name="perfevent">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from hardware
+	    performance counters using the Linux kernel perf_event API
+	</flag>
+	<flag name="pie">Build programs as Position Independent Executables (a security hardening technique)</flag>
+	<flag name="podman">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from podman</flag>
+	<flag name="postgres">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics about the
+	    PostgreSQL database
+	</flag>
+	<flag name="snmp">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from SNMP</flag>
+	<flag name="ssp">Build programs with stack smashing protector</flag>
+	<flag name="systemd">Support for systemd services</flag>
+	<flag name="xls">Customizable performance metrics exporter tool from PCP to XLSX</flag>
     </use>
 </pkgmetadata>
