@@ -9,7 +9,6 @@
 		<name>J. García</name>
 	</maintainer>
 	<use>
-		<flag name="maintainer-mode">Enables maintaner mode</flag>
 		<flag name="debug">Enables debug information</flag>
 	</use>
 </pkgmetadata>
