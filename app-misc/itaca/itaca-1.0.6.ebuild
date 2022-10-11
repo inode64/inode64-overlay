@@ -1,7 +1,7 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 inherit desktop unpacker xdg
 
 KEYWORDS="~amd64"
@@ -10,8 +10,8 @@ HOMEPAGE="https://ceice.gva.es/webitaca/es/index.asp"
 SRC_URI="http://lliurex.net/focal/pool/main/i/itaca/${PN}_${PV}_amd64.deb"
 RESTRICT="mirror strip"
 IUSE=""
-DEPEND="
-		app-accessibility/at-spi2-atk
+RDEPEND="
+		app-accessibility/at-spi2-core
 		dev-libs/nss
 		gnome-base/gvfs
 		media-libs/mesa
@@ -21,7 +21,6 @@ DEPEND="
 		x11-libs/libnotify
 		x11-libs/libxcb
 "
-RDEPEND="${DEPEND}"
 
 LICENSE="Itaca"
 SLOT="0"
