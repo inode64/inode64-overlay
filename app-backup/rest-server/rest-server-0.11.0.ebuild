@@ -27,7 +27,7 @@ src_prepare() {
 }
 
 src_compile() {
-	ego build -o rest-server ./cmd/rest-server || die
+	CGO_ENABLED=0 ego build -o rest-server ./cmd/rest-server || die
 }
 
 src_install() {
