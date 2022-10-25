@@ -10,7 +10,7 @@ MY_PV="00${PV}.0000.0000"
 MY_P="${PN}-${MY_PV}"
 DESCRIPTION="MegaRAID StorCLI (successor of the MegaCLI)"
 HOMEPAGE="https://www.broadcom.com/support/download-search?dk=storcli"
-SRC_URI="https://docs.broadcom.com/docs-and-downloads/raid-controllers/raid-controllers-common-files/${MY_PV}_Unified_StorCLI-PUL.zip -> ${P}.zip"
+SRC_URI="https://docs.broadcom.com/docs-and-downloads/host-bus-adapters/host-bus-adapters-common-files/sas_sata_nvme_12g_p24/STORCLI_SAS3.5_P24.zip -> ${P}.zip"
 
 LICENSE="Avago LSI BSD"
 SLOT="0"
@@ -27,7 +27,7 @@ QA_PRESTRIPPED="/opt/MegaRAID/storcli/storcli64"
 
 src_unpack() {
 	default
-	rpm_unpack ./Linux/${MY_P}-1.noarch.rpm
+	rpm_unpack ./STORCLI_SAS3.5_P24/univ_viva_cli_rel/Unified_storcli_all_os/Linux/${MY_P}-1.noarch.rpm
 }
 
 src_install() {
