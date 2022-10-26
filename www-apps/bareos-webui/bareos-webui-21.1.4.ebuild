@@ -19,10 +19,10 @@ RESTRICT="mirror"
 LICENSE="AGPL-3"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="mysql +postgres"
+IUSE=""
 DEPEND=""
 RDEPEND="${DEPEND}
-	dev-lang/php[bzip2,ctype,curl,fileinfo,filter,gd,iconv,intl,mhash,mysql?,nls,pdo,postgres?,session,simplexml,ssl,xml,xmlreader,xmlwriter,zip]
+	dev-lang/php[bzip2,ctype,curl,fileinfo,filter,gd,iconv,intl,mhash,nls,pdo,postgres,session,simplexml,ssl,xml,xmlreader,xmlwriter,zip]
 	virtual/httpd-php
 "
 need_httpd_cgi
