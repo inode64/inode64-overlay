@@ -33,6 +33,13 @@ pkg_setup() {
 	webapp_pkg_setup
 }
 
+src_prepare() {
+	# fix missing VERSION
+	sed -i "s/@BAREOS_FULL_VERSION@/${PV}/g" version.php.in || die
+
+	cmake_src_prepare
+}
+
 src_install() {
 	webapp_src_preinst
 
@@ -47,9 +54,6 @@ src_install() {
 
 	mv "${D}/${MY_HTDOCSDIR}"/usr/share/bareos-webui/* "${D}/${MY_HTDOCSDIR}"/
 	rmdir "${D}/${MY_HTDOCSDIR}"/usr/share/bareos-webui
-
-	webapp_configfile "${MY_HTDOCSDIR}"/config/application.config.php
-	webapp_configfile "${MY_HTDOCSDIR}"/config/autoload/global.php
 
 	find "${D}/${MY_HTDOCSDIR}" -type f -name '*.in' -delete
 
