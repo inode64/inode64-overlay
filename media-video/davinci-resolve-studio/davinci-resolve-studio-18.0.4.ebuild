@@ -78,6 +78,7 @@ DEPEND="
 	media-gfx/graphite2
 	media-libs/alsa-lib
 	media-libs/flac
+	media-libs/gstreamer
 	media-libs/harfbuzz
 	media-libs/libogg
 	media-libs/libpng-compat:1.2
@@ -135,12 +136,12 @@ include_dir() {
 }
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="13G"
+	CHECKREQS_DISK_BUILD="14G"
 
 	check-reqs_pkg_pretend
 }
 pkg_setup() {
-	CHECKREQS_DISK_BUILD="13G"
+	CHECKREQS_DISK_BUILD="14G"
 
 	check-reqs_pkg_pretend
 }
@@ -161,9 +162,7 @@ src_prepare() {
 
 	# Remove 32bits apps
 	rm LUT/GenOutputLut \
-		LUT/GenLut \
-		BlackmagicRAWPlayer/BlackmagicRawAPI/libgcc_s.so.1 \
-		BlackmagicRAWSpeedTest/BlackmagicRawAPI/libgcc_s.so.1 || die
+		LUT/GenLut || die
 
 	# Remove bundled libraries
 	if use !bundled-libs; then
@@ -200,7 +199,8 @@ src_install() {
 
 	insinto "${PKG_HOME}"
 	local _dir
-	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Control "DaVinci Control Panels Setup" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
+	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
+	            "Fairlight Studio Utility" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
 
