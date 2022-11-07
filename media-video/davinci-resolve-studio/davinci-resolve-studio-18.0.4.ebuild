@@ -46,8 +46,6 @@ LIBS_SYM="
 	libs/libxcb-xkb.so.1
 	libs/libxcb.so.1
 	libs/libxdot.so.4.0.0
-	libs/libxmlsec1-openssl.so
-	libs/libxmlsec1.so
 "
 
 KEYWORDS="~amd64"
