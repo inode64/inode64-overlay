@@ -1,0 +1,17 @@
+BDEPEND=dev-util/patchelf
+DEFINED_PHASES=compile configure install nofetch postinst test unpack
+DEPEND=>=virtual/opencl-3 x11-libs/libdrm[libkms] utils? ( dev-util/cunit )
+DESCRIPTION=Proprietary OpenCL implementation for AMD GPUs
+EAPI=7
+HOMEPAGE=https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-40-1
+INHERIT=unpacker multilib-minimal
+IUSE=utils abi_x86_32 abi_x86_64
+KEYWORDS=~amd64 ~x86
+LICENSE=AMD-GPU-PRO-EULA
+RDEPEND=>=virtual/opencl-3 x11-libs/libdrm[libkms] utils? ( dev-util/cunit ) !media-libs/mesa[opencl]
+REQUIRED_USE=|| ( abi_x86_32 abi_x86_64 )
+RESTRICT=bindist fetch mirror strip
+SLOT=0
+SRC_URI=amdgpu-pro-21.40-1.40501-ubuntu-20.04.tar.xz
+_eclasses_=multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	1542e649be915f43f6908a9e93909961	multilib	5ca4e49abed8e3a2f7b56920eadee157	unpacker	bc57272a0491765c71d973c8cfd35063	multibuild	d26d81f242cb193d899a72bca423d0bd	multilib-build	87f1b83e21a473787b821ef3d0437bf3	multilib-minimal	4b0f1857965db8869a729948d5277e0b
+_md5_=ab241425cde85bdc2933f575f7fef24d

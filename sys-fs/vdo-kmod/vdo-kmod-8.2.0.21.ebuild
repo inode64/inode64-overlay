@@ -19,11 +19,11 @@ BDEPEND="dev-libs/elfutils"
 CONFIG_CHECK="LZ4_COMPRESS LZ4_DECOMPRESS"
 
 pkg_pretend() {
-        linux-mod_pkg_setup
+	linux-mod_pkg_setup
 }
 
 pkg_setup() {
-        linux-mod_pkg_setup
+	linux-mod_pkg_setup
 }
 
 src_compile() {

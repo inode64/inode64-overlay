@@ -39,7 +39,7 @@ DEPEND="
 	dev-libs/gmp:0
 	!clientonly? (
 		acct-user/${PN}
-		dev-db/postgresql:*[threads]
+		dev-db/postgresql:*
 		director? (
 			virtual/mta
 		)
@@ -79,8 +79,7 @@ BDEPEND="
 	${PYTHON_DEPS}
 	test? (
 		dev-cpp/gtest
-		dev-db/postgresql:*[server,threads]
-		dev-db/mariadb:*[server]
+		dev-db/postgresql:*[server]
 	)
 "
 
@@ -128,10 +127,6 @@ src_test() {
 	createuser -h "${T}" bareos || die
 	createdb -h "${T}" --owner bareos bareos || die
 	export PGHOST="${T}"
-
-	# initiale mariadb database for backup tests
-	# $USER must be set and != root
-	export USER=portage
 
 	default
 	cmake_src_test

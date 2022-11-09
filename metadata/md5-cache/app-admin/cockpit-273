@@ -1,0 +1,15 @@
+BDEPEND=>=app-crypt/mit-krb5-1.11 >=dev-libs/glib-2.50 >=dev-libs/json-glib-1.4 >=net-libs/gnutls-3.6.0 >=net-libs/libssh-0.8.5[server] >=sys-apps/systemd-235[policykit] >=sys-auth/polkit-0.105[systemd] doc? ( app-text/xmlto ) sys-devel/gnuconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4 virtual/pkgconfig
+DEFINED_PHASES=configure install postinst prepare
+DEPEND=dev-libs/libpwquality dev-python/dbus-python net-libs/nodejs[npm] networkmanager? ( firewalld? ( net-firewall/firewalld ) net-misc/networkmanager[policykit,systemd] ) pcp? ( app-metrics/pcp ) sys-apps/accountsservice[systemd] udisks? ( sys-fs/udisks[lvm,systemd] ) tuned? ( sys-apps/tuned ) virtual/libcrypt:=
+DESCRIPTION=Server Administration Web Interface
+EAPI=8
+HOMEPAGE=http://cockpit-project.org/
+INHERIT=autotools pam systemd
+IUSE=+doc +networkmanager debug firewalld pcp selinux tuned udisks
+KEYWORDS=~amd64 ~x86
+LICENSE=LGPL-2.1+
+RDEPEND=dev-libs/libpwquality dev-python/dbus-python net-libs/nodejs[npm] networkmanager? ( firewalld? ( net-firewall/firewalld ) net-misc/networkmanager[policykit,systemd] ) pcp? ( app-metrics/pcp ) sys-apps/accountsservice[systemd] udisks? ( sys-fs/udisks[lvm,systemd] ) tuned? ( sys-apps/tuned ) virtual/libcrypt:= acct-group/cockpit-ws acct-group/cockpit-wsinstance acct-user/cockpit-ws acct-user/cockpit-wsinstance dev-libs/libgudev net-libs/glib-networking[ssl] virtual/krb5
+SLOT=0
+SRC_URI=https://github.com/cockpit-project/cockpit/releases/download/273/cockpit-273.tar.xz
+_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	1542e649be915f43f6908a9e93909961	multilib	5ca4e49abed8e3a2f7b56920eadee157	libtool	241a8f577b9781a42a7421e53448a44e	autotools	9e6965bfaa00f52cc61e0d4bc44c87b3	flag-o-matic	29a755b1291d64133634d80b0328f153	pam	e44a1dd98f13e1ad76de01e919bde1f1	systemd	2736b403a83f194b59b767f3b344c2c1
+_md5_=43836b4035617917cc2578b4abbe60d5
