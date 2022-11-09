@@ -1,0 +1,14 @@
+DEFINED_PHASES=compile install
+DEPEND=dev-java/maven-bin
+DESCRIPTION=Guacamole is a clientless remote desktop gateway
+EAPI=8
+HOMEPAGE=https://guacamole.apache.org/
+IUSE=ldap +mysql postgres
+KEYWORDS=~amd64 ~x86
+LICENSE=MIT
+RDEPEND=dev-java/maven-bin ldap? ( net-nds/openldap ) postgres? ( dev-java/jdbc-postgresql ) virtual/jre:1.8 www-servers/tomcat:8.5
+REQUIRED_USE=|| ( ldap mysql postgres )
+RESTRICT=network-sandbox
+SLOT=0
+SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.4.0/source/guacamole-client-1.4.0.tar.gz
+_md5_=a1d4414252dfd6615fe86a6f809273b1

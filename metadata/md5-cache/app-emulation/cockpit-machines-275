@@ -1,0 +1,12 @@
+BDEPEND=
+DEFINED_PHASES=-
+DEPEND=
+DESCRIPTION=This is the Cockpit user interface for virtual machines
+EAPI=8
+HOMEPAGE=http://cockpit-project.org/
+KEYWORDS=~amd64 ~x86
+LICENSE=LGPL-2.1
+RDEPEND=>=app-admin/cockpit-275 app-emulation/libvirt-dbus app-emulation/libvirt[firewalld,policykit] app-emulation/qemu[usbredir] app-emulation/virt-manager[policykit]
+SLOT=0
+SRC_URI=https://github.com/cockpit-project/cockpit-machines/releases/download/275/cockpit-machines-275.tar.xz
+_md5_=a36b69729876683504e7fe60f6ed484f

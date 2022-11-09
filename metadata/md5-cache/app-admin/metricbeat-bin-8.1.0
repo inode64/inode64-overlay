@@ -1,0 +1,12 @@
+BDEPEND=virtual/pkgconfig
+DEFINED_PHASES=compile install
+DESCRIPTION=Lightweight shipper for metrics
+EAPI=8
+HOMEPAGE=https://www.elastic.co/es/beats/metricbeat
+INHERIT=systemd
+KEYWORDS=~amd64
+LICENSE=Apache-2.0
+SLOT=0
+SRC_URI=https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-8.1.0-linux-x86_64.tar.gz
+_eclasses_=toolchain-funcs	441f754fd75cd4fd1fa06fbc17da6144	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
+_md5_=822b8a8448b4f9f73f881dce74813962

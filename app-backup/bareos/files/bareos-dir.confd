@@ -3,7 +3,7 @@
 
 # Config file for /etc/init.d/bareos-dir
 
-# Bareos can use more than one catalog database and each one can 
+# Bareos can use more than one catalog database and each one can
 # be of any supported type.
 # If a database server where you store a bareos catalog
 # is on a different machine, you might want to remove the corresponding

@@ -1,0 +1,14 @@
+BDEPEND=dev-lang/typescript >=net-libs/nodejs-10[npm] virtual/pkgconfig
+DEFINED_PHASES=compile install
+DESCRIPTION=It bridges events and allows you to control your Zigbee devices via MQTT
+EAPI=8
+HOMEPAGE=https://www.zigbee2mqtt.io/
+INHERIT=systemd
+KEYWORDS=~amd64
+LICENSE=GPL-3
+RDEPEND=acct-group/zigbee2mqtt acct-user/zigbee2mqtt app-misc/mosquitto net-libs/nodejs:=
+RESTRICT=network-sandbox
+SLOT=0
+SRC_URI=https://github.com/Koenkk/zigbee2mqtt/archive/1.27.0.tar.gz -> zigbee2mqtt-1.27.0.tar.gz
+_eclasses_=toolchain-funcs	1542e649be915f43f6908a9e93909961	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	2736b403a83f194b59b767f3b344c2c1
+_md5_=ffed97ac7e196ce8047f894581004b6d
