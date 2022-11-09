@@ -23,7 +23,6 @@ LIBS_SYM="
 	libs/libcdt.so.5.0.0
 	libs/libcgraph.so.6.0.0
 	libs/libcrypto.so.1.1
-	libs/libcurl.so
 	libs/libgvc.so.6.0.0
 	libs/libgvpr.so.2.0.0
 	libs/libpathplan.so.4.0.0
@@ -46,8 +45,6 @@ LIBS_SYM="
 	libs/libxcb-xkb.so.1
 	libs/libxcb.so.1
 	libs/libxdot.so.4.0.0
-	libs/libxmlsec1-openssl.so
-	libs/libxmlsec1.so
 "
 
 KEYWORDS="~amd64"
@@ -78,6 +75,7 @@ DEPEND="
 	media-gfx/graphite2
 	media-libs/alsa-lib
 	media-libs/flac
+	media-libs/gstreamer
 	media-libs/harfbuzz
 	media-libs/libogg
 	media-libs/libpng-compat:1.2
@@ -135,12 +133,12 @@ include_dir() {
 }
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="13G"
+	CHECKREQS_DISK_BUILD="14G"
 
 	check-reqs_pkg_pretend
 }
 pkg_setup() {
-	CHECKREQS_DISK_BUILD="13G"
+	CHECKREQS_DISK_BUILD="14G"
 
 	check-reqs_pkg_pretend
 }
@@ -161,9 +159,7 @@ src_prepare() {
 
 	# Remove 32bits apps
 	rm LUT/GenOutputLut \
-		LUT/GenLut \
-		BlackmagicRAWPlayer/BlackmagicRawAPI/libgcc_s.so.1 \
-		BlackmagicRAWSpeedTest/BlackmagicRawAPI/libgcc_s.so.1 || die
+		LUT/GenLut || die
 
 	# Remove bundled libraries
 	if use !bundled-libs; then
@@ -200,7 +196,8 @@ src_install() {
 
 	insinto "${PKG_HOME}"
 	local _dir
-	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Control "DaVinci Control Panels Setup" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
+	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
+	            "Fairlight Studio Utility" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
 
@@ -294,5 +291,6 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
+	udev_reload
 	xdg_pkg_postrm
 }
