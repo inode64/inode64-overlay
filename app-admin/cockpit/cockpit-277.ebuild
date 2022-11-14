@@ -6,9 +6,7 @@ EAPI=8
 inherit autotools pam
 
 DESCRIPTION="Server Administration Web Interface "
-HOMEPAGE="http://cockpit-project.org/"
-
-if [[ ${PV} == 9999* ]]; then
+HOMEPAGE="https://cockpit-project.org/"if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/cockpit-project/cockpit.git"
 	KEYWORDS=""
