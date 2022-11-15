@@ -4,14 +4,40 @@ After=network.target
 Wants=mosquitto.service
 
 [Service]
-ExecStart=/usr/bin/zigbee2mqtt
-WorkingDirectory=/var/lib/zigbee2mqtt
-StandardOutput=inherit
+ExecStart=node index.js
+WorkingDirectory=/usr/lib64/node_modules/zigbee2mqtt
 Environment=ZIGBEE2MQTT_DATA=/var/lib/zigbee2mqtt
-# Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
+StandardOutput=inherit
 StandardError=inherit
 Restart=always
 User=zigbee2mqtt
+
+CapabilityBoundingSet=
+NoNewPrivileges=true
+RemoveIPC=true
+LockPersonality=true
+
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectProc=noaccess
+ProtectClock=yes
+DeviceAllow=char-* rw
+
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/zigbee2mqtt
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @pkey
 
 [Install]
 WantedBy=multi-user.target
