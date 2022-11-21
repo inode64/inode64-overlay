@@ -10,5 +10,5 @@ RDEPEND=app-admin/apache-tools
 RESTRICT=strip
 SLOT=0
 SRC_URI=https://github.com/restic/rest-server/archive/v0.11.0.tar.gz -> rest-server-0.11.0.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/rest-server-0.11.0-vendor.tar.xz
-_eclasses_=go-module	15312495dc4fd84f8c37bbe228ea2abd	toolchain-funcs	441f754fd75cd4fd1fa06fbc17da6144	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
+_eclasses_=go-module	4c4b34f361efda91762ffeda8f632c02	toolchain-funcs	441f754fd75cd4fd1fa06fbc17da6144	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
 _md5_=d9dcdac600fecca72b13e7a5209dd838
