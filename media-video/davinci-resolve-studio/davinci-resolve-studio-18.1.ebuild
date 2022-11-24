@@ -55,7 +55,6 @@ DEPEND="
 	dev-libs/libunistring
 	dev-libs/nspr
 	dev-libs/nss
-	dev-libs/ocl-icd
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/alsa-lib
@@ -73,6 +72,7 @@ DEPEND="
 	net-libs/nghttp2
 	sys-apps/dbus
 	virtual/libcrypt
+	virtual/opencl
 	virtual/opengl
 	x11-libs/libX11
 	x11-libs/libXext
