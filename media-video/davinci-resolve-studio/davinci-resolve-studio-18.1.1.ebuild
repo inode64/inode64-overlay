@@ -55,7 +55,7 @@ DEPEND="
 	dev-libs/libunistring
 	dev-libs/nspr
 	dev-libs/nss
-	dev-qt/qt3d[gamepad]
+	dev-qt/qt3d[gamepad,qml]
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/alsa-lib
