@@ -96,14 +96,14 @@ src_install() {
 	rm -rf "${D}"/usr/share/cockpit/{packagekit,playground,sosreport}
 	rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
 
-	dodir /usr/share/cockpit/branding/gentoo
+	insinto /usr/share/cockpit/branding/gentoo
 	doins "${FILESDIR}/branding.css"
-	doins gentoo-logo.png logo.png
-	doins gentoo-logo.png apple-touch-icon.png
-	doins gentoo-logo.png favicon.ico
+	newins "${DISTDIR}/gentoo-logo.png" logo.png
+	newins "${DISTDIR}/gentoo-logo.png" apple-touch-icon.png
+	newins "${DISTDIR}/gentoo-logo.png" favicon.ico
 
 	# Remove branding from others distros
-	rm -rd "${D}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
+	rm -rf "${D}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
 
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
