@@ -16,7 +16,7 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 	EPL-1.0 EPL-2.0 GPL-2 GPL-2-with-classpath-exception GPL-3 ISC JDOM
 	LGPL-2.1+ LGPL-3 MIT MPL-1.0 MPL-1.1 OFL public-domain PSF-2 UoI-NCSA ZLIB"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
 
 BDEPEND="dev-util/patchelf"
@@ -75,14 +75,11 @@ src_prepare() {
 		plugins/performanceTesting/bin/libyjpagent.dylib
 		plugins/performanceTesting/bin/libyjpagent.so
 		plugins/remote-dev-server/selfcontained
-		plugins/tailwindcss/server/prebuilds/linux-x64/{\
-		    fsevents-72LCIACT.node,\
-		    node.napi.glibc-7JUDUCUY.node,\
-		    node.napi.glibc-GXL6UBYG.node,\
-		    node.napi.glibc-N3T2EEZH.node,\
-            node.napi.musl-IAP67VWK.node\
-		    }
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-linux-arm64
+		plugins/tailwindcss/server/{fsevents-72LCIACT.node,node.napi.glibc-7JUDUCUY.node,node.napi.glibc-GXL6UBYG.node,node.napi.glibc-N3T2EEZH.node,node.napi.musl-IAP67VWK.node}
 	)
+
+	use x86 || remove_me+=( lib/pty4j-native/linux/x86 )
 
 	rm -rv "${remove_me[@]}" || die
 
