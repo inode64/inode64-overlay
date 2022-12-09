@@ -16,6 +16,7 @@ else
 	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/cockpit-project/${PN}/releases/download/${PV}/${P}.tar.xz"
 fi
+SRC_URI="${SRC_URI} https://www.gentoo.org/assets/img/logo/gentoo-logo.png"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
@@ -94,6 +95,15 @@ src_install() {
 
 	rm -rf "${D}"/usr/share/cockpit/{packagekit,playground,sosreport}
 	rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
+
+	insinto /usr/share/cockpit/branding/gentoo
+	doins "${FILESDIR}/branding.css"
+	newins "${DISTDIR}/gentoo-logo.png" logo.png
+	newins "${DISTDIR}/gentoo-logo.png" apple-touch-icon.png
+	newins "${DISTDIR}/gentoo-logo.png" favicon.ico
+
+	# Remove branding from others distros
+	rm -rf "${D}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
 
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
