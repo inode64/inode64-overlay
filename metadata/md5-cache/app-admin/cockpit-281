@@ -10,6 +10,6 @@ KEYWORDS=~amd64 ~x86
 LICENSE=LGPL-2.1+
 RDEPEND=dev-libs/libpwquality dev-python/dbus-python net-libs/nodejs[npm] networkmanager? ( firewalld? ( net-firewall/firewalld ) net-misc/networkmanager[policykit,systemd] ) pcp? ( app-metrics/pcp ) sys-apps/accountsservice[systemd] udisks? ( sys-fs/udisks[lvm,systemd] ) tuned? ( sys-apps/tuned ) virtual/libcrypt:= acct-group/cockpit-ws acct-group/cockpit-wsinstance acct-user/cockpit-ws acct-user/cockpit-wsinstance dev-libs/libgudev net-libs/glib-networking[ssl] virtual/krb5
 SLOT=0
-SRC_URI=https://github.com/cockpit-project/cockpit/releases/download/281/cockpit-281.tar.xz
+SRC_URI=https://github.com/cockpit-project/cockpit/releases/download/281/cockpit-281.tar.xz https://www.gentoo.org/assets/img/logo/gentoo-logo.png
 _eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	37a4612ce5522df5a100359a8dbc8491	multilib	5ca4e49abed8e3a2f7b56920eadee157	libtool	241a8f577b9781a42a7421e53448a44e	autotools	6dcd6b6a486e79928e1243ff9ba41fcc	flag-o-matic	69394e25812406faa1f90edaf4969395	pam	e44a1dd98f13e1ad76de01e919bde1f1
-_md5_=bff083559508f759f4737200bbe18e5b
+_md5_=8784fab31c0c5a2e453bd1de4c914087

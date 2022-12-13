@@ -62,6 +62,7 @@ RDEPEND="${DEPEND}
 	acct-group/cockpit-wsinstance
 	acct-user/cockpit-ws
 	acct-user/cockpit-wsinstance
+	app-crypt/sscg
 	dev-libs/libgudev
 	net-libs/glib-networking[ssl]
 	virtual/krb5
