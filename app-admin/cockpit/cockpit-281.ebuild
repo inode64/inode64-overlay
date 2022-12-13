@@ -110,6 +110,9 @@ src_install() {
 	ewarn "use at your own risk"
 	newpamd "${FILESDIR}/cockpit.pam" cockpit
 	dodoc README.md AUTHORS
+
+    # Required for store self-signed certificates
+	keepdir /etc/cockpit/ws-certs.d/
 }
 
 pkg_postinst() {
