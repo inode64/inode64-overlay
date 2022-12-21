@@ -24,7 +24,7 @@ REQUIRED_USE="^^ ( apache2 nginx )"
 
 RDEPEND="
 	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
-	>=net-analyzer/fping-4.2[suid,ipv6]
+	>=net-analyzer/fping-4.2[suid]
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
 	app-arch/unzip
