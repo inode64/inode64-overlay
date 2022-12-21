@@ -1,2 +1,3 @@
 move sys-apps/cockpit app-admin/cockpit
 move sys-apps/pcp app-metrics/pcp
+move app-emulation/cockpit-machines app-admin/cockpit-machines
