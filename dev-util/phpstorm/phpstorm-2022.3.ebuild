@@ -79,7 +79,6 @@ src_prepare() {
 		plugins/performanceTesting/bin/libyjpagent.so
 		plugins/remote-dev-server/selfcontained
 		plugins/tailwindcss/server/{fsevents-72LCIACT.node,node.napi.glibc-7JUDUCUY.node,node.napi.glibc-GXL6UBYG.node,node.napi.glibc-N3T2EEZH.node,node.napi.musl-IAP67VWK.node}
-		plugins/webp/lib/libwebp/linux/libwebp_jni.so
 	)
 
 	use x86 || remove_me+=( lib/pty4j-native/linux/x86 )
