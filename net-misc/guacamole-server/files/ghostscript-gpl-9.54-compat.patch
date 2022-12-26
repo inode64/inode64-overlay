@@ -1,5 +1,5 @@
---- src/protocols/rdp/print-job.c.old	2021-12-25 00:33:35.000000000 +0100
-+++ src/protocols/rdp/print-job.c	2022-12-26 17:44:49.042231727 +0100
+--- old/src/protocols/rdp/print-job.c	2021-12-25 00:33:35.000000000 +0100
++++ new/src/protocols/rdp/print-job.c	2022-12-26 17:44:49.042231727 +0100
 @@ -46,7 +46,6 @@
      "-sDEVICE=pdfwrite",
      "-sOutputFile=-",
