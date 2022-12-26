@@ -1,15 +1,16 @@
 BDEPEND=virtual/pkgconfig sys-devel/gnuconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71-r5 >=sys-devel/libtool-2.4.7 >=dev-vcs/git-1.8.2.1[curl]
 DEFINED_PHASES=configure install prepare unpack
-DEPEND=<app-text/ghostscript-gpl-9.54.0[-X] net-analyzer/openbsd-netcat ssh? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) telnet? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) acct-group/guacamole acct-user/guacamole dev-libs/ossp-uuid media-libs/libjpeg-turbo:0= media-libs/libpng:0= x11-libs/cairo encode? ( media-video/ffmpeg ) rdp? ( net-misc/freerdp ) ssh? ( net-libs/libssh2 x11-libs/pango ) telnet? ( net-libs/libtelnet x11-libs/pango ) vnc? ( net-libs/libvncserver[threads] pulseaudio? ( media-sound/pulseaudio ) ) dev-libs/openssl:0= vorbis? ( media-libs/libvorbis ) webp? ( media-libs/libwebp )
+DEPEND=print? ( app-text/ghostscript-gpl[-X] ) net-analyzer/openbsd-netcat ssh? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) telnet? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) kubernetes? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) acct-group/guacamole acct-user/guacamole dev-libs/openssl:0= || ( dev-libs/ossp-uuid sys-libs/libuuid ) encode? ( media-video/ffmpeg ) kubernetes? ( net-libs/libwebsockets ) media-libs/libpng:0= media-libs/libjpeg-turbo:0= rdp? ( net-misc/freerdp ) ssh? ( net-libs/libssh2 x11-libs/pango ) telnet? ( net-libs/libtelnet x11-libs/pango ) vnc? ( net-libs/libvncserver[threads] pulseaudio? ( media-sound/pulseaudio ) ) vorbis? ( media-libs/libvorbis ) webp? ( media-libs/libwebp ) x11-libs/cairo
 DESCRIPTION=This is the proxy-daemon used by www-apps/guacamole
-EAPI=7
+EAPI=8
 HOMEPAGE=https://guacamole.apache.org/
 INHERIT=systemd autotools git-r3
-IUSE=encode pulseaudio rdp ssh telnet vnc vorbis webp
+IUSE=encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp
+KEYWORDS=~amd64 ~x86
 LICENSE=MIT
 PROPERTIES=live
-RDEPEND=<app-text/ghostscript-gpl-9.54.0[-X] net-analyzer/openbsd-netcat ssh? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) telnet? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font )
+RDEPEND=print? ( app-text/ghostscript-gpl[-X] ) net-analyzer/openbsd-netcat ssh? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) telnet? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font ) kubernetes? ( media-fonts/dejavu media-fonts/liberation-fonts media-fonts/terminus-font )
 REQUIRED_USE=pulseaudio? ( vnc )
 SLOT=0
 _eclasses_=toolchain-funcs	37a4612ce5522df5a100359a8dbc8491	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca	gnuconfig	b6b3e92f8b8c996400074b5f61a59256	libtool	241a8f577b9781a42a7421e53448a44e	autotools	6dcd6b6a486e79928e1243ff9ba41fcc	git-r3	2347f8fe2d392b2a091191f94be37e6f
-_md5_=509fe7c6753fa22e414601a136c76f7b
+_md5_=1cfb3f7ecd3b5981304cd15b38f28822

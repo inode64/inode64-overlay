@@ -1,13 +1,13 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 inherit systemd autotools
 
 DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
 HOMEPAGE="https://guacamole.apache.org/"
 
-if [[ "${PV}" == *9999 ]] ; then
+if [[ "${PV}" == *9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-server.git"
 else
@@ -16,51 +16,56 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS=""
-IUSE="encode pulseaudio rdp ssh telnet vnc vorbis webp"
+KEYWORDS="~amd64 ~x86"
+IUSE="encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp"
 REQUIRED_USE="pulseaudio? ( vnc )"
+FONTS="
+	media-fonts/dejavu
+	media-fonts/liberation-fonts
+	media-fonts/terminus-font
+"
 RDEPEND="
-	<app-text/ghostscript-gpl-9.54.0[-X]
+	print? ( app-text/ghostscript-gpl[-X] )
 	net-analyzer/openbsd-netcat
-	ssh? (
-		media-fonts/dejavu
-		media-fonts/liberation-fonts
-		media-fonts/terminus-font )
-	telnet?	(
-		media-fonts/dejavu
-		media-fonts/liberation-fonts
-		media-fonts/terminus-font )
+	ssh? ( ${FONTS} )
+	telnet? ( ${FONTS} )
+	kubernetes? ( ${FONTS} )
 "
 DEPEND="${RDEPEND}
 	acct-group/guacamole
 	acct-user/guacamole
-	dev-libs/ossp-uuid
-	media-libs/libjpeg-turbo:0=
-	media-libs/libpng:0=
-	x11-libs/cairo
+	dev-libs/openssl:0=
+	|| ( dev-libs/ossp-uuid sys-libs/libuuid )
 	encode? ( media-video/ffmpeg )
+	kubernetes? ( net-libs/libwebsockets )
+	media-libs/libpng:0=
+	media-libs/libjpeg-turbo:0=
 	rdp? ( net-misc/freerdp )
 	ssh? (
 		net-libs/libssh2
-		x11-libs/pango )
+		x11-libs/pango
+		)
 	telnet?	(
 		net-libs/libtelnet
-		x11-libs/pango )
+		x11-libs/pango
+		)
 	vnc? (
 		net-libs/libvncserver[threads]
-		pulseaudio? ( media-sound/pulseaudio ) )
-	dev-libs/openssl:0=
+		pulseaudio? (
+			media-sound/pulseaudio
+			)
+	)
 	vorbis? ( media-libs/libvorbis )
 	webp? ( media-libs/libwebp )
+	x11-libs/cairo
 "
-
 PATCHES=(
-	# From https://issues.apache.org/jira/browse/GUACAMOLE-997
-	"${FILESDIR}"/rdp-read-request.diff
+	"${FILESDIR}"/guacamole-1115.patch
+	"${FILESDIR}"/ghostscript-gpl-9.54-compat.patch
 )
 
 src_prepare() {
-	autoreconf -f -i
+	eautoreconf -fi
 	eapply_user
 	default
 }
@@ -72,19 +77,27 @@ src_configure() {
 		myconf="--with-terminal --with-pango"
 	fi
 
+	if use rdp; then
+		myconf="--enable-allow-freerdp-snapshots"
+	fi
+
 	econf ${myconf} \
 		$(use_enable encode guacenc) \
-		$(use_with ssh) \
-		$(use_with rdp) \
-		$(use_with vnc) \
+		$(use_enable kubernetes) \
 		$(use_with pulseaudio pulse) \
-		$(use_with vorbis) \
+		$(use_with rdp) \
+		$(use_with ssh) \
 		$(use_with telnet) \
+		$(use_with vnc) \
+		$(use_with vorbis) \
 		$(use_with webp)
 }
 
 src_install() {
 	default
-	doinitd "${FILESDIR}/guacd"
-	systemd_dounit "${FILESDIR}/guacd.service"
+
+	newinitd "${FILESDIR}/guacd.initd" guacd
+	newconfd "${FILESDIR}/guacd.confd" guacd
+
+	systemd_newunit "${FILESDIR}/guacd.service" guacd.service
 }
