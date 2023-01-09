@@ -1,0 +1,15 @@
+DEFINED_PHASES=install setup unpack
+DEPEND=dev-lang/python[ssl] python_single_target_python3_9? ( >=dev-lang/python-3.9.16:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1:3.11 )
+DESCRIPTION=Command line administration tool for RabbitMQ
+EAPI=8
+HOMEPAGE=http://www.rabbitmq.com/management-cli.html
+INHERIT=python-single-r1
+IUSE=python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11
+KEYWORDS=~amd64
+LICENSE=MPL-2.0
+RDEPEND=dev-lang/python[ssl] python_single_target_python3_9? ( >=dev-lang/python-3.9.16:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1:3.11 )
+REQUIRED_USE=^^ ( python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11 )
+SLOT=0
+SRC_URI=https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.11.x/deps/rabbitmq_management/bin/rabbitmqadmin -> rabbitmqadmin.v3.11.5
+_eclasses_=multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	37a4612ce5522df5a100359a8dbc8491	multilib	5ca4e49abed8e3a2f7b56920eadee157	python-utils-r1	1d1b325c00c1d24c564a1b49327ec3c5	python-single-r1	75118e916668a74c660a13b0ecb22562
+_md5_=04afd4fe7d6af6b65659e8b9435a64bb
