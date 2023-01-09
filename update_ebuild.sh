@@ -56,4 +56,4 @@ EOF
 	ebuild "${ebuild}" digest 2>/dev/null
 done
 
-/usr/bin/pkgcheck scan
+/usr/bin/pkgcheck scan --net
