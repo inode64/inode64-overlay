@@ -1,7 +1,7 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit systemd
 
@@ -12,38 +12,44 @@ SRC_URI="https://github.com/Unitech/pm2/archive/${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="AGPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
+IUSE="test"
 
-DEPEND=""
 RDEPEND="
 	net-libs/nodejs:=
+"
+DEPEND="
+	${RDEPEND}
+	test? ( net-libs/nodejs[debug] )
 "
 BDEPEND="
 	net-libs/nodejs[npm]
 "
 
 # To enable download packages
-RESTRICT="network-sandbox"
+RESTRICT="network-sandbox !test? ( test )"
+
+NPM_FLAGS=(
+        --audit false
+        --color false
+        --foreground-scripts
+        --global
+        --progress false
+        --save false
+        --verbose
+)
 
 src_compile() {
-	# nothing to compile here
-	:
+	npm "${NPM_FLAGS[@]}" pack || die
+}
+
+src_test() {
+	npm test
 }
 
 src_install() {
-	npm \
-		--color false \
+	npm "${NPM_FLAGS[@]}" \
 		--prefix "${ED}"/usr \
-		--progress false \
-		--verbose \
-		install -g || die "npm install failed"
-
-	# remove the link to /var/tmp/portage/...
-	rm "${ED}"/usr/$(get_libdir)/node_modules/${PN} || die
-
-	insinto /usr/$(get_libdir)/node_modules/${PN}
-	doins -r bin lib node_modules pres
-	doins *.js *.json
-	fperms +x /usr/$(get_libdir)/node_modules/${PN}/bin/{pm2,pm2-dev,pm2-docker,pm2-runtime}
+		install pm2-${PV}.tgz|| die "npm install failed"
 
 	dodoc *.md
 
