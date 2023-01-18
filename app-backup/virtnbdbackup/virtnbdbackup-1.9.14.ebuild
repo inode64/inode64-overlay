@@ -25,7 +25,7 @@ IUSE=""
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 "
 RDEPEND="
-	>=app-emulation/libnbd-1.5.5[python]
+	>=sys-libs/libnbd-1.5.5[python]
 	>=dev-python/libvirt-python-7.6.0[${PYTHON_USEDEP}]
 	app-emulation/qemu[multipath]
 	dev-python/lxml[${PYTHON_USEDEP}]
