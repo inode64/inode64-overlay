@@ -17,10 +17,6 @@ IUSE="test"
 RDEPEND="
 	net-libs/nodejs:=
 "
-DEPEND="
-	${RDEPEND}
-	test? ( net-libs/nodejs[debug] )
-"
 BDEPEND="
 	net-libs/nodejs[npm]
 "
