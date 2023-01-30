@@ -15,7 +15,7 @@ inherit systemd
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
-COMMIT="dddce571d30c9bc416b60fbb86ad05bb187c5cb6"
+COMMIT="bb3e8f6d414f126cd7f57686e0e9798f285eb78e"
 
 LICENSE="GPL-3"
 SLOT="0"
