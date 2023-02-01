@@ -20,6 +20,7 @@ SLOT="0"
 IUSE=""
 
 BDEPEND="
+    sys-libs/libosinfo
 "
 DEPEND="
 "
