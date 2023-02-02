@@ -3,7 +3,7 @@
 # For convert go.sum to EGO_SUM
 # cat go.sum |awk '{print $1 " " $2}'|while read line; do echo \"${line}\"; done
 
-temp_file=$(mktemp /tmp/$(basename $0).XXXXXX)
+temp_file=$(mktemp "/tmp/$(basename "$0").XXXXXX")
 
 #
 # Fix tabs in old metadata.xml
@@ -18,9 +18,9 @@ temp_file=$(mktemp /tmp/$(basename $0).XXXXXX)
 # Trim and convert indents to tabs
 #
 
-find . -type f | grep -v ".svn\|CVS\|CVSROOT\|.git\|.idea" | while read file; do
-	if [ "$(file ${file} | grep -v 'unified diff' | grep text)" ]; then
-		sed -i -e 's/[ \t]*$//' ${file}
+find . -type f | grep -v ".svn\|CVS\|CVSROOT\|.git\|.idea" | while read -r file; do
+	if file "${file}" | grep -v 'unified diff' | grep -q text; then
+		sed -i -e 's/[ \t]*$//' "${file}"
 		unexpand --first-only "${file}" | awk '/^$/ {nlstack=nlstack "\n";next;} {printf "%s",nlstack; nlstack=""; print;}' >"${temp_file}"
 		cat "${temp_file}" >"${file}"
 	fi
