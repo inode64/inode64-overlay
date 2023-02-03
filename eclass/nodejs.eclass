@@ -67,8 +67,12 @@ case ${NODEJS_TYPESCRIPT} in
                 ;;
 esac
 
-nodejs_version() { node -p "require('./package.json').version" }
-nodejs_package() { node -p "require('./package.json').name" }
+nodejs_version() {
+    node -p "require('./package.json').version"
+}
+nodejs_package() {
+    node -p "require('./package.json').name"
+}
 
 RDEPEND+=" net-libs/nodejs"
 BDEPEND+="
