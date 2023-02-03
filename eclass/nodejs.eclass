@@ -76,17 +76,6 @@ BDEPEND+="
 	test? ( app-misc/jq )
 "
 
-NPM_FLAGS=(
-        --audit false
-        --color false
-        --foreground-scripts
-        --global
-        --offline
-        --progress false
-        --save false
-        --verbose
-)
-
 enpm() {
     debug-print-function ${FUNCNAME} "$@"
 
