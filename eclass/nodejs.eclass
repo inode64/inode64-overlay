@@ -131,7 +131,7 @@ enpm_install() {
 
     enpm --prefix "${ED}"/usr \
         install \
-        $(echo nodejs_package)-$( echo nodejs_version).tgz || die "install failed"
+        $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
 }
 
 # @FUNCTION: nodejs_src_prepare
