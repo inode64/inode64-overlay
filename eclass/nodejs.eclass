@@ -138,14 +138,14 @@ nodejs_src_prepare() {
 nodejs_src_compile() {
     debug-print-function ${FUNCNAME} "$@"
 
-    npm "${NPM_FLAGS[@]}" pack || die "npm pack failed"
+    enpm pack || die "pack failed"
 }
 
 nodejs_src_test() {
     debug-print-function ${FUNCNAME} "$@"
 
 	if jq -e '.scripts | has("test")' <package.json >/dev/null; then
-		npm run test || die
+		npm run test || die "test failed"
 	else
 		die 'No "test" command defined in package.json'
 	fi
@@ -154,13 +154,9 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function ${FUNCNAME} "$@"
 
-    local NAME=$(node -p "require('./package.json').name")
-    Local DEV=$(node -p "require('./package.json').version")
-
-    npm "${NPM_FLAGS[@]}" \
-        --prefix "${ED}"/usr \
+    enpm --prefix "${ED}"/usr \
         install \
-        ${NAME}-${DEV}.tgz || die "npm install failed"
+        $(echo nodejs_package)-$( echo nodejs_version).tgz || die "install failed"
 
     find ${pkgdir} -name "*.d.ts" -delete
     find ${pkgdir} -name "*.d.ts.map" -delete
