@@ -67,7 +67,6 @@ case ${NODEJS_TYPESCRIPT} in
                 ;;
 esac
 
-
 nodejs_version() { node -p "require('./package.json').version" }
 nodejs_package() { node -p "require('./package.json').name" }
 
@@ -111,6 +110,26 @@ enpm() {
     esac
 }
 
+enpm_clean() {
+    debug-print-function ${FUNCNAME} "$@"
+
+	enpm prune --omit=dev || die
+
+    if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
+        find ${pkgdir} -name "*.d.ts" -delete
+        find ${pkgdir} -name "*.d.ts.map" -delete
+        find ${pkgdir} -name "*.js.map" -delete
+    fi
+}
+
+enpm_install() {
+    debug-print-function ${FUNCNAME} "$@"
+
+    enpm --prefix "${ED}"/usr \
+        install \
+        $(echo nodejs_package)-$( echo nodejs_version).tgz || die "install failed"
+}
+
 # @FUNCTION: nodejs_src_prepare
 # @DESCRIPTION:
 # Implementation of src_prepare() phase
@@ -143,13 +162,11 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function ${FUNCNAME} "$@"
 
-    enpm --prefix "${ED}"/usr \
-        install \
-        $(echo nodejs_package)-$( echo nodejs_version).tgz || die "install failed"
+    enpm_install
 
-    find ${pkgdir} -name "*.d.ts" -delete
-    find ${pkgdir} -name "*.d.ts.map" -delete
-    find ${pkgdir} -name "*.js.map" -delete
+    if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
+        tsc || die "tsc falied"
+    fi
 
     dodoc *.md
 
