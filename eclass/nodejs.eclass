@@ -47,6 +47,13 @@ nodejs_version() {
 nodejs_package() {
     node -p "require('./package.json').name"
 }
+# @ECLASS_VARIABLE: _NODEJS_MODULES
+# @DEPRECATED: none
+# @DESCRIPTION:
+# Location of modules to install
+_NODEJS_MODULES() {
+    echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
+}
 
 case ${NODEJS_MANAGEMENT} in
 npm)
@@ -99,7 +106,6 @@ enpm() {
         --global
         --offline
         --progress false
-        --save false
         --verbose
         "${mynpmflags_local[@]}"
     )
@@ -147,12 +153,6 @@ nodejs_src_prepare() {
     fi
 
     default_src_prepare
-
-    # @ECLASS_VARIABLE: _NODEJS_MODULES
-    # @DEPRECATED: none
-    # @DESCRIPTION:
-    # Location of modules to install
-    declare -g _NODEJS_MODULES=/usr/$(get_libdir)/node_modules/$(nodejs_package)
 }
 
 nodejs_src_compile() {
