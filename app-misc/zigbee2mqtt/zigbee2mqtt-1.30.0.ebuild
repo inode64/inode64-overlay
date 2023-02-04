@@ -38,7 +38,7 @@ RESTRICT="network-sandbox"
 src_install() {
     enpm_install
 
-	dodir /usr/lib64/node_modules/${PN}/dist
+	dodir $(_NODEJS_MODULES)/dist
 	cp -r lib "${ED}$(_NODEJS_MODULES)" || die
 	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
 
