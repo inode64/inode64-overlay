@@ -41,9 +41,10 @@ src_install() {
 	dodir $(_NODEJS_MODULES)/dist
 	cp -r lib "${ED}$(_NODEJS_MODULES)" || die
 	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
+    cp babel.config.js "${ED}$(_NODEJS_MODULES)" || die
 
 	cd "${ED}$(_NODEJS_MODULES)"
-	enpm --prefix . install || die
+	enpm --prefix . install  --save-dev || die
 	enpm run build || die
 	enpm_clean
 
