@@ -36,13 +36,13 @@ BDEPEND="
 RESTRICT="network-sandbox"
 
 src_install() {
-    enpm_install
+	enpm_install
 
 	dodir $(_NODEJS_MODULES)/dist
 	cp -r lib "${ED}$(_NODEJS_MODULES)" || die
 	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
 
-	cd "${ED}${_NODEJS_MODULES}"
+	cd "${ED}$(_NODEJS_MODULES)"
 	enpm --prefix . install || die
 	enpm run build || die
 	enpm_clean
