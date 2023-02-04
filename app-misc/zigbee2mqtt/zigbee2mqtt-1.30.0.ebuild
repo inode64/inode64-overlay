@@ -39,10 +39,10 @@ src_install() {
     enpm_install
 
 	dodir /usr/lib64/node_modules/${PN}/dist
-	cp -r lib "${D}${_NODEJS_MODULES}" || die
-	cp tsconfig.json "${D}${_NODEJS_MODULES}" || die
+	cp -r lib "${ED}$(_NODEJS_MODULES)" || die
+	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
 
-	cd "${D}${_NODEJS_MODULES}"
+	cd "${ED}${_NODEJS_MODULES}"
 	enpm --prefix . install || die
 	enpm run build || die
 	enpm_clean
@@ -71,6 +71,6 @@ src_install() {
 
 	dodoc *.md
 
-	rm -rf "${ED}"${_NODEJS_MODULES}/data || die
-	rm "${ED}"/usr/lib64/node_modules/${PN}/{update.sh} || die
+	rm -rf "${ED}"$(_NODEJS_MODULES)/data || die
+	rm "${ED}"$(_NODEJS_MODULES)/{update.sh} || die
 }
