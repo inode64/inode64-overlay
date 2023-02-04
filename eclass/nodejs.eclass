@@ -18,15 +18,14 @@
 #       https://github.com/gentoo-mirror/lanodanOverlay/blob/master/eclass/nodejs.eclass
 
 case ${EAPI} in
-        7|8) ;;
-        *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
+7 | 8) ;;
+*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
 if [[ -z ${_NODEJS_ECLASS} ]]; then
 _NODEJS_ECLASS=1
 
 EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
-
 
 # @ECLASS_VARIABLE: NODEJS_MANAGEMENT
 # @PRE_INHERIT
@@ -42,31 +41,6 @@ EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
 # and add the necessary BDEPEND. If set to "false", do nothing.
 : ${NODEJS_TYPESCRIPT:=false}
 
-
-case ${NODEJS_MANAGEMENT} in
-        npm)
-                BDEPEND+=" net-libs/nodejs[npm]"
-                ;;
-        yarn)
-                BDEPEND+=" sys-apps/yarn"
-                ;;
-        *)
-                eerror "Unknown value for \${NODEJS_MANAGEMENT}"
-                die "Value ${NODEJS_MANAGEMENT} is not supported"
-                ;;
-esac
-
-case ${NODEJS_TYPESCRIPT} in
-        true)
-                BDEPEND+=" dev-lang/typescript"
-                ;;
-        false) ;;
-        *)
-                eerror "Unknown value for \${NODEJS_TYPESCRIPT}"
-                die "Value ${NODEJS_TYPESCRIPT} is not supported"
-                ;;
-esac
-
 nodejs_version() {
     node -p "require('./package.json').version"
 }
@@ -74,9 +48,41 @@ nodejs_package() {
     node -p "require('./package.json').name"
 }
 
+# @ECLASS_VARIABLE: _NODEJS_MODULES
+# @DEPRECATED: none
+# @DESCRIPTION:
+# Location of modules to install
+declare -g _NODEJS_MODULES=/usr/$(get_libdir)/node_modules/${nodejs_package}
+
+case ${NODEJS_MANAGEMENT} in
+npm)
+    BDEPEND+=" net-libs/nodejs[npm]"
+    ;;
+yarn)
+    BDEPEND+=" sys-apps/yarn"
+    ;;
+*)
+    eerror "Unknown value for \${NODEJS_MANAGEMENT}"
+    die "Value ${NODEJS_MANAGEMENT} is not supported"
+    ;;
+esac
+
+case ${NODEJS_TYPESCRIPT} in
+true)
+    BDEPEND+=" dev-lang/typescript"
+    ;;
+false) ;;
+*)
+    eerror "Unknown value for \${NODEJS_TYPESCRIPT}"
+    die "Value ${NODEJS_TYPESCRIPT} is not supported"
+    ;;
+esac
+
+IUSE+=" test"
+RESTRICT+=" !test? ( test )"
 RDEPEND+=" net-libs/nodejs"
 BDEPEND+="
-	test? ( app-misc/jq )
+test? ( app-misc/jq )
 "
 
 enpm() {
@@ -90,7 +96,7 @@ enpm() {
         die "mynpmflags must be declared as array"
     fi
 
-    local mynpmflags_local=( "${mynpmflags[@]}" )
+    local mynpmflags_local=("${mynpmflags[@]}")
 
     local npmflags=(
         --audit false
@@ -117,7 +123,7 @@ enpm() {
 enpm_clean() {
     debug-print-function ${FUNCNAME} "$@"
 
-	enpm prune --omit=dev || die
+    enpm prune --omit=dev || die
 
     if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
         find ${pkgdir} -name "*.d.ts" -delete
@@ -140,11 +146,13 @@ enpm_install() {
 nodejs_src_prepare() {
     debug-print-function ${FUNCNAME} "$@"
 
-     if [[ ! -e package.json ]] ; then
-         eerror "Unable to locate package.json"
-         eerror "Consider not inheriting the nodejs eclass."
-         die "FATAL: Unable to find package.json"
-     fi
+    if [[ ! -e package.json ]]; then
+        eerror "Unable to locate package.json"
+        eerror "Consider not inheriting the nodejs eclass."
+        die "FATAL: Unable to find package.json"
+    fi
+
+    default_src_prepare
 }
 
 nodejs_src_compile() {
@@ -156,11 +164,11 @@ nodejs_src_compile() {
 nodejs_src_test() {
     debug-print-function ${FUNCNAME} "$@"
 
-	if jq -e '.scripts | has("test")' <package.json >/dev/null; then
-		npm run test || die "test failed"
-	else
-		die 'No "test" command defined in package.json'
-	fi
+    if jq -e '.scripts | has("test")' <package.json >/dev/null; then
+        npm run test || die "test failed"
+    else
+        die 'No "test" command defined in package.json'
+    fi
 }
 
 nodejs_src_install() {
@@ -169,12 +177,11 @@ nodejs_src_install() {
     enpm_install
 
     if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
-        tsc || die "tsc falied"
+        tsc || die "tsc failed"
     fi
 
     dodoc *.md
 
-    rm "${ED}"/usr/lib64/node_modules/${PN}/{LICENSE,*.md}
+    rm "${ED}"${_NODEJS_MODULES}/{LICENSE,*.md}
 }
-
 fi
