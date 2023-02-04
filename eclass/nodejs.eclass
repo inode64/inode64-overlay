@@ -52,7 +52,7 @@ nodejs_package() {
 # @DEPRECATED: none
 # @DESCRIPTION:
 # Location of modules to install
-declare -g _NODEJS_MODULES=/usr/$(get_libdir)/node_modules/${nodejs_package}
+declare -g _NODEJS_MODULES=/usr/$(get_libdir)/node_modules/$(nodejs_package)
 
 case ${NODEJS_MANAGEMENT} in
 npm)
@@ -126,9 +126,9 @@ enpm_clean() {
     enpm prune --omit=dev || die
 
     if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
-        find ${pkgdir} -name "*.d.ts" -delete
-        find ${pkgdir} -name "*.d.ts.map" -delete
-        find ${pkgdir} -name "*.js.map" -delete
+        find "${D}" -type f -name "*.d.ts" -delete
+        find "${D}" -type f -name "*.d.ts.map" -delete
+        find "${D}" -type f -name "*.js.map" -delete
     fi
 }
 
@@ -182,6 +182,6 @@ nodejs_src_install() {
 
     dodoc *.md
 
-    rm "${ED}"${_NODEJS_MODULES}/{LICENSE,*.md}
+    rm "${ED}"$(_NODEJS_MODULES)/{LICENSE,*.md}
 }
 fi
