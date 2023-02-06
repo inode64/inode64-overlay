@@ -55,6 +55,10 @@ _NODEJS_MODULES() {
     echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
 }
 
+nodejs_has_package() {
+    [[ -d "${S}"/package ]] || return 1
+}
+
 case ${NODEJS_MANAGEMENT} in
 npm)
     BDEPEND+=" net-libs/nodejs[npm]"
@@ -135,9 +139,11 @@ enpm_clean() {
 enpm_install() {
     debug-print-function ${FUNCNAME} "$@"
 
-    enpm --prefix "${ED}"/usr \
-        install \
-        $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
+    if nodejs_has_package; then
+        enpm --prefix "${ED}"/usr \
+            install \
+            $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
+    fi
 }
 
 # @FUNCTION: nodejs_src_prepare
@@ -158,7 +164,9 @@ nodejs_src_prepare() {
 nodejs_src_compile() {
     debug-print-function ${FUNCNAME} "$@"
 
-    enpm pack || die "pack failed"
+    if nodejs_has_package; then
+        enpm pack || die "pack failed"
+    fi
 }
 
 nodejs_src_test() {
