@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit autotools linux-info pam xdg-utils
+inherit autotools linux-info pam xdg-utils udev
 
 MY_PN=ConsoleKit2
 MY_P=${MY_PN}-${PV}
@@ -119,4 +119,14 @@ src_install() {
 	find "${ED}" -name '*.la' -delete || die
 
 	rm -rf "${ED}"/var/run || die # let the init script create the directory
+}
+
+pkg_postinst() {
+	udev_reload
+	xdg_pkg_postinst
+}
+
+pkg_postrm() {
+	udev_reload
+	xdg_pkg_postrm
 }
