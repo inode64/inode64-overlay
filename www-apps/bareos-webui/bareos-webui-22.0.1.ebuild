@@ -59,6 +59,7 @@ src_install() {
 	rmdir "${D}/${MY_HTDOCSDIR}"/usr/share/bareos-webui
 
 	find "${D}/${MY_HTDOCSDIR}" -type f -name '*.in' -delete
+	find "${D}/${MY_HTDOCSDIR}" -type f -name '*.map' -delete
 
 	mv "${D}/${MY_HTDOCSDIR}/etc" "${D}/etc"
 	rm -rf "${D}/etc/httpd"
