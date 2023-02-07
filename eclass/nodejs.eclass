@@ -41,12 +41,6 @@ EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
 # The default is set to "npm".
 : ${NODEJS_MANAGEMENT:=npm}
 
-# @ECLASS_VARIABLE: NODEJS_TYPESCRIPT
-# @DESCRIPTION:
-# If set to "true", add build for typescript
-# and add the necessary BDEPEND. If set to "false", do nothing.
-: ${NODEJS_TYPESCRIPT:=false}
-
 nodejs_version() {
     node -p "require('./package.json').version"
 }
@@ -75,17 +69,6 @@ yarn)
 *)
     eerror "Unknown value for \${NODEJS_MANAGEMENT}"
     die "Value ${NODEJS_MANAGEMENT} is not supported"
-    ;;
-esac
-
-case ${NODEJS_TYPESCRIPT} in
-true)
-    BDEPEND+=" dev-lang/typescript"
-    ;;
-false) ;;
-*)
-    eerror "Unknown value for \${NODEJS_TYPESCRIPT}"
-    die "Value ${NODEJS_TYPESCRIPT} is not supported"
     ;;
 esac
 
@@ -134,30 +117,28 @@ enpm_clean() {
 
     enpm prune --omit=dev || die
 
-    if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
 	find "${D}" -type f -name "*.d.ts" -delete
 	find "${D}" -type f -name "*.d.ts.map" -delete
 	find "${D}" -type f -name "*.js.map" -delete
-    fi
 }
 
 enpm_install() {
     debug-print-function ${FUNCNAME} "$@"
 
     if nodejs_has_package; then
-	einfo "Install pack files"
-	enpm --prefix "${ED}"/usr \
-	    install \
-	    $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
+        einfo "Install pack files"
+        enpm --prefix "${ED}"/usr \
+            install \
+            $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
     fi
 
     if [[ -d node_modules ]]; then
-	einfo "Compile native addon modules"
-	find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-	    pushd "${dir}" > /dev/null
-	    npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
-	    popd
-	done
+        einfo "Compile native addon modules"
+        find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
+            pushd "${dir}" > /dev/null
+            npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
+            popd
+        done
     fi
 }
 
@@ -168,9 +149,9 @@ nodejs_src_prepare() {
     debug-print-function ${FUNCNAME} "$@"
 
     if [[ ! -e package.json ]]; then
-	eerror "Unable to locate package.json"
-	eerror "Consider not inheriting the nodejs eclass."
-	die "FATAL: Unable to find package.json"
+        eerror "Unable to locate package.json"
+        eerror "Consider not inheriting the nodejs eclass."
+        die "FATAL: Unable to find package.json"
     fi
 
     default_src_prepare
@@ -180,8 +161,8 @@ nodejs_src_compile() {
     debug-print-function ${FUNCNAME} "$@"
 
     if nodejs_has_package; then
-	einfo "Create pack file"
-	enpm pack || die "pack failed"
+        einfo "Create pack file"
+        enpm pack || die "pack failed"
     fi
 }
 
@@ -189,9 +170,9 @@ nodejs_src_test() {
     debug-print-function ${FUNCNAME} "$@"
 
     if jq -e '.scripts | has("test")' <package.json >/dev/null; then
-	npm run test || die "test failed"
+    	npm run test || die "test failed"
     else
-	die 'No "test" command defined in package.json'
+	    die 'No "test" command defined in package.json'
     fi
 }
 
@@ -199,10 +180,6 @@ nodejs_src_install() {
     debug-print-function ${FUNCNAME} "$@"
 
     enpm_install
-
-    if [[ ${NODEJS_TYPESCRIPT} = true ]]; then
-	tsc || die "tsc failed"
-    fi
 
     dodoc *.md
 
