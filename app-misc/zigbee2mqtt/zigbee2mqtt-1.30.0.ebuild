@@ -44,8 +44,8 @@ src_install() {
 	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
     cp babel.config.js "${ED}$(_NODEJS_MODULES)" || die
 
-	cd "${ED}$(_NODEJS_MODULES)"
-	enpm install || die
+	#cd "${ED}$(_NODEJS_MODULES)"
+	#enpm install || die
 	enpm run build || die
 	enpm_clean
 

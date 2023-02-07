@@ -16,6 +16,7 @@
 #       https://github.com/gentoo/gentoo/pull/930/files
 #       https://github.com/gentoo-mirror/ssnb/blob/master/eclass/npm.eclass
 #       https://github.com/gentoo-mirror/lanodanOverlay/blob/master/eclass/nodejs.eclass
+#       https://github.com/Tatsh/tatsh-overlay/blob/master/eclass/yarn.eclass
 
 #
 # Build package for node_modules
@@ -144,9 +145,19 @@ enpm_install() {
     debug-print-function ${FUNCNAME} "$@"
 
     if nodejs_has_package; then
+        einfo "Install pack files"
         enpm --prefix "${ED}"/usr \
             install \
             $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
+    fi
+
+    if [[ -d node_modules ]]; then
+        einfo "Compile native addon modules"
+        find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
+            pushd "${dir}" > /dev/null
+            npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
+            popd
+        done
     fi
 }
 
@@ -169,6 +180,7 @@ nodejs_src_compile() {
     debug-print-function ${FUNCNAME} "$@"
 
     if nodejs_has_package; then
+        einfo "Create pack file"
         enpm pack || die "pack failed"
     fi
 }
