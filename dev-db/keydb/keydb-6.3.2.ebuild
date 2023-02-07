@@ -128,7 +128,11 @@ src_install() {
 	insinto /etc/logrotate.d/
 	newins "${FILESDIR}/${PN}.logrotate" ${PN}
 
-	dodoc 00-RELEASENOTES BUGS CONTRIBUTING.md MANIFESTO README.md
+	dodoc 00-RELEASENOTES README.md
+
+	if use ssl; then
+	    dodoc TLS.md
+    fi
 
 	dobin src/keydb-cli
 	dosbin src/keydb-benchmark src/keydb-server src/keydb-check-aof src/keydb-check-rdb src/keydb-diagnostic-tool
