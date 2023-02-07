@@ -14,4 +14,3 @@ if [ "$1" = "session_removed" ] && [ -e "$TAGFILE" ]; then
 	sed -i "\%^$CK_SESSION_ID\$%d" "$TAGFILE"
 	[ -s "$TAGFILE" ] || rm -f "$TAGFILE"
 fi
-
