@@ -16,17 +16,16 @@
  
  USEASM?=true
  ENABLE_FLASH?=no
-@@ -304,9 +297,10 @@
+@@ -304,9 +297,8 @@
  
  ifeq ($(MALLOC),jemalloc)
- 	DEPENDENCY_TARGETS+= jemalloc
+-	DEPENDENCY_TARGETS+= jemalloc
 -	FINAL_CFLAGS+= -DUSE_JEMALLOC -I../deps/jemalloc/include
 -	FINAL_CXXFLAGS+= -DUSE_JEMALLOC -I../deps/jemalloc/include
 -	FINAL_LIBS := ../deps/jemalloc/lib/libjemalloc.a $(FINAL_LIBS)
 +	FINAL_CFLAGS+= -DUSE_JEMALLOC -DJEMALLOC_NO_DEMANGLE -I/usr/include/jemalloc
 +	FINAL_CXXFLAGS+= -DUSE_JEMALLOC -DJEMALLOC_NO_DEMANGLE -I/usr/include/jemalloc
 +	FINAL_LIBS := -ljemalloc $(FINAL_LIBS)
-+	
  endif
  
  ifeq ($(MALLOC),memkind)
