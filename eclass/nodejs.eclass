@@ -17,6 +17,11 @@
 #       https://github.com/gentoo-mirror/ssnb/blob/master/eclass/npm.eclass
 #       https://github.com/gentoo-mirror/lanodanOverlay/blob/master/eclass/nodejs.eclass
 
+#
+# Build package for node_modules
+#   npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#   tar --create --auto-compress --file foo-1-node_modules.tar.xz node_modules/
+
 case ${EAPI} in
 7 | 8) ;;
 *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
@@ -103,7 +108,6 @@ enpm() {
         --audit false
         --color false
         --foreground-scripts
-        --global
         --offline
         --progress false
         --verbose
