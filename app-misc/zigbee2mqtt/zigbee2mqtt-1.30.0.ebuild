@@ -12,8 +12,6 @@ else
 		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
 
-NODEJS_TYPESCRIPT=true
-
 inherit nodejs systemd
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
@@ -33,28 +31,21 @@ RDEPEND="
 BDEPEND="
 "
 
-# To enable download packages
-RESTRICT="network-sandbox"
+NODEJS_EXTRA_FILES="scripts"
 
 src_install() {
-	enpm_install
-
-	dodir $(_NODEJS_MODULES)/dist
-	cp -r {lib,node_modules} "${ED}$(_NODEJS_MODULES)" || die
-	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
-    cp babel.config.js "${ED}$(_NODEJS_MODULES)" || die
-
-	#cd "${ED}$(_NODEJS_MODULES)"
-	#enpm install || die
-	enpm run build || die
-	enpm_clean
+    einfo "Run build"
+    enpm run build || die
 
 	echo "{\"hash\": \"${COMMIT}\"}" > dist/.hash.json
 
-	echo -e "\nadvanced:" >>data/configuration.yaml
+	echo -e "\nadvanced:" >data/configuration.yaml
 	echo -e "  network_key: GENERATE" >>data/configuration.yaml
 	echo -e "  pan_id: GENERATE" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
+
+	enpm_clean
+	enpm_install
 
 	keepdir /var/log/${PN}
 
@@ -70,9 +61,4 @@ src_install() {
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
-
-	dodoc *.md
-
-	rm -rf "${ED}"$(_NODEJS_MODULES)/data || die
-	rm "${ED}"$(_NODEJS_MODULES)/{update.sh} || die
 }
