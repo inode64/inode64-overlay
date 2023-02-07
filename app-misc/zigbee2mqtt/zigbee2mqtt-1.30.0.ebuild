@@ -8,7 +8,8 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_BRANCH="dev"
 	inherit git-r3
 else
-	SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz
+		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
 
 NODEJS_TYPESCRIPT=true
@@ -39,12 +40,12 @@ src_install() {
 	enpm_install
 
 	dodir $(_NODEJS_MODULES)/dist
-	cp -r lib "${ED}$(_NODEJS_MODULES)" || die
+	cp -r {lib,node_modules} "${ED}$(_NODEJS_MODULES)" || die
 	cp tsconfig.json "${ED}$(_NODEJS_MODULES)" || die
     cp babel.config.js "${ED}$(_NODEJS_MODULES)" || die
 
 	cd "${ED}$(_NODEJS_MODULES)"
-	enpm --prefix . install  --save-dev || die
+	enpm install || die
 	enpm run build || die
 	enpm_clean
 
