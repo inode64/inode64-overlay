@@ -152,6 +152,7 @@ enpm_clean() {
 
     # Remove typscript files
     find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+    find -type f -name tsconfig.json -delete || die
 
     # Remove misc files
     find -type f -iname "*.musl.node" -delete || die
