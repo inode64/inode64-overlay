@@ -16,7 +16,7 @@ inherit nodejs systemd
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
-COMMIT="bb3e8f6d414f126cd7f57686e0e9798f285eb78e"
+COMMIT="8f781db93e8b9effbaeeba9216705b57d8d468d9"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -37,9 +37,9 @@ src_install() {
     einfo "Run build"
     enpm run build || die
 
-	echo "{\"hash\": \"${COMMIT}\"}" > dist/.hash.json
+	echo "${COMMIT}" > dist/.hash.json
 
-	echo -e "\nadvanced:" >data/configuration.yaml
+	echo -e "\nadvanced:" >>data/configuration.yaml
 	echo -e "  network_key: GENERATE" >>data/configuration.yaml
 	echo -e "  pan_id: GENERATE" >>data/configuration.yaml
 	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
