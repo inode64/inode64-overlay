@@ -37,7 +37,7 @@ src_install() {
     einfo "Run build"
     enpm run build || die
 
-	echo "${COMMIT}" > dist/.hash.json
+	echo "${COMMIT}" > dist/.hash
 
 	echo -e "\nadvanced:" >>data/configuration.yaml
 	echo -e "  network_key: GENERATE" >>data/configuration.yaml
