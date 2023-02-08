@@ -142,15 +142,23 @@ enpm_clean() {
     pushd node_modules > /dev/null
 
     # Cleanups
-    find -type f -iregex '.*/license\(\.\(md\|rtf\|txt\|markdown\)\)?' -delete || die
 
-	find -type f -name "*.d.ts" -delete
-	find -type f -name "*.md" -delete
-	find -type f -name "*.d.ts.map" -delete
-	find -type f -name "*.js.map" -delete
-	find -type f -name "*.musl.node" -delete
-	find -type f -name ".travis.yml" -delete
-    find -type f -iregex '.*\.\(tsx?\|jsx\|map\)' -delete || die
+    # Remove license files
+    find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
+
+    # Remove documentation files
+    find -type f -iregex '.*/*.\.\(md\|txt\)$' -delete || die
+    find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
+
+    # Remove typscript files
+    find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+
+    # Remove misc files
+	find -type f -iname "*.musl.node" -delete || die
+	find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
+    find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\)$' -delete || die
+    find -type f -iname makefile -delete || die
+    find -type f -name *\~ -delete || die
 
     find -type d \
           \( \
