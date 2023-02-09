@@ -1,0 +1,15 @@
+BDEPEND=sys-devel/gnuconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71-r5 >=sys-devel/libtool-2.4.7 >=dev-vcs/git-1.8.2.1[curl]
+DEFINED_PHASES=configure install prepare setup unpack
+DEPEND=>=dev-libs/glib-2.40:2=[dbus] >=sys-devel/gettext-0.19 sys-apps/dbus sys-libs/zlib:= x11-libs/libX11:= acl? ( sys-apps/acl:= >=virtual/udev-200 ) cgroups? ( app-admin/cgmanager >=sys-libs/libnih-1.0.2[dbus] ) evdev? ( dev-libs/libevdev:= ) udev? ( virtual/libudev x11-libs/libdrm:= ) pam? ( sys-libs/pam ) policykit? ( >=sys-auth/polkit-0.110 ) selinux? ( sys-libs/libselinux ) dev-libs/libxslt virtual/pkgconfig doc? ( app-text/xmlto ) test? ( app-text/docbook-xml-dtd:4.1.2 app-text/xmlto )
+DESCRIPTION=Framework for defining and tracking users, login sessions and seats
+EAPI=7
+HOMEPAGE=https://github.com/ConsoleKit2/ConsoleKit2 https://www.freedesktop.org/wiki/Software/ConsoleKit
+INHERIT=autotools git-r3 linux-info pam xdg-utils
+IUSE=acl cgroups debug doc evdev kernel_linux pam pm-utils policykit selinux test udev
+LICENSE=GPL-2
+PROPERTIES=live
+RDEPEND=>=dev-libs/glib-2.40:2=[dbus] >=sys-devel/gettext-0.19 sys-apps/dbus sys-libs/zlib:= x11-libs/libX11:= acl? ( sys-apps/acl:= >=virtual/udev-200 ) cgroups? ( app-admin/cgmanager >=sys-libs/libnih-1.0.2[dbus] ) evdev? ( dev-libs/libevdev:= ) udev? ( virtual/libudev x11-libs/libdrm:= ) pam? ( sys-libs/pam ) policykit? ( >=sys-auth/polkit-0.110 ) selinux? ( sys-libs/libselinux ) kernel_linux? ( sys-apps/coreutils[acl?] ) pm-utils? ( sys-power/pm-utils ) selinux? ( sec-policy/selinux-consolekit )
+RESTRICT=!test? ( test )
+SLOT=0
+_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	9a610728b9bcca1919234cceb35a1027	multilib	5ca4e49abed8e3a2f7b56920eadee157	libtool	241a8f577b9781a42a7421e53448a44e	autotools	6dcd6b6a486e79928e1243ff9ba41fcc	git-r3	2347f8fe2d392b2a091191f94be37e6f	linux-info	4b552625ebd741dfd2ac08637fd2436e	edos2unix	33e347e171066657f91f8b0c72ec8773	strip-linguas	ac3ee41ee2d31d8c41a77c0838320cc7	wrapper	4a1902f969e5718126434fc35f3a0d9c	eutils	8f942ebdcf04334697649d4a0bf65a32	flag-o-matic	69394e25812406faa1f90edaf4969395	pam	01b77091d5b6560b0aeafa7fbb1bd818	xdg-utils	ac0e315a3688929e34ac75b139e7349a
+_md5_=b3a48b3b097d807dbae2780524c8fc14
