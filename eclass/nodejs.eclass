@@ -61,7 +61,6 @@ NODEJS_FILES="babel.config.js babel.config.json cli.js dist index.js lib node_mo
 # Can be either files, or directories.
 # Example: NODEJS_EXTRA_FILES="rigger.js modules"
 
-
 case ${NODEJS_MANAGEMENT} in
 npm)
     BDEPEND+=" net-libs/nodejs[npm]"
@@ -76,9 +75,7 @@ yarn)
 esac
 
 RDEPEND+=" net-libs/nodejs"
-BDEPEND+="
-    app-misc/jq
-"
+BDEPEND+=" app-misc/jq"
 
 # @FUNCTION: nodejs_version
 # @DESCRIPTION:
