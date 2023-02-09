@@ -149,8 +149,14 @@ enpm_clean() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     einfo "Clean files"
-
-    enpm prune --omit=dev || die
+    case ${NODEJS_MANAGEMENT} in
+    npm)
+        enpm prune --omit=dev || die
+        ;;
+    yarn)
+        enpm install --production || die
+        ;;
+    esac
 
     pushd "${S}/node_modules" >/dev/null || die
 
