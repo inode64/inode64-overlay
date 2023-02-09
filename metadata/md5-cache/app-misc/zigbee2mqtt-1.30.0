@@ -1,15 +1,13 @@
-BDEPEND=net-libs/nodejs[npm] test? ( app-misc/jq ) virtual/pkgconfig
+BDEPEND=net-libs/nodejs[npm] app-misc/jq virtual/pkgconfig
 DEFINED_PHASES=compile install prepare test
 DESCRIPTION=It bridges events and allows you to control your Zigbee devices via MQTT
 EAPI=8
 HOMEPAGE=https://www.zigbee2mqtt.io/
 INHERIT=nodejs systemd
-IUSE=test
 KEYWORDS=~amd64
 LICENSE=GPL-3
 RDEPEND=acct-group/zigbee2mqtt acct-user/zigbee2mqtt app-misc/mosquitto net-libs/nodejs:= net-libs/nodejs
-RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://github.com/Koenkk/zigbee2mqtt/archive/1.30.0.tar.gz -> zigbee2mqtt-1.30.0.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/zigbee2mqtt-1.30.0-node_modules.tar.xz
-_eclasses_=nodejs	ef523cf91d21a8ae1138e4981ce631c4	toolchain-funcs	9a610728b9bcca1919234cceb35a1027	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
-_md5_=5dc2a428aa34cf2e33d0c4bfe7cbd13e
+_eclasses_=nodejs	08a5c4d6fdf6f3f8fc507b9431833c5f	toolchain-funcs	9a610728b9bcca1919234cceb35a1027	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
+_md5_=7bd7a9474080929bff237bede9b2eb3a
