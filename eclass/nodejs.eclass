@@ -278,7 +278,7 @@ nodejs_src_compile() {
 nodejs_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    if jq -e '.scripts | has("test")' <package.json >/dev/null; then
+    if ! nodejs_has_package && jq -e '.scripts | has("test")' <package.json >/dev/null; then
         npm run test || die "test failed"
     else
         die 'No "test" command defined in package.json'
