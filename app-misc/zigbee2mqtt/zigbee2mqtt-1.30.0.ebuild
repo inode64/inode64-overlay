@@ -34,9 +34,6 @@ BDEPEND="
 NODEJS_EXTRA_FILES="scripts"
 
 src_install() {
-    einfo "Run build"
-    enpm run build || die
-
 	echo "${COMMIT}" > dist/.hash
 
 	echo -e "\nadvanced:" >>data/configuration.yaml
