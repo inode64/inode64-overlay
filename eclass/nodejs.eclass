@@ -39,45 +39,28 @@ EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
 # @DESCRIPTION:
 # Specify a package management
 # The default is set to "npm".
-: ${NODEJS_MANAGEMENT:=npm}
+: "${NODEJS_MANAGEMENT:=npm}"
 
-# @ECLASS-VARIABLE: NODEJS_FILES
+# @ECLASS_VARIABLE: NODEJS_FILES
 # @INTERNAL
 # @DESCRIPTION:
 # Files and directories that usually come in a standard NodeJS/npm module.
 NODEJS_FILES="babel.config.js babel.config.json cli.js dist index.js lib node_modules package.json"
 
-# @ECLASS-VARIABLE: NODEJS_DOCS
+# @ECLASS_VARIABLE: NODEJS_DOCS
 # @DESCRIPTION:
 # Document files that come in a NodeJS/npm module, outside the usual docs
 # list of README*, ChangeLog AUTHORS* etc. These are only installed if 'doc' is
 # in ${USE}
 # NODEJS_DOCS="README* LICENSE HISTORY*"
 
-# @ECLASS-VARIABLE: NODEJS_EXTRA_FILES
+# @ECLASS_VARIABLE: NODEJS_EXTRA_FILES
 # @DESCRIPTION:
 # If additional dist files are present in the NodeJS/npm module that are not
 # listed in NODEJS_FILES, then this is the place to put them in.
 # Can be either files, or directories.
 # Example: NODEJS_EXTRA_FILES="rigger.js modules"
 
-nodejs_version() {
-    node -p "require('./package.json').version"
-}
-nodejs_package() {
-    node -p "require('./package.json').name"
-}
-# @ECLASS_VARIABLE: _NODEJS_MODULES
-# @DEPRECATED: none
-# @DESCRIPTION:
-# Location of modules to install
-_NODEJS_MODULES() {
-    echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
-}
-
-nodejs_has_package() {
-    [[ -d "${S}"/package ]] || return 1
-}
 
 case ${NODEJS_MANAGEMENT} in
 npm)
@@ -92,27 +75,57 @@ yarn)
     ;;
 esac
 
-IUSE+=" test"
-RESTRICT+=" !test? ( test )"
 RDEPEND+=" net-libs/nodejs"
 BDEPEND+="
-test? ( app-misc/jq )
+    app-misc/jq
 "
 
+# @FUNCTION: nodejs_version
+# @DESCRIPTION:
+# Return the package version
+nodejs_version() {
+    node -p "require('./package.json').version"
+}
+
+# @FUNCTION: nodejs_package
+# @DESCRIPTION:
+# Return de package name
+nodejs_package() {
+    node -p "require('./package.json').name"
+}
+
+# @FUNCTION: _NODEJS_MODULES
+# @DESCRIPTION:
+# Location where to install nodejs
+_NODEJS_MODULES() {
+    echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
+}
+# @FUNCTION: nodejs_has_package
+# @DESCRIPTION:
+# Return true (0) if is a package
+nodejs_has_package() {
+    [[ -d "${S}"/package ]] || return 1
+}
+
+# @FUNCTION: enpm
+# @DESCRIPTION:
+# Packet manager execution wrapper
 enpm() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
+
+    local mynpmflags_local mynpmflagstype npmflags
 
     # Make the array a local variable since <=portage-2.1.6.x does not support
     # global arrays (see bug #297255). But first make sure it is initialised.
     [[ -z ${mynpmflags} ]] && declare -a mynpmflags=()
-    local mynpmflagstype=$(declare -p mynpmflags 2>&-)
+    mynpmflagstype=$(declare -p mynpmflags 2>&-)
     if [[ "${mynpmflagstype}" != "declare -a mynpmflags="* ]]; then
         die "mynpmflags must be declared as array"
     fi
 
-    local mynpmflags_local=("${mynpmflags[@]}")
+    mynpmflags_local=("${mynpmflags[@]}")
 
-    local npmflags=(
+    npmflags=(
         --audit false
         --color false
         --foreground-scripts
@@ -132,14 +145,17 @@ enpm() {
     esac
 }
 
+# @FUNCTION: enpm_clean
+# @DESCRIPTION:
+# Delete all unnecessary files
 enpm_clean() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
 
     einfo "Clean files"
 
     enpm prune --omit=dev || die
 
-    pushd node_modules >/dev/null
+    pushd "${S}/node_modules" >/dev/null || die
 
     # Cleanups
 
@@ -155,11 +171,11 @@ enpm_clean() {
     find -type f -name tsconfig.json -delete || die
 
     # Remove misc files
-    find -type f -iname "*.musl.node" -delete || die
+    find -type f -iname '*.musl.node' -delete || die
     find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
     find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\)$' -delete || die
     find -type f -iname makefile -delete || die
-    find -type f -name *\~ -delete || die
+    find -type f -name '*\~' -delete || die
 
     find -type d \
         \( \
@@ -183,22 +199,27 @@ enpm_clean() {
         \) \
         -exec rm -rvf {} +
 
-    popd
+    popd >/dev/null || die
 }
 
+# @FUNCTION: enpm_install
+# @DESCRIPTION:
+# Install the files and folders necessary for the execution of nodejs
 enpm_install() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
+
+    local nodejs_files
 
     if nodejs_has_package; then
         einfo "Install pack files"
         enpm --prefix "${ED}"/usr \
             install \
-            $(nodejs_package)-$(nodejs_version).tgz || die "install failed"
+            "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
     fi
 
-    local nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
+    nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
 
-    dodir $(_NODEJS_MODULES) || die "Could not create DEST folder"
+    dodir "$(_NODEJS_MODULES)" || die "Could not create DEST folder"
 
     for f in ${nodejs_files}; do
         if [[ -e "${S}/${f}" ]]; then
@@ -209,9 +230,9 @@ enpm_install() {
 
 # @FUNCTION: nodejs_src_prepare
 # @DESCRIPTION:
-# Implementation of src_prepare() phase
+# Nodejs preparation phase
 nodejs_src_prepare() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
 
     if [[ ! -e package.json ]]; then
         eerror "Unable to locate package.json"
@@ -222,26 +243,37 @@ nodejs_src_prepare() {
     default_src_prepare
 }
 
+# @FUNCTION: nodejs_src_compile
+# @DESCRIPTION:
+# General function for compiling a nodejs module
 nodejs_src_compile() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
 
     if nodejs_has_package; then
         einfo "Create pack file"
         enpm pack || die "pack failed"
     fi
 
+    if jq -e '.scripts | has("build")' <package.json >/dev/null; then
+        einfo "Run build"
+        npm run build || die "build failed"
+    fi
+
     if [[ -d node_modules ]]; then
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-            pushd "${dir}" >/dev/null
+            pushd "${dir}" >/dev/null || die
             npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
-            popd
+            popd >/dev/null || die
         done
     fi
 }
 
+# @FUNCTION: nodejs_src_test
+# @DESCRIPTION:
+# General function for testing a nodejs module
 nodejs_src_test() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
 
     if jq -e '.scripts | has("test")' <package.json >/dev/null; then
         npm run test || die "test failed"
@@ -250,11 +282,15 @@ nodejs_src_test() {
     fi
 }
 
+# @FUNCTION: nodejs_src_install
+# @DESCRIPTION:
+# Function for installing the package
 nodejs_src_install() {
-    debug-print-function ${FUNCNAME} "$@"
+    debug-print-function "${FUNCNAME}" "${@}"
 
+    enpm_clean
     enpm_install
 
-    dodoc *.md
+    dodoc "*.md ${NODEJS_DOCS}"
 }
 fi
