@@ -95,6 +95,7 @@ nodejs_package() {
 # @DESCRIPTION:
 # Location where to install nodejs
 _NODEJS_MODULES() {
+    # shellcheck disable=SC2046
     echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
 }
 # @FUNCTION: nodejs_has_package
@@ -163,23 +164,34 @@ enpm_clean() {
     # Cleanups
 
     # Remove license files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
 
     # Remove documentation files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/*.\.\(md\|txt\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
 
     # Remove typscript files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -name tsconfig.json -delete || die
 
     # Remove misc files
+    # shellcheck disable=SC2185
     find -type f -iname '*.musl.node' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iname makefile -delete || die
+    # shellcheck disable=SC2185
     find -type f -name '*\~' -delete || die
 
+    # shellcheck disable=SC2185
     find -type d \
         \( \
         -iwholename '*.github' -o \
@@ -266,6 +278,7 @@ nodejs_src_compile() {
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
             pushd "${dir}" >/dev/null || die
+            # shellcheck disable=SC2046
             npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
             popd >/dev/null || die
         done
@@ -291,7 +304,8 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    dodoc "*.md ${NODEJS_DOCS}"
+    # shellcheck disable=SC2035
+    dodoc *.md "${NODEJS_DOCS}" || die "failed to install documentation"
 
     enpm_clean
     enpm_install
