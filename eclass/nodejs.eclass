@@ -123,7 +123,6 @@ enpm() {
     mynpmflags_local=("${mynpmflags[@]}")
 
     npmflags=(
-        --audit false
         --color false
         --foreground-scripts
         --offline
@@ -134,6 +133,7 @@ enpm() {
 
     case ${NODEJS_MANAGEMENT} in
     npm)
+        npmflags+=( "--audit false" )
         npm "${npmflags[@]}" "$@"
         ;;
     yarn)
@@ -291,9 +291,9 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+    dodoc "*.md ${NODEJS_DOCS}"
+
     enpm_clean
     enpm_install
-
-    dodoc "*.md ${NODEJS_DOCS}"
 }
 fi
