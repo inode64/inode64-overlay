@@ -111,7 +111,7 @@ src_install() {
 	newpamd "${FILESDIR}/cockpit.pam" cockpit
 	dodoc README.md AUTHORS
 
-    # Required for store self-signed certificates
+	# Required for store self-signed certificates
 	keepdir /etc/cockpit/ws-certs.d/
 }
 
