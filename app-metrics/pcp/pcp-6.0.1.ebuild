@@ -2,8 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=(python3_{8..11})
-inherit distutils-r1
+PYTHON_COMPAT=(python3_{9..11})
+inherit python-single-r1
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
 HOMEPAGE="https://pcp.io"
@@ -21,6 +21,9 @@ SLOT="0"
 IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp systemd +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
+REQUIRED_USE="
+	${PYTHON_REQUIRED_USE}
+"
 BDEPEND="
 	discovery? ( net-dns/avahi[dbus] )
 	doc? ( app-text/xmlto )
@@ -31,33 +34,60 @@ BDEPEND="
 "
 
 DEPEND="
-	activemq?  ( dev-perl/libwww-perl )
+	${PYTHON_DEPS}
+	activemq? ( dev-perl/libwww-perl )
 	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
-	influxdb? ( dev-python/requests[${PYTHON_USEDEP}] )
-	json? ( dev-python/jsonpointer[${PYTHON_USEDEP}] dev-python/six[${PYTHON_USEDEP}] )
-	libvirt? ( dev-python/libvirt-python[${PYTHON_USEDEP}] dev-python/lxml[${PYTHON_USEDEP}] )
+	influxdb? (
+		$(python_gen_cond_dep '
+			dev-python/requests[${PYTHON_USEDEP}]
+		')
+	)
+	json? (
+		$(python_gen_cond_dep '
+			dev-python/jsonpointer[${PYTHON_USEDEP}]
+			dev-python/six[${PYTHON_USEDEP}]
+		')
+	)
+	libvirt? (
+		$(python_gen_cond_dep '
+			dev-python/libvirt-python[${PYTHON_USEDEP}]
+			dev-python/lxml[${PYTHON_USEDEP}]
+		')
+	)
 	mysql? ( dev-perl/DBD-mysql )
 	nginx? ( dev-perl/libwww-perl )
 	nutcracker? ( dev-perl/YAML-LibYAML virtual/perl-JSON-PP )
 	perfevent? ( dev-libs/libpfm )
 	podman? ( app-containers/podman )
-	postgres? ( dev-python/psycopg:*[${PYTHON_USEDEP}] )
+	postgres? (
+		$(python_gen_cond_dep '
+			dev-python/psycopg:*[${PYTHON_USEDEP}]
+		')
+	)
 	snmp? ( dev-perl/Net-SNMP )
-	xls? ( dev-python/openpyxl[${PYTHON_USEDEP}] )
+	xls? (
+		$(python_gen_cond_dep '
+			dev-python/openpyxl[${PYTHON_USEDEP}]
+		')
+	)
 "
 RDEPEND="${DEPEND}
 	acct-group/pcp
 	acct-user/pcp
 "
 
+pkg_setup() {
+	use influxdb || use libvirt || use json || use postgres || use xls && python-single-r1_pkg_setup
+}
+
 src_prepare() {
 	eapply_user
 
 	# gentooify systemd services
 	sed \
-	-e 's:sysconfig/:conf.d/:g' \
-	-e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
-	-i "${S}"/*/*/*.service.in || die
+		-e 's:sysconfig/:conf.d/:g' \
+		-e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
+		-i "${S}"/*/*/*.service.in || die
 }
 
 src_configure() {
@@ -89,6 +119,7 @@ src_compile() {
 
 src_install() {
 	emake DIST_ROOT="${D}" PCP_SYSCONFIG_DIR=/etc/conf.d install
+	use influxdb || use libvirt || use json || use postgres || use xls && python_optimize
 
 	rm -rf "${D}/var/lib/pcp/testsuite"
 }
