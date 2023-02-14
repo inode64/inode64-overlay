@@ -77,7 +77,6 @@ yarn)
 esac
 
 RDEPEND+=" net-libs/nodejs"
-BDEPEND+=" app-misc/jq"
 
 # @FUNCTION: nodejs_version
 # @DESCRIPTION:
@@ -88,9 +87,23 @@ nodejs_version() {
 
 # @FUNCTION: nodejs_package
 # @DESCRIPTION:
-# Return de package name
+# Return the package name
 nodejs_package() {
     node -p "require('./package.json').name"
+}
+
+# @FUNCTION: nodejs_has_test
+# @DESCRIPTION:
+# Return true if test script exist
+nodejs_has_test() {
+    node -p "if (require('./package.json').scripts.test === undefined) { process.exit(1) }" &>/dev/null
+}
+
+# @FUNCTION: nodejs_has_build
+# @DESCRIPTION:
+# Return true if build script exist
+nodejs_has_build() {
+    node -p "if (require('./package.json').scripts.build === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: _NODEJS_MODULES
@@ -120,28 +133,28 @@ enpm() {
     [[ -z ${mynpmflags} ]] && declare -a mynpmflags=()
     mynpmflagstype=$(declare -p mynpmflags 2>&-)
     if [[ "${mynpmflagstype}" != "declare -a mynpmflags="* ]]; then
-	die "mynpmflags must be declared as array"
+        die "mynpmflags must be declared as array"
     fi
 
     mynpmflags_local=("${mynpmflags[@]}")
 
     npmflags=(
-	--color false
-	--foreground-scripts
-	--offline
-	--progress false
-	--verbose
-	"${mynpmflags_local[@]}"
+        --color false
+        --foreground-scripts
+        --offline
+        --progress false
+        --verbose
+        "${mynpmflags_local[@]}"
     )
 
     case ${NODEJS_MANAGEMENT} in
     npm)
-	npmflags+=( "--audit false" )
-	npm "${npmflags[@]}" "$@"
-	;;
+        npmflags+=("--audit false")
+        npm "${npmflags[@]}" "$@"
+        ;;
     yarn)
-	yarn "${npmflags[@]}" "$@"
-	;;
+        yarn "${npmflags[@]}" "$@"
+        ;;
     esac
 }
 
@@ -154,11 +167,11 @@ enpm_clean() {
     einfo "Clean files"
     case ${NODEJS_MANAGEMENT} in
     npm)
-	enpm prune --omit=dev || die
-	;;
+        enpm prune --omit=dev || die
+        ;;
     yarn)
-	enpm install --production || die
-	;;
+        enpm install --production || die
+        ;;
     esac
 
     pushd "${S}/node_modules" >/dev/null || die
@@ -195,26 +208,26 @@ enpm_clean() {
 
     # shellcheck disable=SC2185
     find -type d \
-	\( \
-	-iwholename '*.github' -o \
-	-iwholename '*.tscache' -o \
-	-iwholename '*/man' -o \
-	-iwholename '*/test' -o \
-	-iwholename '*/scripts' -o \
-	-iwholename '*/git-hooks' -o \
-	-iwholename '*/prebuilds' -o \
-	-iwholename '*/android-arm' -o \
-	-iwholename '*/android-arm64' -o \
-	-iwholename '*/linux-arm64' -o \
-	-iwholename '*/linux-armvy' -o \
-	-iwholename '*/linux-armv7' -o \
-	-iwholename '*/linux-arm' -o \
-	-iwholename '*/win32-ia32' -o \
-	-iwholename '*/win32-x64' -o \
-	-iwholename '*/darwin-x64' \
-	-iwholename '*/darwin-x64+arm64' \
-	\) \
-	-exec rm -rvf {} +
+        \( \
+        -iwholename '*.github' -o \
+        -iwholename '*.tscache' -o \
+        -iwholename '*/man' -o \
+        -iwholename '*/test' -o \
+        -iwholename '*/scripts' -o \
+        -iwholename '*/git-hooks' -o \
+        -iwholename '*/prebuilds' -o \
+        -iwholename '*/android-arm' -o \
+        -iwholename '*/android-arm64' -o \
+        -iwholename '*/linux-arm64' -o \
+        -iwholename '*/linux-armvy' -o \
+        -iwholename '*/linux-armv7' -o \
+        -iwholename '*/linux-arm' -o \
+        -iwholename '*/win32-ia32' -o \
+        -iwholename '*/win32-x64' -o \
+        -iwholename '*/darwin-x64' \
+        -iwholename '*/darwin-x64+arm64' \
+        \) \
+        -exec rm -rvf {} +
 
     popd >/dev/null || die
 }
@@ -228,10 +241,10 @@ enpm_install() {
     local nodejs_files
 
     if nodejs_has_package; then
-	einfo "Install pack files"
-	enpm --prefix "${ED}"/usr \
-	    install \
-	    "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
+        einfo "Install pack files"
+        enpm --prefix "${ED}"/usr \
+            install \
+            "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
     fi
 
     nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
@@ -239,9 +252,9 @@ enpm_install() {
     dodir "$(_NODEJS_MODULES)" || die "Could not create DEST folder"
 
     for f in ${nodejs_files}; do
-	if [[ -e "${S}/${f}" ]]; then
-	    cp -r "${S}/${f}" "${ED}/$(_NODEJS_MODULES)"
-	fi
+        if [[ -e "${S}/${f}" ]]; then
+            cp -r "${S}/${f}" "${ED}/$(_NODEJS_MODULES)"
+        fi
     done
 }
 
@@ -252,9 +265,9 @@ nodejs_src_prepare() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     if [[ ! -e package.json ]]; then
-	eerror "Unable to locate package.json"
-	eerror "Consider not inheriting the nodejs eclass."
-	die "FATAL: Unable to find package.json"
+        eerror "Unable to locate package.json"
+        eerror "Consider not inheriting the nodejs eclass."
+        die "FATAL: Unable to find package.json"
     fi
 
     default_src_prepare
@@ -267,23 +280,23 @@ nodejs_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     if nodejs_has_package; then
-	einfo "Create pack file"
-	enpm pack || die "pack failed"
+        einfo "Create pack file"
+        enpm pack || die "pack failed"
     fi
 
     if jq -e '.scripts | has("build")' <package.json >/dev/null; then
-	einfo "Run build"
-	npm run build || die "build failed"
+        einfo "Run build"
+        npm run build || die "build failed"
     fi
 
     if [[ -d node_modules ]]; then
-	einfo "Compile native addon modules"
-	find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-	    pushd "${dir}" >/dev/null || die
-	    # shellcheck disable=SC2046
-	    npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
-	    popd >/dev/null || die
-	done
+        einfo "Compile native addon modules"
+        find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
+            pushd "${dir}" >/dev/null || die
+            # shellcheck disable=SC2046
+            npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
+            popd >/dev/null || die
+        done
     fi
 }
 
@@ -293,10 +306,10 @@ nodejs_src_compile() {
 nodejs_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    if ! nodejs_has_package && jq -e '.scripts | has("test")' <package.json >/dev/null; then
-	npm run test || die "test failed"
+    if ! nodejs_has_package && nodejs_has_test; then
+        npm run test || die "test failed"
     else
-	die 'No "test" command defined in package.json'
+        die 'No "test" command defined in package.json'
     fi
 }
 
