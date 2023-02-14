@@ -12,7 +12,7 @@ else
 		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
 
-inherit nodejs systemd
+inherit nodejs systemd tmpfiles
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
@@ -49,13 +49,15 @@ src_install() {
 	insinto /var/lib/${PN}
 	doins data/configuration.yaml
 
-	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}
-	fowners zigbee2mqtt:zigbee2mqtt /var/log/${PN}
-	fowners zigbee2mqtt:zigbee2mqtt /var/lib/${PN}/configuration.yaml
+	dotmpfiles "${FILESDIR}"/zigbee2mqtt.conf
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /etc/env.d
-	echo "CONFIG_PROTECT=/var/lib/${PN}" >>"${ED}"/etc/env.d/90${PN} || die
+	echo 'CONFIG_PROTECT="/var/lib/${PN}"' >>"${ED}"/etc/env.d/90${PN} || die
+}
+
+pkg_postinst() {
+	tmpfiles_process zigbee2mqtt.conf
 }
