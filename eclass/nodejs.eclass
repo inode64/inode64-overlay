@@ -21,6 +21,8 @@
 #
 # Build package for node_modules
 #   npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#   or in yarn
+#   yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #   tar --create --auto-compress --file foo-1-node_modules.tar.xz node_modules/
 
 case ${EAPI} in
@@ -95,6 +97,7 @@ nodejs_package() {
 # @DESCRIPTION:
 # Location where to install nodejs
 _NODEJS_MODULES() {
+    # shellcheck disable=SC2046
     echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
 }
 # @FUNCTION: nodejs_has_package
@@ -117,28 +120,28 @@ enpm() {
     [[ -z ${mynpmflags} ]] && declare -a mynpmflags=()
     mynpmflagstype=$(declare -p mynpmflags 2>&-)
     if [[ "${mynpmflagstype}" != "declare -a mynpmflags="* ]]; then
-	die "mynpmflags must be declared as array"
+        die "mynpmflags must be declared as array"
     fi
 
     mynpmflags_local=("${mynpmflags[@]}")
 
     npmflags=(
-	--audit false
-	--color false
-	--foreground-scripts
-	--offline
-	--progress false
-	--verbose
-	"${mynpmflags_local[@]}"
+        --color false
+        --foreground-scripts
+        --offline
+        --progress false
+        --verbose
+        "${mynpmflags_local[@]}"
     )
 
     case ${NODEJS_MANAGEMENT} in
     npm)
-	npm "${npmflags[@]}" "$@"
-	;;
+        npmflags+=( "--audit false" )
+        npm "${npmflags[@]}" "$@"
+        ;;
     yarn)
-	yarn "${npmflags[@]}" "$@"
-	;;
+        yarn "${npmflags[@]}" "$@"
+        ;;
     esac
 }
 
@@ -149,52 +152,69 @@ enpm_clean() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     einfo "Clean files"
-
-    enpm prune --omit=dev || die
+    case ${NODEJS_MANAGEMENT} in
+    npm)
+        enpm prune --omit=dev || die
+        ;;
+    yarn)
+        enpm install --production || die
+        ;;
+    esac
 
     pushd "${S}/node_modules" >/dev/null || die
 
     # Cleanups
 
     # Remove license files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
 
     # Remove documentation files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/*.\.\(md\|txt\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
 
     # Remove typscript files
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -name tsconfig.json -delete || die
 
     # Remove misc files
+    # shellcheck disable=SC2185
     find -type f -iname '*.musl.node' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\)$' -delete || die
+    # shellcheck disable=SC2185
     find -type f -iname makefile -delete || die
+    # shellcheck disable=SC2185
     find -type f -name '*\~' -delete || die
 
+    # shellcheck disable=SC2185
     find -type d \
-	\( \
-	-iwholename '*.github' -o \
-	-iwholename '*.tscache' -o \
-	-iwholename '*/man' -o \
-	-iwholename '*/test' -o \
-	-iwholename '*/scripts' -o \
-	-iwholename '*/git-hooks' -o \
-	-iwholename '*/prebuilds' -o \
-	-iwholename '*/android-arm' -o \
-	-iwholename '*/android-arm64' -o \
-	-iwholename '*/linux-arm64' -o \
-	-iwholename '*/linux-armvy' -o \
-	-iwholename '*/linux-armv7' -o \
-	-iwholename '*/linux-arm' -o \
-	-iwholename '*/win32-ia32' -o \
-	-iwholename '*/win32-x64' -o \
-	-iwholename '*/darwin-x64' \
-	-iwholename '*/darwin-x64+arm64' \
-	\) \
-	-exec rm -rvf {} +
+        \( \
+        -iwholename '*.github' -o \
+        -iwholename '*.tscache' -o \
+        -iwholename '*/man' -o \
+        -iwholename '*/test' -o \
+        -iwholename '*/scripts' -o \
+        -iwholename '*/git-hooks' -o \
+        -iwholename '*/prebuilds' -o \
+        -iwholename '*/android-arm' -o \
+        -iwholename '*/android-arm64' -o \
+        -iwholename '*/linux-arm64' -o \
+        -iwholename '*/linux-armvy' -o \
+        -iwholename '*/linux-armv7' -o \
+        -iwholename '*/linux-arm' -o \
+        -iwholename '*/win32-ia32' -o \
+        -iwholename '*/win32-x64' -o \
+        -iwholename '*/darwin-x64' \
+        -iwholename '*/darwin-x64+arm64' \
+        \) \
+        -exec rm -rvf {} +
 
     popd >/dev/null || die
 }
@@ -208,10 +228,10 @@ enpm_install() {
     local nodejs_files
 
     if nodejs_has_package; then
-	einfo "Install pack files"
-	enpm --prefix "${ED}"/usr \
-	    install \
-	    "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
+        einfo "Install pack files"
+        enpm --prefix "${ED}"/usr \
+            install \
+            "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
     fi
 
     nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
@@ -219,9 +239,9 @@ enpm_install() {
     dodir "$(_NODEJS_MODULES)" || die "Could not create DEST folder"
 
     for f in ${nodejs_files}; do
-	if [[ -e "${S}/${f}" ]]; then
-	    cp -r "${S}/${f}" "${ED}/$(_NODEJS_MODULES)"
-	fi
+        if [[ -e "${S}/${f}" ]]; then
+            cp -r "${S}/${f}" "${ED}/$(_NODEJS_MODULES)"
+        fi
     done
 }
 
@@ -232,9 +252,9 @@ nodejs_src_prepare() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     if [[ ! -e package.json ]]; then
-	eerror "Unable to locate package.json"
-	eerror "Consider not inheriting the nodejs eclass."
-	die "FATAL: Unable to find package.json"
+        eerror "Unable to locate package.json"
+        eerror "Consider not inheriting the nodejs eclass."
+        die "FATAL: Unable to find package.json"
     fi
 
     default_src_prepare
@@ -247,22 +267,23 @@ nodejs_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     if nodejs_has_package; then
-	einfo "Create pack file"
-	enpm pack || die "pack failed"
+        einfo "Create pack file"
+        enpm pack || die "pack failed"
     fi
 
     if jq -e '.scripts | has("build")' <package.json >/dev/null; then
-	einfo "Run build"
-	npm run build || die "build failed"
+        einfo "Run build"
+        npm run build || die "build failed"
     fi
 
     if [[ -d node_modules ]]; then
-	einfo "Compile native addon modules"
-	find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-	    pushd "${dir}" >/dev/null || die
-	    npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
-	    popd >/dev/null || die
-	done
+        einfo "Compile native addon modules"
+        find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
+            pushd "${dir}" >/dev/null || die
+            # shellcheck disable=SC2046
+            npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
+            popd >/dev/null || die
+        done
     fi
 }
 
@@ -272,10 +293,10 @@ nodejs_src_compile() {
 nodejs_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    if jq -e '.scripts | has("test")' <package.json >/dev/null; then
-	npm run test || die "test failed"
+    if ! nodejs_has_package && jq -e '.scripts | has("test")' <package.json >/dev/null; then
+        npm run test || die "test failed"
     else
-	die 'No "test" command defined in package.json'
+        die 'No "test" command defined in package.json'
     fi
 }
 
@@ -285,9 +306,10 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+    # shellcheck disable=SC2035
+    dodoc *.md "${NODEJS_DOCS}" || die "failed to install documentation"
+
     enpm_clean
     enpm_install
-
-    dodoc "*.md ${NODEJS_DOCS}"
 }
 fi

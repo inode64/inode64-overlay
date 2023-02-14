@@ -37,7 +37,7 @@ RDEPEND="
 	dev-python/pymysql
 	dev-python/python-dotenv
 	dev-python/python-memcached
-	dev-python/redis-py
+	dev-python/redis
 	dev-vcs/git
 	ipmi? ( sys-apps/ipmitool )
 	media-gfx/graphviz
