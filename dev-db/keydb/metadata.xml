@@ -2,12 +2,8 @@
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="person" proxied="yes">
-		<email>arkamar@atlas.cz</email>
-		<name>Petr Vaněk</name>
-	</maintainer>
-	<maintainer type="person">
-		<email>sam@gentoo.org</email>
-		<name>Sam James</name>
+		<email>web@inode64.com</email>
+		<name>Francisco Javier Félix</name>
 	</maintainer>
 	<maintainer type="project" proxied="proxy">
 		<email>proxy-maint@gentoo.org</email>
@@ -17,8 +13,12 @@
 		<flag name="tcmalloc">
 			Use tcmalloc from <pkg>dev-util/google-perftools</pkg> for allocations.
 		</flag>
+		<flag name="flash">
+			KeyDB FLASH is built on RocksDB and is persistent to the storage medium it is written to.
+			It is still considered to be a Beta feature (experimental) and should be treated as such.
+		</flag>
 	</use>
 	<upstream>
-		<remote-id type="github">redis/redis</remote-id>
+		<remote-id type="github">Snapchat/KeyDB</remote-id>
 	</upstream>
 </pkgmetadata>
