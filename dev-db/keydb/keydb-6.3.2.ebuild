@@ -8,16 +8,16 @@ MY_PN="KeyDB"
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
 
-inherit autotools edo flag-o-matic multiprocessing systemd tmpfiles toolchain-funcs
+inherit edo multiprocessing systemd tmpfiles toolchain-funcs
 
-DESCRIPTION="A persistent caching system, key-value, and data structures database, a Multithreaded fork of Redis"
+DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
 SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+jemalloc ssl systemd tcmalloc test"
+IUSE="flash +jemalloc ssl systemd tcmalloc test"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
@@ -52,9 +52,9 @@ DEPEND="
 REQUIRED_USE="?? ( jemalloc tcmalloc )"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-6.3.2-config.patch
-	"${FILESDIR}"/${PN}-sentinel-6.3.2-config.patch
-	"${FILESDIR}"/${PN}-5.0-use-system-jemalloc.patch
+	"${FILESDIR}/${PN}-6.3.2-config.patch"
+	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
+	"${FILESDIR}/${PN}-5.0-use-system-jemalloc.patch"
 )
 
 S="${WORKDIR}/${MY_PN}-${PV}"
@@ -73,6 +73,9 @@ src_compile() {
 	if use ssl; then
 		myconf+=" BUILD_TLS=yes"
 	fi
+	if use flash; then
+		myconf+=" ENABLE_FASH=yes"
+	fi
 
 	export USE_SYSTEMD=$(usex systemd)
 
@@ -83,11 +86,10 @@ src_compile() {
 src_test() {
 	local runtestargs=(
 		--clients "$(makeopts_jobs)" # see bug #649868
-
 		--skiptest "Active defrag eval scripts" # see bug #851654
 	)
 
-	if has usersandbox ${FEATURES} || ! has userpriv ${FEATURES}; then
+	if has usersandbox "${FEATURES}" || ! has userpriv "${FEATURES}"; then
 		ewarn "oom-score-adj related tests will be skipped." \
 			"They are known to fail with FEATURES usersandbox or -userpriv. See bug #756382."
 
@@ -126,13 +128,13 @@ src_install() {
 	newinitd "${FILESDIR}/keydb-sentinel.initd-r1" keydb-sentinel
 
 	insinto /etc/logrotate.d/
-	newins "${FILESDIR}/${PN}.logrotate" ${PN}
+	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
 	dodoc 00-RELEASENOTES README.md
 
 	if use ssl; then
 	    dodoc TLS.md
-    fi
+	fi
 
 	dobin src/keydb-cli
 	dosbin src/keydb-benchmark src/keydb-server src/keydb-check-aof src/keydb-check-rdb src/keydb-diagnostic-tool
