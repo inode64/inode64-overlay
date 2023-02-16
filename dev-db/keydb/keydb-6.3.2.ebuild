@@ -17,17 +17,18 @@ SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz ->
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="flash +jemalloc ssl systemd tcmalloc test"
+IUSE="curl flash +jemalloc ssl systemd tcmalloc test"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
+	app-arch/lz4
+	app-arch/snappy
+	app-arch/zstd
+	curl? ( net-misc/curl )
 	jemalloc? ( >=dev-libs/jemalloc-5.1:= )
 	ssl? ( dev-libs/openssl:0= )
 	systemd? ( sys-apps/systemd:= )
 	tcmalloc? ( dev-util/google-perftools )
-	app-arch/snappy
-	app-arch/zstd
-	app-arch/lz4
 "
 
 RDEPEND="
@@ -69,12 +70,14 @@ src_compile() {
 	else
 		myconf+="MALLOC=libc"
 	fi
-
 	if use ssl; then
 		myconf+=" BUILD_TLS=yes"
 	fi
 	if use flash; then
 		myconf+=" ENABLE_FASH=yes"
+	fi
+	if ! use CURL; then
+		myconf+=" NO_MOTD=yes"
 	fi
 
 	export USE_SYSTEMD=$(usex systemd)
@@ -84,9 +87,11 @@ src_compile() {
 }
 
 src_test() {
+    # TODO: At the moment the test freezes and I have not found a solution
 	local runtestargs=(
 		--clients "$(makeopts_jobs)" # see bug #649868
 		--skiptest "Active defrag eval scripts" # see bug #851654
+		--verbose
 	)
 
 	if has usersandbox "${FEATURES}" || ! has userpriv "${FEATURES}"; then
