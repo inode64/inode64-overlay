@@ -284,7 +284,7 @@ nodejs_src_compile() {
         enpm pack || die "pack failed"
     fi
 
-    if jq -e '.scripts | has("build")' <package.json >/dev/null; then
+    if nodejs_has_build; then
         einfo "Run build"
         npm run build || die "build failed"
     fi
