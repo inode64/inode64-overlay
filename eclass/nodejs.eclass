@@ -14,7 +14,7 @@
 # Changelog:
 #   Initial version from:
 #       https://github.com/gentoo/gentoo/pull/930/files
-#       https://github.com/gentoo-mirror/ssnb/blob/master/eclass/npm.eclass
+#       https://github.com/samuelbernardo/ssnb-overlay/blob/master/eclass/npm.eclass
 #       https://github.com/gentoo-mirror/lanodanOverlay/blob/master/eclass/nodejs.eclass
 #       https://github.com/Tatsh/tatsh-overlay/blob/master/eclass/yarn.eclass
 
