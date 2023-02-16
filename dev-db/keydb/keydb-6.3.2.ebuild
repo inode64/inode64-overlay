@@ -76,7 +76,7 @@ src_compile() {
 	if use flash; then
 		myconf+=" ENABLE_FASH=yes"
 	fi
-	if ! use CURL; then
+	if ! use curl; then
 		myconf+=" NO_MOTD=yes"
 	fi
 
