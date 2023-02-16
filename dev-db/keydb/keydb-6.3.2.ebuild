@@ -8,7 +8,7 @@ MY_PN="KeyDB"
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
 
-inherit edo multiprocessing systemd tmpfiles toolchain-funcs
+inherit edo multiprocessing systemd tmpfiles toolchain-funcs flag-o-matic
 
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
@@ -81,13 +81,14 @@ src_compile() {
 	fi
 
 	export USE_SYSTEMD=$(usex systemd)
-	export LDFLAGS="$LDFLAGS -latomic"
+	append-libs -latomic
 
-	emake ${myconf} DEBUG=""
+	tc-export AR CC RANLIB
+	emake V=1 ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}" DEBUG=""
 }
 
 src_test() {
-    # TODO: At the moment the test freezes and I have not found a solution
+	# TODO: At the moment the test freezes and I have not found a solution
 	local runtestargs=(
 		--clients "$(makeopts_jobs)" # see bug #649868
 		--skiptest "Active defrag eval scripts" # see bug #851654
