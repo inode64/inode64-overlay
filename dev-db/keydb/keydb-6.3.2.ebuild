@@ -81,9 +81,9 @@ src_compile() {
 	fi
 
 	export USE_SYSTEMD=$(usex systemd)
+	export LDFLAGS="$LDFLAGS -latomic"
 
-	tc-export AR CC RANLIB
-	emake V=1 ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}"
+	emake ${myconf} DEBUG=""
 }
 
 src_test() {
