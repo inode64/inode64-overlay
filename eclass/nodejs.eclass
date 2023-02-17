@@ -80,42 +80,43 @@ RDEPEND+=" net-libs/nodejs"
 
 # @FUNCTION: nodejs_version
 # @DESCRIPTION:
-# Return the package version
+# @RETURN: the package version
 nodejs_version() {
     node -p "require('./package.json').version"
 }
 
 # @FUNCTION: nodejs_package
 # @DESCRIPTION:
-# Return the package name
+# @RETURN: the package name
 nodejs_package() {
     node -p "require('./package.json').name"
 }
 
 # @FUNCTION: nodejs_has_test
 # @DESCRIPTION:
-# Return true if test script exist
+# @RETURN: true if test script exist
 nodejs_has_test() {
     node -p "if (require('./package.json').scripts.test === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: nodejs_has_build
 # @DESCRIPTION:
-# Return true if build script exist
+# @RETURN: true if build script exist
 nodejs_has_build() {
     node -p "if (require('./package.json').scripts.build === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: _NODEJS_MODULES
 # @DESCRIPTION:
-# Location where to install nodejs
+# @RETURN: Location where to install nodejs
 _NODEJS_MODULES() {
     # shellcheck disable=SC2046
     echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
 }
+
 # @FUNCTION: nodejs_has_package
 # @DESCRIPTION:
-# Return true (0) if is a package
+# @RETURN: true (0) if is a package
 nodejs_has_package() {
     [[ -d "${S}"/package ]] || return 1
 }
