@@ -10,9 +10,6 @@
 		<name>Proxy Maintainers</name>
 	</maintainer>
 	<use>
-		<flag name="tcmalloc">
-			Use tcmalloc from <pkg>dev-util/google-perftools</pkg> for allocations.
-		</flag>
 		<flag name="flash">
 			KeyDB FLASH is built on RocksDB and is persistent to the storage medium it is written to.
 			It is still considered to be a Beta feature (experimental) and should be treated as such.
