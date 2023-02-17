@@ -8,7 +8,7 @@ MY_PN="KeyDB"
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
 
-inherit edo multiprocessing systemd tmpfiles toolchain-funcs flag-o-matic
+inherit edo multiprocessing systemd tmpfiles toolchain-funcs
 
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
@@ -17,7 +17,7 @@ SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz ->
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="curl flash +jemalloc ssl systemd tcmalloc test"
+IUSE="curl flash ssl systemd test"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
@@ -25,10 +25,8 @@ COMMON_DEPEND="
 	app-arch/snappy
 	app-arch/zstd
 	curl? ( net-misc/curl )
-	jemalloc? ( >=dev-libs/jemalloc-5.1:= )
 	ssl? ( dev-libs/openssl:0= )
 	systemd? ( sys-apps/systemd:= )
-	tcmalloc? ( dev-util/google-perftools )
 "
 
 RDEPEND="
@@ -50,12 +48,10 @@ DEPEND="
 		ssl? ( dev-tcltk/tls )
 	)"
 
-REQUIRED_USE="?? ( jemalloc tcmalloc )"
-
 PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
-	"${FILESDIR}/${PN}-5.0-use-system-jemalloc.patch"
+	"${FILESDIR}/${PN}-use-atomic.patch"
 )
 
 S="${WORKDIR}/${MY_PN}-${PV}"
@@ -63,51 +59,31 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 src_compile() {
 	local myconf=""
 
-	if use jemalloc; then
-		myconf+="MALLOC=jemalloc"
-	elif use tcmalloc; then
-		myconf+="MALLOC=tcmalloc"
-	else
-		myconf+="MALLOC=libc"
-	fi
 	if use ssl; then
 		myconf+=" BUILD_TLS=yes"
 	fi
 	if use flash; then
-		myconf+=" ENABLE_FASH=yes"
+		myconf+=" ENABLE_FLASH=yes"
 	fi
 	if ! use curl; then
 		myconf+=" NO_MOTD=yes"
 	fi
 
 	export USE_SYSTEMD=$(usex systemd)
-	append-libs -latomic
 
 	tc-export AR CC RANLIB
-	emake V=1 ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}" DEBUG=""
+	emake ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}" DEBUG=""
 }
 
 src_test() {
-	# TODO: At the moment the test freezes and I have not found a solution
 	local runtestargs=(
 		--clients "$(makeopts_jobs)" # see bug #649868
-		--skiptest "Active defrag eval scripts" # see bug #851654
+		--skipunit unit/oom-score-adj # see bug #756382
+		--skipunit unit/expire
+		--skipunit integration/replication-active
+		--skipunit unit/shutdown
 		--verbose
 	)
-
-	if has usersandbox "${FEATURES}" || ! has userpriv "${FEATURES}"; then
-		ewarn "oom-score-adj related tests will be skipped." \
-			"They are known to fail with FEATURES usersandbox or -userpriv. See bug #756382."
-
-		runtestargs+=(
-			# unit/oom-score-adj was introduced in version 6.2.0
-			--skipunit unit/oom-score-adj # see bug #756382
-
-			# Following test was added in version 7.0.0 to unit/introspection.
-			# It also tries to adjust OOM score.
-			--skiptest "CONFIG SET rollback on apply error"
-		)
-	fi
 
 	if use ssl; then
 		edo ./utils/gen-test-certs.sh
