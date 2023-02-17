@@ -121,6 +121,23 @@ nodejs_has_package() {
     [[ -d "${S}"/package ]] || return 1
 }
 
+# @FUNCTION: nodejs_docs
+# @DESCRIPTION:
+# Install docs usually found in NodeJS/NPM packages
+nodejs_docs() {
+    # If docs variable is not empty when install docs usually found in NodeJS/NPM packages
+    [[ "${DOCS}" ]] || return
+
+    local f
+
+	for f in README* HISTORY* ChangeLog AUTHORS NEWS TODO CHANGES \
+			THANKS BUGS FAQ CREDITS CHANGELOG* *.md; do
+		if [[ -s "${f}" ]]; then
+			dodoc "${f}"
+		fi
+	done
+}
+
 # @FUNCTION: enpm
 # @DESCRIPTION:
 # Packet manager execution wrapper
@@ -320,8 +337,7 @@ nodejs_src_test() {
 nodejs_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    # shellcheck disable=SC2035
-    dodoc *.md "${NODEJS_DOCS}" || die "failed to install documentation"
+    nodejs_docs
 
     enpm_clean
     enpm_install
