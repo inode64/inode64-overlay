@@ -13,13 +13,13 @@ depend() {
 }
 
 configtest() {
-        ${command} -t 1>/dev/null 2>&1
-        ret=$?
-        if [ ${ret} -ne 0 ] ; then
-                eerror "${SVCNAME} has detected an error in your setup:"
-                ${command} -t
-        fi
-        return $ret
+	${command} -t 1>/dev/null 2>&1
+	ret=$?
+	if [ ${ret} -ne 0 ] ; then
+		eerror "${SVCNAME} has detected an error in your setup:"
+		${command} -t
+	fi
+	return $ret
 }
 
 start() {

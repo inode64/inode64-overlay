@@ -130,12 +130,12 @@ nodejs_docs() {
 
     local f
 
-	for f in README* HISTORY* ChangeLog AUTHORS NEWS TODO CHANGES \
-			THANKS BUGS FAQ CREDITS CHANGELOG* *.md; do
-		if [[ -s "${f}" ]]; then
-			dodoc "${f}"
-		fi
-	done
+    for f in README* HISTORY* ChangeLog AUTHORS NEWS TODO CHANGES \
+        THANKS BUGS FAQ CREDITS CHANGELOG* *.md; do
+        if [[ -s "${f}" ]]; then
+            dodoc "${f}"
+        fi
+    done
 }
 
 # @FUNCTION: nodejs_docs

@@ -1,17 +1,16 @@
-BDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) jemalloc? ( >=dev-libs/jemalloc-5.1:= ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) tcmalloc? ( dev-util/google-perftools ) virtual/pkgconfig virtual/pkgconfig
+BDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) virtual/pkgconfig virtual/pkgconfig
 DEFINED_PHASES=compile install postinst test
-DEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) jemalloc? ( >=dev-libs/jemalloc-5.1:= ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) tcmalloc? ( dev-util/google-perftools ) test? ( dev-lang/tcl:0= ssl? ( dev-tcltk/tls ) )
+DEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) test? ( dev-lang/tcl:0= ssl? ( dev-tcltk/tls ) )
 DESCRIPTION=KeyDB is a high performance fork of Redis with a focus on multithreading
 EAPI=8
 HOMEPAGE=https://docs.keydb.dev/
-INHERIT=edo multiprocessing systemd tmpfiles toolchain-funcs flag-o-matic
-IUSE=curl flash +jemalloc ssl systemd tcmalloc test
+INHERIT=edo multiprocessing systemd tmpfiles toolchain-funcs
+IUSE=curl flash ssl systemd test
 KEYWORDS=~amd64 ~x86
 LICENSE=BSD
-RDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) jemalloc? ( >=dev-libs/jemalloc-5.1:= ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) tcmalloc? ( dev-util/google-perftools ) acct-group/keydb acct-user/keydb virtual/tmpfiles
-REQUIRED_USE=?? ( jemalloc tcmalloc )
+RDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) acct-group/keydb acct-user/keydb virtual/tmpfiles
 RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://github.com/Snapchat/KeyDB/archive/refs/tags/v6.3.2.tar.gz -> keydb-6.3.2.tar.gz
-_eclasses_=edo	c0eb9cbe6b0bd01fcb4918f12598a4d3	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	9a610728b9bcca1919234cceb35a1027	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f	flag-o-matic	69394e25812406faa1f90edaf4969395
-_md5_=73c4b12f7b519684f13110a42358e867
+_eclasses_=edo	c0eb9cbe6b0bd01fcb4918f12598a4d3	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	9a610728b9bcca1919234cceb35a1027	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f
+_md5_=b4d61ae9d807002acdffe6ca83d5c48f
