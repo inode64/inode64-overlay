@@ -138,6 +138,67 @@ nodejs_docs() {
 	done
 }
 
+# @FUNCTION: nodejs_docs
+# @INTERNAL
+# @DESCRIPTION:
+# Remove docs, licenses and development files
+nodejs_remove_dev() {
+    # Remove license files
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
+
+    # Remove documentation files
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*/*.\.md$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
+
+    # Remove typscript files
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -name tsconfig.json -delete || die
+
+    # Remove misc files
+    # shellcheck disable=SC2185
+    find -type f -iname '*.musl.node' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\|env\|nycrc\|eslint.*\|coveralls.*\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(jscs.json\|jshintignore\|gitignore\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iname makefile -delete || die
+    # shellcheck disable=SC2185
+    find -type f -name '*\~' -delete || die
+
+    # shellcheck disable=SC2185
+    find -type d \
+        \( \
+        -iwholename '*.github' -o \
+        -iwholename '*.tscache' -o \
+        -iwholename '*.vscode' -o \
+        -iwholename '*.idea' -o \
+        -iwholename '*/man' -o \
+        -iwholename '*/test' -o \
+        -iwholename '*/scripts' -o \
+        -iwholename '*/git-hooks' -o \
+        -iwholename '*/prebuilds' -o \
+        -iwholename '*/android-arm' -o \
+        -iwholename '*/android-arm64' -o \
+        -iwholename '*/linux-arm64' -o \
+        -iwholename '*/linux-armvy' -o \
+        -iwholename '*/linux-armv7' -o \
+        -iwholename '*/linux-arm' -o \
+        -iwholename '*/win32-ia32' -o \
+        -iwholename '*/win32-x64' -o \
+        -iwholename '*/darwin-x64' \
+        -iwholename '*/darwin-x64+arm64' \
+        \) \
+        -exec rm -rvf {} +
+}
+
 # @FUNCTION: enpm
 # @DESCRIPTION:
 # Packet manager execution wrapper
@@ -182,6 +243,8 @@ enpm() {
 enpm_clean() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+    local nodejs_files f
+
     einfo "Clean files"
     case ${NODEJS_MANAGEMENT} in
     npm)
@@ -192,62 +255,16 @@ enpm_clean() {
         ;;
     esac
 
-    pushd "${S}/node_modules" >/dev/null || die
+    nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES}"
 
     # Cleanups
-
-    # Remove license files
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
-
-    # Remove documentation files
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*/*.\.md$' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
-
-    # Remove typscript files
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -name tsconfig.json -delete || die
-
-    # Remove misc files
-    # shellcheck disable=SC2185
-    find -type f -iname '*.musl.node' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\)$' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -iname makefile -delete || die
-    # shellcheck disable=SC2185
-    find -type f -name '*\~' -delete || die
-
-    # shellcheck disable=SC2185
-    find -type d \
-        \( \
-        -iwholename '*.github' -o \
-        -iwholename '*.tscache' -o \
-        -iwholename '*/man' -o \
-        -iwholename '*/test' -o \
-        -iwholename '*/scripts' -o \
-        -iwholename '*/git-hooks' -o \
-        -iwholename '*/prebuilds' -o \
-        -iwholename '*/android-arm' -o \
-        -iwholename '*/android-arm64' -o \
-        -iwholename '*/linux-arm64' -o \
-        -iwholename '*/linux-armvy' -o \
-        -iwholename '*/linux-armv7' -o \
-        -iwholename '*/linux-arm' -o \
-        -iwholename '*/win32-ia32' -o \
-        -iwholename '*/win32-x64' -o \
-        -iwholename '*/darwin-x64' \
-        -iwholename '*/darwin-x64+arm64' \
-        \) \
-        -exec rm -rvf {} +
-
-    popd >/dev/null || die
+    for f in ${nodejs_files}; do
+        if [[ -d "${S}/${f}" ]]; then
+            pushd "${S}/${f}" >/dev/null || die
+            nodejs_remove_dev
+            popd >/dev/null || die
+        fi
+    done
 }
 
 # @FUNCTION: enpm_install
@@ -256,7 +273,7 @@ enpm_clean() {
 enpm_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    local nodejs_files
+    local nodejs_files f
 
     if nodejs_has_package; then
         einfo "Install pack files"
