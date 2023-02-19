@@ -202,7 +202,7 @@ enpm_clean() {
 
     # Remove documentation files
     # shellcheck disable=SC2185
-    find -type f -iregex '.*/*.\.\(md\|txt\)$' -delete || die
+    find -type f -iregex '.*/*.\.md$' -delete || die
     # shellcheck disable=SC2185
     find -type f -iregex '.*/\(readme\(.*\)?\|changelog\|roadmap\|security\|release\|contributors\|todo\|authors\)$' -delete || die
 
