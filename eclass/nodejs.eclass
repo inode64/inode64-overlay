@@ -167,7 +167,9 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\|env\|nycrc\|eslint.*\|coveralls.*\)$' -delete || die
     # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(jscs.json\|jshintignore\|gitignore\)$' -delete || die
+    find -type f -iregex '.*\.\(jscs.json\|jshintignore\|gitignore\|babelrc\|runkit_example.js\|airtap.yml\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(jekyll-metadata\|codeclimate.yml\)$' -delete || die
     # shellcheck disable=SC2185
     find -type f -iname makefile -delete || die
     # shellcheck disable=SC2185
@@ -180,6 +182,8 @@ nodejs_remove_dev() {
         -iwholename '*.tscache' -o \
         -iwholename '*.vscode' -o \
         -iwholename '*.idea' -o \
+        -iwholename '*.nyc_output' -o \
+        -iwholename '*.deps' -o \
         -iwholename '*/man' -o \
         -iwholename '*/test' -o \
         -iwholename '*/scripts' -o \
