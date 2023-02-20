@@ -236,11 +236,16 @@ enpm() {
 
     case ${NODEJS_MANAGEMENT} in
     npm)
-        npmflags+=("--audit false")
-        npm "${npmflags[@]}" "$@"
+        npmflags+=(
+            --audit false
+        )
+        npm "$@" "${npmflags[@]}"
         ;;
     yarn)
-        yarn "${npmflags[@]}" "$@"
+        npmflags+=(
+            --cache-folder "${S}/.cache"
+        )
+        yarn "$@" "${npmflags[@]}"
         ;;
     esac
 }
@@ -259,7 +264,10 @@ enpm_clean() {
         enpm prune --omit=dev || die
         ;;
     yarn)
-        enpm install --production || die
+        enpm install production || die
+        # TODO
+        #enpm autoclean --init || die
+        #enpm autoclean --force || die
         ;;
     esac
 
