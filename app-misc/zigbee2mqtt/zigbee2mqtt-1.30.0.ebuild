@@ -12,7 +12,7 @@ else
 		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
 
-inherit nodejs systemd tmpfiles
+inherit nodejs-pack systemd tmpfiles
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
@@ -26,9 +26,6 @@ RDEPEND="
 	acct-group/zigbee2mqtt
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
-	net-libs/nodejs:=
-"
-BDEPEND="
 "
 
 NODEJS_EXTRA_FILES="scripts"
