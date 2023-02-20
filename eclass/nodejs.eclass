@@ -19,10 +19,14 @@
 #       https://github.com/Tatsh/tatsh-overlay/blob/master/eclass/yarn.eclass
 
 #
-# Build package for node_modules
+# Build package for node_modules:
+#   npm:
 #   npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
-#   or in yarn
+#
+#   yarn:
 #   yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#
+#   Create archive in tar:
 #   tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 
 case ${EAPI} in
