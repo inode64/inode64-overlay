@@ -149,7 +149,7 @@ nodejs_docs() {
 nodejs_remove_dev() {
     # Remove license files
     # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(...-\)?license\(-...\)?\(\.\(md\|rtf\|txt\|markdown\)\)?$' -delete || die
+    find -type f -iregex '.*/\(...-\)?license\(-...\|-apache\)?\(\.\(md\|rtf\|txt\|markdown\|bsd\)\)?$' -delete || die
 
     # Remove documentation files
     # shellcheck disable=SC2185
@@ -164,6 +164,8 @@ nodejs_remove_dev() {
     find -type f -name tsconfig.json -delete || die
     # shellcheck disable=SC2185
     find -type f -name docker-compose.yml -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iname CopyrightNotice.txt -delete || die
 
     # Remove misc files
     # shellcheck disable=SC2185
@@ -175,7 +177,7 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(jscs.json\|jshintignore\|gitignore\|babelrc.*\|runkit_example.js\|airtap.yml\)$' -delete || die
     # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(jekyll-metadata\|codeclimate.yml\|prettierrc.yaml\|drone.jsonnet\|mocharc.yml\)$' -delete || die
+    find -type f -iregex '.*\.\(jekyll-metadata\|codeclimate.yml\|prettierrc.yaml\|drone.jsonnet\|mocharc.*\)$' -delete || die
     # shellcheck disable=SC2185
     find -type f -iname makefile -delete || die
     # shellcheck disable=SC2185
