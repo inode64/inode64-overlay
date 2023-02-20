@@ -162,6 +162,8 @@ nodejs_remove_dev() {
     find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
     # shellcheck disable=SC2185
     find -type f -name tsconfig.json -delete || die
+    # shellcheck disable=SC2185
+    find -type f -name docker-compose.yml -delete || die
 
     # Remove misc files
     # shellcheck disable=SC2185
