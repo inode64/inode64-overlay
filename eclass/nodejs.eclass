@@ -325,7 +325,7 @@ nodejs_src_compile() {
 
     if nodejs_has_build; then
         einfo "Run build"
-        npm run build || die "build failed"
+        enpm run build || die "build failed"
     fi
 
     if [[ -d node_modules ]]; then
@@ -346,7 +346,7 @@ nodejs_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     if ! nodejs_has_package && nodejs_has_test; then
-        npm run test || die "test failed"
+        enpm run test || die "test failed"
     else
         die 'No "test" command defined in package.json'
     fi
