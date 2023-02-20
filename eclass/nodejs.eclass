@@ -327,11 +327,6 @@ nodejs_src_compile() {
         enpm pack || die "pack failed"
     fi
 
-    if nodejs_has_build; then
-        einfo "Run build"
-        enpm run build || die "build failed"
-    fi
-
     if [[ -d node_modules ]]; then
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
@@ -340,6 +335,11 @@ nodejs_src_compile() {
             npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
             popd >/dev/null || die
         done
+    fi
+
+    if nodejs_has_build; then
+        einfo "Run build"
+        enpm run build || die "build failed"
     fi
 }
 
