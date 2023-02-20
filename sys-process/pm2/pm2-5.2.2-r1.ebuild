@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit nodejs-pack systemd
+inherit nodejs nodejs-pack systemd
 
 DESCRIPTION="Process manager for Node.js applications with a built-in load balancer"
 HOMEPAGE="https://pm2.keymetrics.io/"
