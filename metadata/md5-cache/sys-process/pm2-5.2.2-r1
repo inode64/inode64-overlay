@@ -1,0 +1,13 @@
+BDEPEND=net-libs/nodejs[npm] virtual/pkgconfig
+DEFINED_PHASES=compile install prepare test
+DESCRIPTION=Process manager for Node.js applications with a built-in load balancer
+EAPI=8
+HOMEPAGE=https://pm2.keymetrics.io/
+INHERIT=nodejs systemd
+KEYWORDS=~amd64
+LICENSE=AGPL-3
+RDEPEND=net-libs/nodejs:= net-libs/nodejs
+SLOT=0
+SRC_URI=https://github.com/Unitech/pm2/archive/5.2.2.tar.gz -> pm2-5.2.2.tar.gz
+_eclasses_=nodejs	03aaaabdc175bf7629f723040d37e8d4	toolchain-funcs	6001248ef162a5fa2a21ce132a212f6b	multilib	5ca4e49abed8e3a2f7b56920eadee157	systemd	5f4bb0758df2e483babf68cd517078ca
+_md5_=5a15224ff42f357c1ff12f79c8ee664f
