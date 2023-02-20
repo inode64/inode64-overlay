@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit nodejs systemd tmpfiles
+inherit nodejs-pack systemd tmpfiles
 
 DESCRIPTION="A visual tool for wiring the Internet of Things."
 HOMEPAGE="https://nodered.org"
@@ -17,7 +17,6 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-group/node-red
 	acct-user/node-red
-	net-libs/nodejs:=
 "
 
 NODEJS_EXTRA_FILES="packages"

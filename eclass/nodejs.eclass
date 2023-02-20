@@ -37,8 +37,6 @@ esac
 if [[ -z ${_NODEJS_ECLASS} ]]; then
 _NODEJS_ECLASS=1
 
-EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
-
 # @ECLASS_VARIABLE: NODEJS_MANAGEMENT
 # @PRE_INHERIT
 # @DEFAULT_UNSET
@@ -52,13 +50,6 @@ EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
 # @DESCRIPTION:
 # Files and directories that usually come in a standard NodeJS/npm module.
 NODEJS_FILES="babel.config.js babel.config.json cli.js dist index.js lib node_modules package.json"
-
-# @ECLASS_VARIABLE: NODEJS_DOCS
-# @DESCRIPTION:
-# Document files that come in a NodeJS/npm module, outside the usual docs
-# list of README*, ChangeLog AUTHORS* etc. These are only installed if 'doc' is
-# in ${USE}
-# NODEJS_DOCS="README* LICENSE HISTORY*"
 
 # @ECLASS_VARIABLE: NODEJS_EXTRA_FILES
 # @DESCRIPTION:
@@ -79,8 +70,6 @@ yarn)
     die "Value ${NODEJS_MANAGEMENT} is not supported"
     ;;
 esac
-
-RDEPEND+=" net-libs/nodejs"
 
 # @FUNCTION: nodejs_version
 # @DESCRIPTION:
@@ -130,7 +119,7 @@ nodejs_has_package() {
 # Install docs usually found in NodeJS/NPM packages
 nodejs_docs() {
     # If docs variable is not empty when install docs usually found in NodeJS/NPM packages
-    [[ "${DOCS}" ]] || return
+    [[ ! "${DOCS}" ]] || return
 
     local f
 
@@ -142,7 +131,7 @@ nodejs_docs() {
     done
 }
 
-# @FUNCTION: nodejs_docs
+# @FUNCTION: nodejs_remove_dev
 # @INTERNAL
 # @DESCRIPTION:
 # Remove docs, licenses and development files
@@ -311,72 +300,5 @@ enpm_install() {
             cp -r "${S}/${f}" "${ED}/$(_NODEJS_MODULES)"
         fi
     done
-}
-
-# @FUNCTION: nodejs_src_prepare
-# @DESCRIPTION:
-# Nodejs preparation phase
-nodejs_src_prepare() {
-    debug-print-function "${FUNCNAME}" "${@}"
-
-    if [[ ! -e package.json ]]; then
-        eerror "Unable to locate package.json"
-        eerror "Consider not inheriting the nodejs eclass."
-        die "FATAL: Unable to find package.json"
-    fi
-
-    default_src_prepare
-}
-
-# @FUNCTION: nodejs_src_compile
-# @DESCRIPTION:
-# General function for compiling a nodejs module
-nodejs_src_compile() {
-    debug-print-function "${FUNCNAME}" "${@}"
-
-    if nodejs_has_package; then
-        einfo "Create pack file"
-        enpm pack || die "pack failed"
-    fi
-
-    if [[ -d node_modules ]]; then
-        einfo "Compile native addon modules"
-        find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-            pushd "${dir}" >/dev/null || die
-            # shellcheck disable=SC2046
-            npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild --verbose
-            popd >/dev/null || die
-        done
-    fi
-
-    if nodejs_has_build; then
-        einfo "Run build"
-        enpm run build || die "build failed"
-    fi
-}
-
-# @FUNCTION: nodejs_src_test
-# @DESCRIPTION:
-# General function for testing a nodejs module
-nodejs_src_test() {
-    debug-print-function "${FUNCNAME}" "${@}"
-
-    if ! nodejs_has_package && nodejs_has_test; then
-        enpm run test || die "test failed"
-    else
-        die 'No "test" command defined in package.json'
-    fi
-}
-
-# @FUNCTION: nodejs_src_install
-# @DESCRIPTION:
-# Function for installing the package
-nodejs_src_install() {
-    debug-print-function "${FUNCNAME}" "${@}"
-
-    nodejs_docs
-
-    enpm_clean
-    enpm_install
 }
 fi
