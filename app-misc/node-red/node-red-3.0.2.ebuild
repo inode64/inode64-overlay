@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit nodejs-pack systemd tmpfiles
+inherit nodejs nodejs-pack systemd tmpfiles
 
 DESCRIPTION="A visual tool for wiring the Internet of Things."
 HOMEPAGE="https://nodered.org"
