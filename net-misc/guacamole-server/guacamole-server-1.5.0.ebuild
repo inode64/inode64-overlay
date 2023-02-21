@@ -66,9 +66,8 @@ PATCHES=(
 src_prepare() {
 	if [[ "${PV}" == *9999 ]]; then
 		eautoreconf -fi
-		eapply_user
-		default
 	fi
+    default
 }
 
 src_configure() {
