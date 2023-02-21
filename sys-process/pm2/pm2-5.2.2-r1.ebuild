@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit nodejs nodejs-pack systemd
+inherit nodejs-pack systemd
 
 DESCRIPTION="Process manager for Node.js applications with a built-in load balancer"
 HOMEPAGE="https://pm2.keymetrics.io/"
@@ -15,9 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 src_install() {
-	nodejs_docs
-	enpm_clean
-	enpm_install
+	nodejs-pack_src_install
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
