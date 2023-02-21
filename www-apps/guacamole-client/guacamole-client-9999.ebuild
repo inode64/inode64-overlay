@@ -8,7 +8,6 @@ HOMEPAGE="https://guacamole.apache.org/"
 
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
-	KEYWORDS=""
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-client.git"
 else
 	KEYWORDS="~amd64 ~x86"

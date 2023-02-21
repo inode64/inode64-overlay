@@ -6,45 +6,74 @@ EAPI=8
 DESCRIPTION="Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 
+# Download process
+#
+# download mvn:
+# LC_ALL=C LANG=en-US.UTF-8 mvn dependency:go-offline -Dmaven.repo.local=.m2 -Drat.ignoreErrors=true
+#
+# Download node_modules:
+# tar --create --auto-compress --file guacamole-client-1.5.0-node_modules.tar.xz
+# ./../../../guacamole/target/node/npm install --verbose
+
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-client.git"
 else
 	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
+	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz
+	        https://inode64.com/dist/${P}-node_modules.tar.xz
+			https://inode64.com/dist/${P}-mvn.tar.xz"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="ldap +mysql postgres"
-REQUIRED_USE="|| ( ldap mysql postgres )"
-DEPEND="dev-java/maven-bin"
-RDEPEND="${DEPEND}
+IUSE="ldap +mysql postgres test"
+REQUIRED_USE="|| ( mysql postgres )"
+BDEPEND="dev-java/maven-bin"
+RDEPEND="
 	ldap? ( net-nds/openldap )
-	postgres? ( dev-java/jdbc-postgresql )
 	virtual/jre:1.8
 	www-servers/tomcat:8.5
 	"
+RESTRICT="!test? ( test )"
 
-# To enable Maven access to https://repo.maven.apache.org/maven2
-RESTRICT="network-sandbox"
+PATCHES=(
+	"${FILESDIR}"/npm_offline.diff
+)
+
 MY_PN="guacamole"
 MY_PV="$(ver_cut 1-3)"
 GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
 
 src_compile() {
-	mvn package -Drat.skip=true -Dmaven.repo.local="${T}"
+	export LC_ALL=C
+	export LANG=en-US.UTF-8
+
+	local myconf=(
+		-Dmaven.repo.local="${S}/.m2"
+		-Drat.ignoreErrors=true
+	)
+
+	if ! use test; then
+		myconf+=(
+			-DskipTests=true
+	    )
+	fi
+
+	mvn package ${myconf[@]} || die
 }
 
 src_install() {
 	insinto "${GUACAMOLE_HOME}/extensions"
-	#doins extensions/guacamole-auth-cas/target/guacamole-auth-cas-${MY_PV}.jar
-	#doins extensions/guacamole-auth-totp/target/guacamole-auth-totp-${MY_PV}.jar
-	doins extensions/guacamole-auth-quickconnect/target/guacamole-auth-quickconnect-${MY_PV}.jar
-	#doins extensions/guacamole-auth-openid/target/guacamole-auth-openid-${MY_PV}.jar
-	doins extensions/guacamole-auth-header/target/guacamole-auth-header-${MY_PV}.jar
 	#doins extensions/guacamole-auth-duo/target/guacamole-auth-duo-${MY_PV}.jar
+	doins extensions/guacamole-auth-header/target/guacamole-auth-header-${MY_PV}.jar
+	doins extensions/guacamole-auth-json/target/guacamole-auth-json-${MY_PV}.jar
+	doins extensions/guacamole-auth-quickconnect/target/guacamole-auth-quickconnect-${MY_PV}.jar
+	#doins extensions/guacamole-auth-radius/target/guacamole-auth-radius-${MY_PV}.jar
+	#doins extensions/guacamole-auth-sso/target/guacamole-auth-sso-${MY_PV}.jar
+	#doins extensions/guacamole-auth-totp/target/guacamole-auth-totp-${MY_PV}.jar
+	#doins extensions/guacamole-history-recording-storage/target/guacamole-history-recording-storage-${MY_PV}.jar
 
 	if use mysql || use postgres; then
 		insinto "${GUACAMOLE_HOME}/extensions"

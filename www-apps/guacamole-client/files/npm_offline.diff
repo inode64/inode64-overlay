@@ -1,0 +1,18 @@
+--- a/guacamole/pom.xml.old	2023-02-21 17:40:39.944089562 +0100
++++ b/guacamole/pom.xml	2023-02-21 17:47:51.617831301 +0100
+@@ -80,15 +80,6 @@
+                         </configuration>
+                     </execution>
+                     <execution>
+-                        <id>npm-ci</id>
+-                        <goals>
+-                            <goal>npm</goal>
+-                        </goals>
+-                        <configuration>
+-                            <arguments>ci</arguments>
+-                        </configuration>
+-                    </execution>
+-                    <execution>
+                         <id>npm-build</id>
+                         <phase>generate-resources</phase>
+                         <goals>
