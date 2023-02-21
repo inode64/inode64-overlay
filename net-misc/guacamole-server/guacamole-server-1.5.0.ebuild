@@ -17,7 +17,9 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp"
+IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
+RESTRICT="!test? ( test )"
+
 REQUIRED_USE="pulseaudio? ( vnc )"
 FONTS="
 	media-fonts/dejavu
@@ -58,6 +60,9 @@ DEPEND="${RDEPEND}
 	vorbis? ( media-libs/libvorbis )
 	webp? ( media-libs/libwebp )
 	x11-libs/cairo
+	test? (
+		dev-util/cunit
+	)
 "
 PATCHES=(
 	"${FILESDIR}"/ghostscript-gpl-9.54-compat.patch
@@ -67,7 +72,7 @@ src_prepare() {
 	if [[ "${PV}" == *9999 ]]; then
 		eautoreconf -fi
 	fi
-    default
+	default
 }
 
 src_configure() {
