@@ -3,6 +3,13 @@
 <pkgmetadata>
 	<maintainer type="person" proxied="yes">
 		<email>web@inode64.com</email>
-		<description>The INODE64 Gentoo Project</description>
+		<name>Fco. Javier Félix</name>
 	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">abbbi/virtnbdbackup</remote-id>
+	</upstream>
 </pkgmetadata>
