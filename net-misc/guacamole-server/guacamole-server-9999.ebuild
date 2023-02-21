@@ -9,7 +9,6 @@ HOMEPAGE="https://guacamole.apache.org/"
 
 if [[ "${PV}" == *9999 ]]; then
 	inherit git-r3
-	KEYWORDS=""
 	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-server.git"
 else
 	KEYWORDS="~amd64 ~x86"
@@ -37,7 +36,7 @@ DEPEND="${RDEPEND}
 	acct-user/guacamole
 	dev-libs/openssl:0=
 	|| ( dev-libs/ossp-uuid sys-libs/libuuid )
-	encode? ( media-video/ffmpeg )
+	encode? ( media-video/ffmpeg[encode] )
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
@@ -51,7 +50,7 @@ DEPEND="${RDEPEND}
 		x11-libs/pango
 		)
 	vnc? (
-		net-libs/libvncserver[threads]
+		net-libs/libvncserver[jpeg]
 		pulseaudio? (
 			media-sound/pulseaudio
 			)
