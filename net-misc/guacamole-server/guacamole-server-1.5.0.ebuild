@@ -60,7 +60,6 @@ DEPEND="${RDEPEND}
 	x11-libs/cairo
 "
 PATCHES=(
-	"${FILESDIR}"/guacamole-1115.patch
 	"${FILESDIR}"/ghostscript-gpl-9.54-compat.patch
 )
 
