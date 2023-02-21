@@ -77,5 +77,9 @@ nodejs-pack_src_install() {
     enpm --prefix "${ED}"/usr --global \
         install \
         "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
+
+    pushd "${ED}/$(_NODEJS_MODULES)" >/dev/null || die
+    nodejs_remove_dev
+    popd >/dev/null || die
 }
 fi
