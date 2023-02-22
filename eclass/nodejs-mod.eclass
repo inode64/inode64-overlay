@@ -40,7 +40,7 @@ _NODEJS-MODE_ECLASS=1
 inherit nodejs
 
 if has nodejs-pack ${INHERITED}; then
-        eerror "nodejs-mod and nodejs-pack eclass are incompatible"
+    eerror "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
 
 EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
@@ -103,7 +103,7 @@ nodejs-pack_src_install() {
 
     nodejs_docs
 
-    enpm_clean
     enpm_install
+    enpm_clean
 }
 fi

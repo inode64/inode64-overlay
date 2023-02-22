@@ -90,7 +90,7 @@ BDEPEND="
 "
 
 PATCHES=(
-        "${FILESDIR}"/Update-h264-to-use-new-FFMPEG-API.patch
+	"${FILESDIR}"/Update-h264-to-use-new-FFMPEG-API.patch
 )
 
 src_configure() {
