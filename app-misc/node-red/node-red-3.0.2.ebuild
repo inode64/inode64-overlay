@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit nodejs-pack systemd tmpfiles
+inherit nodejs-mod systemd tmpfiles
 
 DESCRIPTION="A visual tool for wiring the Internet of Things."
 HOMEPAGE="https://nodered.org"
@@ -33,7 +33,7 @@ src_install() {
 	rm -rf node_modules/jsdoc-nr-template/ || die
 	sed -i -e '/jsdoc-nr-template/d' package.json || die
 
-	nodejs-pack_src_install
+	nodejs-mod_src_install
 
 	dotmpfiles "${FILESDIR}"/node-red.conf
 
