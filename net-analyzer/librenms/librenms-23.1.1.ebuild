@@ -3,13 +3,10 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..11} )
-inherit python-single-r1
-
 DESCRIPTION="A fully featured network monitoring system"
 HOMEPAGE="https://www.librenms.org"
 
-if [[ "${PV}" != 9999 ]] ; then
+if [[ "${PV}" != 9999 ]]; then
 	SRC_URI="https://github.com/${PN}/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64"
 else
@@ -22,27 +19,23 @@ SLOT="0"
 IUSE="amqp apache2 ipmi ldap nginx postgres radius redis"
 REQUIRED_USE="^^ ( apache2 nginx )"
 
-REQUIRED_USE="${PYTHON_REQUIRED_USE}"
-RDEPEND="
-	${PYTHON_DEPS}
-	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
-	>=net-analyzer/fping-4.2[suid]
+DEPEND="
+	acct-group/librenms
+	acct-user/librenms
+"
+
+RDEPEND="${RDEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
 	app-arch/unzip
+	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
 	dev-php/composer
 	dev-php/pecl-imagick
 	dev-php/pecl-memcache:7
-	dev-python/command-runner
-	dev-python/pip
-	dev-python/psutil
-	dev-python/pymysql
-	dev-python/python-dotenv
-	dev-python/python-memcached
-	dev-python/redis
 	dev-vcs/git
 	ipmi? ( sys-apps/ipmitool )
 	media-gfx/graphviz
+	>=net-analyzer/fping-4.2[suid]
 	net-analyzer/mtr
 	net-analyzer/net-snmp
 	net-analyzer/nmap
@@ -51,14 +44,15 @@ RDEPEND="
 	radius? ( dev-php/pecl-radius )
 	redis? ( dev-db/redis )
 	sys-apps/acl
-	virtual/mysql
-"
-
-DEPEND="${RDEPEND}
-	acct-group/librenms
-	acct-user/librenms
-	app-shells/bash-completion
 	virtual/cron
+	virtual/mysql
+	dev-python/command-runner
+	dev-python/pip
+	dev-python/psutil
+	dev-python/pymysql
+	dev-python/python-dotenv
+	dev-python/python-memcached
+	dev-python/redis
 "
 
 LIBRENMS_HOME="/opt/librenms"
@@ -66,8 +60,6 @@ LIBRENMS_HOME="/opt/librenms"
 pkg_setup() {
 	use nginx && usermod -a -G librenms nginx
 	use apache2 && usermod -a -G librenms apache
-
-	python-single-r1_pkg_setup
 }
 
 src_compile() {
@@ -88,8 +80,6 @@ src_install() {
 
 	rm -r "${S}"/.github
 	cp -r . "${D}"${LIBRENMS_HOME}
-
-	python_optimize
 
 	fowners librenms:librenms -R ${LIBRENMS_HOME}
 }
@@ -120,8 +110,7 @@ pkg_config() {
 
 	einfo "Installing composer deps ..."
 	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev
-	if [ -e ${LIBRENMS_HOME}/config.php ]
-	then
+	if [ -e ${LIBRENMS_HOME}/config.php ]; then
 		einfo "Updating existing installation ..."
 		sudo -u librenms /opt/librenms/lnms migrate
 

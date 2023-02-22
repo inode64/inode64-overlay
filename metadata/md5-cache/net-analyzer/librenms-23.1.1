@@ -1,15 +1,13 @@
 DEFINED_PHASES=compile config install postinst setup
-DEPEND=python_single_target_python3_9? ( >=dev-lang/python-3.9.16-r1:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) >=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip] >=net-analyzer/fping-4.2[suid] amqp? ( dev-php/pecl-amqp ) app-admin/sudo app-arch/unzip dev-php/composer dev-php/pecl-imagick dev-php/pecl-memcache:7 dev-python/command-runner dev-python/pip dev-python/psutil dev-python/pymysql dev-python/python-dotenv dev-python/python-memcached dev-python/redis dev-vcs/git ipmi? ( sys-apps/ipmitool ) media-gfx/graphviz net-analyzer/mtr net-analyzer/net-snmp net-analyzer/nmap net-analyzer/rrdtool net-misc/whois radius? ( dev-php/pecl-radius ) redis? ( dev-db/redis ) sys-apps/acl virtual/mysql acct-group/librenms acct-user/librenms app-shells/bash-completion virtual/cron
+DEPEND=acct-group/librenms acct-user/librenms
 DESCRIPTION=A fully featured network monitoring system
 EAPI=8
 HOMEPAGE=https://www.librenms.org
-INHERIT=python-single-r1
-IUSE=amqp apache2 ipmi ldap nginx postgres radius redis python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11
+IUSE=amqp apache2 ipmi ldap nginx postgres radius redis
 KEYWORDS=~amd64
 LICENSE=GPL-3+
-RDEPEND=python_single_target_python3_9? ( >=dev-lang/python-3.9.16-r1:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) >=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip] >=net-analyzer/fping-4.2[suid] amqp? ( dev-php/pecl-amqp ) app-admin/sudo app-arch/unzip dev-php/composer dev-php/pecl-imagick dev-php/pecl-memcache:7 dev-python/command-runner dev-python/pip dev-python/psutil dev-python/pymysql dev-python/python-dotenv dev-python/python-memcached dev-python/redis dev-vcs/git ipmi? ( sys-apps/ipmitool ) media-gfx/graphviz net-analyzer/mtr net-analyzer/net-snmp net-analyzer/nmap net-analyzer/rrdtool net-misc/whois radius? ( dev-php/pecl-radius ) redis? ( dev-db/redis ) sys-apps/acl virtual/mysql
-REQUIRED_USE=^^ ( python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11 )
+RDEPEND=amqp? ( dev-php/pecl-amqp ) app-admin/sudo app-arch/unzip >=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip] dev-php/composer dev-php/pecl-imagick dev-php/pecl-memcache:7 dev-vcs/git ipmi? ( sys-apps/ipmitool ) media-gfx/graphviz >=net-analyzer/fping-4.2[suid] net-analyzer/mtr net-analyzer/net-snmp net-analyzer/nmap net-analyzer/rrdtool net-misc/whois radius? ( dev-php/pecl-radius ) redis? ( dev-db/redis ) sys-apps/acl virtual/cron virtual/mysql dev-python/command-runner dev-python/pip dev-python/psutil dev-python/pymysql dev-python/python-dotenv dev-python/python-memcached dev-python/redis
+REQUIRED_USE=^^ ( apache2 nginx )
 SLOT=0
 SRC_URI=https://github.com/librenms/librenms/archive/23.1.1.tar.gz -> librenms-23.1.1.tar.gz
-_eclasses_=multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	6001248ef162a5fa2a21ce132a212f6b	multilib	5ca4e49abed8e3a2f7b56920eadee157	python-utils-r1	429bfd4e8d8e39db5385ba5744f30788	python-single-r1	75118e916668a74c660a13b0ecb22562
-_md5_=c1b84fde0f89024282af6b8e913ede2e
+_md5_=fc6a081213b81734a52eec8dd8b47865
