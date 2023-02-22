@@ -9,4 +9,8 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="pypi">pylspci</remote-id>
+		<remote-id type="gitlab">Lucidiot/pylspci</remote-id>
+	</upstream>
 </pkgmetadata>

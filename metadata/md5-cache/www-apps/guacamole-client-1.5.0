@@ -11,4 +11,4 @@ REQUIRED_USE=|| ( mysql postgres )
 RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.5.0/source/guacamole-client-1.5.0.tar.gz https://inode64.com/dist/guacamole-client-1.5.0-node_modules.tar.xz https://inode64.com/dist/guacamole-client-1.5.0-mvn.tar.xz
-_md5_=a72dc71fd1a2e9d752b4ffb80eb3e592
+_md5_=432ca7bdb5fc6db02398509596378820

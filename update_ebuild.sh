@@ -18,13 +18,15 @@ temp_file=$(mktemp "/tmp/$(basename "$0").XXXXXX")
 # Trim and convert indents to tabs
 #
 
-find . -type f | grep -v ".svn\|CVS\|CVSROOT\|.git\|.idea" | while read -r file; do
+find . -type f | grep -v ".svn\|CVS\|CVSROOT\|.git\|.idea\|eclass" | while read -r file; do
 	if file "${file}" | grep -v 'unified diff' | grep -q text; then
 		sed -i -e 's/[ \t]*$//' "${file}"
 		unexpand --first-only "${file}" | awk '/^$/ {nlstack=nlstack "\n";next;} {printf "%s",nlstack; nlstack=""; print;}' >"${temp_file}"
 		cat "${temp_file}" >"${file}"
 	fi
 done
+
+exit
 
 rm -f "${temp_file}" 2>/dev/null
 

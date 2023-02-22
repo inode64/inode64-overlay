@@ -8,7 +8,7 @@ MY_PV="222.4459.28"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
-HOMEPAGE="https://www.jetbrains.com/phpstorm"
+HOMEPAGE="https://www.jetbrains.com/phpstorm/"
 SRC_URI="https://download.jetbrains.com/webide/${MY_PN}-${PV}.tar.gz"
 
 LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )

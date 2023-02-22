@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{8..11} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 inherit python-single-r1 git-r3
 
@@ -19,13 +19,14 @@ EGIT_REPO_URI="https://github.com/zewelor/bt-mqtt-gateway.git"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS=""
+
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="
 	${PYTHON_DEPS}
 	dev-lang/python[bluetooth]
 	dev-python/APScheduler
-	dev-python/bluepy
 	dev-python/interruptingcow
 	dev-python/paho-mqtt
 	dev-python/pyyaml
@@ -34,6 +35,8 @@ RDEPEND="
 BDEPEND="
 	${RDEPEND}
 "
+
+DOCS=( README.md )
 
 src_compile() {
 	python_fix_shebang .

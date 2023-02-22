@@ -22,7 +22,9 @@ SLOT="0"
 IUSE="amqp apache2 ipmi ldap nginx postgres radius redis"
 REQUIRED_USE="^^ ( apache2 nginx )"
 
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RDEPEND="
+	${PYTHON_DEPS}
 	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
 	>=net-analyzer/fping-4.2[suid]
 	amqp? ( dev-php/pecl-amqp )
@@ -114,7 +116,7 @@ pkg_postinst() {
 
 pkg_config() {
 	einfo "Installing cronjobs ..."
-	crontab -u librenms "${EROOT%/}"/${LIBRENMS_HOME}/librenms.nonroot.cron || die
+	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/librenms.nonroot.cron || die
 
 	einfo "Installing composer deps ..."
 	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev
