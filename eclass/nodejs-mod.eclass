@@ -34,16 +34,14 @@ case ${EAPI} in
 *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
-if [[ -z ${_NODEJS-MODE_ECLASS} ]]; then
-_NODEJS-MODE_ECLASS=1
+if [[ -z ${_NODEJS-MOD_ECLASS} ]]; then
+_NODEJS-MOD_ECLASS=1
 
 inherit nodejs
 
 if has nodejs-pack ${INHERITED}; then
     eerror "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
-
-EXPORT_FUNCTIONS src_compile src_install src_prepare src_test
 
 RDEPEND+=" net-libs/nodejs:="
 
@@ -106,4 +104,7 @@ nodejs-mod_src_install() {
     enpm_clean
     enpm_install
 }
+
 fi
+
+EXPORT_FUNCTIONS src_prepare src_compile src_test src_install

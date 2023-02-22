@@ -37,8 +37,6 @@ RDEPEND+=" net-libs/nodejs"
 # Upstream does not support stripping go packages
 RESTRICT="test strip"
 
-EXPORT_FUNCTIONS src_compile src_install src_prepare
-
 # @FUNCTION: nodejs-pack_src_prepare
 # @DESCRIPTION:
 # Nodejs preparation phase
@@ -81,4 +79,7 @@ nodejs-pack_src_install() {
     nodejs_remove_dev
     popd >/dev/null || die
 }
+
 fi
+
+EXPORT_FUNCTIONS src_prepare src_compile src_install
