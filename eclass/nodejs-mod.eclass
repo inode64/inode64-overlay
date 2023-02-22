@@ -103,7 +103,7 @@ nodejs-pack_src_install() {
 
     nodejs_docs
 
-    enpm_install
     enpm_clean
+    enpm_install
 }
 fi
