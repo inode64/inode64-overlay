@@ -26,8 +26,6 @@ find . -type f | grep -v ".svn\|CVS\|CVSROOT\|.git\|.idea\|eclass" | while read 
 	fi
 done
 
-exit
-
 rm -f "${temp_file}" 2>/dev/null
 
 find . -name "*.ebuild" | while read -r ebuild; do
