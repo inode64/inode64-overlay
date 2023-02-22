@@ -10,5 +10,5 @@ RDEPEND=ldap? ( net-nds/openldap ) virtual/jre:1.8 www-servers/tomcat:8.5
 REQUIRED_USE=|| ( mysql postgres )
 RESTRICT=!test? ( test )
 SLOT=0
-SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.5.0/source/guacamole-client-1.5.0.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/guacamole-client-1.5.0-node_modules.tar.xz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/guacamole-client-1.5.0-mvn.tar.xz
-_md5_=70b7897ac2a8d838d0939c1a8ae990c5
+SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.5.0/source/guacamole-client-1.5.0.tar.gz https://inode64.com/dist/guacamole-client-1.5.0-node_modules.tar.xz https://inode64.com/dist/guacamole-client-1.5.0-mvn.tar.xz
+_md5_=a72dc71fd1a2e9d752b4ffb80eb3e592

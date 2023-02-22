@@ -21,8 +21,8 @@ if [[ "${PV}" == *9999 ]] ; then
 else
 	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz
-	        https://inode64.com/dist/${P}-node_modules.tar.xz
-			https://inode64.com/dist/${P}-mvn.tar.xz"
+		https://inode64.com/dist/${P}-node_modules.tar.xz
+		https://inode64.com/dist/${P}-mvn.tar.xz"
 fi
 
 LICENSE="MIT"
