@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit autotools linux-info pam xdg xdg-utils udev
+inherit autotools linux-info pam xdg udev
 
 MY_PN=ConsoleKit2
 MY_P=${MY_PN}-${PV}
