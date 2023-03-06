@@ -27,9 +27,9 @@ pkg_setup() {
 }
 
 src_compile() {
-    emake -C /usr/src/linux M=`pwd`
+	emake -C /usr/src/linux M=`pwd`
 }
 
 src_install() {
-    emake -C /usr/src/linux M=`pwd` modules_install
+	emake -C /usr/src/linux M=`pwd` modules_install
 }
