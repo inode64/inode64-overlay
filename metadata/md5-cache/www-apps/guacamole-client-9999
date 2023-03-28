@@ -12,5 +12,5 @@ RDEPEND=dev-java/maven-bin ldap? ( net-nds/openldap ) postgres? ( dev-java/jdbc-
 REQUIRED_USE=|| ( ldap mysql postgres )
 RESTRICT=network-sandbox
 SLOT=0
-_eclasses_=git-r3	2347f8fe2d392b2a091191f94be37e6f
+_eclasses_=git-r3	27e13c09a4c7e4c78ac812f74727e676
 _md5_=956c9ee367fa3986e421d37268b56fd9
