@@ -4,7 +4,7 @@
 EAPI=8
 inherit desktop wrapper
 
-MY_PV="231.87770.68"
+MY_PV="231.8770.68"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
