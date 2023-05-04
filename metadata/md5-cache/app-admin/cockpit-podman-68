@@ -1,0 +1,12 @@
+BDEPEND=dev-libs/appstream-glib
+DEFINED_PHASES=-
+DEPEND=
+DESCRIPTION=This is the Cockpit user interface for podman containers
+EAPI=8
+HOMEPAGE=https://cockpit-project.org/
+KEYWORDS=~amd64 ~x86
+LICENSE=LGPL-2.1
+RDEPEND=app-admin/cockpit
+SLOT=0
+SRC_URI=https://github.com/cockpit-project/cockpit-podman/releases/download/68/cockpit-podman-68.tar.xz
+_md5_=afb12cb1e1fb71dcedc1eb3a19434cce

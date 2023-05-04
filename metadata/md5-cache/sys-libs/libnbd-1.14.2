@@ -1,17 +1,17 @@
 BDEPEND=dev-lang/perl sys-devel/gnuconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71-r5 >=sys-devel/libtool-2.4.7
 DEFINED_PHASES=configure install prepare setup test
-DEPEND=examples? ( dev-libs/glib dev-libs/libev ) fuse? ( sys-fs/fuse:3 ) gnutls? ( net-libs/gnutls:= ) go? ( dev-lang/go ) ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] ) python? ( python_single_target_python3_9? ( >=dev-lang/python-3.9.16-r1:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) ) dev-libs/libxml2 test? ( sys-block/nbd[gnutls?] )
+DEPEND=examples? ( dev-libs/glib dev-libs/libev ) fuse? ( sys-fs/fuse:3 ) gnutls? ( net-libs/gnutls:= ) go? ( dev-lang/go ) ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] ) python? ( python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) ) dev-libs/libxml2 test? ( sys-block/nbd[gnutls?] )
 DESCRIPTION=NBD client library in userspace
 EAPI=8
 HOMEPAGE=https://gitlab.com/nbdkit/libnbd
 INHERIT=autotools bash-completion-r1 python-single-r1
-IUSE=examples fuse gnutls go ocaml python test python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11
+IUSE=examples fuse gnutls go ocaml python test python_single_target_python3_10 python_single_target_python3_11
 KEYWORDS=~amd64 ~x86
 LICENSE=LGPL-2.1+
-RDEPEND=examples? ( dev-libs/glib dev-libs/libev ) fuse? ( sys-fs/fuse:3 ) gnutls? ( net-libs/gnutls:= ) go? ( dev-lang/go ) ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] ) python? ( python_single_target_python3_9? ( >=dev-lang/python-3.9.16-r1:3.9 ) python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) ) dev-libs/libxml2
-REQUIRED_USE=python? ( ^^ ( python_single_target_python3_9 python_single_target_python3_10 python_single_target_python3_11 ) )
+RDEPEND=examples? ( dev-libs/glib dev-libs/libev ) fuse? ( sys-fs/fuse:3 ) gnutls? ( net-libs/gnutls:= ) go? ( dev-lang/go ) ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] ) python? ( python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) ) dev-libs/libxml2
+REQUIRED_USE=python? ( ^^ ( python_single_target_python3_10 python_single_target_python3_11 ) )
 RESTRICT=!test? ( test ) test? ( fuse? ( userpriv ) )
 SLOT=0
 SRC_URI=https://download.libguestfs.org/libnbd/1.14-stable/libnbd-1.14.2.tar.gz
-_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	d1408425c7c4a7669b9b17735404b693	libtool	9d3a9a889a6fa62ae794f817c156491b	autotools	f0d3196128225dee3220e65f3371bc7a	bash-completion-r1	59cf54afadd3b37d31d9d85c7d7d8067	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	python-utils-r1	429bfd4e8d8e39db5385ba5744f30788	python-single-r1	75118e916668a74c660a13b0ecb22562
+_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	d1408425c7c4a7669b9b17735404b693	libtool	9d3a9a889a6fa62ae794f817c156491b	autotools	f0d3196128225dee3220e65f3371bc7a	bash-completion-r1	59cf54afadd3b37d31d9d85c7d7d8067	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	python-utils-r1	4544ab96b58e177dc52d75e42f5ee307	python-single-r1	75118e916668a74c660a13b0ecb22562
 _md5_=8486b2730b2d11455b900ef23a3bb8d6
