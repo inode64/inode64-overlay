@@ -25,7 +25,7 @@ DEPEND="
 
 RDEPEND="${DEPEND}
 	app-admin/cockpit
-	app-admin/podman
+	app-containers/podman
 "
 
 S="${WORKDIR}/${PN}"
