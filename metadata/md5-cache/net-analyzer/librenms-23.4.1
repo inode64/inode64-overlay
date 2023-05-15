@@ -1,0 +1,13 @@
+DEFINED_PHASES=compile config install postinst setup
+DEPEND=acct-group/librenms acct-user/librenms
+DESCRIPTION=A fully featured network monitoring system
+EAPI=8
+HOMEPAGE=https://www.librenms.org
+IUSE=amqp apache2 ipmi ldap nginx postgres radius redis
+KEYWORDS=~amd64
+LICENSE=GPL-3+
+RDEPEND=amqp? ( dev-php/pecl-amqp ) app-admin/sudo app-arch/unzip >=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip] dev-php/composer dev-php/pecl-imagick dev-php/pecl-memcache:7 dev-vcs/git ipmi? ( sys-apps/ipmitool ) media-gfx/graphviz >=net-analyzer/fping-4.2[suid] net-analyzer/mtr net-analyzer/net-snmp net-analyzer/nmap net-analyzer/rrdtool net-misc/whois radius? ( dev-php/pecl-radius ) redis? ( dev-db/redis ) sys-apps/acl virtual/cron virtual/mysql dev-python/command-runner dev-python/pip dev-python/psutil dev-python/pymysql dev-python/python-dotenv dev-python/python-memcached dev-python/redis
+REQUIRED_USE=^^ ( apache2 nginx )
+SLOT=0
+SRC_URI=https://github.com/librenms/librenms/archive/23.4.1.tar.gz -> librenms-23.4.1.tar.gz
+_md5_=123b3083d016abe6f0996b06563d7822
