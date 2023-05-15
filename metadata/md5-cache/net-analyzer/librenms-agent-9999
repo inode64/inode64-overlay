@@ -1,0 +1,14 @@
+BDEPEND=>=dev-vcs/git-1.8.2.1[curl]
+DEFINED_PHASES=compile install setup unpack
+DESCRIPTION=a fully featured network monitoring system
+EAPI=8
+HOMEPAGE=https://www.librenms.org
+INHERIT=git-r3 python-single-r1
+IUSE=+apache fail2ban mdadm bind ipmi python_single_target_python3_10 python_single_target_python3_11
+LICENSE=GPL-3+
+PROPERTIES=live
+RDEPEND=python_single_target_python3_10? ( >=dev-lang/python-3.10.9-r1:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.1-r1:3.11 ) app-admin/hddtemp sys-apps/ethtool app-admin/sudo dev-python/distro sys-apps/xinetd net-analyzer/net-snmp[elf,lm-sensors,mfd-rewrites,netlink,pci] apache? ( dev-python/pycurl dev-perl/libwww-perl ) fail2ban? ( dev-perl/JSON ) mdadm? ( dev-perl/JSON ) bind? ( dev-perl/File-ReadBackwards ) ipmi? ( || ( sys-libs/freeipmi sys-apps/ipmitool ) )
+REQUIRED_USE=^^ ( python_single_target_python3_10 python_single_target_python3_11 )
+SLOT=0
+_eclasses_=git-r3	27e13c09a4c7e4c78ac812f74727e676	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	104e1332efb829e2f7cbf89307a474f1	python-utils-r1	4544ab96b58e177dc52d75e42f5ee307	python-single-r1	75118e916668a74c660a13b0ecb22562
+_md5_=d7877b5a36e8d7c1819cf9d00369bb6d
