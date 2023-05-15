@@ -1,12 +1,12 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 DESCRIPTION="a fully featured network monitoring system"
 HOMEPAGE="https://www.librenms.org"
 
-PYTHON_COMPAT=( python3_{6,7,8,9} )
+PYTHON_COMPAT=( python3_{10..11} )
 inherit git-r3 python-single-r1
 
 LICENSE="GPL-3+"
@@ -14,16 +14,20 @@ SLOT="0"
 IUSE="+apache fail2ban mdadm bind ipmi"
 REQUIRED_USE=""
 EGIT_REPO_URI="https://github.com/librenms/${PN}"
-KEYWORDS="amd64"
+KEYWORDS=""
 
+REQUIRED_USE="
+	${PYTHON_REQUIRED_USE}
+"
 RDEPEND="
+	${PYTHON_DEPS}
 	app-admin/hddtemp
 	sys-apps/ethtool
 	app-admin/sudo
 	dev-python/distro
 	sys-apps/xinetd
 	net-analyzer/net-snmp[elf,lm-sensors,mfd-rewrites,netlink,pci]
-	apache? ( dev-python/urlgrabber dev-python/pycurl dev-perl/libwww-perl )
+	apache? ( dev-python/pycurl dev-perl/libwww-perl )
 	fail2ban? ( dev-perl/JSON )
 	mdadm? ( dev-perl/JSON )
 	bind? ( dev-perl/File-ReadBackwards )

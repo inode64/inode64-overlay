@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{10..11} )
 DISTUTILS_USE_PEP517=setuptools
 
 inherit distutils-r1
@@ -30,7 +30,7 @@ RDEPEND="
 	dev-python/paramiko[${PYTHON_USEDEP}]
 	dev-python/tqdm[${PYTHON_USEDEP}]
 	dev-python/typing-extensions[${PYTHON_USEDEP}]
-	>=sys-libs/libnbd-1.5.5[python]
+	>=sys-libs/libnbd-1.16.1[python]
 	virtual/logger
 "
 

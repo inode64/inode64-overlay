@@ -9,5 +9,5 @@ LICENSE=AGPL-3
 RDEPEND=net-libs/nodejs:=
 SLOT=0
 SRC_URI=https://github.com/Unitech/pm2/archive/5.2.2.tar.gz -> pm2-5.2.2.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/pm2-5.2.2-node_modules.tar.xz
-_eclasses_=nodejs	7c96c95f14b41874329027a94e463e2c	nodejs-mod	36807d5f0642ea5d6a916ee54e432a3f	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	d1408425c7c4a7669b9b17735404b693	systemd	5f4bb0758df2e483babf68cd517078ca
+_eclasses_=nodejs	7c96c95f14b41874329027a94e463e2c	nodejs-mod	36807d5f0642ea5d6a916ee54e432a3f	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	104e1332efb829e2f7cbf89307a474f1	systemd	5f4bb0758df2e483babf68cd517078ca
 _md5_=4e9fdbe51dcfcd3af3bfb9c653e785a3

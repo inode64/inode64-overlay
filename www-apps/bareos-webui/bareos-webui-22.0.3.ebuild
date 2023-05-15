@@ -12,7 +12,7 @@ MY_PN="bareos"
 MY_P="${MY_PN}-${MY_PV}"
 
 DESCRIPTION="Featureful client/server network backup suite"
-HOMEPAGE="https://www.bareos.org/"
+HOMEPAGE="https://www.bareos.com/"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/Release/${MY_PV}.tar.gz -> ${MY_P}.tar.gz"
 RESTRICT="mirror"
 
