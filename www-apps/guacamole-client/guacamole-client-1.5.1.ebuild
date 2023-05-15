@@ -8,6 +8,7 @@ HOMEPAGE="https://guacamole.apache.org/"
 
 # Download mvn:
 # cd guacamole-client-1.5.1
+# Require Java 8 for maven
 # LC_ALL=C LANG=en-US.UTF-8 mvn dependency:go-offline -Dmaven.repo.local=.m2 -Drat.ignoreErrors=true
 #
 # Download node_modules:
