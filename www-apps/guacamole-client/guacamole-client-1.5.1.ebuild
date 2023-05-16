@@ -44,6 +44,7 @@ RESTRICT="!test? ( test )"
 
 PATCHES=(
 	"${FILESDIR}"/npm_offline.diff
+	"${FILESDIR}"/plexus-utils.patch
 )
 
 MY_PN="guacamole"
