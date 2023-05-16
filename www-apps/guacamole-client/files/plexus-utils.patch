@@ -1,0 +1,28 @@
+From dacc08a8411b61e1425d287eb053bd35988e4c3a Mon Sep 17 00:00:00 2001
+From: Mike Jumper <mjumper@apache.org>
+Date: Sat, 13 May 2023 10:31:43 -0700
+Subject: [PATCH] GUACAMOLE-1788: Manually add plexus-utils to dependencies of
+ minify-maven-plugin (fix build).
+
+---
+ pom.xml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/pom.xml b/pom.xml
+index fa3891b983..210ba9212a 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -248,6 +248,13 @@
+                     <groupId>com.github.buckelieg</groupId>
+                     <artifactId>minify-maven-plugin</artifactId>
+                     <version>2.0.1</version>
++                    <dependencies>
++                        <dependency>
++                            <groupId>org.codehaus.plexus</groupId>
++                            <artifactId>plexus-utils</artifactId>
++                            <version>3.5.1</version>
++                        </dependency>
++                    </dependencies>
+                 </plugin>
+ 
+                 <!-- Explicitly use latest versions of core plugins -->
