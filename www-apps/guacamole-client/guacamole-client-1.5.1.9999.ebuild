@@ -7,26 +7,30 @@ DESCRIPTION="Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 
 # Download mvn and node_modules:
-# cd guacamole-client-1.5.2
+# cd guacamole-client-1.5.1
 # Require Java 8
 # LC_ALL=C LANG=en-US.UTF-8 mvn dependency:go-offline -Dmaven.repo.local=.m2 -Drat.ignoreErrors=true package
 
-# Compression process
+# Compression process:
 # cd ..
-# tar --create --auto-compress --file guacamole-client-1.5.2-mvn.tar.xz guacamole-client-1.5.2/.m2
-# tar --create --auto-compress --file guacamole-client-1.5.2-node_modules.tar.xz guacamole-client-1.5.2/guacamole/src/main/frontend/node_modules
+# tar --create --auto-compress --file guacamole-client-1.5.1-mvn.tar.xz guacamole-client-1.5.1/.m2
+# tar --create --auto-compress --file guacamole-client-1.5.1-node_modules.tar.xz guacamole-client-1.5.1/guacamole/src/main/frontend/node_modules
 
-inherit git-r3
-EGIT_REPO_URI="https://github.com/apache/guacamole-client.git"
-EGIT_BRANCH="staging/1.5.2"
 KEYWORDS="~amd64 ~x86"
-SRC_URI="
+if [[ "${PV}" == *9999 ]] ; then
+	inherit git-r3
+	EGIT_REPO_URI="https://github.com/apache/guacamole-client.git"
+	EGIT_BRANCH="staging/1.5.2"
+else
+	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
+fi
+SRC_URI+="
 	https://inode64.com/dist/${P}-node_modules.tar.xz
 	https://inode64.com/dist/${P}-mvn.tar.xz"
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="ldap +mysql postgres test"
+IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
 BDEPEND="dev-java/maven-bin"
 RDEPEND="
@@ -38,13 +42,19 @@ RESTRICT="!test? ( test )"
 
 PATCHES=(
 	"${FILESDIR}"/npm_offline.diff
-	"${FILESDIR}"/plexus-utils.patch
 )
 
 MY_PN="guacamole"
 MY_PV="$(ver_cut 1-3)"
 GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
+
+src_unpack() {
+	if [[ "${PV}" == *9999 ]] ; then
+		git-r3_src_unpack
+	fi
+	default
+}
 
 src_compile() {
 	export LC_ALL=C
@@ -70,10 +80,16 @@ src_install() {
 	doins extensions/guacamole-auth-header/target/guacamole-auth-header-${MY_PV}.jar
 	doins extensions/guacamole-auth-json/target/guacamole-auth-json-${MY_PV}.jar
 	doins extensions/guacamole-auth-quickconnect/target/guacamole-auth-quickconnect-${MY_PV}.jar
-	#doins extensions/guacamole-auth-radius/target/guacamole-auth-radius-${MY_PV}.jar
-	#doins extensions/guacamole-auth-sso/target/guacamole-auth-sso-${MY_PV}.jar
-	#doins extensions/guacamole-auth-totp/target/guacamole-auth-totp-${MY_PV}.jar
-	#doins extensions/guacamole-history-recording-storage/target/guacamole-history-recording-storage-${MY_PV}.jar
+	if use radius; then
+		doins extensions/guacamole-auth-radius/target/guacamole-auth-radius-${MY_PV}.jar
+	fi
+	if use sso; then
+		doins extensions/guacamole-auth-sso/target/guacamole-auth-sso-${MY_PV}.jar
+	fi
+	if use totp; then
+		doins extensions/guacamole-auth-totp/target/guacamole-auth-totp-${MY_PV}.jar
+	fi
+	doins extensions/guacamole-history-recording-storage/target/guacamole-history-recording-storage-${MY_PV}.jar
 
 	if use mysql || use postgres; then
 		insinto "${GUACAMOLE_HOME}/extensions"

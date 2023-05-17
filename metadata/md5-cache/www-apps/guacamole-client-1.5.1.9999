@@ -1,0 +1,17 @@
+BDEPEND=dev-java/maven-bin >=dev-vcs/git-1.8.2.1[curl]
+DEFINED_PHASES=compile install unpack
+DESCRIPTION=Guacamole is a clientless remote desktop gateway
+EAPI=8
+HOMEPAGE=https://guacamole.apache.org/
+INHERIT=git-r3
+IUSE=ldap +mysql postgres radius sso test totp
+KEYWORDS=~amd64 ~x86
+LICENSE=MIT
+PROPERTIES=live
+RDEPEND=ldap? ( net-nds/openldap ) virtual/jre:1.8 www-servers/tomcat:8.5
+REQUIRED_USE=|| ( mysql postgres )
+RESTRICT=!test? ( test )
+SLOT=0
+SRC_URI=https://inode64.com/dist/guacamole-client-1.5.1.9999-node_modules.tar.xz https://inode64.com/dist/guacamole-client-1.5.1.9999-mvn.tar.xz
+_eclasses_=git-r3	27e13c09a4c7e4c78ac812f74727e676
+_md5_=bf44219aea4f349541bc76679a557ce0
