@@ -2,16 +2,20 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit autotools systemd tmpfiles
+inherit systemd tmpfiles
 
 DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
 HOMEPAGE="https://guacamole.apache.org/"
 
-inherit git-r3
-EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
-EGIT_BRANCH="staging/1.5.2"
-KEYWORDS="~amd64 ~x86"
+if [[ "${PV}" == *9999 ]]; then
+	inherit autotools git-r3
+	EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
+	EGIT_BRANCH="staging/1.5.2"
+else
+	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
+fi
 
+KEYWORDS="~amd64 ~x86"
 LICENSE="MIT"
 SLOT="0"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
