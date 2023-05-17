@@ -2,22 +2,21 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit systemd autotools
+inherit autotools systemd tmpfiles
 
 DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
 HOMEPAGE="https://guacamole.apache.org/"
 
-if [[ "${PV}" == *9999 ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/apache/incubator-guacamole-server.git"
-else
-	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
-fi
+inherit git-r3
+EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
+EGIT_BRANCH="staging/1.5.2"
+KEYWORDS="~amd64 ~x86"
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="encode kubernetes print pulseaudio rdp ssh telnet vnc vorbis webp"
+IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
+RESTRICT="!test? ( test )"
+
 REQUIRED_USE="pulseaudio? ( vnc )"
 FONTS="
 	media-fonts/dejavu
@@ -25,11 +24,11 @@ FONTS="
 	media-fonts/terminus-font
 "
 RDEPEND="
-	print? ( app-text/ghostscript-gpl[-X] )
+	kubernetes? ( ${FONTS} )
 	net-analyzer/openbsd-netcat
+	print? ( app-text/ghostscript-gpl[-X] )
 	ssh? ( ${FONTS} )
 	telnet? ( ${FONTS} )
-	kubernetes? ( ${FONTS} )
 "
 DEPEND="${RDEPEND}
 	acct-group/guacamole
@@ -58,46 +57,62 @@ DEPEND="${RDEPEND}
 	vorbis? ( media-libs/libvorbis )
 	webp? ( media-libs/libwebp )
 	x11-libs/cairo
+	test? (
+		dev-util/cunit
+	)
 "
-PATCHES=(
-	"${FILESDIR}"/guacamole-1115.patch
-	"${FILESDIR}"/ghostscript-gpl-9.54-compat.patch
-)
 
 src_prepare() {
-	eautoreconf -fi
-	eapply_user
+	if [[ "${PV}" == *9999 ]]; then
+		eautoreconf -fi
+	fi
 	default
 }
 
 src_configure() {
-	local myconf="--without-terminal --without-pango"
+	local myconf=(
+		$(use_enable encode guacenc)
+		$(use_enable kubernetes)
+		$(use_with pulseaudio pulse)
+		$(use_with rdp)
+		$(use_with ssh)
+		$(use_with telnet)
+		$(use_with vnc)
+		$(use_with vorbis)
+		$(use_with webp)
+	)
 
 	if use ssh || use telnet; then
-		myconf="--with-terminal --with-pango"
+	    myconf+=(
+	    --with-terminal
+	    --with-pango
+	    )
+	else
+	    myconf+=(
+	    --without-terminal
+	    --without-pango
+	    )
 	fi
 
 	if use rdp; then
-		myconf="--enable-allow-freerdp-snapshots"
+		myconf+=(--enable-allow-freerdp-snapshots)
 	fi
 
-	econf ${myconf} \
-		$(use_enable encode guacenc) \
-		$(use_enable kubernetes) \
-		$(use_with pulseaudio pulse) \
-		$(use_with rdp) \
-		$(use_with ssh) \
-		$(use_with telnet) \
-		$(use_with vnc) \
-		$(use_with vorbis) \
-		$(use_with webp)
+	econf "${myconf[@]}"
 }
 
 src_install() {
 	default
 
+	find "${D}" -type f -name '*.la' -delete || die
+
 	newinitd "${FILESDIR}/guacd.initd" guacd
 	newconfd "${FILESDIR}/guacd.confd" guacd
 
 	systemd_newunit "${FILESDIR}/guacd.service" guacd.service
+	newtmpfiles "${FILESDIR}/guacd.conf" guacd.conf
+}
+
+pkg_postinst() {
+	tmpfiles_process guacd.conf
 }
