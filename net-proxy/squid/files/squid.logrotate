@@ -1,0 +1,7 @@
+/var/log/squid/*.log {
+    copytruncate
+    compress
+    notifempty
+    missingok
+    sharedscripts
+}
