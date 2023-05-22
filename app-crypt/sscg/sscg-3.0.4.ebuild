@@ -38,4 +38,4 @@ src_configure() {
 	meson_src_configure
 }
 
-DOCS=( README.md Changelog.md )
+DOCS=( README.md )
