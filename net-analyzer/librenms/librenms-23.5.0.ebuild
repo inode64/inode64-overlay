@@ -42,7 +42,7 @@ RDEPEND="${BDEPEND}
 	net-analyzer/mtr
 	net-analyzer/net-snmp
 	net-analyzer/nmap
-	net-analyzer/rrdtool
+	net-analyzer/rrdtool[rrdcached]
 	net-misc/whois
 	radius? ( dev-php/pecl-radius )
 	redis? ( dev-db/redis )
