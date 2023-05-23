@@ -24,15 +24,18 @@ DEPEND="
 	acct-user/librenms
 "
 
-RDEPEND="${RDEPEND}
+BDEPEND="
+	app-arch/unzip
+	dev-php/composer
+	dev-vcs/git
+"
+RDEPEND="${BDEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
 	app-arch/unzip
 	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
-	dev-php/composer
 	dev-php/pecl-imagick
 	dev-php/pecl-memcache:7
-	dev-vcs/git
 	ipmi? ( sys-apps/ipmitool )
 	media-gfx/graphviz
 	>=net-analyzer/fping-4.2[suid]
@@ -106,7 +109,7 @@ pkg_postinst() {
 
 pkg_config() {
 	einfo "Installing cronjobs ..."
-	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/librenms.nonroot.cron || die
+	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/dist/librenms.cron || die
 
 	einfo "Installing composer deps ..."
 	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev
