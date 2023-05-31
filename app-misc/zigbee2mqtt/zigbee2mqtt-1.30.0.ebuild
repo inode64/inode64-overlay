@@ -52,7 +52,7 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /etc/env.d
-	echo 'CONFIG_PROTECT="/var/lib/${PN}"' >>"${ED}"/etc/env.d/90${PN} || die
+	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}"/etc/env.d/90${PN} || die
 }
 
 pkg_postinst() {
