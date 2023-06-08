@@ -55,9 +55,10 @@ CLASSPATH="${GUACAMOLE_HOME}/lib"
 src_unpack() {
 	if [[ "${PV}" == *9999 ]] ; then
 		git-r3_src_unpack
+	else
+		unpack ${P}.tar.gz
 	fi
 
-	unpack ${P}.tar.gz
 	unpack ${P}-node_modules.tar.xz
 	unpack ${P}-mvn.tar.xz
 
