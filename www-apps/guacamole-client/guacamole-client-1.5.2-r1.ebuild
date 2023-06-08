@@ -110,7 +110,7 @@ src_install() {
 	if use mysql; then
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-mysql/target/guacamole-auth-jdbc-mysql-${MY_PV}.jar
-		doins "${WORKDIR}"/mysql-connector-java-8.0.33/mysql-connector-j-8.0.33.jar
+		doins "${WORKDIR}"/mysql-connector-j-8.0.33/mysql-connector-j-8.0.33.jar
 
 		insinto "/usr/share/${PN}/schema/mysql"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-mysql/schema/" -name '*.sql' -exec doins '{}' +
