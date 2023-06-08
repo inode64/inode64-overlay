@@ -27,8 +27,8 @@ fi
 SRC_URI+="
 	https://inode64.com/dist/${P}-node_modules.tar.xz
 	https://inode64.com/dist/${P}-mvn.tar.xz
-	https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.0.33.tar.gz
-	https://jdbc.postgresql.org/download/postgresql-42.6.0.jar
+	mysql? ( https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.0.33.tar.gz )
+	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
 	"
 
 LICENSE="MIT"
@@ -56,7 +56,14 @@ src_unpack() {
 	if [[ "${PV}" == *9999 ]] ; then
 		git-r3_src_unpack
 	fi
-	default
+
+	unpack ${P}.tar.gz
+	unpack ${P}-node_modules.tar.xz
+	unpack ${P}-mvn.tar.xz
+
+	if use mysql; then
+		unpack mysql-connector-j-8.0.33.tar.gz
+	fi
 }
 
 src_compile() {
@@ -102,7 +109,7 @@ src_install() {
 	if use mysql; then
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-mysql/target/guacamole-auth-jdbc-mysql-${MY_PV}.jar
-		doins "${S}"/mysql-connector-java-8.0.33/mysql-connector-java-8.0.33.jar
+		doins "${WORKDIR}"/mysql-connector-java-8.0.33/mysql-connector-java-8.0.33.jar
 
 		insinto "/usr/share/${PN}/schema/mysql"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-mysql/schema/" -name '*.sql' -exec doins '{}' +
@@ -117,7 +124,7 @@ src_install() {
 	if use postgres; then
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-postgresql/target/guacamole-auth-jdbc-postgresql-${MY_PV}.jar
-		doins "${S}"/postgresql-42.6.0.jar
+		doins "${WORKDIR}"/postgresql-42.6.0.jar
 
 		insinto "/usr/share/${PN}/schema/postgres"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-postgresql/schema/" -name '*.sql' -exec doins '{}' +
