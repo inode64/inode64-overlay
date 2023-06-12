@@ -1,14 +1,14 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit autotools bash-completion-r1 flag-o-matic systemd tmpfiles toolchain-funcs udev
+inherit bash-completion-r1 flag-o-matic linux-info optfeature systemd tmpfiles toolchain-funcs udev
 
 MY_P=${P/_/-}
 
 DESCRIPTION="Network-UPS Tools"
-HOMEPAGE="https://www.networkupstools.org/"
+HOMEPAGE="https://networkupstools.org/"
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/networkupstools/${PN}.git"
@@ -20,85 +20,59 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
 
-IUSE="cgi ipmi snmp +usb modbus selinux split-usr ssl systemd tcpd xml zeroconf"
-
-CDEPEND="
-	acct-group/nut
-	acct-user/nut
-"
+IUSE="cgi doc ipmi serial i2c +man snmp +usb modbus selinux split-usr ssl tcpd xml zeroconf"
 
 DEPEND="
-	dev-libs/libltdl
-	net-libs/libnsl:=
-	virtual/udev
+	acct-group/nut
+	acct-user/nut
 	cgi? ( >=media-libs/gd-2[png] )
+	dev-libs/libltdl
+	i2c? ( sys-apps/i2c-tools )
 	ipmi? ( sys-libs/freeipmi )
 	modbus? ( dev-libs/libmodbus )
 	snmp? ( net-analyzer/net-snmp:= )
 	ssl? ( >=dev-libs/openssl-1:= )
-	systemd? ( sys-apps/systemd:= )
 	tcpd? ( sys-apps/tcp-wrappers )
 	usb? ( virtual/libusb )
+	virtual/udev
 	xml? ( >=net-libs/neon-0.25.0:= )
-	zeroconf? ( net-dns/avahi )"
+	zeroconf? ( net-dns/avahi )
+"
 
 BDEPEND="
-	${CDEPEND}
-	virtual/pkgconfig"
+	man? ( app-text/asciidoc )
+	virtual/pkgconfig
+"
 
 RDEPEND="
-	${CDEPEND}
 	${DEPEND}
-	selinux? ( sec-policy/selinux-nut )"
+	selinux? ( sec-policy/selinux-nut )
+"
 
 S="${WORKDIR}/${MY_P}"
 
-# Bug #480664 requested UPS_DRIVERS_IUSE for more flexibility in building this package
-SERIAL_DRIVERLIST="al175 bcmxcp belkin belkinunv bestfcom bestfortress bestuferrups bestups dummy-ups etapro everups gamatronic genericups isbmex liebert liebert-esp2 masterguard metasys mge-utalk microdowell microsol-apc mge-shut oneac optiups powercom rhino safenet nutdrv_siemens-sitop skel solis tripplite tripplitesu upscode2 victronups powerpanel blazer_ser clone clone-outlet ivtscd apcsmart apcsmart-old apcupsd-ups riello_ser nutdrv_qx"
-SNMP_DRIVERLIST="snmp-ups"
-USB_LIBUSB_DRIVERLIST="usbhid-ups bcmxcp_usb tripplite_usb blazer_usb richcomm_usb riello_usb nutdrv_qx"
-USB_DRIVERLIST=${USB_LIBUSB_DRIVERLIST}
-NEONXML_DRIVERLIST="netxml-ups"
-MODBUS_DRIVERLIST="phoenixcontact_modbus generic_modbus huawei-ups2000 socomec_jbus adelsystem_cbi"
-IPMI_DRIVERLIST="nut-ipmipsu"
-
-# Now we build from it:
-for name in ${SERIAL_DRIVERLIST} ; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} +ups-drivers-${name}"
-done
-for name in ${USB_DRIVERLIST} ; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} +ups-drivers-${name}"
-	REQUIRED_USE="${REQUIRED_USE} ups-drivers-${name}? ( usb )"
-done
-for name in ${NEONXML_DRIVERLIST}; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} ups-drivers-${name}"
-	REQUIRED_USE="${REQUIRED_USE} ups-drivers-${name}? ( xml )"
-done
-for name in ${SNMP_DRIVERLIST} ; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} ups-drivers-${name}"
-	REQUIRED_USE="${REQUIRED_USE} ups-drivers-${name}? ( snmp )"
-done
-for name in ${MODBUS_DRIVERLIST} ; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} ups-drivers-${name}"
-	REQUIRED_USE="${REQUIRED_USE} ups-drivers-${name}? ( modbus )"
-done
-for name in ${IPMI_DRIVERLIST} ; do
-	IUSE_UPS_DRIVERS="${IUSE_UPS_DRIVERS} ups-drivers-${name}"
-	REQUIRED_USE="${REQUIRED_USE} ups-drivers-${name}? ( ipmi )"
-done
-IUSE="${IUSE} ${IUSE_UPS_DRIVERS}"
-
-# public files should be 644 root:root
-NUT_PUBLIC_FILES="/etc/nut/{ups,upssched}.conf"
-# private files should be 640 root:nut - readable by nut, writeable by root,
-NUT_PRIVATE_FILES="/etc/nut/{upsd.conf,upsd.users,upsmon.conf}"
-# public files should be 644 root:root, only installed if USE=cgi
-NUT_CGI_FILES="/etc/nut/{{hosts,upsset}.conf,upsstats{,-single}.html}"
-
 PATCHES=(
-	"${FILESDIR}"/${PN}-2.6.2-lowspeed-buffer-size.patch
-	"${FILESDIR}"/nut-2.8.0-fix-man-page-generation.patch
+	"${FILESDIR}/${PN}-2.6.2-lowspeed-buffer-size.patch"
 )
+
+pkg_pretend() {
+	if use i2c; then
+		CONFIG_CHECK="~I2C_CHARDEV"
+		ERROR_I2C_CHARDEV="You must enable I2C_CHARDEV in your kernel to continue"
+	fi
+	if use usb; then
+		CONFIG_CHECK+=" ~HIDRAW ~USB_HIDDEV"
+		ERROR_HIDRAW="HIDRAW is needed to support USB UPSes"
+		ERROR_I2C_CHARDEV="USB_HIDDEV is needed to support USB UPSes"
+	fi
+	if use serial; then
+		CONFIG_CHECK="~SERIAL_8250"
+		ERROR_SERIAL_8250="SERIAL_8250 is needed to support Serial UPSes"
+	fi
+
+	# Now do the actual checks setup above
+	check_extra_config
+}
 
 src_unpack() {
 	if [[ "${PV}" == *9999 ]] ; then
@@ -110,76 +84,59 @@ src_unpack() {
 src_prepare() {
 	default
 
-	sed -e "s:GD_LIBS.*=.*-L/usr/X11R6/lib \(.*\) -lXpm -lX11:GD_LIBS=\"\1:" \
-		-e '/systemdsystemunitdir=.*echo.*sed.*libdir/s,^,#,g' \
-		-i configure.ac || die
-
-	sed -e "s:52.nut-usbups.rules:70-nut-usbups.rules:" \
-		-i scripts/udev/Makefile.am || die
-
-	if [[ "${PV}" != *9999 ]] ; then
-		rm ltmain.sh m4/lt* m4/libtool.m4 || die
-	fi
-
-	sed -e 's:@LIBSSL_LDFLAGS@:@LIBSSL_LIBS@:' \
-		-i lib/libupsclient{.pc,-config}.in || die #361685
-
 	if [[ "${PV}" == *9999 ]] ; then
 		./autogen.sh
 	fi
-	eautoreconf
 }
 
 src_configure() {
-	local myconf
+	local myeconfargs=(
+		--datadir=/usr/share/nut
+		--datarootdir=/usr/share/nut
+		--disable-static
+		--sysconfdir=/etc/nut
+		--with-dev
+		--with-drvpath="/$(get_libdir)/nut"
+		--with-group=nut
+		--with-htmlpath=/usr/share/nut/html
+		--with-logfacility=LOG_DAEMON
+		--with-statepath=/var/lib/nut
+		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
+		--with-user=nut
+		--without-powerman
+		--without-python
+		--without-python2
+		--without-python3
+		$(use_with i2c linux_i2c)
+		$(use_with ipmi freeipmi)
+		$(use_with ipmi)
+		$(use_with serial)
+		$(use_with snmp)
+		$(use_with ssl)
+		$(use_with tcpd wrap)
+		$(use_with usb)
+		$(use_with xml neon)
+		$(use_with zeroconf avahi)
+	)
 
 	append-flags -fno-lto
-	# bug #786702
-	append-cxxflags -std=c++14
 
 	tc-export CC
 	tc-export CXX
 	tc-export AR
 
-	local UPS_DRIVERS=""
-	for u in $USE ; do
-		u2=${u#ups-drivers-}
-		[[ "${u}" != "${u2}" ]] && UPS_DRIVERS="${UPS_DRIVERS} ${u2}"
-	done
-	UPS_DRIVERS="${UPS_DRIVERS# }" UPS_DRIVERS="${UPS_DRIVERS% }"
-	myconf="${myconf} --with-drivers=${UPS_DRIVERS// /,}"
+	use cgi && myeconfargs+=( --with-cgipath=/usr/share/nut/cgi )
+	use man && myeconfargs+=( --with-doc=man )
 
-	use cgi && myconf="${myconf} --with-cgipath=/usr/share/nut/cgi"
+	export bashcompdir="$(get_bashcompdir)"
 
-	econf \
-		--sysconfdir=/etc/nut \
-		--datarootdir=/usr/share/nut \
-		--datadir=/usr/share/nut \
-		--disable-static \
-		--with-statepath=/var/lib/nut \
-		--with-drvpath=/$(get_libdir)/nut \
-		--with-htmlpath=/usr/share/nut/html \
-		--with-user=nut \
-		--with-group=nut \
-		--with-logfacility=LOG_DAEMON \
-		--with-dev \
-		--with-serial \
-		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)" \
-		--without-powerman \
-		$(use_with cgi) \
-		$(use_with ipmi) \
-		$(use_with ipmi freeipmi) \
-		$(use_with snmp) \
-		$(use_with ssl) \
-		$(use_with tcpd wrap) \
-		$(use_with usb) \
-		$(use_with xml neon) \
-		$(use_with zeroconf avahi) \
-		${myconf}
+	econf "${myeconfargs[@]}"
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
+	default
+
+	rm -rf "${D}/etc/hotplug" || die
 
 	find "${D}" -name '*.la' -delete || die
 
@@ -191,6 +148,8 @@ src_install() {
 		elog "copy them to your web server's ScriptPath to activate (this is a"
 		elog "change from the old location)."
 		elog "If you use lighttpd, see lighttpd_nut.conf in the documentation."
+		elog
+		elog "Use script aliases according to the web server you use (apache, nginx, lighttpd, etc...)"
 	fi
 
 	# this must be done after all of the install phases
@@ -198,17 +157,15 @@ src_install() {
 		mv "${i}" "${i/.sample/}" || die
 	done
 
-	local DOCS=( AUTHORS docs/*.txt MAINTAINERS NEWS README TODO UPGRADING )
-	if [[ "${PV}" != *9999 ]] ; then
-		DOCS+=( Changelog )
-	fi
+	local DOCS=( AUTHORS MAINTAINERS NEWS README TODO UPGRADING )
 	einstalldocs
 
-	newdoc lib/README README.lib
-	newdoc "${FILESDIR}"/lighttpd_nut.conf-2.2.0 lighttpd_nut.conf
-
-	docinto cables
-	dodoc docs/cables/*
+	if use doc; then
+		newdoc lib/README README.lib
+		dodoc docs/*.txt
+		docinto cables
+		dodoc docs/cables/*
+	fi
 
 	newinitd "${FILESDIR}"/nut-2.6.5-init.d-upsd upsd
 	newinitd "${FILESDIR}"/nut-2.2.2-init.d-upsdrv upsdrv
@@ -216,92 +173,45 @@ src_install() {
 	newinitd "${FILESDIR}"/nut-2.6.5-init.d-upslog upslog
 	newinitd "${FILESDIR}"/nut.powerfail.initd nut.powerfail
 
-	keepdir /var/lib/nut
-
-	einfo "Setting up permissions on files and directories"
-	fperms 0700 /var/lib/nut
-	fowners nut:nut /var/lib/nut
-
-	# Do not remove eval here, because the variables contain shell expansions.
-	eval fperms 0640 ${NUT_PRIVATE_FILES}
-	eval fowners root:nut ${NUT_PRIVATE_FILES}
-
-	# Do not remove eval here, because the variables contain shell expansions.
-	eval fperms 0644 ${NUT_PUBLIC_FILES}
-	eval fowners root:root ${NUT_PUBLIC_FILES}
-
-	# Do not remove eval here, because the variables contain shell expansions.
-	if use cgi; then
-		eval fperms 0644 ${NUT_CGI_FILES}
-		eval fowners root:root ${NUT_CGI_FILES}
-	fi
-
-	# this is installed for 2.4 and fbsd guys
-	if ! has_version virtual/udev; then
-		einfo "Installing non-udev hotplug support"
-		insinto /etc/hotplug/usb
-		insopts -m 755
-		doins scripts/hotplug/nut-usbups.hotplug
-	fi
-
 	newbashcomp "${S}"/scripts/misc/nut.bash_completion upsc
 	bashcomp_alias upsc upscmd upsd upsdrvctl upsmon upsrw
+
+	if use zeroconf; then
+		insinto /etc/avahi/services
+		doins scripts/avahi/nut.service
+	fi
+
+	mv "${D}"/usr/lib/tmpfiles.d/nut-common.tmpfiles "${D}"/usr/lib/tmpfiles.d/nut-common-tmpfiles.conf || die
 }
 
 pkg_postinst() {
-	# this is to ensure that everybody that installed old versions still has
-	# correct permissions
+	elog "Please note that NUT now runs under the 'nut' user."
+	elog "NUT is in the uucp group for access to RS-232 UPS."
+	elog "However if you use a USB UPS you may need to look at the udev or"
+	elog "hotplug rules that are installed, and alter them suitably."
+	elog
+	elog "You are strongly advised to read the UPGRADING file provided by upstream."
+	elog
+	elog "Please note that upsdrv is NOT automatically started by upsd anymore."
+	elog "If you have multiple UPS units, you can use their NUT names to"
+	elog "have a service per UPS:"
+	elog "ln -s /etc/init.d/upsdrv /etc/init.d/upsdrv.\$UPSNAME"
+	elog
+	elog 'If you want apcupsd to power off your UPS when it'
+	elog 'shuts down your system in a power failure, you must'
+	elog 'add nut.powerfail to your shutdown runlevel:'
+	elog
+	elog 'rc-update add nut.powerfail shutdown'
+	elog
 
-	chown nut:nut "${ROOT}"/var/lib/nut 2>/dev/null
-	chmod 0700 "${ROOT}"/var/lib/nut 2>/dev/null
+	optfeature "all notify events generate a global message (wall) to all users, plus they are logged via the syslog" \
+		sys-apps/util-linu[logger,tty-helpers]
 
-	# Do not remove eval here, because the variables contain shell expansions.
-	eval chown root:nut "${ROOT}"${NUT_PRIVATE_FILES} 2>/dev/null
-	eval chmod 0640 "${ROOT}"${NUT_PRIVATE_FILES} 2>/dev/null
-
-	# Do not remove eval here, because the variables contain shell expansions.
-	eval chown root:root "${ROOT}"${NUT_PUBLIC_FILES} 2>/dev/null
-	eval chmod 0644 "${ROOT}"${NUT_PUBLIC_FILES} 2>/dev/null
-
-	# Do not remove eval here, because the variables contain shell expansions.
-	if use cgi; then
-		eval chown root:root "${ROOT}"${NUT_CGI_FILES} 2>/dev/null
-		eval chmod 0644 "${ROOT}"${NUT_CGI_FILES} 2>/dev/null
-	fi
-
-	warningmsg elog
 	udev_reload
 
-	# tmpfiles are only generated with systemd
-	if use systemd; then
-		tmpfiles_process nut-common.tmpfiles
-	fi
+	tmpfiles_process nut-common-tmpfiles.conf
 }
 
 pkg_postrm() {
 	udev_reload
-}
-
-warningmsg() {
-	msgfunc="$1"
-	[ -z "$msgfunc" ] && die "msgfunc not specified in call to warningmsg!"
-	${msgfunc} "Please note that NUT now runs under the 'nut' user."
-	${msgfunc} "NUT is in the uucp group for access to RS-232 UPS."
-	${msgfunc} "However if you use a USB UPS you may need to look at the udev or"
-	${msgfunc} "hotplug rules that are installed, and alter them suitably."
-	${msgfunc} ''
-	${msgfunc} "You are strongly advised to read the UPGRADING file provided by upstream."
-	${msgfunc} ''
-	${msgfunc} "Please note that upsdrv is NOT automatically started by upsd anymore."
-	${msgfunc} "If you have multiple UPS units, you can use their NUT names to"
-	${msgfunc} "have a service per UPS:"
-	${msgfunc} "ln -s /etc/init.d/upsdrv /etc/init.d/upsdrv.\$UPSNAME"
-	${msgfunc} ''
-	${msgfunc} 'If you want apcupsd to power off your UPS when it'
-	${msgfunc} 'shuts down your system in a power failure, you must'
-	${msgfunc} 'add nut.powerfail to your shutdown runlevel:'
-	${msgfunc} ''
-	${msgfunc} 'rc-update add nut.powerfail shutdown'
-	${msgfunc} ''
-
 }

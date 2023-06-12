@@ -11,5 +11,5 @@ LICENSE=LGPL-2.1+
 RDEPEND=dev-libs/libpwquality dev-python/dbus-python net-libs/nodejs[npm] networkmanager? ( firewalld? ( net-firewall/firewalld ) net-misc/networkmanager[policykit,systemd] ) pcp? ( app-metrics/pcp ) sys-apps/accountsservice[systemd] udisks? ( sys-fs/udisks[lvm,systemd] ) tuned? ( sys-apps/tuned ) virtual/libcrypt:= acct-group/cockpit-ws acct-group/cockpit-wsinstance acct-user/cockpit-ws acct-user/cockpit-wsinstance app-crypt/sscg dev-libs/libgudev net-libs/glib-networking[ssl] virtual/krb5
 SLOT=0
 SRC_URI=https://github.com/cockpit-project/cockpit/releases/download/293/cockpit-293.tar.xz https://www.gentoo.org/assets/img/logo/gentoo-logo.png
-_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	14a8ae365191b518fad51caad7a08f3e	multilib	c19072c3cd7ac5cb21de013f7e9832e0	libtool	9d3a9a889a6fa62ae794f817c156491b	autotools	6ae9a4347149b19a112caa1182d03bde	flag-o-matic	16483e58fadb0d47b4528f0aa7e171f6	pam	4efe951aa8ce2c16288d7c915196fe29
+_eclasses_=gnuconfig	b6b3e92f8b8c996400074b5f61a59256	toolchain-funcs	513c31b3346458ed1f3878b57da6d61c	multilib	c19072c3cd7ac5cb21de013f7e9832e0	libtool	9d3a9a889a6fa62ae794f817c156491b	autotools	6ae9a4347149b19a112caa1182d03bde	flag-o-matic	16483e58fadb0d47b4528f0aa7e171f6	pam	4efe951aa8ce2c16288d7c915196fe29
 _md5_=3d718579ded71a362374cbff6f59e972
