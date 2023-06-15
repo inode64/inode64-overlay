@@ -107,8 +107,8 @@ src_configure() {
 		--without-python
 		--without-python2
 		--without-python3
-	    --with-altpidpath=/run/nut
-    	--with-pidpath=/run/nut
+		--with-altpidpath=/run/nut
+		--with-pidpath=/run/nut
 		$(use_with i2c linux_i2c)
 		$(use_with ipmi freeipmi)
 		$(use_with ipmi)
@@ -184,6 +184,9 @@ src_install() {
 	fi
 
 	mv "${D}"/usr/lib/tmpfiles.d/nut-common.tmpfiles "${D}"/usr/lib/tmpfiles.d/nut-common-tmpfiles.conf || die
+
+	# Fix double directory
+	sed -i -e 's:/nut/nut:/nut:g' "${D}"/usr/lib/tmpfiles.d/nut-common-tmpfiles.conf || die
 }
 
 pkg_postinst() {
