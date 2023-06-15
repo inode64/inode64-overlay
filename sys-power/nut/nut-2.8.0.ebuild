@@ -107,6 +107,8 @@ src_configure() {
 		--without-python
 		--without-python2
 		--without-python3
+	    --with-altpidpath=/run/nut
+    	--with-pidpath=/run/nut
 		$(use_with i2c linux_i2c)
 		$(use_with ipmi freeipmi)
 		$(use_with ipmi)
