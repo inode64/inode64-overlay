@@ -4,7 +4,7 @@
 
 extra_started_commands="reload"
 
-pidfile=/var/lib/nut/upsd.pid
+pidfile=/run/nut/upsd.pid
 bin=/usr/sbin/upsd
 
 depend() {
