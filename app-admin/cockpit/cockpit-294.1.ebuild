@@ -77,24 +77,25 @@ src_configure() {
 		$(use_enable debug)
 		$(use_enable pcp)
 		$(use_enable doc)
-		"--with-pamdir=/lib64/security"
-		"--with-cockpit-user=cockpit-ws"
-		"--with-cockpit-ws-instance-user=cockpit-wsinstance"
-		"--with-cockpit-group=cockpit-ws"
-		"--localstatedir=${EPREFIX}/var")
+		--with-pamdir="/$(get_libdir)/security"
+		--with-cockpit-user=cockpit-ws
+		--with-cockpit-ws-instance-user=cockpit-wsinstance
+		--with-cockpit-group=cockpit-ws
+		--localstatedir="${EPREFIX}/var"
+	)
 	econf "${myconf[@]}"
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "emake install failed"
+	default
 
 	if ! use selinux; then
-		rm -rf "${D}"/usr/share/cockpit/selinux
-		rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml
+		rm -rf "${ED}"/usr/share/cockpit/selinux
+		rm -rf "${ED}"/usr/share/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml
 	fi
 
-	rm -rf "${D}"/usr/share/cockpit/{packagekit,playground,sosreport}
-	rm -rf "${D}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
+	rm -rf "${ED}"/usr/share/cockpit/{packagekit,playground,sosreport}
+	rm -rf "${ED}"/usr/share/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml
 
 	insinto /usr/share/cockpit/branding/gentoo
 	doins "${FILESDIR}/branding.css"
@@ -103,7 +104,7 @@ src_install() {
 	newins "${DISTDIR}/gentoo-logo.png" favicon.ico
 
 	# Remove branding from others distros
-	rm -rf "${D}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
+	rm -rf "${ED}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
 
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
