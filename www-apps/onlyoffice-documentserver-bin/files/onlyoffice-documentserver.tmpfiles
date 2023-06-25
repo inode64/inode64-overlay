@@ -1,0 +1,2 @@
+d /var/lib/onlyoffice                    0750        ds   ds   -
+d /var/log/onlyoffice                    0750        ds   ds   -
