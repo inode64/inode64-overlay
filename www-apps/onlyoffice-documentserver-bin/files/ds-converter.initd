@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright 1999-2023 Gentoo Authors
+
+description="OnlyOffice Document server - Docs Converter"
+command="/usr/share/onlyoffice/documentserver/server/FileConverter/converter"
+command_user="ds:ds"
+directory="/usr/share/onlyoffice/documentserver/server/FileConverter"
+output_log="/var/log/onlyoffice/documentserver/converter/out.log"
+error_log="/var/log/onlyoffice/documentserver/converter/err.log"
+command_background="1"
+pidfile="/run/ds-docconveter.pid"
+
+depend() {
+	use net
+	need ds-metrics rabbitmq
+}

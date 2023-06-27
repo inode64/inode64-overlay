@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright 1999-2023 Gentoo Authors
+
+description="OnlyOffice Document server - Docs Servicer"
+command="/usr/share/onlyoffice/documentserver/server/DocService/docservice"
+command_user="ds:ds"
+directory="/usr/share/onlyoffice/documentserver/server/DocService"
+output_log="/var/log/onlyoffice/documentserver/docservice/out.log"
+error_log="/var/log/onlyoffice/documentserver/docservice/err.log"
+command_background="1"
+pidfile="/run/ds-docservice.pid"
+
+depend() {
+	use net
+	need ds-metrics rabbitmq
+}

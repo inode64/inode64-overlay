@@ -22,6 +22,9 @@ KEYWORDS="~amd64"
 RESTRICT="mirror strip test"
 
 RDEPEND="
+	net-misc/rabbitmq-server
+	dev-db/redis
+	dev-db/postgresql
 "
 DEPEND="${RDEPEND}
 	acct-group/ds
@@ -55,6 +58,10 @@ src_install() {
     insinto /usr/share/onlyoffice
     doins -r var/www/onlyoffice/documentserver
 
+    keepdir /usr/share/onlyoffice/documentserver/fonts
+
+    fperms +x /usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh}
+
     fperms +x /usr/share/onlyoffice/documentserver/npm/json
     fperms +x /usr/share/onlyoffice/documentserver/server/DocService/docservice
     fperms +x /usr/share/onlyoffice/documentserver/server/FileConverter/bin/{docbuilder,x2t}
@@ -72,12 +79,27 @@ src_install() {
 	    fperms +x "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" || die
     done
 
+    # Generate an env.d entry
+    insinto /etc/env.d/binutils
+    cat <<-EOF > "${T}"/99onlyoffice
+	    NODE_ENV="production-linux"
+	    NODE_CONFIG_DIR="/etc/onlyoffice/documentserver"
+	    NODE_DISABLE_COLORS="1"
+	    APPLICATION_NAME="ONLYOFFICE"
+    EOF
+    doenvd "${T}"/99onlyoffice
+
+    newinitd "${FILESDIR}/ds-converter.initd" ds-converter
+    newinitd "${FILESDIR}/ds-docservice.initd" ds-docservice
+    newinitd "${FILESDIR}/ds-metrics.initd" ds-metrics
+
     systemd_dounit usr/lib/systemd/system/ds-converter.service
     systemd_dounit usr/lib/systemd/system/ds-docservice.service
     systemd_dounit usr/lib/systemd/system/ds-metrics.service
-    dotmpfiles "${FILESDIR}"/onlyoffice-documentserver.tmpfiles
+
+    newtmpfiles "${FILESDIR}"/onlyoffice-documentserver.tmpfiles.conf onlyoffice-documentserver.conf
 }
 
 pkg_postinst() {
-    tmpfiles_process onlyoffice-documentserver.tmpfiles
+    tmpfiles_process onlyoffice-documentserver.conf
 }
