@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright 1999-2023 Gentoo Authors
+
+description="OnlyOffice Document server - Docs Metrics"
+command="/usr/share/onlyoffice/documentserver/server/Metrics/metrics"
+command_user="ds:ds"
+command_args="./config/config.js"
+directory="/usr/share/onlyoffice/documentserver/server/Metrics"
+output_log="/var/log/onlyoffice/documentserver/metrics/out.log"
+error_log="/var/log/onlyoffice/documentserver/metrics/err.log"
+command_background="1"
+pidfile="/run/ds-metrics.pid"
+
+depend() {
+	use net
+}
