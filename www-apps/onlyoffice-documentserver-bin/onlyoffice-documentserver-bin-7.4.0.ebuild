@@ -22,9 +22,9 @@ KEYWORDS="~amd64"
 RESTRICT="mirror strip test"
 
 RDEPEND="
-	net-misc/rabbitmq-server
-	dev-db/redis
 	dev-db/postgresql
+	dev-db/redis
+	net-misc/rabbitmq-server
 "
 DEPEND="${RDEPEND}
 	acct-group/ds
@@ -82,10 +82,10 @@ src_install() {
     # Generate an env.d entry
     insinto /etc/env.d/binutils
     cat <<-EOF > "${T}"/99onlyoffice
-	    NODE_ENV="production-linux"
-	    NODE_CONFIG_DIR="/etc/onlyoffice/documentserver"
-	    NODE_DISABLE_COLORS="1"
-	    APPLICATION_NAME="ONLYOFFICE"
+	    NODE_ENV=\"production-linux\"
+	    NODE_CONFIG_DIR=\"/etc/onlyoffice/documentserver\"
+	    NODE_DISABLE_COLORS=\"1\"
+	    APPLICATION_NAME=\"ONLYOFFICE\"
     EOF
     doenvd "${T}"/99onlyoffice
 
