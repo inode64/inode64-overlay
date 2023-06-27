@@ -82,11 +82,11 @@ src_install() {
     # Generate an env.d entry
     insinto /etc/env.d/binutils
     cat <<-EOF > "${T}"/99onlyoffice
-	    NODE_ENV=\"production-linux\"
-	    NODE_CONFIG_DIR=\"/etc/onlyoffice/documentserver\"
-	    NODE_DISABLE_COLORS=\"1\"
-	    APPLICATION_NAME=\"ONLYOFFICE\"
-    EOF
+	    NODE_ENV="production-linux"
+	    NODE_CONFIG_DIR="/etc/onlyoffice/documentserver"
+	    NODE_DISABLE_COLORS="1"
+	    APPLICATION_NAME="ONLYOFFICE"
+EOF
     doenvd "${T}"/99onlyoffice
 
     newinitd "${FILESDIR}/ds-converter.initd" ds-converter
