@@ -30,6 +30,7 @@ RDEPEND="${DEPEND}
   dev-db/postgresql
   dev-db/redis
   net-misc/rabbitmq-server
+  www-servers/nginx
 "
 
 S="${WORKDIR}"
@@ -48,13 +49,16 @@ src_install() {
     insinto /etc/logrotate.d/
     doins etc/onlyoffice/documentserver/logrotate/ds.conf
 
+    insinto /etc/nginx/conf.d/
+    newins "${FILESDIR}/nginx.conf" onlyoffice-documentserver.conf
+
     insinto /etc/onlyoffice/documentserver
     doins etc/onlyoffice/documentserver/{default.json,production-linux.json}
     insinto /etc/onlyoffice/documentserver/log4js
     doins etc/onlyoffice/documentserver/log4js/production.json
 
     insinto /usr/bin
-    doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh}
+    doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh}
 
     insinto /usr/share/onlyoffice
     doins -r var/www/onlyoffice/documentserver
@@ -114,8 +118,9 @@ pkg_postinst() {
     einfo
     einfo "> sudo -i -u postgres psql -c \"CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';\""
     einfo "> sudo -i -u postgres psql -c \"CREATE DATABASE onlyoffice OWNER onlyoffice;\""
-    einfo "> psql -hlocalhost -Uonlyoffice -d onlyoffice -f ${EROOT}/usr/share/webapps/onlyoffice/documentserver/server/schema/postgresql/createdb.sql"
+    einfo "> psql -hlocalhost -Uonlyoffice -d onlyoffice -f ${EROOT}/usr/share/onlyoffice/documentserver/server/schema/postgresql/createdb.sql"
     einfo
+    einfo "Fill in PORT, SERVER_NAME, SSL_CERT and SSL_KEY. in ${EROOT}/etc/nginx/sites-available/onlyoffice-documentserver"
 }
 
 pkg_config() {
