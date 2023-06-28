@@ -21,14 +21,15 @@ SLOT="0"
 KEYWORDS="~amd64"
 RESTRICT="mirror strip test"
 
-RDEPEND="
-	dev-db/postgresql
-	dev-db/redis
-	net-misc/rabbitmq-server
-"
-DEPEND="${RDEPEND}
+DEPEND="
 	acct-group/ds
 	acct-user/ds
+"
+RDEPEND="${DEPEND}
+  app-admin/sudo
+  dev-db/postgresql
+  dev-db/redis
+  net-misc/rabbitmq-server
 "
 
 S="${WORKDIR}"
@@ -40,7 +41,7 @@ src_prepare() {
 
     sed -i 's|/var/www/onlyoffice|/usr/share/onlyoffice|g' etc/onlyoffice/documentserver/production-linux.json usr/lib/systemd/system/*.service usr/bin/*.sh || die
 
-    rm -rf var/www/onlyoffice/documentserver/server/schema/mysql || die
+    rm -rf var/www/onlyoffice/documentserver/server/schema/{dameng,mysql} || die
 }
 
 src_install() {
@@ -102,4 +103,21 @@ EOF
 
 pkg_postinst() {
     tmpfiles_process onlyoffice-documentserver.conf
+
+    einfo
+    einfo "Execute the following command to setup for generate all fonts"
+    einfo "> emerge --config =${CATEGORY}/${PF}"
+    einfo
+
+    einfo
+    einfo "Execute the following commands to setup for PostgreSQL"
+    einfo
+    einfo "> sudo -i -u postgres psql -c \"CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';\""
+    einfo "> sudo -i -u postgres psql -c \"CREATE DATABASE onlyoffice OWNER onlyoffice;\""
+    einfo "> psql -hlocalhost -Uonlyoffice -d onlyoffice -f ${EROOT}/usr/share/webapps/onlyoffice/documentserver/server/schema/postgresql/createdb.sql"
+    einfo
+}
+
+pkg_config() {
+    ${EROOT}/usr/bin/documentserver-generate-allfonts.sh
 }
