@@ -1,0 +1,16 @@
+BDEPEND=>=dev-util/ninja-1.8.2 >=dev-util/cmake-3.20.5
+DEFINED_PHASES=compile configure install postinst prepare prerm setup test
+DEPEND=|| ( virtual/httpd-cgi virtual/httpd-fastcgi ) app-admin/webapp-config
+DESCRIPTION=Featureful client/server network backup suite
+EAPI=8
+HOMEPAGE=https://www.bareos.com/
+INHERIT=cmake webapp
+IUSE=vhosts
+KEYWORDS=~amd64 ~x86
+LICENSE=AGPL-3
+RDEPEND=dev-lang/php[bzip2,ctype,curl,fileinfo,filter,gd,iconv,intl,mhash,nls,pdo,postgres,session,simplexml,ssl,xml,xmlreader,xmlwriter,zip] virtual/httpd-php app-admin/webapp-config
+RESTRICT=mirror
+SLOT=22.1.0
+SRC_URI=https://github.com/bareos/bareos/archive/Release/22.1.0.tar.gz -> bareos-22.1.0.tar.gz
+_eclasses_=toolchain-funcs	513c31b3346458ed1f3878b57da6d61c	multilib	c19072c3cd7ac5cb21de013f7e9832e0	flag-o-matic	ad475baa777c9978fa035216c8264a10	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	ninja-utils	76050953ad5b70d7e09a6ca55558db92	xdg-utils	baea6080dd821f5562d715887954c9d3	cmake	6c921d868d090cc18e142a396f66f74a	webapp	1aad5c010cfdf11d0376c80467b0de4c
+_md5_=bf7595a72d337817c7de2498281a4bd6
