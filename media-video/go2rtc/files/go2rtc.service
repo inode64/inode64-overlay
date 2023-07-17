@@ -7,8 +7,10 @@ Type=simple
 ExecStart=/usr/bin/go2rtc -config /etc/go2rtc/go2rtc.yaml
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
-User=root
-Group=root
+StandardOutput=append:/var/log/go2rtc/go2rtc.log
+StandardError=append:/var/log/go2rtc/go2rtc.log
+User=go2rtc
+Group=go2rtc
 
 [Install]
 WantedBy=multi-user.target
