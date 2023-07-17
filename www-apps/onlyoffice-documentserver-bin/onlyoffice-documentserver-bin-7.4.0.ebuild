@@ -26,11 +26,11 @@ DEPEND="
 	acct-user/ds
 "
 RDEPEND="${DEPEND}
-  app-admin/sudo
-  dev-db/postgresql
-  dev-db/redis
-  net-misc/rabbitmq-server
-  www-servers/nginx
+	app-admin/sudo
+	dev-db/postgresql
+	dev-db/redis
+	net-misc/rabbitmq-server
+	www-servers/nginx
 "
 
 S="${WORKDIR}"
@@ -38,91 +38,94 @@ S="${WORKDIR}"
 QA_PREBUILT="*"
 
 src_prepare() {
-    default
+	default
 
-    sed -i 's|/var/www/onlyoffice|/usr/share/onlyoffice|g' etc/onlyoffice/documentserver/production-linux.json usr/lib/systemd/system/*.service usr/bin/*.sh || die
+	sed -i 's|/var/www/onlyoffice|/usr/share/onlyoffice|g' \
+		etc/onlyoffice/documentserver/production-linux.json \
+		usr/lib/systemd/system/*.service usr/bin/*.sh || die
 
-    rm -rf var/www/onlyoffice/documentserver/server/schema/{dameng,mysql} || die
+	rm -rf var/www/onlyoffice/documentserver/server/schema/{dameng,mysql} || die
 }
 
 src_install() {
-    insinto /etc/logrotate.d/
-    doins etc/onlyoffice/documentserver/logrotate/ds.conf
+	insinto /etc/logrotate.d/
+	doins etc/onlyoffice/documentserver/logrotate/ds.conf
 
-    insinto /etc/nginx/conf.d/
-    newins "${FILESDIR}/nginx.conf" onlyoffice-documentserver.conf
+	insinto /etc/nginx/conf.d/
+	newins "${FILESDIR}/nginx.conf" onlyoffice-documentserver.conf
 
-    insinto /etc/onlyoffice/documentserver
-    doins etc/onlyoffice/documentserver/{default.json,production-linux.json}
-    insinto /etc/onlyoffice/documentserver/log4js
-    doins etc/onlyoffice/documentserver/log4js/production.json
+	insinto /etc/onlyoffice/documentserver
+	doins etc/onlyoffice/documentserver/{default.json,production-linux.json}
+	insinto /etc/onlyoffice/documentserver/log4js
+	doins etc/onlyoffice/documentserver/log4js/production.json
 
-    insinto /usr/bin
-    doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh}
+	insinto /usr/bin
+	doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh}
 
-    insinto /usr/share/onlyoffice
-    doins -r var/www/onlyoffice/documentserver
+	insinto /usr/share/onlyoffice
+	doins -r var/www/onlyoffice/documentserver
 
-    keepdir /usr/share/onlyoffice/documentserver/fonts
+	keepdir /usr/share/onlyoffice/documentserver/fonts
 
-    fperms +x /usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh}
+	fperms +x /usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh}
 
-    fperms +x /usr/share/onlyoffice/documentserver/npm/json
-    fperms +x /usr/share/onlyoffice/documentserver/server/DocService/docservice
-    fperms +x /usr/share/onlyoffice/documentserver/server/FileConverter/bin/{docbuilder,x2t}
-    fperms +x /usr/share/onlyoffice/documentserver/server/FileConverter/converter
-    fperms +x /usr/share/onlyoffice/documentserver/server/Metrics/metrics
-    fperms +x /usr/share/onlyoffice/documentserver/server/Metrics/node_modules/modern-syslog/build/Release/core.node
-    fperms +x /usr/share/onlyoffice/documentserver/server/tools/{allfontsgen,allthemesgen,pluginsmanager}
+	fperms +x /usr/share/onlyoffice/documentserver/npm/json
+	fperms +x /usr/share/onlyoffice/documentserver/server/DocService/docservice
+	fperms +x /usr/share/onlyoffice/documentserver/server/FileConverter/bin/{docbuilder,x2t}
+	fperms +x /usr/share/onlyoffice/documentserver/server/FileConverter/converter
+	fperms +x /usr/share/onlyoffice/documentserver/server/Metrics/metrics
+	fperms +x /usr/share/onlyoffice/documentserver/server/Metrics/node_modules/modern-syslog/build/Release/core.node
+	fperms +x /usr/share/onlyoffice/documentserver/server/tools/{allfontsgen,allthemesgen,pluginsmanager}
 
-    fowners ds:ds -R /usr/share/onlyoffice/documentserver
+	fowners ds:ds -R /usr/share/onlyoffice/documentserver
 
-    local lib
-    for lib in libPdfFile.so libXpsFile.so libDjVuFile.so libHtmlRenderer.so libkernel_network.so libDocxRenderer.so libdoctrenderer.so libHtmlFile2.so \
-	     libUnicodeConverter.so libgraphics.so libFb2File.so libEpubFile.so libkernel.so libicudata.so.58 libicuuc.so.58; do
-	    dosym -r "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" "/usr/$(get_libdir)/${lib}" || die
-	    fperms +x "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" || die
-    done
+	local lib
+	for lib in libPdfFile.so libXpsFile.so libDjVuFile.so libHtmlRenderer.so \
+		libkernel_network.so libDocxRenderer.so libdoctrenderer.so libHtmlFile2.so \
+		libUnicodeConverter.so libgraphics.so libFb2File.so libEpubFile.so libkernel.so libicudata.so.58 libicuuc.so.58; do
+		dosym -r "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" "/usr/$(get_libdir)/${lib}" || die
+		fperms +x "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" || die
+	done
 
-    # Generate an env.d entry
-    insinto /etc/env.d/binutils
-    cat <<-EOF > "${T}"/99onlyoffice
-	    NODE_ENV="production-linux"
-	    NODE_CONFIG_DIR="/etc/onlyoffice/documentserver"
-	    NODE_DISABLE_COLORS="1"
-	    APPLICATION_NAME="ONLYOFFICE"
-EOF
-    doenvd "${T}"/99onlyoffice
+	# Generate an env.d entry
+	insinto /etc/env.d/binutils
+	cat <<-EOF >"${T}"/99onlyoffice
+		    NODE_ENV="production-linux"
+		    NODE_CONFIG_DIR="/etc/onlyoffice/documentserver"
+		    NODE_DISABLE_COLORS="1"
+		    APPLICATION_NAME="ONLYOFFICE"
+	EOF
+	doenvd "${T}"/99onlyoffice
 
-    newinitd "${FILESDIR}/ds-converter.initd" ds-converter
-    newinitd "${FILESDIR}/ds-docservice.initd" ds-docservice
-    newinitd "${FILESDIR}/ds-metrics.initd" ds-metrics
+	newinitd "${FILESDIR}/ds-converter.initd" ds-converter
+	newinitd "${FILESDIR}/ds-docservice.initd" ds-docservice
+	newinitd "${FILESDIR}/ds-metrics.initd" ds-metrics
 
-    systemd_dounit usr/lib/systemd/system/ds-converter.service
-    systemd_dounit usr/lib/systemd/system/ds-docservice.service
-    systemd_dounit usr/lib/systemd/system/ds-metrics.service
+	systemd_dounit usr/lib/systemd/system/ds-converter.service
+	systemd_dounit usr/lib/systemd/system/ds-docservice.service
+	systemd_dounit usr/lib/systemd/system/ds-metrics.service
 
-    newtmpfiles "${FILESDIR}"/onlyoffice-documentserver.tmpfiles.conf onlyoffice-documentserver.conf
+	newtmpfiles "${FILESDIR}"/onlyoffice-documentserver.tmpfiles.conf onlyoffice-documentserver.conf
 }
 
 pkg_postinst() {
-    tmpfiles_process onlyoffice-documentserver.conf
+	tmpfiles_process onlyoffice-documentserver.conf
 
-    einfo
-    einfo "Execute the following command to setup for generate all fonts"
-    einfo "> emerge --config =${CATEGORY}/${PF}"
-    einfo
+	einfo
+	einfo "Execute the following command to setup for generate all fonts"
+	einfo "> emerge --config =${CATEGORY}/${PF}"
+	einfo
 
-    einfo
-    einfo "Execute the following commands to setup for PostgreSQL"
-    einfo
-    einfo "> sudo -i -u postgres psql -c \"CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';\""
-    einfo "> sudo -i -u postgres psql -c \"CREATE DATABASE onlyoffice OWNER onlyoffice;\""
-    einfo "> psql -hlocalhost -Uonlyoffice -d onlyoffice -f ${EROOT}/usr/share/onlyoffice/documentserver/server/schema/postgresql/createdb.sql"
-    einfo
-    einfo "Fill in PORT, SERVER_NAME, SSL_CERT and SSL_KEY. in ${EROOT}/etc/nginx/sites-available/onlyoffice-documentserver"
+	einfo
+	einfo "Execute the following commands to setup for PostgreSQL"
+	einfo
+	einfo "> sudo -i -u postgres psql -c \"CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';\""
+	einfo "> sudo -i -u postgres psql -c \"CREATE DATABASE onlyoffice OWNER onlyoffice;\""
+	einfo "> psql -hlocalhost -Uonlyoffice -d onlyoffice -f ${EROOT}/usr/share/onlyoffice/documentserver/server/schema/postgresql/createdb.sql"
+	einfo
+	einfo "Fill in PORT, SERVER_NAME, SSL_CERT and SSL_KEY. in ${EROOT}/etc/nginx/sites-available/onlyoffice-documentserver"
 }
 
 pkg_config() {
-    ${EROOT}/usr/bin/documentserver-generate-allfonts.sh
+	"${EROOT}/usr/bin/documentserver-generate-allfonts.sh"
 }
