@@ -1,0 +1,14 @@
+BDEPEND=>=dev-lang/go-1.18 app-arch/unzip virtual/pkgconfig
+DEFINED_PHASES=compile configure install test unpack
+DESCRIPTION=Ultimate camera streaming application
+EAPI=8
+HOMEPAGE=https://github.com/AlexxIT/go2rtc
+INHERIT=go-module systemd
+KEYWORDS=~amd64 ~x86
+LICENSE=MIT
+RDEPEND=acct-group/go2rtc acct-user/go2rtc media-video/ffmpeg[encode,x264,x265,opus]
+RESTRICT=strip
+SLOT=0
+SRC_URI=https://github.com/AlexxIT/go2rtc/archive/refs/tags/v1.6.0.tar.gz -> go2rtc-1.6.0.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/go2rtc-1.6.0-vendor.tar.xz
+_eclasses_=multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	513c31b3346458ed1f3878b57da6d61c	multilib	c19072c3cd7ac5cb21de013f7e9832e0	go-module	8624eede24936fd7666e5298e5332f22	systemd	5f4bb0758df2e483babf68cd517078ca
+_md5_=28645e47aac3bf5a5649b534bfa00b46
