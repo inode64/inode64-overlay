@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{8..11} )
+PYTHON_COMPAT=( python3_{10..12} )
 inherit bash-completion-r1 python-single-r1
 
 DESCRIPTION="NBD client library in userspace"

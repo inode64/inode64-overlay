@@ -6,7 +6,7 @@ EAPI=8
 DESCRIPTION="a fully featured network monitoring system"
 HOMEPAGE="https://www.librenms.org"
 
-PYTHON_COMPAT=( python3_{10..11} )
+PYTHON_COMPAT=( python3_{10..12} )
 inherit git-r3 python-single-r1
 
 LICENSE="GPL-3+"
