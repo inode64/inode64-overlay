@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module systemd
+inherit go-module systemd tmpfiles
 
 DESCRIPTION="Ultimate camera streaming application"
 HOMEPAGE="https://github.com/AlexxIT/go2rtc"
@@ -58,6 +58,11 @@ src_install() {
 	fowners -R go2rtc:go2rtc /etc/${PN}
 
 	newinitd "${FILESDIR}/go2rtc.initd" go2rtc
+	dotmpfiles "${FILESDIR}"/${PN}.conf
 
 	systemd_dounit "${FILESDIR}/${PN}.service"
+}
+
+pkg_postinst() {
+	tmpfiles_process go2rtc.conf
 }

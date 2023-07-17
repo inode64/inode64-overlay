@@ -6,9 +6,10 @@ command="/usr/bin/go2rtc"
 command_args="-config /etc/go2rtc/go2rtc.yaml"
 command_background=true
 pidfile="/run/$RC_SVCNAME.pid"
+command_user="go2rtc:go2rtc"
 
-output_log="/var/log/go2rtc.log"
-error_log="/var/log/go2rtc.log"
+output_log="/var/log/go2rtc/go2rtc.log"
+error_log="/var/log/go2rtc/go2rtc.log"
 
 depend() {
     need net
