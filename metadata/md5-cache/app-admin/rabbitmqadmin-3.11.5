@@ -1,15 +1,15 @@
 DEFINED_PHASES=install setup unpack
-DEPEND=dev-lang/python[ssl] python_single_target_python3_10? ( >=dev-lang/python-3.10.12:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.4:3.11 )
+DEPEND=dev-lang/python[ssl] python_single_target_python3_10? ( >=dev-lang/python-3.10.12:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.4:3.11 ) python_single_target_python3_12? ( >=dev-lang/python-3.12.0_beta3:3.12 )
 DESCRIPTION=Command line administration tool for RabbitMQ
 EAPI=8
 HOMEPAGE=http://www.rabbitmq.com/management-cli.html
 INHERIT=python-single-r1
-IUSE=python_single_target_python3_10 python_single_target_python3_11
+IUSE=python_single_target_python3_10 python_single_target_python3_11 python_single_target_python3_12
 KEYWORDS=~amd64
 LICENSE=MPL-2.0
-RDEPEND=dev-lang/python[ssl] python_single_target_python3_10? ( >=dev-lang/python-3.10.12:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.4:3.11 )
-REQUIRED_USE=^^ ( python_single_target_python3_10 python_single_target_python3_11 )
+RDEPEND=dev-lang/python[ssl] python_single_target_python3_10? ( >=dev-lang/python-3.10.12:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.4:3.11 ) python_single_target_python3_12? ( >=dev-lang/python-3.12.0_beta3:3.12 )
+REQUIRED_USE=^^ ( python_single_target_python3_10 python_single_target_python3_11 python_single_target_python3_12 )
 SLOT=0
 SRC_URI=https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.11.x/deps/rabbitmq_management/bin/rabbitmqadmin -> rabbitmqadmin.v3.11.5
 _eclasses_=multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	513c31b3346458ed1f3878b57da6d61c	multilib	c19072c3cd7ac5cb21de013f7e9832e0	python-utils-r1	a013e16d5d896b3d8be68dd2a0e846ea	python-single-r1	75118e916668a74c660a13b0ecb22562
-_md5_=864dfba9ff811afba0fd2fbab171b025
+_md5_=8bd2603685ea4238a68399294ea1e1bb
