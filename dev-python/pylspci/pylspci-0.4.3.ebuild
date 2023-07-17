@@ -5,14 +5,13 @@ EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{10..11} )
-inherit distutils-r1
+inherit distutils-r1 pypi
 
 DESCRIPTION="A Python parser for the lspci command from the pciutils package"
 HOMEPAGE="
 		https://pypi.org/project/pylspci/
-		https://gitlab.com/Lucidiot/pylspci
+		https://tildegit.org/lucidiot/pylspci
 "
-SRC_URI="https://gitlab.com/Lucidiot/${PN}/-/archive/${PV}/${P}.tar.bz2"
 
 SLOT="0"
 LICENSE="GPL-3"
