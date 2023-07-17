@@ -6,7 +6,7 @@ EAPI=8
 inherit go-module systemd
 
 DESCRIPTION="Ultimate camera streaming application"
-HOMEPAGE="https://syncthing.net"
+HOMEPAGE="https://github.com/AlexxIT/go2rtc"
 SRC_URI="https://github.com/AlexxIT/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
 	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz
 "
@@ -16,29 +16,31 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-RDEPEND="media-video/ffmpeg[encode,x264,x265,opus]
+RDEPEND="
+	acct-group/go2rtc
+	acct-user/go2rtc
+	media-video/ffmpeg[encode,x264,x265,opus]
 "
 
-DOCS=( README.md )
+DOCS=(README.md)
 
 src_configure() {
-        export CGO_ENABLED=1
-        export CGO_CFLAGS="${CFLAGS}"
-        export CGO_CPPFLAGS="${CPPFLAGS}"
-        export CGO_CXXFLAGS="${CXXFLAGS}"
-        export CGO_LDFLAGS="${LDFLAGS}"
+	export CGO_ENABLED=1
+	export CGO_CFLAGS="${CFLAGS}"
+	export CGO_CPPFLAGS="${CPPFLAGS}"
+	export CGO_CXXFLAGS="${CXXFLAGS}"
+	export CGO_LDFLAGS="${LDFLAGS}"
 
-        default
+	default
 }
 
-
 src_compile() {
-    local mygoargs=(
-	-asmflags "-trimpath=${S}"
-	-gcflags "-trimpath=${S}"
-    )
+	local mygoargs=(
+		-asmflags "-trimpath=${S}"
+		-gcflags "-trimpath=${S}"
+	)
 
-    ego build "${mygoargs[@]}"
+	ego build "${mygoargs[@]}"
 }
 
 src_test() {
@@ -46,12 +48,16 @@ src_test() {
 }
 
 src_install() {
-    default
+	default
 
-    insinto /usr/bin
-    dobin go2rtc
+	insinto /usr/bin
+	dobin go2rtc
 
-    insinto /etc/go2rtc
-    doins "${FILESDIR}/go2rtc.yaml"
-    newinitd "${FILESDIR}/go2rtc.initd" go2rtc
+	insinto /etc/${PN}
+	doins "${FILESDIR}/go2rtc.yaml"
+	fowners -R go2rtc:go2rtc /etc/${PN}
+
+	newinitd "${FILESDIR}/go2rtc.initd" go2rtc
+
+	systemd_dounit "${FILESDIR}/${PN}.service"
 }

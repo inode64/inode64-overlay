@@ -1,0 +1,14 @@
+[Unit]
+Description=go2rtc
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/go2rtc -config /etc/go2rtc/go2rtc.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
