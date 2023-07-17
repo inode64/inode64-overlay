@@ -53,6 +53,9 @@ src_install() {
 	insinto /usr/bin
 	dobin go2rtc
 
+	insinto /etc/logrotate.d
+	newins "${FILESDIR}/go2rtc.logrotate" go2rtc
+
 	insinto /etc/${PN}
 	doins "${FILESDIR}/go2rtc.yaml"
 	fowners -R go2rtc:go2rtc /etc/${PN}
