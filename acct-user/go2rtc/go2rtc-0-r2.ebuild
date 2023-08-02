@@ -7,6 +7,6 @@ inherit acct-user
 
 DESCRIPTION="A user for go2rtc"
 ACCT_USER_ID=991
-ACCT_USER_GROUPS=( go2rtc )
+ACCT_USER_GROUPS=( go2rtc video render )
 
 acct-user_add_deps
