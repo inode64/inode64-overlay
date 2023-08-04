@@ -39,7 +39,7 @@ REQUIRED_USE="|| ( mysql postgres )"
 BDEPEND="dev-java/maven-bin"
 RDEPEND="
 	ldap? ( net-nds/openldap )
-	virtual/jre:1.11
+	virtual/jre:11
 	www-servers/tomcat:8.5
 	"
 RESTRICT="!test? ( test )"
