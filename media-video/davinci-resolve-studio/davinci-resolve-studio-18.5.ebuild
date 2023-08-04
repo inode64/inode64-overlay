@@ -64,10 +64,10 @@ DEPEND="
 	media-libs/harfbuzz
 	media-libs/libogg
 	media-libs/libpng-compat:1.2
+	media-libs/libpulse
 	media-libs/libsndfile
 	media-libs/libvorbis
 	media-libs/opus
-	media-sound/pulseaudio
 	net-dns/libidn2
 	net-libs/libasyncns
 	net-libs/nghttp2
