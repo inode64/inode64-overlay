@@ -55,7 +55,7 @@ DEPEND="${RDEPEND}
 	vnc? (
 		net-libs/libvncserver[jpeg]
 		pulseaudio? (
-			media-sound/pulseaudio
+			media-libs/libpulse
 			)
 	)
 	vorbis? ( media-libs/libvorbis )
