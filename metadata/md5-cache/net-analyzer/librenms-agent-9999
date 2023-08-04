@@ -7,8 +7,8 @@ INHERIT=git-r3 python-single-r1
 IUSE=+apache fail2ban mdadm bind ipmi python_single_target_python3_10 python_single_target_python3_11 python_single_target_python3_12
 LICENSE=GPL-3+
 PROPERTIES=live
-RDEPEND=python_single_target_python3_10? ( >=dev-lang/python-3.10.12:3.10 ) python_single_target_python3_11? ( >=dev-lang/python-3.11.4:3.11 ) python_single_target_python3_12? ( >=dev-lang/python-3.12.0_beta3:3.12 ) app-admin/hddtemp sys-apps/ethtool app-admin/sudo dev-python/distro sys-apps/xinetd net-analyzer/net-snmp[elf,lm-sensors,mfd-rewrites,netlink,pci] apache? ( dev-python/pycurl dev-perl/libwww-perl ) fail2ban? ( dev-perl/JSON ) mdadm? ( dev-perl/JSON ) bind? ( dev-perl/File-ReadBackwards ) ipmi? ( || ( sys-libs/freeipmi sys-apps/ipmitool ) )
+RDEPEND=python_single_target_python3_10? ( dev-lang/python:3.10 ) python_single_target_python3_11? ( dev-lang/python:3.11 ) python_single_target_python3_12? ( dev-lang/python:3.12 ) app-admin/hddtemp sys-apps/ethtool app-admin/sudo dev-python/distro sys-apps/xinetd net-analyzer/net-snmp[elf,lm-sensors,mfd-rewrites,netlink,pci] apache? ( dev-python/pycurl dev-perl/libwww-perl ) fail2ban? ( dev-perl/JSON ) mdadm? ( dev-perl/JSON ) bind? ( dev-perl/File-ReadBackwards ) ipmi? ( || ( sys-libs/freeipmi sys-apps/ipmitool ) )
 REQUIRED_USE=^^ ( python_single_target_python3_10 python_single_target_python3_11 python_single_target_python3_12 )
 SLOT=0
-_eclasses_=git-r3	27e13c09a4c7e4c78ac812f74727e676	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	513c31b3346458ed1f3878b57da6d61c	multilib	c19072c3cd7ac5cb21de013f7e9832e0	python-utils-r1	a013e16d5d896b3d8be68dd2a0e846ea	python-single-r1	75118e916668a74c660a13b0ecb22562
+_eclasses_=git-r3	2358a7b20091609e24bd3a83b3ac5991	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	toolchain-funcs	0c8a0b0d318eb5d5180d114bd3f6592b	multilib	c19072c3cd7ac5cb21de013f7e9832e0	python-utils-r1	7f2c0a7465411e0f3a6db30e966155d6	python-single-r1	75118e916668a74c660a13b0ecb22562
 _md5_=2053ae198f1ab9e3ddefa03fe369da7a
