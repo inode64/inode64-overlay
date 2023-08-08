@@ -82,13 +82,16 @@ DEPEND="
 	x11-libs/libXtst
 	x11-libs/libxcb
 	!bundled-libs? (
+	    dev-db/postgresql
 		dev-cpp/tbb
+		net-misc/curl
 		dev-libs/apr
 		dev-libs/xmlsec
 		media-gfx/graphviz
 		media-libs/freeglut
 		media-libs/soxr
 		net-dns/avahi[mdnsresponder-compat]
+		net-libs/libsrtp
 		net-misc/curl
 	)
 	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
