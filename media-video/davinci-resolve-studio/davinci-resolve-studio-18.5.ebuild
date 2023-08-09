@@ -108,7 +108,7 @@ include_dir() {
 
 	doins -r "${_dir}"
 	# Set permissions for executables and libraries
-	find "${_dir}" -type f -name "*.so" | while read exe; do
+	find "${_dir}" -type f -name "*.so*" | while read exe; do
 		fperms +x "${PKG_HOME}"/"${exe}"
 	done
 	find "${_dir}" -type f -executable | while read exe; do
