@@ -2,7 +2,6 @@
 # Distributed under the terms of the GNU General Public License v2
 
 # TODO:
-#	remove qt5 library in bundled mode (numerous errors and coredumps to open applications)
 #	Panel Daemon is don't installed
 #   amdgpu isn't tested
 
