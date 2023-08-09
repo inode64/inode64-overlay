@@ -41,25 +41,19 @@ IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 DEPEND="
 	app-arch/brotli
 	app-arch/lz4
-	app-arch/zstd
 	app-crypt/argon2
-	app-crypt/libmd
 	dev-libs/fribidi
 	dev-libs/glib
 	dev-libs/icu
 	dev-libs/json-c
-	dev-libs/libbsd
 	dev-libs/libgpg-error
 	dev-libs/libltdl
 	dev-libs/libunistring
 	dev-libs/nspr
 	dev-libs/nss
-	dev-qt/qt3d[gamepad,qml]
 	gnome-base/librsvg
 	media-gfx/graphite2
-	media-libs/alsa-lib
 	media-libs/flac
-	media-libs/gstreamer
 	media-libs/harfbuzz
 	media-libs/libogg
 	media-libs/libpng-compat:1.2
@@ -81,9 +75,7 @@ DEPEND="
 	x11-libs/libXtst
 	x11-libs/libxcb
 	!bundled-libs? (
-	    dev-db/postgresql
 		dev-cpp/tbb
-		net-misc/curl
 		dev-libs/apr
 		dev-libs/xmlsec
 		media-gfx/graphviz
@@ -92,6 +84,9 @@ DEPEND="
 		net-dns/avahi[mdnsresponder-compat]
 		net-libs/libsrtp
 		net-misc/curl
+		net-misc/curl
+	    dev-db/postgresql
+	    gnome-base/gnome-shell
 	)
 	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
 	video_cards_nvidia? ( x11-drivers/nvidia-drivers )
