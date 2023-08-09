@@ -55,6 +55,9 @@ LIBS_SYM="
 	libs/libpq.so.5
 	libs/libsoxr.so
 	libs/libcdt.so.5
+	liborc-0.4.so
+	liborc-0.4.so.0
+	liborc-0.4.so.0.32.0
 	Fairlight Studio Utility/libxcb.so.1
 	Fairlight Studio Utility/libavahi-common.so.3
 	Fairlight Studio Utility/libavahi-client.so.3
@@ -81,6 +84,7 @@ DEPEND="
 	dev-libs/libunistring
 	dev-libs/nspr
 	dev-libs/nss
+	dev-qt/qt3d[gamepad,qml]
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/flac
@@ -106,6 +110,7 @@ DEPEND="
 	x11-libs/libxcb
 	!bundled-libs? (
 		dev-cpp/tbb
+		dev-lang/orc
 		dev-libs/apr
 		dev-libs/xmlsec
 		media-gfx/graphviz
@@ -113,7 +118,6 @@ DEPEND="
 		media-libs/soxr
 		net-dns/avahi[mdnsresponder-compat]
 		net-libs/libsrtp
-		net-misc/curl
 		net-misc/curl
 	    dev-db/postgresql
 	    gnome-base/gnome-shell
