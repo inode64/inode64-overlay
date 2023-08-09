@@ -13,22 +13,52 @@ PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
 LIBS_SYM="
-	DaVinci Control Panels Setup/libavahi-client.so.3
-	DaVinci Control Panels Setup/libavahi-common.so.3
-	DaVinci Control Panels Setup/libdns_sd.so.1
 	DaVinci Control Panels Setup/libxcb.so.1
-	libs/libapr-1.so.0.7.0
-	libs/libaprutil-1.so.0.6.1
-	libs/libcdt.so.5.0.0
-	libs/libcgraph.so.6.0.0
-	libs/libcrypto.so.1.1
+	DaVinci Control Panels Setup/libavahi-common.so.3
+	DaVinci Control Panels Setup/libavahi-client.so.3
+	DaVinci Control Panels Setup/libdns_sd.so.1
+	libs/libsoxr.so.0
 	libs/libgvc.so.6.0.0
+	libs/libsrtp2.so
+	libs/libcdt.so
+	libs/libcdt.so.5.0.0
+	libs/libxmlsec1-openssl.so
+	libs/libaprutil-1.so
+	libs/libgvpr.so
+	libs/libaprutil-1.so.0
+	libs/libxdot.so.4
+	libs/libpathplan.so
+	libs/libpathplan.so.4
+	libs/libxmlsec1.so
+	libs/libgvpr.so.2
+	libs/libxdot.so
+	libs/libcrypto.so.1.1
+	libs/libsrtp2.so.2.4.0
 	libs/libgvpr.so.2.0.0
-	libs/libpathplan.so.4.0.0
-	libs/libssl.so.1.1
-	libs/libtbbmalloc.so.2
-	libs/libtbbmalloc_proxy.so.2
+	libs/libcurl.so
+	libs/libtbb.so.2
 	libs/libxdot.so.4.0.0
+	libs/libapr-1.so.0
+	libs/libapr-1.so.0.7.0
+	libs/libgvc.so
+	libs/libtbbmalloc_proxy.so.2
+	libs/libtbbmalloc.so.2
+	libs/libcgraph.so
+	libs/libcgraph.so.6
+	libs/libssl.so.1.1
+	libs/libsoxr.so.0.1.3
+	libs/libpathplan.so.4.0.0
+	libs/libcgraph.so.6.0.0
+	libs/libapr-1.so
+	libs/libaprutil-1.so.0.6.1
+	libs/libgvc.so.6
+	libs/libpq.so.5
+	libs/libsoxr.so
+	libs/libcdt.so.5
+	Fairlight Studio Utility/libxcb.so.1
+	Fairlight Studio Utility/libavahi-common.so.3
+	Fairlight Studio Utility/libavahi-client.so.3
+	Fairlight Studio Utility/libdns_sd.so.1
 "
 
 KEYWORDS="~amd64"
@@ -107,6 +137,11 @@ include_dir() {
 	_dir="$1"
 
 	doins -r "${_dir}"
+
+	# Reset permissions for executables
+	find "${_dir}" -type f | while read exe; do
+		fperms -x "${PKG_HOME}"/"${exe}"
+	done
 	# Set permissions for executables and libraries
 	find "${_dir}" -type f -name "*.so*" | while read exe; do
 		fperms +x "${PKG_HOME}"/"${exe}"
@@ -141,9 +176,18 @@ src_prepare() {
 	# Set installation directory
 	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory
 
+	# Fix categories
+	sed -i -e "s|=Video|=AudioVideo|g" share/*.desktop
+
 	# Remove 32bits apps
-	rm LUT/GenOutputLut \
-		LUT/GenLut || die
+	rm LUT/GenOutputLut LUT/GenLut || die
+
+	# Remove glib-2.0 compiled with old pango
+	# And fix Davinci Resolve: libpango undefined symbol: g_string_free_and_steal
+	# https://www.reddit.com/r/Fedora/comments/12z32r1/davinci_resolve_libpango_undefined_symbol_g/
+	rm libs/{libgio*,libglib*,libgmodule*,libgobject*} || die
+
+	rm -rf libs/pkgconfig || die
 
 	# Remove bundled libraries
 	if use !bundled-libs; then
@@ -154,25 +198,15 @@ src_prepare() {
 			fi
 		done
 
-		rm -rf libs/pkgconfig || die
-
 		# remove some libraries
-		rm libs/libsoxr.so* || die
-
-		rm libs/graphviz/libgvplugin_core.so.6.0.0 || die
-		rm libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
-
-		rm "DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libusb-1.0.so.0" || die
-		rm "DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libusb-1.0.so.0" || die
-		rm bin/libusb* || die
+		rm -rf libs/graphviz || die
+		find -name "libgcc_s.so.1" -delete || die
+		find -name "libusb*" -delete || die
 	fi
 
 	# Remove license files
-	rm "BlackmagicRAWSpeedTest/Third Party Licenses.rtf"
-	rm "BlackmagicRAWPlayer/Third Party Licenses.rtf"
-
-	# Fix categories
-	sed -i -e "s|=Video|=AudioVideo|g" share/*.desktop
+	rm "BlackmagicRAWSpeedTest/Third Party Licenses.rtf" || die
+	rm "BlackmagicRAWPlayer/Third Party Licenses.rtf" || die
 }
 
 src_install() {
@@ -181,7 +215,7 @@ src_install() {
 	insinto "${PKG_HOME}"
 	local _dir
 	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
-		    "Fairlight Studio Utility" Fusion graphics libs LUT Onboarding plugins UI_Resource; do
+		    "Fairlight Studio Utility" Fusion graphics libs LUT plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
 
@@ -208,30 +242,9 @@ src_install() {
 	doins share/{blackmagicraw.xml,resolve.xml}
 
 	diropts -m 0777
-	keepdir "${PKG_HOME}/"{.license,easyDCP,Fairlight,logs}
+	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Fairlight,GPUCache,logs,Media,"Resolve Disk Database",.crashreport,.license,.LUT}
+
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
-
-	if use !bundled-libs; then
-		# symlink of libusb
-		dosym -r /usr/$(get_libdir)/libusb-1.0.so "${PKG_HOME}DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards/lib/libusb-1.0.so.0" || die
-		dosym -r /usr/$(get_libdir)/libusb-1.0.so "${PKG_HOME}DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels/lib/libusb-1.0.so.0" || die
-		dosym -r /usr/$(get_libdir)/libusb-1.0.so "${PKG_HOME}/bin/libusb-1.0.so" || die
-
-		local _lib
-		local _libname
-		echo "${LIBS_SYM}" | while read _lib; do
-			if [ "${_lib}" ]; then
-				_libname=$(basename "${_lib}")
-				dosym -r "/usr/$(get_libdir)/${_libname}" "${PKG_HOME}/${_lib}" || die
-			fi
-		done
-
-		dosym -r /usr/$(get_libdir)/libsoxr.so "${PKG_HOME}"/libs/libsoxr.so || die
-		dosym -r /usr/$(get_libdir)/libsoxr.so.0 "${PKG_HOME}"/libs/libsoxr.so.0 || die
-		dosym -r /usr/$(get_libdir)/libsoxr.so.0.1.2 "${PKG_HOME}"/libs/libsoxr.so.0.1.3 || die
-		dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0	"${PKG_HOME}"/libs/graphviz/libgvplugin_core.so.6.0.0 || die
-		dosym -r /usr/$(get_libdir)/graphviz/libgvplugin_core.so.6.0.0 "${PKG_HOME}"/libs/graphviz/libgvplugin_dot_layout.so.6.0.0 || die
-	fi
 
 	# Install desktop shortcut
 	newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
