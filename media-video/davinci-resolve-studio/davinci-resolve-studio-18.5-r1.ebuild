@@ -152,12 +152,12 @@ include_dir() {
 }
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="18G"
+	CHECKREQS_DISK_BUILD="20G"
 
 	check-reqs_pkg_pretend
 }
 pkg_setup() {
-	CHECKREQS_DISK_BUILD="18G"
+	CHECKREQS_DISK_BUILD="20G"
 
 	check-reqs_pkg_pretend
 }
