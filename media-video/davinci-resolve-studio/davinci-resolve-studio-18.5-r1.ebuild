@@ -17,47 +17,47 @@ LIBS_SYM="
 	DaVinci Control Panels Setup/libavahi-common.so.3
 	DaVinci Control Panels Setup/libavahi-client.so.3
 	DaVinci Control Panels Setup/libdns_sd.so.1
-	libs/libsoxr.so.0
-	libs/libgvc.so.6.0.0
-	libs/libsrtp2.so
-	libs/libcdt.so
-	libs/libcdt.so.5.0.0
-	libs/libxmlsec1-openssl.so
-	libs/libaprutil-1.so
-	libs/libgvpr.so
-	libs/libaprutil-1.so.0
-	libs/libxdot.so.4
-	libs/libpathplan.so
-	libs/libpathplan.so.4
-	libs/libxmlsec1.so
-	libs/libgvpr.so.2
-	libs/libxdot.so
-	libs/libcrypto.so.1.1
-	libs/libsrtp2.so.2.4.0
-	libs/libgvpr.so.2.0.0
-	libs/libcurl.so
-	libs/libtbb.so.2
-	libs/libxdot.so.4.0.0
+	libs/libapr-1.so
 	libs/libapr-1.so.0
 	libs/libapr-1.so.0.7.0
-	libs/libgvc.so
-	libs/libtbbmalloc_proxy.so.2
-	libs/libtbbmalloc.so.2
+	libs/libaprutil-1.so
+	libs/libaprutil-1.so.0
+	libs/libaprutil-1.so.0.6.1
+	libs/libcdt.so
+	libs/libcdt.so.5
+	libs/libcdt.so.5.0.0
 	libs/libcgraph.so
 	libs/libcgraph.so.6
-	libs/libssl.so.1.1
-	libs/libsoxr.so.0.1.3
-	libs/libpathplan.so.4.0.0
 	libs/libcgraph.so.6.0.0
-	libs/libapr-1.so
-	libs/libaprutil-1.so.0.6.1
+	libs/libcrypto.so.1.1
+	libs/libcurl.so
+	libs/libgvc.so
 	libs/libgvc.so.6
+	libs/libgvc.so.6.0.0
+	libs/libgvpr.so
+	libs/libgvpr.so.2
+	libs/libgvpr.so.2.0.0
+	libs/liborc-0.4.so
+	libs/liborc-0.4.so.0
+	libs/liborc-0.4.so.0.32.0
+	libs/libpathplan.so
+	libs/libpathplan.so.4
+	libs/libpathplan.so.4.0.0
 	libs/libpq.so.5
 	libs/libsoxr.so
-	libs/libcdt.so.5
-	liborc-0.4.so
-	liborc-0.4.so.0
-	liborc-0.4.so.0.32.0
+	libs/libsoxr.so.0
+	libs/libsoxr.so.0.1.3
+	libs/libsrtp2.so
+	libs/libsrtp2.so.2.4.0
+	libs/libssl.so.1.1
+	libs/libtbb.so.2
+	libs/libtbbmalloc.so.2
+	libs/libtbbmalloc_proxy.so.2
+	libs/libxdot.so
+	libs/libxdot.so.4
+	libs/libxdot.so.4.0.0
+	libs/libxmlsec1-openssl.so
+	libs/libxmlsec1.so
 	Fairlight Studio Utility/libxcb.so.1
 	Fairlight Studio Utility/libavahi-common.so.3
 	Fairlight Studio Utility/libavahi-client.so.3
