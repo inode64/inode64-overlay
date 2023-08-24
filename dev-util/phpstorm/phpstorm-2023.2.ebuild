@@ -19,8 +19,6 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
 
-BDEPEND="dev-util/patchelf"
-
 RDEPEND="
 	app-arch/brotli
 	app-arch/lz4
