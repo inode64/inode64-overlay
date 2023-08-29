@@ -21,38 +21,22 @@ RESTRICT="mirror"
 
 RDEPEND="
 	app-arch/brotli
-	app-arch/lz4
-	app-arch/zstd
+	app-arch/zstd[lz4]
 	app-crypt/argon2
-	app-crypt/p11-kit
-	dev-libs/fribidi
-	dev-libs/glib
+	dev-libs/glib[dbus]
 	dev-libs/json-c
-	dev-libs/libbsd
+	dev-libs/nspr
 	dev-libs/nss
 	<dev-libs/openssl-3.0:=
 	dev-libs/wayland
 	media-fonts/dejavu
-	media-gfx/graphite2
 	media-libs/alsa-lib
-	media-libs/fontconfig
-	media-libs/freetype:2=
-	media-libs/harfbuzz
-	media-libs/libglvnd
-	media-libs/libjpeg-turbo:0=
+	media-libs/harfbuzz[cairo,glib,graphite]
 	media-libs/libpng:0=
-	net-libs/gnutls
+	net-dns/avahi
 	net-print/cups
-	sys-apps/dbus
-	sys-libs/libcap
-	sys-libs/zlib
-	x11-libs/libX11
-	x11-libs/libXext
-	x11-libs/libXi
 	x11-libs/libXrandr
-	x11-libs/libXrender
 	x11-libs/libXtst
-	x11-libs/libxcb
 	x11-libs/pango
 "
 
