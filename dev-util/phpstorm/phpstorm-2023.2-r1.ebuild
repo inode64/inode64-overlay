@@ -73,12 +73,10 @@ src_install() {
 
 	insinto "${DIR}"
 	doins -r *
-	fperms 755 "${DIR}"/bin/{format.sh,fsnotifier,inspect.sh,ltedit.sh,phpstorm.sh,remote-dev-server.sh,repair,restart.py}
 
-	fperms 755 "${DIR}"/jbr/bin/{java,javac,javadoc,jcmd,jdb,jfr,jhsdb,jinfo,jmap,jps,jrunscript,jstack,jstat,keytool,rmiregistry,serialver}
-	fperms 755 "${DIR}"/jbr/lib/{chrome-sandbox,jcef_helper,jexec,jspawnhelper}
-	fperms 755 "${DIR}"/plugins/javascript-impl/helpers/package-version-range-matcher/node_modules/semver/bin/semver.js
-	fperms 755 "${DIR}"/plugins/webp/lib/libwebp/linux/libwebp_jni64.so
+	find -type f -executable | while read exe; do
+		fperms +x "${exe}"
+	done
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
 	newicon "bin/${PN}.svg" "${PN}.svg"
