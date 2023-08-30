@@ -18,7 +18,7 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
-USE="30bit"
+IUSE="30bit"
 
 RDEPEND="
 	app-arch/brotli
