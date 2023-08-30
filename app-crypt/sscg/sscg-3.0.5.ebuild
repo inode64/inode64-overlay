@@ -25,7 +25,7 @@ RDEPEND="
 	sys-libs/talloc
 	dev-libs/ding-libs
 	>=dev-libs/popt-1.14
-	>=dev-libs/openssl-1.1.0
+	>=dev-libs/openssl-1.1.0:=
 "
 BDEPEND="
 	sys-apps/help2man
