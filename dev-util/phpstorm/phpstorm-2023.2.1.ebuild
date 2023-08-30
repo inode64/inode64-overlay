@@ -18,7 +18,7 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
-IUSE="30bit"
+IUSE="30bits"
 
 RDEPEND="
 	app-arch/brotli
@@ -60,7 +60,7 @@ src_prepare() {
 
 	rm -rv "${remove_me[@]}" || die
 
-	if use 30bit; then
+	if use 30bits; then
 		echo "-Dsun.java2d.opengl=true" >> bin/phpstorm64.vmoptions || die
 	fi
 
