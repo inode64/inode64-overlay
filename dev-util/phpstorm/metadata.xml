@@ -12,4 +12,9 @@
 	<upstream>
 		<bugs-to>https://youtrack.jetbrains.com/issues/WI</bugs-to>
 	</upstream>
+	<use>
+		<flag name="30bit">Support on 30 bit color display.
+			(https://youtrack.jetbrains.com/issue/IDEA-241795/Not-working-on-30-bit-color-displays)
+		</flag>
+	</use>
 </pkgmetadata>
