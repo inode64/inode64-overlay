@@ -1,9 +1,9 @@
 DEFINED_PHASES=install postinst preinst prerm pretend
 DESCRIPTION=System user: cockpit-ws
-EAPI=7
+EAPI=8
 INHERIT=acct-user
 KEYWORDS=~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~arm64-macos ~ppc-macos ~x64-macos ~x64-solaris
 RDEPEND=acct-group/cockpit-ws
 SLOT=0
 _eclasses_=user-info	9951b1a0e4f026d16c33a001fd2d5cdf	acct-user	fd6725fcc11ecffded6fe9228b8e3448
-_md5_=195342bdb7fb2035dd3a8515c6cdc366
+_md5_=e5de14e6444d557a1d7ad5dbdd34a5a4
