@@ -1,7 +1,7 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 MY_VER=72
 
 DESCRIPTION="Run just one instance of a command and its args at a time"
