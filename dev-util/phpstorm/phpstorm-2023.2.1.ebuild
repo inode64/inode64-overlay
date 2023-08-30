@@ -80,7 +80,7 @@ src_install() {
 	doins -r *
 
 	find -type f -executable | while read exe; do
-		fperms +x "${exe}"
+		fperms +x "${DIR}/${exe}"
 	done
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
