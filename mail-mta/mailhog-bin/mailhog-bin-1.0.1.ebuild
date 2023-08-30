@@ -1,7 +1,7 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 DESCRIPTION="Runs an SMTP server, catches and displays email in a web interface."
 HOMEPAGE="https://github.com/mailhog/MailHog/"
