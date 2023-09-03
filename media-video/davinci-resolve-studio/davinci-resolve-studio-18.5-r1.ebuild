@@ -3,7 +3,6 @@
 
 # TODO:
 #	Panel Daemon is don't installed
-#   amdgpu isn't tested
 
 EAPI=8
 inherit check-reqs desktop udev xdg
@@ -109,6 +108,7 @@ DEPEND="
 	x11-libs/libXtst
 	x11-libs/libxcb
 	!bundled-libs? (
+		<dev-libs/openssl-3.0
 		dev-cpp/tbb
 		dev-lang/orc
 		dev-libs/apr
@@ -122,7 +122,7 @@ DEPEND="
 	    dev-db/postgresql
 	    gnome-base/gnome-shell
 	)
-	video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl )
+	video_cards_amdgpu? ( >=dev-libs/rocm-opencl-runtime-5.5.1 )
 	video_cards_nvidia? ( x11-drivers/nvidia-drivers )
 "
 RDEPEND="${DEPEND}"
