@@ -283,10 +283,10 @@ src_install() {
 	done
 
 	# create configuration for revdep-rebuild
-    echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
-    echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
-    insinto "/etc/revdep-rebuild"
-    doins "${T}/80${PN}"
+	echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
+	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
+	insinto "/etc/revdep-rebuild"
+	doins "${T}/80${PN}"
 }
 
 pkg_preinst() {
