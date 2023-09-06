@@ -84,6 +84,7 @@ DEPEND="
 	dev-libs/nspr
 	dev-libs/nss
 	dev-qt/qt3d[gamepad,qml]
+	dev-qt/qtvirtualkeyboard
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/flac
