@@ -281,6 +281,12 @@ src_install() {
 		newicon -s ${res} -c mimetypes graphics/DV_ServerAccess.png application-x-resolvedbkey
 		newicon -s ${res} -c mimetypes graphics/DV_TemplateBundle.png application-x-resolvetemplatebundle
 	done
+
+	# create configuration for revdep-rebuild
+    echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
+    echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
+    insinto "/etc/revdep-rebuild"
+    doins "${T}/80${PN}"
 }
 
 pkg_preinst() {
