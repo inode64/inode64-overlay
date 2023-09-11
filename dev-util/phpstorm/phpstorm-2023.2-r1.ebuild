@@ -38,6 +38,7 @@ RDEPEND="
 	net-print/cups
 	x11-libs/libXrandr
 	x11-libs/libXtst
+	x11-libs/libnotify
 	x11-libs/pango
 "
 
