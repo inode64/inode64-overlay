@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit desktop wrapper
+inherit desktop wrapper xdg-utils
 
-MY_PV="232.8660.205"
+MY_PV="232.9921.55"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
@@ -18,41 +18,27 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
+IUSE="30bits"
 
 RDEPEND="
 	app-arch/brotli
-	app-arch/lz4
-	app-arch/zstd
+	app-arch/zstd[lz4]
 	app-crypt/argon2
-	app-crypt/p11-kit
-	dev-libs/fribidi
-	dev-libs/glib
+	dev-libs/glib[dbus]
 	dev-libs/json-c
-	dev-libs/libbsd
+	dev-libs/nspr
 	dev-libs/nss
-	dev-libs/openssl:0=
+	<dev-libs/openssl-3.0
 	dev-libs/wayland
 	media-fonts/dejavu
-	media-gfx/graphite2
 	media-libs/alsa-lib
-	media-libs/fontconfig
-	media-libs/freetype:2=
-	media-libs/harfbuzz
-	media-libs/libglvnd
-	media-libs/libjpeg-turbo:0=
+	media-libs/harfbuzz[cairo,glib,graphite]
 	media-libs/libpng:0=
-	net-libs/gnutls
+	net-dns/avahi
 	net-print/cups
-	sys-apps/dbus
-	sys-libs/libcap
-	sys-libs/zlib
-	x11-libs/libX11
-	x11-libs/libXext
-	x11-libs/libXi
 	x11-libs/libXrandr
-	x11-libs/libXrender
 	x11-libs/libXtst
-	x11-libs/libxcb
+	x11-libs/libnotify
 	x11-libs/pango
 "
 
@@ -75,6 +61,10 @@ src_prepare() {
 
 	rm -rv "${remove_me[@]}" || die
 
+	if use 30bits; then
+		echo "-Dsun.java2d.opengl=true" >> bin/phpstorm64.vmoptions || die
+	fi
+
 	sed -i \
 		-e "\$a\\\\" \
 		-e "\$a#-----------------------------------------------------------------------" \
@@ -89,12 +79,10 @@ src_install() {
 
 	insinto "${DIR}"
 	doins -r *
-	fperms 755 "${DIR}"/bin/{format.sh,fsnotifier,inspect.sh,ltedit.sh,phpstorm.sh,remote-dev-server.sh,repair,restart.py}
 
-	fperms 755 "${DIR}"/jbr/bin/{java,javac,javadoc,jcmd,jdb,jfr,jhsdb,jinfo,jmap,jps,jrunscript,jstack,jstat,keytool,rmiregistry,serialver}
-	fperms 755 "${DIR}"/jbr/lib/{chrome-sandbox,jcef_helper,jexec,jspawnhelper}
-	fperms 755 "${DIR}"/plugins/javascript-impl/helpers/package-version-range-matcher/node_modules/semver/bin/semver.js
-	fperms 755 "${DIR}"/plugins/webp/lib/libwebp/linux/libwebp_jni64.so
+	find -type f -executable | while read exe; do
+		fperms +x "${DIR}/${exe}"
+	done
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
 	newicon "bin/${PN}.svg" "${PN}.svg"
@@ -103,4 +91,17 @@ src_install() {
 	# recommended by: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
 	dodir /usr/lib/sysctl.d/
 	echo "fs.inotify.max_user_watches = 524288" > "${D}/usr/lib/sysctl.d/30-clion-inotify-watches.conf" || die
+
+	# create configuration for revdep-rebuild
+	echo "SEARCH_DIRS=\"${DIR}\"" > "${T}/80${PN}" || die
+	insinto "/etc/revdep-rebuild"
+	doins "${T}/80${PN}"
+}
+
+pkg_postinst() {
+	xdg_icon_cache_update
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
 }
