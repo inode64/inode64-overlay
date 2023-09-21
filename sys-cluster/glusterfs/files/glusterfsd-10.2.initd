@@ -20,7 +20,7 @@ eval 'GLUSTERFS_OPTS="${'${GLUSTERFS_NAME}'_opts}"'
 eval 'GLUSTERFS_MOUNTPOINT="${'${GLUSTERFS_NAME}'_mountpoint}"'
 
 depend() {
-	need net 
+	need net
 	[ -n "${GLUSTERFS_MOUNTPOINT}" ] && need fuse
 	use dns
 	before netmount
