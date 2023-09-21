@@ -83,8 +83,8 @@ DEPEND="
 	dev-libs/libunistring
 	dev-libs/nspr
 	dev-libs/nss
-	dev-qt/qt3d[gamepad,qml]
-	dev-qt/qtvirtualkeyboard
+	dev-qt/qt3d:5[gamepad,qml]
+	dev-qt/qtvirtualkeyboard:5
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/flac

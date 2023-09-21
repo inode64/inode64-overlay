@@ -10,8 +10,6 @@
 		<name>Proxy Maintainers</name>
 	</maintainer>
 	<use>
-		<flag name="nvidia">Enable nvidia cuda toolkit for speeding up computations.</flag>
-		<flag name="amdgpu">Enable AMDGPU opencl for speeding up computations.</flag>
 		<flag name="bundled-libs">Use bundled libraries.</flag>
 		<flag name="developer">Include developer examples and documentation.</flag>
 	</use>
