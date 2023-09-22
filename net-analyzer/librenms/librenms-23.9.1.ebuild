@@ -78,7 +78,7 @@ src_install() {
 	insinto /etc/bash_completion.d
 	doins misc/lnms-completion.bash
 
-	dodoc "AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md"
+	dodoc AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md
 
 	// Remove developer files
 	rm *.md LICENSE.txt || die
