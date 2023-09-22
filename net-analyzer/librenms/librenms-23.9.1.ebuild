@@ -84,7 +84,7 @@ src_install() {
 	rm *.md LICENSE.txt || die
 	find -type f -regex '.*\.gitignore$' -delete || die
 	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
-	rm {.codeclimate.yml,.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.gitignore,.scrutinizer.yml,.styleci.yml,mkdocs.yml} || die
+	rm {.codeclimate.yml,.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.scrutinizer.yml,.styleci.yml,mkdocs.yml} || die
 	rm {phpstan-baseline-deprecated.neon,phpstan-baseline.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
 	rm -rf {.github,doc,mibs,misc,scripts,tests} || die
 	cp -r . "${D}"${LIBRENMS_HOME}
