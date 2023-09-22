@@ -25,17 +25,14 @@ DEPEND="
 "
 
 BDEPEND="
-	app-arch/unzip
 	dev-php/composer
-	dev-vcs/git
 "
 RDEPEND="${BDEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
-	app-arch/unzip
 	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
 	dev-php/pecl-imagick
-	dev-php/pecl-memcache:7
+	dev-php/pecl-memcache
 	ipmi? ( sys-apps/ipmitool )
 	media-gfx/graphviz
 	>=net-analyzer/fping-4.2[suid]
@@ -81,7 +78,15 @@ src_install() {
 	insinto /etc/bash_completion.d
 	doins misc/lnms-completion.bash
 
-	rm -r "${S}"/.github
+	dodoc "AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md"
+
+	// Remove developer files
+	rm *.md LICENSE.txt || die
+	find -type f -regex '.*\.gitignore$' -delete || die
+	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
+	rm {.codeclimate.yml,.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.gitignore,.scrutinizer.yml,.styleci.yml,mkdocs.yml} || die
+	rm {phpstan-baseline-deprecated.neon,phpstan-baseline.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
+	rm -rf {.github,doc,mibs,misc,scripts,tests} || die
 	cp -r . "${D}"${LIBRENMS_HOME}
 
 	fowners librenms:librenms -R ${LIBRENMS_HOME}
