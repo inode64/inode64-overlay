@@ -77,6 +77,7 @@ src_configure() {
 		$(use_enable debug)
 		$(use_enable pcp)
 		$(use_enable doc)
+		--enable-old-bridge
 		--with-pamdir="/$(get_libdir)/security"
 		--with-cockpit-user=cockpit-ws
 		--with-cockpit-ws-instance-user=cockpit-wsinstance
