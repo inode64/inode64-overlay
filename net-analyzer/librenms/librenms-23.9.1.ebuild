@@ -86,7 +86,7 @@ src_install() {
 	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
 	rm {.codeclimate.yml,.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.scrutinizer.yml,.styleci.yml,mkdocs.yml} || die
 	rm {phpstan-baseline-deprecated.neon,phpstan-baseline.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
-	rm -rf {.github,doc,licenses,mibs,tests} || die
+	rm -rf {.github,doc,licenses,tests} || die
 	cp -r . "${D}"${LIBRENMS_HOME}
 
 	fowners librenms:librenms -R ${LIBRENMS_HOME}
