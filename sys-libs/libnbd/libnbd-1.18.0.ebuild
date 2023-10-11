@@ -65,6 +65,7 @@ src_configure() {
 		$(use_enable python)
 		$(use_with gnutls)
 		--with-libxml2
+		--disable-rust
 	)
 
 	export bashcompdir="$(get_bashcompdir)"
