@@ -79,7 +79,7 @@ src_configure() {
 		$(use_with 83support)
 		$(use_with 84support)
 		$(use_with pacemaker)
-		$(use_with systemd initscripttype=systemd)
+		$(usex systemd --with-initscripttype=systemd --with-initscripttype=none)
 		$(use_with udev)
 		$(use_with xen)
 	)
