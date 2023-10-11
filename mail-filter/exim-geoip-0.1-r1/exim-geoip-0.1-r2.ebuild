@@ -23,8 +23,8 @@ RDEPEND="${DEPEND}"
 #S="${WORKDIR}/exim-geoipv6-dlfunc-${PV}"
 
 src_prepare() {
-        default
-        eautoreconf
+	default
+	eautoreconf
 }
 
 src_configure() {

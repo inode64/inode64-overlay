@@ -5,7 +5,7 @@
 ###############################################################################
 
 # Simple copy this to /etc/lighttpd/ and include it in your lighttpd.conf.
-# It will make NUT available at http://$HOST/nut/ 
+# It will make NUT available at http://$HOST/nut/
 
 server.modules += ("mod_cgi")
 

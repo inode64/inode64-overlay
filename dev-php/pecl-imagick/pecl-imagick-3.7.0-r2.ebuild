@@ -4,7 +4,7 @@
 EAPI=8
 
 PHP_EXT_NAME="imagick"
-USE_PHP="php5-6 php7-1 php7-2 php7-3 php7-4 php8-0 php8-1 php8-2"
+USE_PHP="php5-6 php7-3 php7-4 php8-1 php8-2"
 
 # https://github.com/Imagick/imagick/issues/626
 PHP_EXT_NEEDED_USE="-debug"
