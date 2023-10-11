@@ -13,7 +13,7 @@ S="${WORKDIR}/${P/_/}"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="amd64 x86"
-IUSE="83support 84support pacemaker split-usr systemd +udev xen"
+IUSE="83support +84support pacemaker split-usr systemd +udev xen"
 
 DEPEND="
 	pacemaker? ( sys-cluster/pacemaker )
