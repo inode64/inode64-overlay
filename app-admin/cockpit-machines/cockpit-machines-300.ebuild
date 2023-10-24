@@ -33,3 +33,7 @@ RDEPEND="${DEPEND}
 "
 
 S="${WORKDIR}/${PN}"
+
+src_install() {
+	emake PREFIX="${EPREFIX}/usr" install
+}
