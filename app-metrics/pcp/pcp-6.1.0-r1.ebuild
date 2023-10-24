@@ -83,11 +83,7 @@ pkg_setup() {
 src_prepare() {
 	eapply_user
 
-	# gentooify systemd services
-	sed \
-		-e 's:sysconfig/:conf.d/:g' \
-		-e 's:@PCP_SYSCONFIG_DIR@:/etc/conf.d:g' \
-		-i "${S}"/*/*/*.service.in || die
+	default
 }
 
 src_configure() {
@@ -95,6 +91,7 @@ src_configure() {
 		"--localstatedir=${EPREFIX}/var"
 		"--without-dstat-symlink"
 		"--without-python"
+		"--with-sysconfigdir=${EPREFIX}/etc/conf.d"
 		$(use_enable pie)
 		$(use_enable ssp)
 		$(use_with discovery)
@@ -118,7 +115,7 @@ src_compile() {
 }
 
 src_install() {
-	emake DIST_ROOT="${D}" PCP_SYSCONFIG_DIR=/etc/conf.d install
+	emake DIST_ROOT="${D}" install
 	use influxdb || use libvirt || use json || use postgres || use xls && python_optimize
 
 	rm -rf "${D}/var/lib/pcp/testsuite"

@@ -11,12 +11,12 @@ Restart=on-failure
 EnvironmentFile=-/etc/conf.d/ovsdb-server
 ExecStartPre=/bin/chown ${OVS_USER_ID} /run/openvswitch /var/log/openvswitch
 ExecStart=/usr/share/openvswitch/scripts/ovs-ctl \
-          --no-ovs-vswitchd --no-monitor --system-id=random \
-          --ovs-user=${OVS_USER_ID} \
-          start $OPTIONS
+	  --no-ovs-vswitchd --no-monitor --system-id=random \
+	  --ovs-user=${OVS_USER_ID} \
+	  start $OPTIONS
 ExecStop=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd stop
 ExecReload=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd \
-           --ovs-user=${OVS_USER_ID} \
-           --no-monitor restart $OPTIONS
+	   --ovs-user=${OVS_USER_ID} \
+	   --no-monitor restart $OPTIONS
 RuntimeDirectory=openvswitch
 RuntimeDirectoryMode=0755
