@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..12} )
-DISTUTILS_USE_PEP517=setuptools
+DISTUTILS_USE_PEP517=pdm
 
 inherit distutils-r1 pypi
 
@@ -24,3 +24,5 @@ DEPEND="
 	dev-python/cryptography[${PYTHON_USEDEP}]
 "
 RDEPEND="${DEPEND}"
+
+S="${WORKDIR}/${P}"
