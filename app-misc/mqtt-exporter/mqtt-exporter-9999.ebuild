@@ -42,7 +42,7 @@ src_compile() {
 }
 
 src_install() {
-	insinto /usr/lib64/${PN}
+	insinto /usr/$(get_libdir)/${PN}
 
 	doins exporter.py
 	doins -r mqtt_exporter
