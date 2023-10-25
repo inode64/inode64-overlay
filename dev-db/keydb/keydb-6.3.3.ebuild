@@ -52,6 +52,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-use-atomic.patch"
+	"${FILESDIR}/${P}-gcc13.patch"
 )
 
 S="${WORKDIR}/${MY_PN}-${PV}"
