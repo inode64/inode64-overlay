@@ -19,10 +19,10 @@ NODEJS_EXTRA_FILES="bin constants.js index.js paths.js"
 src_install() {
 	nodejs-mod_src_install
 
-	dosym -r /usr/$(get_libdir)/node_modules/pm2/bin/pm2 /usr/bin/pm2
-	dosym -r /usr/$(get_libdir)/node_modules/pm2/bin/pm2-dev /usr/bin/pm2-dev
-	dosym -r /usr/$(get_libdir)/node_modules/pm2/bin/pm2-docker /usr/bin/pm2-docker
-	dosym -r /usr/$(get_libdir)/node_modules/pm2/bin/pm2-runtime /usr/bin/pm2-runtime
+	dosym -r "$(_NODEJS_MODULES)/bin/pm2" /usr/bin/pm2
+	dosym -r "$(_NODEJS_MODULES)/bin/pm2-dev" /usr/bin/pm2-dev
+	dosym -r "$(_NODEJS_MODULES)/bin/pm2-docker" /usr/bin/pm2-docker
+	dosym -r "$(_NODEJS_MODULES)/bin/pm2-runtime" /usr/bin/pm2-runtime
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
