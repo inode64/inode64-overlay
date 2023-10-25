@@ -7,8 +7,10 @@ inherit nodejs-mod systemd
 
 DESCRIPTION="Process manager for Node.js applications with a built-in load balancer"
 HOMEPAGE="https://pm2.keymetrics.io/"
-SRC_URI="https://github.com/Unitech/pm2/archive/${PV}.tar.gz -> ${P}.tar.gz
-			https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
+SRC_URI="
+	https://github.com/Unitech/pm2/archive/${PV}.tar.gz -> ${P}.tar.gz
+	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz
+"
 
 LICENSE="AGPL-3 Apache-2.0 BSD-2 ISC MIT public-domain"
 SLOT="0"
@@ -19,10 +21,10 @@ NODEJS_EXTRA_FILES="bin constants.js index.js paths.js"
 src_install() {
 	nodejs-mod_src_install
 
-	dosym -r "$(_NODEJS_MODULES)/bin/pm2" /usr/bin/pm2
-	dosym -r "$(_NODEJS_MODULES)/bin/pm2-dev" /usr/bin/pm2-dev
-	dosym -r "$(_NODEJS_MODULES)/bin/pm2-docker" /usr/bin/pm2-docker
-	dosym -r "$(_NODEJS_MODULES)/bin/pm2-runtime" /usr/bin/pm2-runtime
+	dosym -r "$(nodejs_modules)/bin/pm2" /usr/bin/pm2
+	dosym -r "$(nodejs_modules)/bin/pm2-dev" /usr/bin/pm2-dev
+	dosym -r "$(nodejs_modules)/bin/pm2-docker" /usr/bin/pm2-docker
+	dosym -r "$(nodejs_modules)/bin/pm2-runtime" /usr/bin/pm2-runtime
 
 	doinitd "${FILESDIR}"/${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
