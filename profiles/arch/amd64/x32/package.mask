@@ -1,0 +1,3 @@
+# NodeJS without support x32
+
+sys-process/pm2
