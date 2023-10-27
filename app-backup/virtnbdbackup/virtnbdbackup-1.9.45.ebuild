@@ -25,6 +25,7 @@ SLOT="0"
 RDEPEND="
 	app-emulation/qemu[multipath]
 	>=dev-python/libvirt-python-7.6.0[${PYTHON_USEDEP}]
+	dev-python/colorlog[${PYTHON_USEDEP}]
 	dev-python/lxml[${PYTHON_USEDEP}]
 	dev-python/lz4[${PYTHON_USEDEP}]
 	dev-python/paramiko[${PYTHON_USEDEP}]
