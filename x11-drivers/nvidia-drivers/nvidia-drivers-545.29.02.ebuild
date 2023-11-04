@@ -244,6 +244,8 @@ src_install() {
 		libnvidia-{gtk,wayland-client} nvidia-{settings,xconfig} # from source
 		libnvidia-egl-gbm 15_nvidia_gbm # gui-libs/egl-gbm
 		libnvidia-egl-wayland 10_nvidia_wayland # gui-libs/egl-wayland
+		libnvidia-pkcs11.so # using the openssl3 version instead
+		libnvidia-pkcs11-openssl3.so
 	)
 	local skip_modules=(
 		$(usev !X "nvfbc vdpau xdriver")
