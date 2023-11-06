@@ -24,7 +24,6 @@ BDEPEND="sys-devel/flex"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-9.23.1-respect-flags.patch
-	"${FILESDIR}"/${PN}-9.25.0-missing-stdint.patch
 )
 
 pkg_setup() {
