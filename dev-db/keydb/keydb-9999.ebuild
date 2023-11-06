@@ -53,8 +53,6 @@ PATCHES=(
 	"${FILESDIR}/${PN}-use-atomic.patch"
 )
 
-S="${WORKDIR}/${MY_PN}-${PV}"
-
 src_compile() {
 	local myconf=""
 
