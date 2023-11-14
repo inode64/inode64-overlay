@@ -25,7 +25,6 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 RESTRICT="test"
 
 PATCHES=(
-	"${FILESDIR}/${PN}-11.0-fix-crash.patch"
 	"${FILESDIR}/${PN}-11.0-extras-defer-invoking-of-gluster-volume-set-help-as-.patch"
 )
 
