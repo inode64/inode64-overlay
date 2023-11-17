@@ -44,7 +44,7 @@ src_compile() {
 }
 
 src_test() {
-	go run build.go test || die "test failed"
+	ego test || die "test failed"
 }
 
 src_install() {
