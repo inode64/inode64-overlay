@@ -1,0 +1,14 @@
+BDEPEND=>=dev-lang/go-1.18 app-arch/unzip virtual/pkgconfig
+DEFINED_PHASES=compile configure install postinst test unpack
+DESCRIPTION=Ultimate camera streaming application
+EAPI=8
+HOMEPAGE=https://github.com/AlexxIT/go2rtc
+INHERIT=go-module systemd tmpfiles
+KEYWORDS=~amd64 ~x86
+LICENSE=MIT
+RDEPEND=acct-group/go2rtc acct-user/go2rtc media-video/ffmpeg[encode,x264,x265,opus] virtual/tmpfiles
+RESTRICT=strip
+SLOT=0
+SRC_URI=https://github.com/AlexxIT/go2rtc/archive/refs/tags/v1.8.3.tar.gz -> go2rtc-1.8.3.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/go2rtc-1.8.3-vendor.tar.xz
+_eclasses_=multiprocessing	30ead54fa2e2b5f9cd4e612ffc34d0fe	toolchain-funcs	eed10cf5e5a06916e654d31f5a1925cc	multilib	c19072c3cd7ac5cb21de013f7e9832e0	go-env	8e2d827579ae355b3dd556d44a79d4a6	go-module	9e5a8f7b134fd3ed3785755097fe8ef0	systemd	c8b03e8df84486aa991d4396686e8942	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f
+_md5_=004d67e37f8b532816fd1fa129c4ea4a
