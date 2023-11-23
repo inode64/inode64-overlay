@@ -1,4 +1,4 @@
-BDEPEND=python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_python3_11? ( dev-lang/python:3.11 ) python_targets_python3_12? ( dev-lang/python:3.12 ) >=dev-python/gpep517-13[python_targets_python3_10(-)?,python_targets_python3_11(-)?,python_targets_python3_12(-)?] >=dev-python/setuptools-67.8.0-r1[python_targets_python3_10(-)?,python_targets_python3_11(-)?,python_targets_python3_12(-)?]
+BDEPEND=python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_python3_11? ( dev-lang/python:3.11 ) python_targets_python3_12? ( dev-lang/python:3.12 ) >=dev-python/gpep517-15[python_targets_python3_10(-)?,python_targets_python3_11(-)?,python_targets_python3_12(-)?] >=dev-python/setuptools-67.8.0-r1[python_targets_python3_10(-)?,python_targets_python3_11(-)?,python_targets_python3_12(-)?]
 DEFINED_PHASES=compile configure install prepare test
 DESCRIPTION=A simple script to identify files not tracked by Portage package manager
 EAPI=8
@@ -11,5 +11,5 @@ RDEPEND=dev-python/psutil[python_targets_python3_10(-)?,python_targets_python3_1
 REQUIRED_USE=|| ( python_targets_python3_10 python_targets_python3_11 python_targets_python3_12 )
 SLOT=0
 SRC_URI=https://github.com/gcarq/portage-lostfiles/archive/v0.2.3.tar.gz -> portage-lostfiles-0.2.3.tar.gz
-_eclasses_=toolchain-funcs	fbbbc99d10168de2926e06da7169b8dc	multilib	c19072c3cd7ac5cb21de013f7e9832e0	flag-o-matic	be27a904c614cb93ae037762dc69bcc2	out-of-source-utils	1a9007554652a6e627edbccb3c25a439	multibuild	30dbf3c5a31db09a19f31ad0a68f2405	multiprocessing	b4e253ab22cef7b1085e9b67c7a3b730	ninja-utils	f3010c780f65d1bb5aea15a9af1adc9c	python-utils-r1	12aa0037eb004139215ff04894d52b28	python-r1	8a28fa6d3e3bc96ff8a7eff2badbe71f	distutils-r1	24344aec2be39c69d9f279b5415298ce
+_eclasses_=toolchain-funcs	eed10cf5e5a06916e654d31f5a1925cc	multilib	c19072c3cd7ac5cb21de013f7e9832e0	flag-o-matic	6b3c606c5de2531072ffd36eca06a5a9	out-of-source-utils	1a9007554652a6e627edbccb3c25a439	multibuild	30dbf3c5a31db09a19f31ad0a68f2405	multiprocessing	30ead54fa2e2b5f9cd4e612ffc34d0fe	ninja-utils	39e7a84b06eff4efd9f2e0c3d1668b98	python-utils-r1	e989dbdcbb647bd8655857c1f95be244	python-r1	8a28fa6d3e3bc96ff8a7eff2badbe71f	distutils-r1	ae136dc2e1c0006e9480d44a6c1886d9
 _md5_=2f76e214f32a83bf536a25717eabf209
