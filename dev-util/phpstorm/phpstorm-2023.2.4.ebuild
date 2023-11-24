@@ -4,7 +4,7 @@
 EAPI=8
 inherit desktop wrapper xdg-utils
 
-MY_PV="232.9921.55"
+MY_PV="232.10227.13"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
@@ -28,7 +28,7 @@ RDEPEND="
 	dev-libs/json-c
 	dev-libs/nspr
 	dev-libs/nss
-	<dev-libs/openssl-3.0
+	dev-libs/openssl:0/3
 	dev-libs/wayland
 	media-fonts/dejavu
 	media-libs/alsa-lib
@@ -76,12 +76,17 @@ src_prepare() {
 
 src_install() {
 	local DIR="/opt/${P}"
+	local exe
 
 	insinto "${DIR}"
 	doins -r *
 
+	# Set permissions for executables and libraries
+	find "${_dir}" -type f -name "*.so*" | while read exe; do
+		fperms +x "${PKG_HOME}"/"${exe}"
+	done
 	find -type f -executable | while read exe; do
-		fperms +x "${DIR}/${exe}"
+		fperms +x "${PKG_HOME}/${exe}"
 	done
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
