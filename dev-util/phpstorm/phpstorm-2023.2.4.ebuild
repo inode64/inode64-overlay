@@ -83,10 +83,10 @@ src_install() {
 
 	# Set permissions for executables and libraries
 	find -type f -name "*.so*" | while read exe; do
-		fperms +x "${PKG_HOME}/${exe}"
+		fperms +x "${DIR}/${exe}"
 	done
 	find -type f -executable | while read exe; do
-		fperms +x "${PKG_HOME}/${exe}"
+		fperms +x "${DIR}/${exe}"
 	done
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
