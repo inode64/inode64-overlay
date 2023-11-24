@@ -82,8 +82,8 @@ src_install() {
 	doins -r *
 
 	# Set permissions for executables and libraries
-	find "${_dir}" -type f -name "*.so*" | while read exe; do
-		fperms +x "${PKG_HOME}"/"${exe}"
+	find -type f -name "*.so*" | while read exe; do
+		fperms +x "${PKG_HOME}/${exe}"
 	done
 	find -type f -executable | while read exe; do
 		fperms +x "${PKG_HOME}/${exe}"
