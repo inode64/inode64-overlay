@@ -8,14 +8,15 @@ MY_PN="KeyDB"
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
 
-inherit edo git-r3 multiprocessing systemd tmpfiles toolchain-funcs
+inherit edo multiprocessing systemd tmpfiles toolchain-funcs
 
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
-EGIT_REPO_URI="https://github.com/Snapchat/${MY_PN}.git"
+SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
+KEYWORDS="~amd64 ~x86"
 IUSE="curl flash ssl systemd test"
 RESTRICT="!test? ( test )"
 
@@ -51,6 +52,8 @@ PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
 )
+
+S="${WORKDIR}/${MY_PN}-${PV}"
 
 src_compile() {
 	local myconf=""
