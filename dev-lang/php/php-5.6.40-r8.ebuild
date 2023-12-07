@@ -286,6 +286,8 @@ src_prepare() {
 }
 
 src_configure() {
+	default
+
 	addpredict /usr/share/snmp/mibs/.index #nowarn
 	addpredict /var/lib/net-snmp/mib_indexes #nowarn
 

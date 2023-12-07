@@ -59,11 +59,12 @@ pkg_setup() {
 }
 
 src_prepare() {
+	default
+
 	xdg_environment_reset
 
 	sed -i -e '/SystemdService/d' data/org.freedesktop.ConsoleKit.service.in || die
 
-	default
 	# patch needs autoreconf, so dont need libtoolize
 	eautoreconf
 	#elibtoolize # bug 593314

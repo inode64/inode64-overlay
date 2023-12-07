@@ -67,10 +67,11 @@ DEPEND="${RDEPEND}
 "
 
 src_prepare() {
+	default
+
 	if [[ "${PV}" == *9999 ]]; then
 		eautoreconf -fi
 	fi
-	default
 }
 
 src_configure() {
