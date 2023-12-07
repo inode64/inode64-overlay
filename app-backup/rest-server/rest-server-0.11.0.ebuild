@@ -20,10 +20,10 @@ RDEPEND="app-admin/apache-tools"
 DEPEND=""
 
 src_prepare() {
+	default
+
 	sed -i -e 's|/usr/local/bin/rest-server|/usr/bin/rest-server|g' examples/systemd/rest-server.service || die
 	sed -i -e 's|/path/to/backups|/srv/backups|g' examples/systemd/rest-server.service || die
-
-	default
 }
 
 src_compile() {

@@ -30,6 +30,8 @@ RDEPEND="
 DEPEND=""
 
 src_prepare() {
+	default
+
 	# change default installation directory
 	find . -type f -exec sed \
 		-e "s#/usr/local/awstats/wwwroot#/usr/share/awstats/wwwroot#g" \

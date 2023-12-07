@@ -113,6 +113,8 @@ RDEPEND="${COMMON_DEPEND}
 S=${WORKDIR}/${P//_rc/-RC}
 
 src_prepare() {
+	default
+
 	# Legacy patches which need a respin for -p1
 	eapply -p0 "${FILESDIR}"/exim-4.14-tail.patch
 	eapply -p0 "${FILESDIR}"/exim-4.74-radius-db-ENV-clash.patch # 287426

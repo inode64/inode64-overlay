@@ -43,6 +43,8 @@ pkg_setup() {
 }
 
 src_prepare() {
+	default
+
 	# Respect LDFLAGS, bug #453442
 	sed -e "s/\$(CC) -o/\$(CC) \$(LDFLAGS) -o/" \
 		-e "/\$(DESTDIR)\$(localstatedir)\/lock/d" \
@@ -64,7 +66,6 @@ src_prepare() {
 	sed -i -e '/usage-count/ s/yes/no/' scripts/global_common.conf || die
 	sed -i -e "s:\$(sysconfdir)/udev:$(get_udevdir):" scripts/Makefile.in || die
 
-	default
 	eautoreconf
 }
 

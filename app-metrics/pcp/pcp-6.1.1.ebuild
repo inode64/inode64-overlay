@@ -82,9 +82,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	eapply_user
-
 	default
+	eapply_user
 }
 
 src_configure() {

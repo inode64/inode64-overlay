@@ -68,6 +68,8 @@ RDEPEND="${DEPEND}
 "
 
 src_prepare() {
+	default
+
 	eapply_user
 	eautoreconf
 }
