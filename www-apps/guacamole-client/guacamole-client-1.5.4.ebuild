@@ -7,21 +7,21 @@ DESCRIPTION="Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 
 # Download mvn and node_modules:
-# tar -xf guacamole-client-1.5.3.tar.gz (don't use mc!!)
-# cd guacamole-client-1.5.3
+# tar -xf guacamole-client-1.5.4.tar.gz (don't use mc!!)
+# cd guacamole-client-1.5.4
 # Require Java 11
 # LC_ALL=C LANG=en-US.UTF-8 mvn dependency:go-offline -Dmaven.repo.local=.m2 -Drat.ignoreErrors=true package
 
 # Compression process:
 # cd ..
-# tar --create --auto-compress --file guacamole-client-1.5.3-mvn.tar.xz guacamole-client-1.5.3/.m2
-# tar --create --auto-compress --file guacamole-client-1.5.3-node_modules.tar.xz guacamole-client-1.5.3/guacamole/src/main/frontend/node_modules
+# tar --create --auto-compress --file guacamole-client-1.5.4-mvn.tar.xz guacamole-client-1.5.4/.m2
+# tar --create --auto-compress --file guacamole-client-1.5.4-node_modules.tar.xz guacamole-client-1.5.4/guacamole/src/main/frontend/node_modules
 
 KEYWORDS="~amd64 ~x86"
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/apache/guacamole-client.git"
-	EGIT_BRANCH="staging/1.5.3"
+	EGIT_BRANCH="staging/1.5.4"
 else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
