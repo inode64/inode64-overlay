@@ -51,6 +51,7 @@ src_prepare() {
 
 	local remove_me=(
 		help/ReferenceCardForMac.pdf
+		lib/async-profiler/aarch64
 		plugins/cwm-plugin/quiche-native/darwin-aarch64
 		plugins/cwm-plugin/quiche-native/linux-aarch64
 		plugins/cwm-plugin/quiche-native/win32-x86-64
