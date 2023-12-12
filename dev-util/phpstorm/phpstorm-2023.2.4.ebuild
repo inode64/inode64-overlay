@@ -24,7 +24,7 @@ RDEPEND="
 	app-arch/brotli
 	app-arch/zstd[lz4]
 	app-crypt/argon2
-	dev-libs/glib[dbus]
+	dev-libs/glib
 	dev-libs/json-c
 	dev-libs/nspr
 	dev-libs/nss
@@ -36,6 +36,7 @@ RDEPEND="
 	media-libs/libpng:0=
 	net-dns/avahi
 	net-print/cups
+	sys-apps/dbus
 	x11-libs/libXrandr
 	x11-libs/libXtst
 	x11-libs/libnotify
