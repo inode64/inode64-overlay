@@ -56,7 +56,6 @@ src_prepare() {
 		plugins/cwm-plugin/quiche-native/win32-x86-64
 		plugins/gateway-plugin/lib/remote-dev-workers/{remote-dev-worker-darwin-amd64,remote-dev-worker-darwin-arm64,remote-dev-worker-linux-arm64,remote-dev-worker-windows-amd64.exe,remote-dev-worker-windows-arm64.exe}
 		plugins/remote-dev-server/selfcontained
-		plugins/tailwindcss/server/{fsevents-72LCIACT.node,node.napi.glibc-7JUDUCUY.node,node.napi.glibc-GXL6UBYG.node,node.napi.glibc-N3T2EEZH.node,node.napi.musl-IAP67VWK.node}
 		plugins/webp/lib/libwebp/linux/libwebp_jni.so
 	)
 
