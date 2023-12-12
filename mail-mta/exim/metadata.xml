@@ -50,7 +50,7 @@
 		<flag name="tpda">Adds support for Transport Post-Delivery Actions</flag>
 	</use>
 	<upstream>
-		<bugs-to>http://bugs.exim.org/</bugs-to>
+		<bugs-to>https://bugs.exim.org/</bugs-to>
 		<!-- stupid DTD doesn't allow this
 		<vcs>http://git.exim.org/exim.git</vcs>
 		-->

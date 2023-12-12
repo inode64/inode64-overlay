@@ -56,5 +56,5 @@ src_install() {
 
 pkg_postinst() {
 	elog "Sample configurations are available at:"
-	elog "http://mmonit.com/monit/documentation/"
+	elog "https://mmonit.com/monit/documentation/"
 }
