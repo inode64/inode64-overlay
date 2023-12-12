@@ -207,9 +207,7 @@ pkg_postinst() {
 	ewarn "run GlusterFS."
 	echo
 	elog "If you are upgrading from a previous version of ${PN}, please read:"
-	elog "  http://docs.gluster.org/en/latest/Upgrade-Guide/upgrade_to_$(ver_cut '1-2')/"
-
-	use emacs && elisp-site-regen
+	elog "  https://docs.gluster.org/en/latest/Upgrade-Guide/upgrade_to_$(ver_cut '1-2')/"	use emacs && elisp-site-regen
 }
 
 pkg_postrm() {

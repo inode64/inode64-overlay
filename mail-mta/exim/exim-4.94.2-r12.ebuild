@@ -644,7 +644,7 @@ pkg_postinst() {
 	if use dcc ; then
 		einfo "DCC support is experimental, you can find some limited"
 		einfo "documentation at the bottom of this prerelease message:"
-		einfo "  http://article.gmane.org/gmane.mail.exim.devel/3579"
+		einfo "  https://article.gmane.org/gmane.mail.exim.devel/3579"
 	fi
 	if use srs ; then
 		einfo "SRS support is experimental in this release of Exim"

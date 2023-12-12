@@ -151,7 +151,7 @@ pkg_postinst() {
 
 	if use x64-macos ; then
 		elog "You might want to install tuntaposx for TAP interface support:"
-		elog "http://tuntaposx.sourceforge.net"
+		elog "https://tuntaposx.sourceforge.net"
 	fi
 
 	if systemd_is_booted || has_version sys-apps/systemd ; then
