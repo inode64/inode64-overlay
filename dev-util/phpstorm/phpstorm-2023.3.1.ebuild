@@ -4,7 +4,7 @@
 EAPI=8
 inherit desktop wrapper xdg-utils
 
-MY_PV="233.11799.232"
+MY_PV="233.11799.297"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
@@ -52,11 +52,18 @@ src_prepare() {
 	local remove_me=(
 		help/ReferenceCardForMac.pdf
 		lib/async-profiler/aarch64
+		lib/async-profiler/amd64/dbghelp.dll
+		lib/async-profiler/amd64/jniSymbolsResolver.dll
+		lib/async-profiler/amd64/libasyncProfiler.dll
+		lib/async-profiler/amd64/symsrv.dll
+		lib/async-profiler/libasyncProfiler.dylib
 		plugins/cwm-plugin/quiche-native/darwin-aarch64
+		plugins/cwm-plugin/quiche-native/darwin-x86-64
 		plugins/cwm-plugin/quiche-native/linux-aarch64
 		plugins/cwm-plugin/quiche-native/win32-x86-64
 		plugins/gateway-plugin/lib/remote-dev-workers/{remote-dev-worker-darwin-amd64,remote-dev-worker-darwin-arm64,remote-dev-worker-linux-arm64,remote-dev-worker-windows-amd64.exe,remote-dev-worker-windows-arm64.exe}
 		plugins/platform-ijent-impl/ijent-aarch64-unknown-linux-musl-release
+		plugins/platform-ijent-impl/ijent-x86_64-unknown-linux-musl-release
 		plugins/remote-dev-server/selfcontained
 		plugins/webp/lib/libwebp/linux/libwebp_jni.so
 	)
