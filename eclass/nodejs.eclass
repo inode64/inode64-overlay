@@ -214,8 +214,11 @@ nodejs_remove_dev() {
         -iwholename '*.idea' -o \
         -iwholename '*.nyc_output' -o \
         -iwholename '*.deps' -o \
+        -iwholename '*/example' -o \
+        -iwholename '*/examples' -o \
         -iwholename '*/man' -o \
         -iwholename '*/test' -o \
+        -iwholename '*/tests' -o \
         -iwholename '*/scripts' -o \
         -iwholename '*/git-hooks' -o \
         -iwholename '*/prebuilds' -o \
