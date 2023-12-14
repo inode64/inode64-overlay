@@ -31,7 +31,7 @@ RDEPEND="
 NODEJS_EXTRA_FILES="scripts"
 
 pkg_pretend() {
-	if -e "${EROOT}/etc/env.d/90${PN}" && \
+	if [[ -e "${EROOT}/etc/env.d/90${PN}" ]] && \
 	    ! grep -q "CONFIG_PROTECT=\"/var/lib/${PN}\"" "${EROOT}/etc/env.d/90${PN}" 2>/dev/null; then
 		eerror "Bad CONFIG_PROTECT"
 		eerror "update ${EROOT}/etc/env.d/90${PN} to include CONFIG_PROTECT=\"/var/lib/${PN}\""
