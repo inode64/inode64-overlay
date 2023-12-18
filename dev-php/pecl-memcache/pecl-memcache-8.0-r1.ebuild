@@ -1,7 +1,8 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="7"
+EAPI=8
+
 PHP_EXT_NAME="memcache"
 PHP_EXT_INI="yes"
 PHP_EXT_ZENDEXT="no"
@@ -21,12 +22,7 @@ SLOT="8"
 IUSE="+session"
 
 DEPEND="
-	php_targets_php8-0? ( sys-libs/zlib )
-	php_targets_php8-1? ( sys-libs/zlib )
-"
-RDEPEND="${DEPEND}
-	php_targets_php7-3? ( dev-php/pecl-memcache:7[php_targets_php7-3(-)?] )
-	php_targets_php7-4? ( dev-php/pecl-memcache:7[php_targets_php7-4(-)?] )
+	sys-libs/zlib
 "
 
 # The test suite requires memcached to be running.
