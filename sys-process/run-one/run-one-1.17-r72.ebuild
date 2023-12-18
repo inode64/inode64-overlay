@@ -11,8 +11,6 @@ SRC_URI="https://bazaar.launchpad.net/~run-one/run-one/trunk/tarball/${MY_VER} -
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE=""
-DEPEND=""
 RDEPEND="${DEPEND}
 	sys-process/lsof
 "

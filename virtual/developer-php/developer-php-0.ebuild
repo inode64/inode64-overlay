@@ -12,7 +12,6 @@ RDEPEND="
 		dev-lang/php
 		dev-php/composer
 		dev-php/PHP_CodeSniffer
-		dev-php/phpmd
 		dev-php/xdebug
 		dev-ruby/sass
 		dev-util/uglifyjs

@@ -12,9 +12,7 @@ inherit git-r3 python-single-r1
 LICENSE="GPL-3+"
 SLOT="0"
 IUSE="+apache fail2ban mdadm bind ipmi"
-REQUIRED_USE=""
 EGIT_REPO_URI="https://github.com/librenms/${PN}"
-KEYWORDS=""
 
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
@@ -33,7 +31,6 @@ RDEPEND="
 	bind? ( dev-perl/File-ReadBackwards )
 	ipmi? ( || ( sys-libs/freeipmi sys-apps/ipmitool ) )
 "
-DEPEND=""
 
 LIBRENMS_AGENT="/usr/lib/check_mk_agent"
 
@@ -82,5 +79,4 @@ src_install() {
 
 	fperms +x ${LIBRENMS_AGENT}/snmp/*
 	fperms +x ${LIBRENMS_AGENT}/repo/*
-
 }

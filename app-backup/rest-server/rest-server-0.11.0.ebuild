@@ -14,10 +14,8 @@ SRC_URI="https://github.com/restic/rest-server/archive/v${PV}.tar.gz -> ${P}.tar
 LICENSE="BSD-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
 
 RDEPEND="app-admin/apache-tools"
-DEPEND=""
 
 src_prepare() {
 	default

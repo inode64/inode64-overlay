@@ -18,7 +18,6 @@ HOMEPAGE="https://github.com/sgallagher/sscg"
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE=""
 S="${WORKDIR}/${PN}-${P}"
 
 RDEPEND="

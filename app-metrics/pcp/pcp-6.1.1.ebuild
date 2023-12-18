@@ -10,7 +10,6 @@ HOMEPAGE="https://pcp.io"
 if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/performancecopilot/pcp.git"
-	SRC_URI=""
 else
 	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/performancecopilot/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"

@@ -27,7 +27,6 @@ RDEPEND="
 		dev-perl/Net-IP
 	)
 "
-DEPEND=""
 
 src_prepare() {
 	default

@@ -16,8 +16,6 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE=""
-DEPEND=""
 RDEPEND="${DEPEND}
 	app-admin/perl-cleaner
 	app-portage/gentoolkit

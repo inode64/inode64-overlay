@@ -1,0 +1,11 @@
+BDEPEND=sys-libs/libosinfo
+DEFINED_PHASES=install
+DESCRIPTION=This is the Cockpit user interface for virtual machines
+EAPI=8
+HOMEPAGE=https://cockpit-project.org/
+KEYWORDS=~amd64 ~x86
+LICENSE=LGPL-2.1
+RDEPEND=>=app-admin/cockpit-304 app-emulation/libvirt-dbus app-emulation/libvirt[firewalld,policykit] app-emulation/qemu[usbredir] app-emulation/virt-manager[policykit]
+SLOT=0
+SRC_URI=https://github.com/cockpit-project/cockpit-machines/releases/download/304/cockpit-machines-304.tar.xz
+_md5_=490ec7e6012c7360a96f70a45e35fdb8

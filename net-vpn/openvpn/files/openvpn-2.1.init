@@ -61,7 +61,7 @@ start() {
 	# If we are re-called by the openvpn gentoo-up.sh script
 	# then we don't actually want to start openvpn
 	[ "${IN_BACKGROUND}" = "true" ] && return 0
-	
+
 	ebegin "Starting ${SVCNAME}"
 
 	checkconfig || return 1
@@ -72,7 +72,7 @@ start() {
 	if ! grep -q "^[ 	]*cd[ 	].*" "${VPNCONF}" ; then
 		args="${args} --cd ${VPNDIR}"
 	fi
-	
+
 	# We mark the service as inactive and then start it.
 	# When we get an authenticated packet from the peer then we run our script
 	# which configures our DNS if any and marks us as up.

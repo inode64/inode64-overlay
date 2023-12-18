@@ -23,7 +23,6 @@ HOMEPAGE="https://github.com/gopro/gpr"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE=""
 
 src_install() {
 	dobin "${BUILD_DIR}"/source/app/gpr_tools/gpr_tools

@@ -1,0 +1,16 @@
+BDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) virtual/pkgconfig virtual/pkgconfig
+DEFINED_PHASES=compile install postinst test
+DEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) test? ( dev-lang/tcl:0= ssl? ( dev-tcltk/tls ) )
+DESCRIPTION=KeyDB is a high performance fork of Redis with a focus on multithreading
+EAPI=8
+HOMEPAGE=https://docs.keydb.dev/
+INHERIT=edo multiprocessing systemd tmpfiles toolchain-funcs
+IUSE=curl flash ssl systemd test
+KEYWORDS=~amd64 ~x86
+LICENSE=BSD
+RDEPEND=app-arch/lz4 app-arch/snappy app-arch/zstd curl? ( net-misc/curl ) ssl? ( dev-libs/openssl:0= ) systemd? ( sys-apps/systemd:= ) acct-group/keydb acct-user/keydb virtual/tmpfiles
+RESTRICT=!test? ( test )
+SLOT=0
+SRC_URI=https://github.com/Snapchat/KeyDB/archive/refs/tags/v6.3.4.tar.gz -> keydb-6.3.4.tar.gz
+_eclasses_=edo	c0eb9cbe6b0bd01fcb4918f12598a4d3	multiprocessing	30ead54fa2e2b5f9cd4e612ffc34d0fe	toolchain-funcs	eed10cf5e5a06916e654d31f5a1925cc	multilib	c19072c3cd7ac5cb21de013f7e9832e0	systemd	c8b03e8df84486aa991d4396686e8942	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f
+_md5_=d40c6fe43fa71cc5395931ea08dba973

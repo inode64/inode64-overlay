@@ -8,8 +8,8 @@ inherit autotools flag-o-matic systemd multilib
 PATCH_V="7.1.33bp"
 
 DESCRIPTION="The PHP language runtime engine"
-HOMEPAGE="https://secure.php.net/"
-SRC_URI="https://php.net/distributions/${P}.tar.xz
+HOMEPAGE="https://www.php.net/"
+SRC_URI="https://www.php.net/distributions/${P}.tar.xz
 	https://gitweb.gentoo.org/proj/php-patches.git/snapshot/php-patches-${PATCH_V}.tar.bz2"
 
 LICENSE="PHP-3.01

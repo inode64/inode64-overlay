@@ -10,7 +10,6 @@ HOMEPAGE="https://cockpit-project.org/"
 if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/cockpit-project/cockpit.git"
-	SRC_URI=""
 else
 	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/cockpit-project/${PN}/releases/download/${PV}/${P}.tar.xz"

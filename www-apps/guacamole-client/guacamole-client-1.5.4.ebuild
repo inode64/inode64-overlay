@@ -26,8 +26,8 @@ else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
 SRC_URI+="
-	https://inode64.com/dist/${P}-node_modules.tar.xz
-	https://inode64.com/dist/${P}-mvn.tar.xz
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz
+	https://www.inode64.com/dist/${P}-mvn.tar.xz
 	mysql? ( https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.0.33.tar.gz )
 	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
 	"
