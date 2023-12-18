@@ -17,7 +17,6 @@ KEYWORDS="~amd64 ~arm ~x86"
 DESCRIPTION="Provides support for CIFS/SMB via samba's libsmbclient library"
 LICENSE="BSD-2"
 SLOT="0"
-IUSE=""
 
 DEPEND="
 	net-fs/samba[client]

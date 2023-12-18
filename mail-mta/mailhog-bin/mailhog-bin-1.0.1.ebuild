@@ -10,7 +10,6 @@ SRC_URI="https://github.com/mailhog/MailHog/releases/download/v${PV}/MailHog_lin
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE=""
 
 S="${WORKDIR}"
 

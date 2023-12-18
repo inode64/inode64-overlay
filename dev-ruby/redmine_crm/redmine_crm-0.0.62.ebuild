@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-USE_RUBY="ruby30 ruby31"
+USE_RUBY="ruby30 ruby31 ruby32"
 
 RUBY_FAKEGEM_EXTRADOC="README.md doc/CHANGELOG"
 RUBY_FAKEGEM_EXTRAINSTALL="config"
@@ -16,7 +16,6 @@ HOMEPAGE="https://www.redminecrm.com/
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE=""
 
 ruby_add_rdepend "
 	    dev-ruby/actionpack

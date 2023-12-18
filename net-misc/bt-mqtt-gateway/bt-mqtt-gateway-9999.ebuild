@@ -10,16 +10,11 @@ inherit python-single-r1 git-r3
 # see scripts/download_import_cldr.py
 CLDR_PV=41.0
 DESCRIPTION="Bluetooth MQTT gateway"
-HOMEPAGE="
-	https://github.com/zewelor/bt-mqtt-gateway
-"
-SRC_URI="
-"
+HOMEPAGE="https://github.com/zewelor/bt-mqtt-gateway"
 EGIT_REPO_URI="https://github.com/zewelor/bt-mqtt-gateway.git"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS=""
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
@@ -48,9 +43,7 @@ pkg_setup() {
 
 src_install() {
 	python_optimize
-}
 
-src_install() {
 	insinto /opt/btmqttgateway
 	doins *.py logger.yaml config.yaml.example
 	insinto /opt/btmqttgateway/workers

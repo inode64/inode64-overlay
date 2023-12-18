@@ -12,9 +12,7 @@ SRC_URI="https://www.libvirt.org/sources/dbus/${P}.tar.xz"
 LICENSE="LGPL-2+"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
 
-DEPEND=""
 RDEPEND="${DEPEND}
 	sys-apps/dbus
 	sys-auth/polkit

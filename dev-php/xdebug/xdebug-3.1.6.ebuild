@@ -26,13 +26,10 @@ HOMEPAGE="https://xdebug.org/"
 SRC_URI="https://github.com/xdebug/xdebug/archive/${MY_PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="Xdebug"
 SLOT="0"
-IUSE=""
 
 # Tests are known to fail
 RESTRICT="test"
 
-DEPEND=""
-RDEPEND="${DEPEND}"
 DOCS=( README.rst CREDITS )
 PHP_EXT_ECONF_ARGS=()
 

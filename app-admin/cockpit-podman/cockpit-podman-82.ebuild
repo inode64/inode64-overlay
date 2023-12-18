@@ -16,12 +16,6 @@ fi
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-IUSE=""
-
-BDEPEND="
-"
-DEPEND="
-"
 
 RDEPEND="${DEPEND}
 	app-admin/cockpit
