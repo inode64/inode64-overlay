@@ -112,7 +112,7 @@ COMMON_DEPEND="
 	sodium? ( dev-libs/libsodium:=[-minimal] )
 	spell? ( >=app-text/aspell-0.50 )
 	sqlite? ( >=dev-db/sqlite-3.7.6.3 )
-	ssl? ( dev-libs/openssl )
+	ssl? ( dev-libs/openssl:= )
 	tidy? ( app-text/htmltidy )
 	tokyocabinet? ( dev-db/tokyocabinet )
 	truetype? ( =media-libs/freetype-2* )
