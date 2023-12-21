@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DESCRIPTION="Guacamole is a clientless remote desktop gateway"
+DESCRIPTION="Apache Guacamole is a clientless remote desktop gateway"
 HOMEPAGE="https://guacamole.apache.org/"
 
 # Download mvn and node_modules:
@@ -32,7 +32,7 @@ SRC_URI+="
 	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
 	"
 
-LICENSE="MIT"
+LICENSE="APACHE-2.0"
 SLOT="0"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
@@ -175,5 +175,12 @@ src_install() {
 	elog "See https://guacamole.apache.org/doc/gug/configuring-guacamole.html for a basic setup"
 	elog "or https://guacamole.apache.org/doc/gug/jdbc-auth.html for a database for authentication and host definitions."
 	elog
-	elog "Please install www-server/apache or www-server/nginx for a proxying Guacamole see: https://guacamole.apache.org/doc/gug/proxying-guacamole.html"
+	elog "Create new tomcat instance for guacamole (https://wiki.gentoo.org/wiki/Apache_Tomcat):"
+	elog "  /usr/share/tomcat-8.5/gentoo/tomcat-instance-manager.bash --create --suffix guacamole --user guacamole --group guacamole"
+	elog
+	elog "Link the war file:"
+	elog "  ln -sf /usr/share/guacamole-client/guacamole.war /var/lib/tomcat-8.5-guacamole/webapps/"
+	elog
+	elog "Please install www-server/apache or www-server/nginx for a proxying Guacamole and update /etc/tomcat-8.5-guacamole/server.xml see:"
+	elog "  https://guacamole.apache.org/doc/gug/reverse-proxy.html"
 }
