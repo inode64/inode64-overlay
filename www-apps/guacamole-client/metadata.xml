@@ -16,4 +16,11 @@
 		and provides an API that drives it. This API can be used to power
 		other similar applications or services.
 	</longdescription>
+	<use>
+		<flag name="sso">Single-Sign-On authentication</flag>
+		<flag name="totp">TOTP two-factor authentication</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">apache/guacamole-client</remote-id>
+	</upstream>
 </pkgmetadata>
