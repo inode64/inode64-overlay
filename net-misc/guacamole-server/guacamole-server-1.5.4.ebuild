@@ -16,7 +16,7 @@ else
 fi
 
 KEYWORDS="~amd64 ~x86"
-LICENSE="APACHE-2.0"
+LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
 RESTRICT="!test? ( test )"
