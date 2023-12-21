@@ -32,7 +32,7 @@ SRC_URI+="
 	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
 	"
 
-LICENSE="APACHE-2.0"
+LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
