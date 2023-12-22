@@ -9,7 +9,6 @@ DESCRIPTION="ITACA administrative management of centers"
 HOMEPAGE="https://ceice.gva.es/webitaca/es/index.asp"
 SRC_URI="https://lliurex.net/focal/pool/main/i/itaca/${PN}_${PV}_amd64.deb"
 RESTRICT="mirror strip"
-IUSE=""
 RDEPEND="
 		app-accessibility/at-spi2-core
 		dev-libs/nss

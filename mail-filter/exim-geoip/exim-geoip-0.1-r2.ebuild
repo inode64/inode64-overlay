@@ -8,13 +8,11 @@ inherit autotools flag-o-matic git-r3
 DESCRIPTION="MaxMind GeoIP2 dlfunc for Exim"
 HOMEPAGE="https://dist.epipe.com/exim/
 	https://github.com/andrewnimmo/exim-geoipv6-dlfunc"
-SRC_URI=""
 EGIT_REPO_URI="https://github.com/andrewnimmo/exim-geoipv6-dlfunc"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
 
 DEPEND="dev-libs/libmaxminddb:=
 	mail-mta/exim[dlfunc]"
