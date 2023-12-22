@@ -15,7 +15,6 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND=""
 DOCS="NOTICE.txt README.md"
 
 S="${WORKDIR}/${MY_P}"

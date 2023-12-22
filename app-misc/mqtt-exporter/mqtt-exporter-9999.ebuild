@@ -28,8 +28,6 @@ RDEPEND="
 	dev-python/paho-mqtt
 	dev-python/prometheus_client
 "
-BDEPEND="
-"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
