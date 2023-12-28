@@ -10,7 +10,7 @@ PHP_EXT_NEEDED_USE="session(-)?"
 DOCS=( README example.php )
 HTML_DOCS=( memcache.php )
 
-USE_PHP="php7-3 php7-4 php8-1"
+USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3"
 
 inherit php-ext-pecl-r3
 
@@ -29,33 +29,21 @@ DEPEND="
 RESTRICT='test'
 PATCHES=( "${FILESDIR}/8.0-patches-20211123.patch" )
 
-src_prepare() {
-	if use php_targets_php8-1 ; then
-		php-ext-source-r3_src_prepare
-	else
-		default
-	fi
-}
-
 src_configure() {
-	if use php_targets_php8-1 ; then
-		local PHP_EXT_ECONF_ARGS=( --enable-memcache --with-zlib-dir="${EPREFIX}/usr" $(use_enable session memcache-session) )
-		php-ext-source-r3_src_configure
-	fi
+	local PHP_EXT_ECONF_ARGS=( --enable-memcache --with-zlib-dir="${EPREFIX}/usr" $(use_enable session memcache-session) )
+	php-ext-source-r3_src_configure
 }
 
 src_install() {
-	if use php_targets_php8-1 ; then
-		php-ext-pecl-r3_src_install
+  php-ext-pecl-r3_src_install
 
-		php-ext-source-r3_addtoinifiles "memcache.allow_failover" "true"
-		php-ext-source-r3_addtoinifiles "memcache.max_failover_attempts" "20"
-		php-ext-source-r3_addtoinifiles "memcache.chunk_size" "32768"
-		php-ext-source-r3_addtoinifiles "memcache.default_port" "11211"
-		php-ext-source-r3_addtoinifiles "memcache.hash_strategy" "consistent"
-		php-ext-source-r3_addtoinifiles "memcache.hash_function" "crc32"
-		php-ext-source-r3_addtoinifiles "memcache.redundancy" "1"
-		php-ext-source-r3_addtoinifiles "memcache.session_redundancy" "2"
-		php-ext-source-r3_addtoinifiles "memcache.protocol" "ascii"
-	fi
+  php-ext-source-r3_addtoinifiles "memcache.allow_failover" "true"
+  php-ext-source-r3_addtoinifiles "memcache.max_failover_attempts" "20"
+  php-ext-source-r3_addtoinifiles "memcache.chunk_size" "32768"
+  php-ext-source-r3_addtoinifiles "memcache.default_port" "11211"
+  php-ext-source-r3_addtoinifiles "memcache.hash_strategy" "consistent"
+  php-ext-source-r3_addtoinifiles "memcache.hash_function" "crc32"
+  php-ext-source-r3_addtoinifiles "memcache.redundancy" "1"
+  php-ext-source-r3_addtoinifiles "memcache.session_redundancy" "2"
+  php-ext-source-r3_addtoinifiles "memcache.protocol" "ascii"
 }
