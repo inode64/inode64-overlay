@@ -8,7 +8,7 @@ PHP_EXT_INI="yes"
 PHP_EXT_ZENDEXT="no"
 DOCS=( README.md )
 
-USE_PHP="php7-4 php8-1 php8-2"
+USE_PHP="php7-4 php8-1 php8-2 php8-3"
 
 inherit php-ext-pecl-r3
 

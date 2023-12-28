@@ -6,7 +6,7 @@ EAPI=8
 PHP_EXT_INI="yes"
 PHP_EXT_NAME="apcu"
 PHP_EXT_ZENDEXT="no"
-USE_PHP="php7-3 php7-4 php8-1 php8-2"
+USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3"
 
 inherit php-ext-pecl-r3
 
@@ -26,16 +26,6 @@ REQUIRED_USE="^^ ( $LUSE )"
 
 DOCS=( NOTICE README.md TECHNOTES.txt )
 
-src_prepare() {
-	php-ext-source-r3_src_prepare
-
-	# Remove broken tests from php 7.4 due to trivial output differences
-	if use php_targets_php7-4 ; then
-		php_init_slot_env "php7.4"
-		rm "${PHP_EXT_S}"/tests/apc_entry_00{2,3}.phpt || die
-	fi
-}
-
 src_configure() {
 	local PHP_EXT_ECONF_ARGS=(
 		--enable-apcu
@@ -52,11 +42,22 @@ src_configure() {
 src_install() {
 	php-ext-pecl-r3_src_install
 
-	insinto /usr/share/php7/apcu
-	doins apc.php
+	if use php_targets_php7-3 || use php_targets_php7-4; then
+		insinto /usr/share/php7/apcu
+		doins apc.php
+	fi
+	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3; then
+		insinto /usr/share/php8/apcu
+		doins apc.php
+	fi
 }
 
 pkg_postinst() {
 	elog "The apc.php file shipped with this release of pecl-apcu"
-	elog "was installed to ${EPREFIX}/usr/share/php7/apcu/."
+	if use php_targets_php7-3 || use php_targets_php7-4; then
+		elog "was installed to ${EPREFIX}/usr/share/php7/apcu/."
+	fi
+	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3; then
+		elog "was installed to ${EPREFIX}/usr/share/php8/apcu/."
+	fi
 }

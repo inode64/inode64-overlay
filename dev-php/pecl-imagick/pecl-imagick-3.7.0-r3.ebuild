@@ -4,7 +4,7 @@
 EAPI=8
 
 PHP_EXT_NAME="imagick"
-USE_PHP="php5-6 php7-3 php7-4 php8-1 php8-2"
+USE_PHP="php5-6 php7-3 php7-4 php8-1 php8-2 php8-3"
 
 # https://github.com/Imagick/imagick/issues/626
 PHP_EXT_NEEDED_USE="-debug"
@@ -23,8 +23,12 @@ RESTRICT="!test? ( test )"
 # imagemagick[-openmp] is needed wrt bug 547922 and upstream
 # https://github.com/Imagick/imagick#openmp
 RDEPEND="media-gfx/imagemagick"
-DEPEND="${RDEPEND}
-	test? ( media-gfx/imagemagick:=[hdri,jpeg,png,svg,truetype,xml] )"
+DEPEND="
+	${RDEPEND}
+	test? ( media-gfx/imagemagick:=[hdri,jpeg,png,svg,truetype,xml] )
+"
+
+PATCHES="${FILESDIR}/${PN}-3.7.0-php8.3.patch"
 
 PHP_EXT_ECONF_ARGS="--with-imagick=${EPREFIX}/usr"
 
