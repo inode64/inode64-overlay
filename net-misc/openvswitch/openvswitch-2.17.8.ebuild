@@ -3,10 +3,9 @@
 
 EAPI=8
 
-MODULES_OPTIONAL_USE="modules"
 PYTHON_COMPAT=( python3_{9..11} )
 
-inherit autotools linux-mod python-single-r1 systemd tmpfiles
+inherit autotools linux-info python-single-r1 systemd tmpfiles
 
 DESCRIPTION="Production quality, multilayer virtual switch"
 HOMEPAGE="https://www.openvswitch.org"
@@ -15,7 +14,7 @@ SRC_URI="https://www.openvswitch.org/releases/${P}.tar.gz"
 LICENSE="Apache-2.0 GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
-IUSE="debug modules monitor +ssl unwind valgrind xdp"
+IUSE="debug monitor +ssl unwind valgrind xdp"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 # Check python/ovs/version.py in tarball for dev-python/ovs dep
@@ -42,19 +41,9 @@ PATCHES=(
 	"${FILESDIR}/xcp-interface-reconfigure-2.3.2.patch"
 )
 
-CONFIG_CHECK="~NET_CLS_ACT ~NET_CLS_U32 ~NET_SCH_INGRESS ~NET_ACT_POLICE ~IPV6 ~TUN"
-MODULE_NAMES="openvswitch(net:${S}/datapath/linux)"
-BUILD_TARGETS="all"
+CONFIG_CHECK="~IPV6 ~NET_ACT_POLICE ~NET_CLS_ACT ~NET_CLS_U32 ~NET_SCH_INGRESS ~OPENVSWITCH ~TUN"
 
 pkg_setup() {
-	if use modules ; then
-		CONFIG_CHECK+=" ~!OPENVSWITCH"
-		kernel_is ge 3 10 0 || die "Linux >= 3.10.0 and <= 5.8 required for userspace modules"
-		kernel_is le 5 8 999 || die "Linux >= 3.10.0 and <= 5.8 required for userspace modules"
-	else
-		CONFIG_CHECK+=" ~OPENVSWITCH"
-	fi
-
 	if use xdp ; then
 		CONFIG_CHECK+=" ~BPF ~BPF_JIT ~BPF_SYSCALL ~HAVE_BPF_JIT ~XDP_SOCKETS"
 	fi
@@ -65,21 +54,15 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	# Never build kernelmodules, doing this manually
-	sed -i \
-		-e '/^SUBDIRS/d' \
-		datapath/Makefile.in || die "sed failed"
-
 	eautoreconf
 }
 
 src_configure() {
-	set_arch_to_kernel
 	python_setup
 
 	# monitor is statically enabled for bug #596206
 	# use monitor || export ovs_cv_python="no"
-	# pyside is staticly disabled
+	# pyside is statically disabled
 	export ovs_cv_pyuic4="no"
 
 	# flake8 is primarily a style guide tool, running it as part of the tests
@@ -92,13 +75,10 @@ src_configure() {
 
 	export ac_cv_header_valgrind_valgrind_h=$(usex valgrind)
 
-	local linux_config
-	use modules && linux_config="--with-linux=${KV_OUT_DIR}"
-
 	export ac_cv_lib_unwind_unw_backtrace="$(usex unwind)"
 
 	# Need PYTHON3 variable for bug #860240
-	PYTHON3="${PYTHON}" CONFIG_SHELL="${BROOT}"/bin/bash SHELL="${BROOT}"/bin/bash econf ${linux_config} \
+	PYTHON3="${PYTHON}" CONFIG_SHELL="${BROOT}"/bin/bash SHELL="${BROOT}"/bin/bash econf \
 		--with-rundir=/run/openvswitch \
 		--with-logdir=/var/log/openvswitch \
 		--with-pkidir=/etc/ssl/openvswitch \
@@ -108,14 +88,10 @@ src_configure() {
 		$(use_enable xdp afxdp)
 }
 
-src_compile() {
-	default
-
-	use modules && linux-mod_src_compile
-}
-
 src_install() {
 	default
+
+	find "${ED}/usr" -name '*.la' -delete || die
 
 	local SCRIPT
 	if use monitor; then
@@ -149,13 +125,9 @@ src_install() {
 
 	insinto /etc/logrotate.d
 	newins rhel/etc_logrotate.d_openvswitch openvswitch
-
-	use modules && linux-mod_src_install
 }
 
 pkg_postinst() {
-	use modules && linux-mod_pkg_postinst
-
 	tmpfiles_process openvswitch.conf
 
 	# Only needed on non-systemd, but helps anyway
