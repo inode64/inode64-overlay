@@ -10,4 +10,4 @@ RDEPEND=net-libs/nodejs:=
 SLOT=0
 SRC_URI=https://github.com/Unitech/pm2/archive/5.3.0.tar.gz -> pm2-5.3.0.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/pm2-5.3.0-node_modules.tar.xz
 _eclasses_=nodejs	61abf5050a25bc38bdd14f44e68dee1d	nodejs-mod	90a3f284265e99b489c9657ef05165ad	toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	systemd	c8b03e8df84486aa991d4396686e8942
-_md5_=88a74e5c679d3893b6a18bca3d6bafe0
+_md5_=6b2565a7d8dfd589b6a0d880d94cca3e

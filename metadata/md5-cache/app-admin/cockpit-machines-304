@@ -8,4 +8,4 @@ LICENSE=LGPL-2.1
 RDEPEND=>=app-admin/cockpit-304 app-emulation/libvirt-dbus app-emulation/libvirt[firewalld,policykit] app-emulation/qemu[usbredir] app-emulation/virt-manager[policykit]
 SLOT=0
 SRC_URI=https://github.com/cockpit-project/cockpit-machines/releases/download/304/cockpit-machines-304.tar.xz
-_md5_=490ec7e6012c7360a96f70a45e35fdb8
+_md5_=e8fc39969f691cb5d5bd8e9f5b8d0def

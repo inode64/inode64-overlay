@@ -4,4 +4,4 @@ EAPI=8
 KEYWORDS=~amd64
 RDEPEND=|| ( dev-util/pycharm-community dev-util/pycharm-professional app-editors/vscode ) dev-python/flake8 dev-python/pip
 SLOT=0
-_md5_=9b60ae396cb2c8218b79e616215e3772
+_md5_=5cdc6ad56f3bf95ba95297ac181704ee
