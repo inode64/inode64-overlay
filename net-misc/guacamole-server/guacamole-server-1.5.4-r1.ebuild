@@ -16,7 +16,7 @@ else
 fi
 
 KEYWORDS="~amd64 ~x86"
-LICENSE="MIT"
+LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
 RESTRICT="!test? ( test )"
@@ -43,7 +43,7 @@ DEPEND="${RDEPEND}
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
-	rdp? ( net-misc/freerdp )
+	rdp? ( net-misc/freerdp:= )
 	ssh? (
 		net-libs/libssh2
 		x11-libs/pango
