@@ -65,7 +65,7 @@ DEPEND="${RDEPEND}
 		dev-util/cunit
 	)
 "
-BDEPEND="rdp? ( <net-misc/freerdp-3 )
+BDEPEND="rdp? ( <net-misc/freerdp-3 )"
 
 src_prepare() {
 	default
