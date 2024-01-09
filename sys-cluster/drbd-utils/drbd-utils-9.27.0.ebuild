@@ -114,8 +114,6 @@ src_install() {
 	keepdir /var/lib/drbd
 	rm -r "${ED}"/var/run || die
 
-	newtmpfiles scripts/drbd.tmpfiles.conf drbd.conf
-
 	# bug #698304
 	dodir /lib/drbd
 	local i
