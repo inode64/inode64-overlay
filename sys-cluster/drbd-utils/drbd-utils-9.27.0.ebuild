@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit autotools bash-completion-r1 linux-info tmpfiles udev
+inherit autotools bash-completion-r1 flag-o-matic linux-info tmpfiles udev
 
 DESCRIPTION="mirror/replicate block-devices across a network-connection"
 HOMEPAGE="https://linbit.com/drbd/"
@@ -12,15 +12,16 @@ S="${WORKDIR}/${P/_/}"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 x86"
-IUSE="83support +84support pacemaker split-usr systemd +udev xen"
+KEYWORDS="~amd64 ~x86"
+IUSE="83support +84support pacemaker +udev xen"
 
 DEPEND="
+	sys-apps/keyutils
 	pacemaker? ( sys-cluster/pacemaker )
 	udev? ( virtual/udev )
 "
 RDEPEND="${DEPEND}"
-BDEPEND="sys-devel/flex"
+BDEPEND="app-alternatives/lex"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-9.23.1-respect-flags.patch
@@ -70,8 +71,18 @@ src_prepare() {
 }
 
 src_configure() {
+	# -Werror=lto-type-mismatch, bug #863728
+	# https://github.com/LINBIT/drbd-utils/issues/40
+	filter-lto
+
 	local myeconfargs=(
 		--localstatedir="${EPREFIX}"/var
+		# don't autodetect systemd/sysv; install systemd and use our own openrc
+		--with-initscripttype=systemd
+		# only used for systemdunitdir and for udevdir; the latter breaks
+		# merged-usr interop
+		PKG_CONFIG=/bin/false
+		--with-systemdunitdir="${EPREFIX}"/usr/lib/systemd/system
 		--with-bashcompletion
 		--with-distro=gentoo
 		--with-prebuiltman
@@ -79,7 +90,6 @@ src_configure() {
 		$(use_with 83support)
 		$(use_with 84support)
 		$(use_with pacemaker)
-		$(usex systemd --with-initscripttype=systemd --with-initscripttype=none)
 		$(use_with udev)
 		$(use_with xen)
 	)
