@@ -60,8 +60,8 @@ src_unpack() {
 		unpack ${P}.tar.gz
 	fi
 
-	unpack ${P}-node_modules.tar.xz
-	unpack ${P}-mvn.tar.xz
+	unpack ${PF}-node_modules.tar.xz
+	unpack ${PF}-mvn.tar.xz
 
 	if use mysql; then
 		unpack mysql-connector-j-8.0.33.tar.gz
