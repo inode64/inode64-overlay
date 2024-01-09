@@ -26,8 +26,8 @@ else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
 SRC_URI+="
-	https://www.inode64.com/dist/${P}-node_modules.tar.xz
-	https://www.inode64.com/dist/${P}-mvn.tar.xz
+	https://www.inode64.com/dist/${PF}-node_modules.tar.xz
+	https://www.inode64.com/dist/${PF}-mvn.tar.xz
 	mysql? ( https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.0.33.tar.gz )
 	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
 	"
@@ -36,7 +36,7 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
-BDEPEND="dev-java/maven-bin"
+BDEPEND=">=dev-java/maven-bin-3.9.6"
 RDEPEND="
 	ldap? ( net-nds/openldap )
 	virtual/jre:11
