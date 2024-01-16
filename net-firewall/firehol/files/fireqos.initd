@@ -21,7 +21,7 @@ start() {
 	checkrules || return 1
 	ebegin "Starting FireQOS"
 		/usr/sbin/fireqos start ${FIREQOS_CONF} -- ${FIREQOS_EXTRA_ARGS} > /dev/null
-	eend $? 
+	eend $?
 }
 
 stop() {
@@ -31,10 +31,10 @@ stop() {
 }
 
 restart() {
-        ebegin "Restarting FireQOS"
-                svc_stop;
-                svc_start;
-        eend $?
+	ebegin "Restarting FireQOS"
+		svc_stop;
+		svc_start;
+	eend $?
 }
 
 status() {

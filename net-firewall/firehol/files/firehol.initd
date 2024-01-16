@@ -25,7 +25,7 @@ start() {
 	checkrules || return 1
 	ebegin "Starting FireHOL"
 		/usr/sbin/firehol ${FIREHOL_CONF} start > /dev/null
-	eend $? 
+	eend $?
 }
 
 stop() {
@@ -35,10 +35,10 @@ stop() {
 }
 
 restart() {
-        ebegin "Restarting Firewall"
-                svc_stop;
-                svc_start;
-        eend $?
+	ebegin "Restarting Firewall"
+		svc_stop;
+		svc_start;
+	eend $?
 }
 
 try() {

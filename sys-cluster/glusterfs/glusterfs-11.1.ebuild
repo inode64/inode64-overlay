@@ -66,8 +66,8 @@ DEPEND="
 	)
 "
 BDEPEND="
-	app-alternatives/lex
 	sys-devel/bison
+	sys-devel/flex
 	virtual/pkgconfig
 "
 
