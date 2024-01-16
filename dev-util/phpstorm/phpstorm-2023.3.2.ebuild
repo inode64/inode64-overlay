@@ -18,7 +18,7 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror"
-IUSE="30bits"
+IUSE="30bits server"
 
 RDEPEND="
 	app-arch/brotli
@@ -41,6 +41,10 @@ RDEPEND="
 	x11-libs/libXtst
 	x11-libs/libnotify
 	x11-libs/pango
+	server? (
+		sys-libs/libselinux
+		sys-process/audit
+	)
 "
 
 S="${WORKDIR}/${MY_PN}-${MY_PV}"
@@ -64,9 +68,12 @@ src_prepare() {
 		plugins/gateway-plugin/lib/remote-dev-workers/{remote-dev-worker-darwin-amd64,remote-dev-worker-darwin-arm64,remote-dev-worker-linux-arm64,remote-dev-worker-windows-amd64.exe,remote-dev-worker-windows-arm64.exe}
 		plugins/platform-ijent-impl/ijent-aarch64-unknown-linux-musl-release
 		plugins/platform-ijent-impl/ijent-x86_64-unknown-linux-musl-release
-		plugins/remote-dev-server/selfcontained
 		plugins/webp/lib/libwebp/linux/libwebp_jni.so
 	)
+
+	if ! use server; then
+		remove_me+=( plugins/remote-dev-server/selfcontained )
+	fi
 
 	rm -rv "${remove_me[@]}" || die
 
