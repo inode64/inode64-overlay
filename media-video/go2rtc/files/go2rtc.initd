@@ -1,16 +1,18 @@
 #!/sbin/openrc-run
 
+GO2NAME="${SVCNAME#*.}"
+
 name="go2rtc"
 description="Camera streaming application"
 command="/usr/bin/go2rtc"
-command_args="-config /etc/go2rtc/go2rtc.yaml"
+command_args="-config /etc/go2rtc/${GO2NAME}.yaml"
 command_background=true
 pidfile="/run/$RC_SVCNAME.pid"
 command_user="go2rtc:go2rtc"
 supervisor=supervise-daemon
 
-output_log="/var/log/go2rtc/go2rtc.log"
-error_log="/var/log/go2rtc/go2rtc.log"
+output_log="/var/log/go2rtc/${GO2NAME}.log"
+error_log="/var/log/go2rtc/${GO2NAME}.log"
 
 depend() {
     need net
