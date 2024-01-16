@@ -16,5 +16,6 @@
 		<flag name="30bits">Support on 30 bits color display.
 			(https://youtrack.jetbrains.com/issue/IDEA-241795/Not-working-on-30-bit-color-displays)
 		</flag>
+		<flag name="server">Support for server selfcontained.</flag>
 	</use>
 </pkgmetadata>
