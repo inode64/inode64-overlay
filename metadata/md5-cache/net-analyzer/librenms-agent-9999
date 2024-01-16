@@ -10,5 +10,5 @@ PROPERTIES=live
 RDEPEND=python_single_target_python3_10? ( dev-lang/python:3.10 ) python_single_target_python3_11? ( dev-lang/python:3.11 ) python_single_target_python3_12? ( dev-lang/python:3.12 ) app-admin/hddtemp sys-apps/ethtool app-admin/sudo dev-python/distro sys-apps/xinetd net-analyzer/net-snmp[elf,lm-sensors,mfd-rewrites,netlink,pci] apache? ( dev-python/pycurl dev-perl/libwww-perl ) fail2ban? ( dev-perl/JSON ) mdadm? ( dev-perl/JSON ) bind? ( dev-perl/File-ReadBackwards ) ipmi? ( || ( sys-libs/freeipmi sys-apps/ipmitool ) )
 REQUIRED_USE=^^ ( python_single_target_python3_10 python_single_target_python3_11 python_single_target_python3_12 )
 SLOT=0
-_eclasses_=git-r3	86fa1f157b70b9d2ff340c4633b1cf4b	multiprocessing	30ead54fa2e2b5f9cd4e612ffc34d0fe	toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	python-utils-r1	474cb53a7d1b62721a91809a1d702661	python-single-r1	75118e916668a74c660a13b0ecb22562
+_eclasses_=git-r3	86fa1f157b70b9d2ff340c4633b1cf4b	multiprocessing	30ead54fa2e2b5f9cd4e612ffc34d0fe	toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	python-utils-r1	042f4cc53680245bf99a84669b94155a	python-single-r1	75118e916668a74c660a13b0ecb22562
 _md5_=08412b62220cd7cd74da738cabe9b71a

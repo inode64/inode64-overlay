@@ -30,7 +30,7 @@ RDEPEND="${PYTHON_DEPS}
 DEPEND="${RDEPEND}
 	sys-apps/lsb-release
 	sys-apps/util-linux[caps]
-	valgrind? ( dev-util/valgrind )
+	valgrind? ( dev-debug/valgrind )
 	xdp? ( net-libs/xdp-tools )"
 BDEPEND="virtual/pkgconfig
 	${PYTHON_DEPS}

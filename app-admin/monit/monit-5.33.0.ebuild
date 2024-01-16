@@ -21,8 +21,8 @@ RDEPEND="sys-libs/zlib:=
 "
 DEPEND="${RDEPEND}"
 BDEPEND="
-	sys-devel/bison
-	sys-devel/flex
+	app-alternatives/yacc
+	app-alternatives/lex
 "
 
 src_prepare() {
