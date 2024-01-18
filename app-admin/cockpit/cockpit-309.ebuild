@@ -30,6 +30,7 @@ BDEPEND="
 	>=sys-auth/polkit-0.105[systemd]
 	doc? (
 		app-text/xmlto
+		dev-util/gtk-doc
 	)
 "
 DEPEND="
