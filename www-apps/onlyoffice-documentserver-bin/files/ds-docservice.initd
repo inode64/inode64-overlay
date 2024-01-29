@@ -12,5 +12,5 @@ pidfile="/run/ds-docservice.pid"
 
 depend() {
 	use net
-	need ds-metrics rabbitmq
+	need ds-converter ds-metrics postgresql rabbitmq redis
 }
