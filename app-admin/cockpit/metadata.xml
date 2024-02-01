@@ -14,6 +14,7 @@
         <flag name="firewalld">Enables support for manage firewall</flag>
         <flag name="pcp">Enables support for system performance and analysis</flag>
         <flag name="tuned">Enables support for change performance profiles</flag>
+        <flag name="old-bridge">use the old bridge written in C instead of the new one with Python</flag>
     </use>
     <upstream>
         <remote-id type="github">cockpit-project/cockpit</remote-id>
