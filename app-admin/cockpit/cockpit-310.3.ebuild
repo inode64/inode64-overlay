@@ -19,9 +19,9 @@ SRC_URI="${SRC_URI} https://www.gentoo.org/assets/img/logo/gentoo-logo.png"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="debug doc firewalld +networkmanager old-bridge pcp selinux test tuned udisks"
+IUSE="debug doc firewalld +networkmanager pcp selinux test tuned udisks"
 
-REQUIRED_USE="old-bridge? ( ${PYTHON_REQUIRED_USE} )"
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RESTRICT="!test? ( test )"
 
 BDEPEND="
@@ -36,14 +36,12 @@ BDEPEND="
 		app-text/xmlto
 		dev-util/gtk-doc
 	)
-	!old-bridge? (
-		${PYTHON_DEPS}
-		dev-python/pip
-		test? (
-			dev-python/pytest-asyncio
-			dev-python/pytest-cov
-			dev-python/pytest-timeout
-		)
+	${PYTHON_DEPS}
+	dev-python/pip
+	test? (
+		dev-python/pytest-asyncio
+		dev-python/pytest-cov
+		dev-python/pytest-timeout
 	)
 "
 DEPEND="
@@ -67,9 +65,7 @@ DEPEND="
 		sys-apps/tuned
 	)
 	virtual/libcrypt:=
-	!old-bridge? (
-		${PYTHON_DEPS}
-	)
+	${PYTHON_DEPS}
 "
 
 RDEPEND="${DEPEND}
@@ -101,7 +97,6 @@ src_configure() {
 		$(use_enable debug)
 		$(use_enable pcp)
 		$(use_enable doc)
-		$(use_enable old-bridge)
 		--with-pamdir="/$(get_libdir)/security"
 		--with-cockpit-user=cockpit-ws
 		--with-cockpit-ws-instance-user=cockpit-wsinstance
@@ -114,7 +109,7 @@ src_configure() {
 src_install() {
 	default
 
-	use old-bridge || python_optimize
+	python_optimize
 
 	if ! use selinux; then
 		rm -rf "${ED}"/usr/share/cockpit/selinux
