@@ -5,7 +5,7 @@ EAPI=7
 
 DISTUTILS_USE_PEP517=setuptools
 DISTUTILS_SINGLE_IMPL=1
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{10..12} )
 
 inherit linux-info udev xdg distutils-r1
 
@@ -16,7 +16,7 @@ if [[ ${PV} =~ 9999* ]]; then
 	EGIT_REPO_URI="https://github.com/pwr-Solaar/Solaar"
 else
 	SRC_URI="https://github.com/pwr-Solaar/Solaar/archive/${PV/_rc/rc}.tar.gz -> ${P/_rc/rc}.tar.gz"
-	KEYWORDS="amd64 ~arm ~arm64 x86"
+	KEYWORDS="~amd64 ~arm ~x86"
 	S="${WORKDIR}"/Solaar-${PV/_rc/rc}
 fi
 
@@ -27,9 +27,9 @@ IUSE="doc appindicator libnotify"
 RDEPEND="
 	acct-group/plugdev
 	$(python_gen_cond_dep '
+		dev-python/evdev[${PYTHON_USEDEP}]
 		dev-python/psutil[${PYTHON_USEDEP}]
 		dev-python/pygobject:3[${PYTHON_USEDEP}]
-		dev-python/python-evdev[${PYTHON_USEDEP}]
 		dev-python/python-xlib[${PYTHON_USEDEP}]
 		>=dev-python/pyudev-0.13[${PYTHON_USEDEP}]
 		dev-python/pyyaml[${PYTHON_USEDEP}]
