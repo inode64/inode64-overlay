@@ -5,7 +5,7 @@
  	@# This needs to work on RHEL8 up through modern Fedora, offline, with
  	@# system packages available to the build.
 -	python3 -m pip install --no-index --force-reinstall --root='$(DESTDIR)/' --prefix='$(prefix)' \
-+	python3 -m pip install --no-index --root='$(DESTDIR)/' --prefix='$(prefix)' \
++	python3 -m pip install --no-index --ignore-installed --root='$(DESTDIR)/' --prefix='$(prefix)' \
  		"$$(python3 '$(srcdir)'/src/build_backend.py --wheel '$(srcdir)' tmp/wheel)"
  	mkdir -p $(DESTDIR)$(libexecdir)
 -	mv -t $(DESTDIR)$(libexecdir) $(DESTDIR)$(bindir)/cockpit-askpass
