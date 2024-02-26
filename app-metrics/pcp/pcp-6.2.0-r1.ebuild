@@ -3,6 +3,7 @@
 
 EAPI=8
 PYTHON_COMPAT=( python3_{10..12} )
+DISTUTILS_USE_PEP517=setuptools
 inherit python-single-r1 tmpfiles
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
@@ -21,7 +22,11 @@ IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx n
 DOC="CHANGELOG README.md INSTALL.md"
 
 REQUIRED_USE="
-	${PYTHON_REQUIRED_USE}
+	influxdb? ( ${PYTHON_REQUIRED_USE} )
+	json? ( ${PYTHON_REQUIRED_USE} )
+	libvirt? ( ${PYTHON_REQUIRED_USE} )
+	postgres? ( ${PYTHON_REQUIRED_USE} )
+	xls? ( ${PYTHON_REQUIRED_USE} )
 "
 BDEPEND="
 	X? ( x11-libs/libXt )
@@ -117,7 +122,13 @@ src_install() {
 	emake DIST_ROOT="${D}" install
 	use influxdb || use json || use libvirt || use postgres || use xls && python_optimize
 
-	rm -rf "${D}/var/lib/pcp/testsuite"
+	rm -rf "${D}/var/lib/pcp/testsuite" || die
+	rm -rf "${D}/var/log" || die
+	rm -rf "${D}/run" || die
+
+	dotmpfiles "${FILESDIR}"/${PN}.conf
+
+	mv -vnT "${ED}"/usr/share/doc/pcp-doc/" ${ED}"/usr/share/doc/pcp/html || die
 }
 
 pkg_postinst() {
