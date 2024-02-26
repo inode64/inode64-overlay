@@ -122,13 +122,19 @@ src_install() {
 	emake DIST_ROOT="${D}" install
 	use influxdb || use json || use libvirt || use postgres || use xls && python_optimize
 
-	rm -rf "${D}/var/lib/pcp/testsuite" || die
-	rm -rf "${D}/var/log" || die
-	rm -rf "${D}/run" || die
+	find "${D}" -type f -name '*.la' -delete || die
+	find "${D}" -type f -name '*.a' -delete || die
+
+	rm -rf "${D}"/var/lib/pcp/testsuite || die
+	rm -r "${D}"/var/lib/pcp/pmcd || die
+	rm -r "${D}"/var/lib/pcp/config/{pmchart,pmda,pmie} || die
+	rm -rf "${D}"/var/lib/pcp/tmp || die
+	rm -rf "${D}"/var/log || die
+	rm -rf "${D}"/run || die
 
 	dotmpfiles "${FILESDIR}"/${PN}.conf
 
-	mv -vnT "${ED}"/usr/share/doc/pcp-doc/" ${ED}"/usr/share/doc/pcp/html || die
+	mv -vnT "${ED}"/usr/share/doc/pcp-doc "${ED}/usr/share/doc/pcp-${PVR}" || die
 }
 
 pkg_postinst() {
