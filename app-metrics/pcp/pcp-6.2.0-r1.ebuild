@@ -102,7 +102,6 @@ src_configure() {
 		$(use_with qt5 qt)
 		$(use_with selinux)
 		$(use_with snmp pmdasnmp)
-		$(use_with systemd)
 		$(use_with threads)
 		$(use_with X x)
 	)
