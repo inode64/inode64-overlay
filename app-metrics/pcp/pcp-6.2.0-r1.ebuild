@@ -3,7 +3,7 @@
 
 EAPI=8
 PYTHON_COMPAT=( python3_{10..12} )
-inherit python-single-r1
+inherit python-single-r1 tmpfiles
 
 DESCRIPTION="Performance Co-Pilot, system performance and analysis framework"
 HOMEPAGE="https://pcp.io"
@@ -17,19 +17,19 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp systemd +threads X xls"
+IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 "
 BDEPEND="
+	X? ( x11-libs/libXt )
+	dev-libs/libuv
 	discovery? ( net-dns/avahi[dbus] )
 	doc? ( app-text/xmlto )
 	qt5? ( dev-qt/qtsvg:5 )
-	systemd? ( sys-apps/systemd )
-	X? ( x11-libs/libXt )
-	dev-libs/libuv
+	sys-apps/systemd
 "
 
 DEPEND="
@@ -77,7 +77,7 @@ RDEPEND="${DEPEND}
 "
 
 pkg_setup() {
-	use influxdb || use libvirt || use json || use postgres || use xls && python-single-r1_pkg_setup
+	use influxdb || use json || use libvirt || use postgres || use xls && python-single-r1_pkg_setup
 }
 
 src_prepare() {
@@ -88,9 +88,10 @@ src_prepare() {
 src_configure() {
 	local myconf=(
 		"--localstatedir=${EPREFIX}/var"
+		"--with-sysconfigdir=${EPREFIX}/etc/conf.d"
+		"--with-systemd"
 		"--without-dstat-symlink"
 		"--without-python"
-		"--with-sysconfigdir=${EPREFIX}/etc/conf.d"
 		$(use_enable pie)
 		$(use_enable ssp)
 		$(use_with discovery)
@@ -115,25 +116,25 @@ src_compile() {
 
 src_install() {
 	emake DIST_ROOT="${D}" install
-	use influxdb || use libvirt || use json || use postgres || use xls && python_optimize
+	use influxdb || use json || use libvirt || use postgres || use xls && python_optimize
 
 	rm -rf "${D}/var/lib/pcp/testsuite"
 }
 
 pkg_postinst() {
-	if use systemd; then
-		elog ""
-		elog "To install basic PCP tools and services and enable collecting performance data on systemd based distributions, run:"
-		elog " - systemctl enable --now pmcd pmlogger"
-		elog ""
-		elog "To install pmfind to begin monitoring discovered metric sources, run:"
-		elog " - systemctl enable --now pmfind"
-		elog ""
-		elog "To enable and start PMIE:"
-		elog " - systemctl enable --now pmie"
-		elog ""
-		elog "To enable and start metrics series collection:"
-		elog "- systemctl enable --now pmlogger pmproxy redis"
-		elog ""
-	fi
+	tmpfiles_process pcp.conf
+
+	elog ""
+	elog "To install basic PCP tools and services and enable collecting performance data on systemd based distributions, run:"
+	elog " - systemctl enable --now pmcd pmlogger"
+	elog ""
+	elog "To install pmfind to begin monitoring discovered metric sources, run:"
+	elog " - systemctl enable --now pmfind"
+	elog ""
+	elog "To enable and start PMIE:"
+	elog " - systemctl enable --now pmie"
+	elog ""
+	elog "To enable and start metrics series collection:"
+	elog "- systemctl enable --now pmlogger pmproxy redis"
+	elog ""
 }
