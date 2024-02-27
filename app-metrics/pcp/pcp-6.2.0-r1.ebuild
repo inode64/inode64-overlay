@@ -119,22 +119,23 @@ src_compile() {
 }
 
 src_install() {
-	emake DIST_ROOT="${D}" install
+	emake DIST_ROOT="${ED}" install
 	use influxdb || use json || use libvirt || use postgres || use xls && python_optimize
 
-	find "${D}" -type f -name '*.la' -delete || die
-	find "${D}" -type f -name '*.a' -delete || die
-
-	rm -rf "${D}"/var/lib/pcp/testsuite || die
-	rm -r "${D}"/var/lib/pcp/pmcd || die
-	rm -r "${D}"/var/lib/pcp/config/{pmchart,pmda,pmie} || die
-	rm -rf "${D}"/var/lib/pcp/tmp || die
-	rm -rf "${D}"/var/log || die
-	rm -rf "${D}"/run || die
+	find "${ED}" -type f -name '*.la' -delete || die
+	find "${ED}" -type f -name '*.a' -delete || die
+	find "${ED}/usr/share/man" -type f -name "*.bz2" -exec bunzip2 {} + || die
 
 	dotmpfiles "${FILESDIR}"/${PN}.conf
+	mv -vnT "${ED}"/usr/share/doc/pcp-doc/html "${ED}/usr/share/doc/pcp-${PVR}/html" || die
 
-	mv -vnT "${ED}"/usr/share/doc/pcp-doc "${ED}/usr/share/doc/pcp-${PVR}" || die
+	rm -rf "${ED}"/var/lib/pcp/testsuite || die
+	rm -r "${ED}"/var/lib/pcp/pmcd || die
+	rm -r "${ED}"/var/lib/pcp/config/{pmchart,pmda,pmie} || die
+	rm -rf "${ED}"/var/lib/pcp/tmp || die
+	rm -r "${ED}"/usr/share/doc/pcp-doc || die
+	rm -rf "${ED}"/var/log || die
+	rm -rf "${ED}"/run || die
 }
 
 pkg_postinst() {
