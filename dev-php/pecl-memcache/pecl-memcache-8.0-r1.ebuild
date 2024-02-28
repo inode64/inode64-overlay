@@ -35,15 +35,15 @@ src_configure() {
 }
 
 src_install() {
-  php-ext-pecl-r3_src_install
+	php-ext-pecl-r3_src_install
 
-  php-ext-source-r3_addtoinifiles "memcache.allow_failover" "true"
-  php-ext-source-r3_addtoinifiles "memcache.max_failover_attempts" "20"
-  php-ext-source-r3_addtoinifiles "memcache.chunk_size" "32768"
-  php-ext-source-r3_addtoinifiles "memcache.default_port" "11211"
-  php-ext-source-r3_addtoinifiles "memcache.hash_strategy" "consistent"
-  php-ext-source-r3_addtoinifiles "memcache.hash_function" "crc32"
-  php-ext-source-r3_addtoinifiles "memcache.redundancy" "1"
-  php-ext-source-r3_addtoinifiles "memcache.session_redundancy" "2"
-  php-ext-source-r3_addtoinifiles "memcache.protocol" "ascii"
+	php-ext-source-r3_addtoinifiles "memcache.allow_failover" "true"
+	php-ext-source-r3_addtoinifiles "memcache.max_failover_attempts" "20"
+	php-ext-source-r3_addtoinifiles "memcache.chunk_size" "32768"
+	php-ext-source-r3_addtoinifiles "memcache.default_port" "11211"
+	php-ext-source-r3_addtoinifiles "memcache.hash_strategy" "consistent"
+	php-ext-source-r3_addtoinifiles "memcache.hash_function" "crc32"
+	php-ext-source-r3_addtoinifiles "memcache.redundancy" "1"
+	php-ext-source-r3_addtoinifiles "memcache.session_redundancy" "2"
+	php-ext-source-r3_addtoinifiles "memcache.protocol" "ascii"
 }
