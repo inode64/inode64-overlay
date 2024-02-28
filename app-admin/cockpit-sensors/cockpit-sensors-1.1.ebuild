@@ -10,7 +10,7 @@ if [[ ${PV} == 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/ocristopfer/cockpit-sensors.git"
 else
 	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://github.com/ocristopfer/${PN}/releases/download/v${PV}/cockpit-sensors.tar.xz -> ${P}.gh.tar.xz"
+	SRC_URI="https://github.com/ocristopfer/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
 LICENSE="LGPL-2.1"
