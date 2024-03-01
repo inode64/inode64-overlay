@@ -79,10 +79,6 @@ RDEPEND="${DEPEND}
 	virtual/krb5
 "
 
-PATCHES=(
-	"${FILESDIR}/pip_install.patch"
-)
-
 src_prepare() {
 	default
 
