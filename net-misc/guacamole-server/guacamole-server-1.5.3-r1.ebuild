@@ -15,9 +15,9 @@ else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
 fi
 
-KEYWORDS="~amd64 ~x86"
 LICENSE="MIT"
 SLOT="0"
+KEYWORDS="~amd64 ~x86"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
 RESTRICT="!test? ( test )"
 

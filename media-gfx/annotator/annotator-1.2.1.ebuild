@@ -8,6 +8,7 @@ DESCRIPTION="Image annotation for Elementary OS"
 HOMEPAGE="https://github.com/phase1geo/Annotator"
 SRC_URI="https://github.com/phase1geo/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
+S="${WORKDIR}/Annotator-${PV}"
 LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
@@ -27,8 +28,6 @@ BDEPEND="
 	virtual/pkgconfig
 	gui-libs/libhandy:1[vala]
 "
-
-S="${WORKDIR}/Annotator-${PV}"
 
 src_configure() {
 	export VALAC="$(type -P valac-$(vala_best_api_version))"

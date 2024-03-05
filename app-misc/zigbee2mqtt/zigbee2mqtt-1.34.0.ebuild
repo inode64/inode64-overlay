@@ -3,6 +3,13 @@
 
 EAPI=8
 
+
+inherit nodejs-mod systemd tmpfiles
+
+DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
+HOMEPAGE="https://www.zigbee2mqtt.io/"
+COMMIT="9996c931e25a0a3e72d9bb1aa89ed9c36eec8a89"
+
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/Koenkk/zigbee2mqtt"
 	EGIT_BRANCH="dev"
@@ -11,12 +18,6 @@ else
 	SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz
 		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
-
-inherit nodejs-mod systemd tmpfiles
-
-DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
-HOMEPAGE="https://www.zigbee2mqtt.io/"
-COMMIT="9996c931e25a0a3e72d9bb1aa89ed9c36eec8a89"
 
 LICENSE="0BSD Apache-2.0 BSD-2 CC-BY-4.0 GPL-3 ISC MIT PYTHON"
 SLOT="0"

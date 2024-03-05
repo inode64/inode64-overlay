@@ -4,11 +4,16 @@
 EAPI=8
 inherit desktop unpacker xdg
 
-KEYWORDS="~amd64"
 DESCRIPTION="ITACA administrative management of centers"
 HOMEPAGE="https://ceice.gva.es/webitaca/es/index.asp"
 SRC_URI="https://lliurex.net/focal/pool/main/i/itaca/${PN}_${PV}_amd64.deb"
+
+S="${WORKDIR}"
+LICENSE="Itaca"
+SLOT="0"
+KEYWORDS="~amd64"
 RESTRICT="mirror strip"
+
 RDEPEND="
 		app-accessibility/at-spi2-core
 		dev-libs/nss
@@ -20,11 +25,6 @@ RDEPEND="
 		x11-libs/libnotify
 		x11-libs/libxcb
 "
-
-LICENSE="Itaca"
-SLOT="0"
-
-S="${WORKDIR}"
 
 src_install() {
 	insinto /usr/$(get_libdir)

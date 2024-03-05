@@ -5,6 +5,30 @@ EAPI="7"
 
 inherit db-use toolchain-funcs pam systemd
 
+SDIR=$([[ ${PV} == *_rc* ]]   && echo /test
+	 [[ ${PV} == *.*.*.* ]] && echo /fixes)
+COMM_URI="https://downloads.exim.org/exim4${SDIR}"
+
+DESCRIPTION="A highly configurable, drop-in replacement for sendmail"
+HOMEPAGE="https://www.exim.org/"
+SRC_URI="${COMM_URI}/${P//_rc/-RC}.tar.xz
+	mirror://gentoo/system_filter.exim.gz
+	doc? ( ${COMM_URI}/${PN}-pdf-${PV//_rc/-RC}.tar.xz )"
+
+S=${WORKDIR}/${P//_rc/-RC}
+LICENSE="GPL-2"
+SLOT="0"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+
+# NOTE on USE="gnutls dane", gnutls[dane] is masked in base, unmasked
+# for x86 and amd64 only, due to this, repoman won't allow depending on
+# gnutls[dane] for all else.  Because we cannot express USE=dane when
+# USE=gnutls is in effect only in package.use.mask, the only option we
+# have left is to a) ignore the dependency (but that results in bug
+# #661164) or b) mask the usage of USE=dane with USE=gnutls.  Both are
+# incorrect, but b) is the only "correct" view from repoman.
+# We cannot express a required use for berkdb/gdbm/tdb correctly because
+# berkdb and gdbm are both enabled in base profile
 IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc +dnsdb doc dovecot-sasl
 dsn exiscan-acl gdbm gnutls idn ipv6 ldap lmtp maildir mbx
 mysql nis pam perl pkcs11 postgres +prdr proxy radius redis sasl selinux
@@ -23,29 +47,6 @@ REQUIRED_USE="
 	)
 	|| ( berkdb gdbm tdb )
 "
-# NOTE on USE="gnutls dane", gnutls[dane] is masked in base, unmasked
-# for x86 and amd64 only, due to this, repoman won't allow depending on
-# gnutls[dane] for all else.  Because we cannot express USE=dane when
-# USE=gnutls is in effect only in package.use.mask, the only option we
-# have left is to a) ignore the dependency (but that results in bug
-# #661164) or b) mask the usage of USE=dane with USE=gnutls.  Both are
-# incorrect, but b) is the only "correct" view from repoman.
-# We cannot express a required use for berkdb/gdbm/tdb correctly because
-# berkdb and gdbm are both enabled in base profile
-
-SDIR=$([[ ${PV} == *_rc* ]]   && echo /test
-	 [[ ${PV} == *.*.*.* ]] && echo /fixes)
-COMM_URI="https://downloads.exim.org/exim4${SDIR}"
-
-DESCRIPTION="A highly configurable, drop-in replacement for sendmail"
-SRC_URI="${COMM_URI}/${P//_rc/-RC}.tar.xz
-	mirror://gentoo/system_filter.exim.gz
-	doc? ( ${COMM_URI}/${PN}-pdf-${PV//_rc/-RC}.tar.xz )"
-HOMEPAGE="https://www.exim.org/"
-
-SLOT="0"
-LICENSE="GPL-2"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 COMMON_DEPEND=">=sys-apps/sed-4.0.5
 	dev-libs/libpcre:=
@@ -109,8 +110,6 @@ RDEPEND="${COMMON_DEPEND}
 	dcc? ( mail-filter/dcc )
 	selinux? ( sec-policy/selinux-exim )
 	"
-
-S=${WORKDIR}/${P//_rc/-RC}
 
 src_prepare() {
 	default

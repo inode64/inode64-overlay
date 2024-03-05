@@ -11,13 +11,12 @@ DESCRIPTION="Lightweight shipper for metrics"
 HOMEPAGE="https://www.elastic.co/es/beats/metricbeat"
 SRC_URI="https://artifacts.elastic.co/downloads/beats/${MY_PN}/${MY_P}.tar.gz"
 
+S="${WORKDIR}/${MY_P}"
 LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64"
 
 DOCS="NOTICE.txt README.md"
-
-S="${WORKDIR}/${MY_P}"
 
 src_compile() {
 	default

@@ -17,7 +17,6 @@ HOMEPAGE="https://guacamole.apache.org/"
 # tar --create --auto-compress --file guacamole-client-1.5.3-mvn.tar.xz guacamole-client-1.5.3/.m2
 # tar --create --auto-compress --file guacamole-client-1.5.3-node_modules.tar.xz guacamole-client-1.5.3/guacamole/src/main/frontend/node_modules
 
-KEYWORDS="~amd64 ~x86"
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/apache/guacamole-client.git"
@@ -34,6 +33,7 @@ SRC_URI+="
 
 LICENSE="MIT"
 SLOT="0"
+KEYWORDS="~amd64 ~x86"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
 BDEPEND="dev-java/maven-bin"

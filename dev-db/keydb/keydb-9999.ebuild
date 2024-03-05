@@ -7,7 +7,6 @@ MY_PN="KeyDB"
 
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
-
 inherit edo git-r3 multiprocessing systemd tmpfiles toolchain-funcs
 
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"

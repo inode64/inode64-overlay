@@ -16,6 +16,7 @@ fi
 
 LICENSE="GPL-3+"
 SLOT="0"
+
 IUSE="amqp apache2 ipmi ldap nginx postgres radius redis"
 REQUIRED_USE="^^ ( apache2 nginx )"
 

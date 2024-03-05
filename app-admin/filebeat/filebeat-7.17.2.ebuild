@@ -1809,13 +1809,12 @@ HOMEPAGE="https://www.elastic.co/products/beats"
 SRC_URI="https://github.com/elastic/beats/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	${EGO_SUM_SRC_URI}"
 
+S="${WORKDIR}/beats-${PV}"
 LICENSE="Apache-2.0 BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="test"
 BDEPEND="dev-util/mage"
-
-S="${WORKDIR}/beats-${PV}"
 
 src_prepare() {
 	default

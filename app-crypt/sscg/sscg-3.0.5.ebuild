@@ -5,6 +5,9 @@ EAPI=8
 
 inherit meson
 
+DESCRIPTION="Simple Signed Certificate Generator"
+HOMEPAGE="https://github.com/sgallagher/sscg"
+
 if [[ ${PV} == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/sgallagher/sscg.git"
@@ -13,12 +16,9 @@ else
 	KEYWORDS="~amd64 ~x86"
 fi
 
-DESCRIPTION="Simple Signed Certificate Generator"
-HOMEPAGE="https://github.com/sgallagher/sscg"
-
+S="${WORKDIR}/${PN}-${P}"
 LICENSE="GPL-3"
 SLOT="0"
-S="${WORKDIR}/${PN}-${P}"
 
 RDEPEND="
 	sys-libs/talloc

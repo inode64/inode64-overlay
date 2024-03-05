@@ -8,12 +8,12 @@ MY_P=${PN}-${PV%_p*}
 DESCRIPTION="AWStats is short for Advanced Web Statistics"
 HOMEPAGE="https://www.awstats.org/"
 SRC_URI="https://www.awstats.org/files/${P}.tar.gz"
+
 S=${WORKDIR}/${MY_P}
 LICENSE="GPL-3"
+SLOT="0"
 KEYWORDS="~amd64 ~riscv ~x86"
 IUSE="geoip2 ipv6"
-
-SLOT="0"
 
 RDEPEND="
 	>=dev-lang/perl-5.6.1
@@ -27,6 +27,8 @@ RDEPEND="
 		dev-perl/Net-IP
 	)
 "
+HTML_DOCS="docs/"
+DOCS="README.md"
 
 src_prepare() {
 	default
@@ -62,9 +64,6 @@ src_prepare() {
 
 	eapply_user
 }
-
-HTML_DOCS="docs/"
-DOCS="README.md"
 
 src_install() {
 	einstalldocs

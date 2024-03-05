@@ -11,4 +11,4 @@ RDEPEND=net-firewall/iptables sys-apps/iproute2[-minimal,ipv6(+)?] sys-apps/kmod
 SLOT=0
 SRC_URI=https://github.com/firehol/firehol/releases/download/v3.1.6/firehol-3.1.6.tar.xz
 _eclasses_=toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	linux-info	c4f1201b96a8a2c1f3b86cc8b2c71c91	optfeature	222cb475c5a4f7ae7cfb0bf510a6fe54
-_md5_=e8201840e0c5288ceb5950744a230348
+_md5_=963eed2f094c9a5202f947bc7d511ce6

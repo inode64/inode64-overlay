@@ -11,4 +11,4 @@ RDEPEND=dev-php/composer amqp? ( dev-php/pecl-amqp ) app-admin/sudo >=dev-lang/p
 REQUIRED_USE=^^ ( apache2 nginx )
 SLOT=0
 SRC_URI=https://github.com/librenms/librenms/archive/24.2.0.tar.gz -> librenms-24.2.0.tar.gz
-_md5_=c5c7e38a129fd496282ac066172bce12
+_md5_=3abf5133ecdf7dfc5ce0ed707909830b
