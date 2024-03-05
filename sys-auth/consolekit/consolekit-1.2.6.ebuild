@@ -11,6 +11,7 @@ DESCRIPTION="Framework for defining and tracking users, login sessions and seats
 HOMEPAGE="https://github.com/ConsoleKit2/ConsoleKit2 https://www.freedesktop.org/wiki/Software/ConsoleKit/"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 
+S=${WORKDIR}/${MY_P}
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
@@ -43,8 +44,6 @@ DEPEND="${COMMON_DEPEND}
 		app-text/docbook-xml-dtd:4.1.2
 		app-text/xmlto
 		)"
-
-S=${WORKDIR}/${MY_P}
 
 QA_MULTILIB_PATHS="usr/lib/ConsoleKit/.*"
 

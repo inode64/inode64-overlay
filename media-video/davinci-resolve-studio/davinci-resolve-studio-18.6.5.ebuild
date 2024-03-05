@@ -64,12 +64,16 @@ LIBS_SYM="
 	Fairlight Studio Utility/libdns_sd.so.1
 "
 
-KEYWORDS="~amd64"
 DESCRIPTION="Professional A/V post-production software suite from Blackmagic Design"
 HOMEPAGE="https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
 SRC_URI="${PKG_NAME}.zip"
-RESTRICT="mirror strip test"
+
+S="${WORKDIR}"
+LICENSE="Blackmagic"
+SLOT="0"
+KEYWORDS="~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
+RESTRICT="mirror strip test"
 
 DEPEND="
 	app-arch/brotli
@@ -130,10 +134,6 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND="app-arch/unzip"
 
-LICENSE="Blackmagic"
-SLOT="0"
-
-S="${WORKDIR}"
 QA_PREBUILT="*"
 
 include_dir() {

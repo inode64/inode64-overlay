@@ -10,10 +10,12 @@ inherit distutils-r1 pypi
 
 DESCRIPTION="A simple Python tool to transfer data from SQLite 3 to MySQL"
 HOMEPAGE="https://github.com/techouse/sqlite3-to-mysql"
+
 LICENSE="MIT"
-RESTRICT="test"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
+RESTRICT="test"
+
 DOCS="CHANGELOG.md"
 
 RDEPEND=">=dev-python/click-8.1.3[${PYTHON_USEDEP}]

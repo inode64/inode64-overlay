@@ -8,6 +8,9 @@ DISTUTILS_USE_PEP517=setuptools
 
 inherit distutils-r1
 
+DESCRIPTION="Backup utility for libvirt kvm / qemu with incremental backup support via NBD"
+HOMEPAGE="https://github.com/abbbi/virtnbdbackup"
+
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/abbbi/virtnbdbackup.git"
 	inherit git-r3
@@ -15,9 +18,6 @@ else
 	SRC_URI="https://github.com/abbbi/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
-
-DESCRIPTION="Backup utility for libvirt kvm / qemu with incremental backup support via NBD"
-HOMEPAGE="https://github.com/abbbi/virtnbdbackup"
 
 LICENSE="GPL-3"
 SLOT="0"

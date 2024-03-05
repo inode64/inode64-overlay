@@ -3,16 +3,16 @@
 
 EAPI=8
 
-DESCRIPTION="a fully featured network monitoring system"
-HOMEPAGE="https://www.librenms.org"
-
 PYTHON_COMPAT=( python3_{10..12} )
 inherit git-r3 python-single-r1
+
+DESCRIPTION="a fully featured network monitoring system"
+HOMEPAGE="https://www.librenms.org"
+EGIT_REPO_URI="https://github.com/librenms/${PN}"
 
 LICENSE="GPL-3+"
 SLOT="0"
 IUSE="+apache fail2ban mdadm bind ipmi"
-EGIT_REPO_URI="https://github.com/librenms/${PN}"
 
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}

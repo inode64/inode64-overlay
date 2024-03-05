@@ -13,6 +13,7 @@ else
 	SRC_URI="https://github.com/ocristopfer/${PN}/releases/download/${PV}/${PN}.tar.xz -> ${P}.tar.xz"
 fi
 
+S="${WORKDIR}/${PN}"
 LICENSE="LGPL-2.1"
 SLOT="0"
 
@@ -20,8 +21,6 @@ RDEPEND="${DEPEND}
 	app-admin/cockpit
 	sys-apps/lm-sensors
 "
-
-S="${WORKDIR}/${PN}"
 
 src_install() {
 	emake DESTDIR="${D}" PREFIX="${EPREFIX}/usr" install

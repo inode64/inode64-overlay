@@ -11,11 +11,10 @@ USE_PHP="php5-6"
 
 inherit php-ext-pecl-r3
 
-KEYWORDS="~amd64 ~arm64 ~x86"
-
 DESCRIPTION="Stripped down version of APC supporting only user cache"
 LICENSE="PHP-3.01"
 SLOT="0"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="+mmap"
 
 LOCKS="pthreadmutex pthreadrw spinlock semaphore"

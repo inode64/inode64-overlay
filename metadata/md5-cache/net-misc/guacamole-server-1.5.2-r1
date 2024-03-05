@@ -14,4 +14,4 @@ RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.5.2/source/guacamole-server-1.5.2.tar.gz
 _eclasses_=toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	systemd	c8b03e8df84486aa991d4396686e8942	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f
-_md5_=41553df79c947110c3f6a8bb962ef8ec
+_md5_=6b6bd84457f0e8421559a13dbf61ea44

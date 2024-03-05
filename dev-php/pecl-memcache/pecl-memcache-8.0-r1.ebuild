@@ -14,11 +14,10 @@ USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3"
 
 inherit php-ext-pecl-r3
 
-KEYWORDS="~amd64 ~hppa ~ppc64 ~x86"
-
 DESCRIPTION="PHP extension for using memcached"
 LICENSE="PHP-3"
 SLOT="8"
+KEYWORDS="~amd64 ~hppa ~ppc64 ~x86"
 IUSE="+session"
 
 DEPEND="

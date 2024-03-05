@@ -8,12 +8,11 @@ inherit linux-mod
 DESCRIPTION="The kernel module component of VDO which provides pools of deduplicated and/or compressed block storage."
 HOMEPAGE="https://github.com/dm-vdo/kvdo"
 SRC_URI="https://github.com/dm-vdo/kvdo/archive/${PV}.tar.gz -> ${P}.tar.gz"
-S=${WORKDIR}/kvdo-${PV}
 
+S=${WORKDIR}/kvdo-${PV}
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
-
 BDEPEND="dev-libs/elfutils"
 
 CONFIG_CHECK="LZ4_COMPRESS LZ4_DECOMPRESS"
