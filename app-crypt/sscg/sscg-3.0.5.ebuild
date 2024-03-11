@@ -30,11 +30,4 @@ BDEPEND="
 	sys-apps/help2man
 "
 
-src_configure() {
-	local emesonargs=(
-		--buildtype plain
-	)
-	meson_src_configure
-}
-
 DOCS=( README.md )
