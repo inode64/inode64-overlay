@@ -9,7 +9,6 @@ inherit distutils-r1 pypi
 
 DESCRIPTION="Python wrapper for the Cloudflare v4 API"
 HOMEPAGE="https://pypi.org/project/cloudflare/"
-S="${WORKDIR}/python-${P}"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
@@ -22,13 +21,11 @@ PROPERTIES="test_network" #actually sends a test request
 
 distutils_enable_tests pytest
 
-python_prepare_all() {
+src_prepare() {
 	# don't install tests or examples
-	sed -i -e "s/'cli4', 'examples'/'cli4'/" \
-		-e "s#'CloudFlare/tests',##" \
-		setup.py || die
+	sed -i -e "s|, 'examples'||" -e "s|'CloudFlare/tests', ||" setup.py || die
 
-	distutils-r1_python_prepare_all
+	distutils-r1_src_prepare
 }
 
 python_test() {
@@ -53,7 +50,7 @@ python_test() {
 
 	# Not sure what permissions/tokens/whatever this test needs, maybe both a token and old api login
 	# tried several of the ssl related options for the cert test but no luck either
-	# Tried several of the prefex related options to try to get loa docs working but nope
+	# Tried several of the prefix related options to try to get loa docs working but nope
 	local EPYTEST_IGNORE+=(
 		'test_images_v2_direct_upload.py'
 		'test_issue114.py' 'test_certificates.py'
@@ -64,12 +61,12 @@ python_test() {
 	# maybe needs a paid plan or just some unknown permission
 	local EPYTEST_DESELECT=(
 		'test_load_balancers.py::test_load_balancers_list_regions'
-		'test_load_balancers_get_regions'
-		'test_load_balancers.py::test_load_balancers_search'
 		'test_load_balancers.py::test_load_balancers_pools'
+		'test_load_balancers.py::test_load_balancers_search'
+		'test_load_balancers_get_regions'
+		'test_rulesets.py::test_zones_ruleset_delete'
 		'test_rulesets.py::test_zones_ruleset_post'
 		'test_rulesets.py::test_zones_rulesets_get_specific'
-		'test_rulesets.py::test_zones_ruleset_delete'
 	)
 
 	epytest
