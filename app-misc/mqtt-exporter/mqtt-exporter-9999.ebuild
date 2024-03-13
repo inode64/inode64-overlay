@@ -3,19 +3,17 @@
 
 EAPI=8
 
+PYTHON_COMPAT=( python3_{10..12} )
+inherit python-single-r1 systemd
+
+DESCRIPTION="Simple and generic Prometheus exporter for MQTT"
+HOMEPAGE="https://github.com/kpetremann/mqtt-exporter"
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/kpetremann/mqtt-exporter"
 	inherit git-r3
 else
 	SRC_URI="https://github.com/kpetremann/mqtt-exporter/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
-
-PYTHON_COMPAT=( python3_{10..12} )
-
-inherit python-single-r1 systemd
-
-DESCRIPTION="Simple and generic Prometheus exporter for MQTT"
-HOMEPAGE="https://github.com/kpetremann/mqtt-exporter"
 
 LICENSE="MIT"
 SLOT="0"

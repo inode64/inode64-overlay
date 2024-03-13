@@ -7,11 +7,10 @@ DESCRIPTION="Runs an SMTP server, catches and displays email in a web interface.
 HOMEPAGE="https://github.com/mailhog/MailHog/"
 SRC_URI="https://github.com/mailhog/MailHog/releases/download/v${PV}/MailHog_linux_amd64 -> ${P}.bin"
 
+S="${WORKDIR}"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-
-S="${WORKDIR}"
 
 src_unpack() {
 	return

@@ -11,6 +11,7 @@ inherit linux-info udev xdg distutils-r1
 
 DESCRIPTION="Linux Device Manager for Logitech Unifying Receivers and Paired Devices"
 HOMEPAGE="https://pwr-solaar.github.io/Solaar/"
+
 if [[ ${PV} =~ 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/pwr-Solaar/Solaar"

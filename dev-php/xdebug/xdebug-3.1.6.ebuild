@@ -13,21 +13,18 @@ PHP_EXT_NEEDED_USE="-threads(-)"
 MY_PV="${PV/_/}"
 MY_PV="${MY_PV/rc/RC}"
 
-S="${WORKDIR}/${PN}-${MY_PV}"
-
 inherit php-ext-source-r3
-
-KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
 
 DESCRIPTION="A PHP debugging and profiling extension"
 HOMEPAGE="https://xdebug.org/"
 # Using tarball from GitHub for tests
 #SRC_URI="https://pecl.php.net/get/${PN}-${MY_PV}.tgz"
 SRC_URI="https://github.com/xdebug/xdebug/archive/${MY_PV}.tar.gz -> ${P}.tar.gz"
+
+S="${WORKDIR}/${PN}-${MY_PV}"
 LICENSE="Xdebug"
 SLOT="0"
-
-# Tests are known to fail
+KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
 RESTRICT="test"
 
 DOCS=( README.rst CREDITS )

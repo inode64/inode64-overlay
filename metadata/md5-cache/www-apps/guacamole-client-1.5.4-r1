@@ -11,4 +11,4 @@ REQUIRED_USE=|| ( mysql postgres )
 RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://mirrors.ircam.fr/pub/apache/guacamole/1.5.4/source/guacamole-client-1.5.4.tar.gz https://www.inode64.com/dist/guacamole-client-1.5.4-r1-node_modules.tar.xz https://www.inode64.com/dist/guacamole-client-1.5.4-r1-mvn.tar.xz mysql? ( https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.0.33.tar.gz ) postgres? ( https://jdbc.postgresql.org/download/postgresql-42.6.0.jar )
-_md5_=cc0582cf490a995a75ec80acb813c3e4
+_md5_=fa5ef34e20187ae9af43a6333c060ecd

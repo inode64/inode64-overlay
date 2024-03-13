@@ -15,6 +15,7 @@ HOMEPAGE="
 "
 SRC_URI="https://files.pythonhosted.org/packages/e9/27/e6c4ed83f23b2825b4bbee1881be0872f7714fc6663046c884ad0d3f804b/${P}.tar.gz"
 
+S="${WORKDIR}/${P}"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
@@ -24,5 +25,3 @@ DEPEND="
 	dev-python/cryptography[${PYTHON_USEDEP}]
 "
 RDEPEND="${DEPEND}"
-
-S="${WORKDIR}/${P}"

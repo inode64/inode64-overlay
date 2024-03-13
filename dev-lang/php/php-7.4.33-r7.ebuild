@@ -7,6 +7,8 @@ WANT_AUTOMAKE="none"
 
 inherit flag-o-matic systemd autotools multilib
 
+PHP_MV="$(ver_cut 1)"
+
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
 SRC_URI="https://www.php.net/distributions/${P}.tar.xz"
@@ -18,8 +20,8 @@ LICENSE="PHP-3.01
 	fpm? ( BSD-2 )
 	gd? ( gd )
 	unicode? ( BSD-2 LGPL-2.1 )"
-
 SLOT="$(ver_cut 1-2)"
+
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos"
 
 # We can build the following SAPIs in the given order
@@ -140,7 +142,6 @@ DEPEND="${COMMON_DEPEND}
 
 BDEPEND="virtual/pkgconfig"
 
-PHP_MV="$(ver_cut 1)"
 
 PATCHES=(
 	"${FILESDIR}"/php-iodbc-header-location.patch

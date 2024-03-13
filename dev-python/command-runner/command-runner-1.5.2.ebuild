@@ -16,7 +16,6 @@ HOMEPAGE="https://pypi.org/project/command-runner/
 SRC_URI="https://github.com/netinvent/${MY_PN}/archive/refs/tags/v${PV}.tar.gz  -> ${P}.gh.tar.gz"
 
 S="${WORKDIR}/${MY_P}"
-
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
