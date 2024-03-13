@@ -9,8 +9,8 @@ DESCRIPTION="Superset of JavaScript with optional static typing, classes and int
 HOMEPAGE="https://www.typescriptlang.org/
 	https://github.com/microsoft/TypeScript/"
 SRC_URI="https://registry.npmjs.org/${PN}/-/${P}.tgz"
-S="${WORKDIR}"/package
 
+S="${WORKDIR}"/package
 LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~ppc64"

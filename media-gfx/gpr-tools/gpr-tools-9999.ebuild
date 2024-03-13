@@ -5,6 +5,9 @@ EAPI=8
 
 inherit cmake
 
+DESCRIPTION="The General Purpose Raw (GPR) tools for gopro"
+HOMEPAGE="https://github.com/gopro/gpr"
+
 if [[ ${PV} == *9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/gopro/gpr.git"
@@ -17,9 +20,6 @@ else
 	SRC_URI="https://github.com/gopro/gpr/releases/${MY_P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
-
-DESCRIPTION="The General Purpose Raw (GPR) tools for gopro"
-HOMEPAGE="https://github.com/gopro/gpr"
 
 LICENSE="Apache-2.0"
 SLOT="0"

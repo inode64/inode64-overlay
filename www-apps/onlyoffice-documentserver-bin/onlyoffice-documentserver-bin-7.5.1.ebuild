@@ -16,6 +16,7 @@ SRC_URI="
 	)
 "
 
+S="${WORKDIR}"
 LICENSE="AGPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
@@ -32,8 +33,6 @@ RDEPEND="${DEPEND}
 	net-misc/rabbitmq-server
 	www-servers/nginx
 "
-
-S="${WORKDIR}"
 
 QA_PREBUILT="*"
 

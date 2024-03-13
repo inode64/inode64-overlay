@@ -3,6 +3,13 @@
 
 EAPI=8
 
+DISTUTILS_USE_PEP517=setuptools
+PYTHON_COMPAT=( python3_{10..12} )
+inherit python-single-r1
+
+DESCRIPTION="Script to communicate with Texas Instruments CC13xx/CC2538/CC26xx Serial Boot Loader"
+HOMEPAGE="https://github.com/JelmerT/cc2538-bsl"
+
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/JelmerT/${PN}"
 	inherit git-r3
@@ -11,16 +18,8 @@ else
 	KEYWORDS="~amd64 ~x86"
 fi
 
-DISTUTILS_USE_PEP517=setuptools
-PYTHON_COMPAT=( python3_{10..12} )
-inherit python-single-r1
-
-DESCRIPTION="Script to communicate with Texas Instruments CC13xx/CC2538/CC26xx Serial Boot Loader"
-HOMEPAGE="https://github.com/JelmerT/cc2538-bsl"
-
 LICENSE="BSD"
 SLOT="0"
-
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="

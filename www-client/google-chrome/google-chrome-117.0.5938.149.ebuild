@@ -9,23 +9,22 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 
 inherit chromium-2 desktop pax-utils unpacker xdg
 
-DESCRIPTION="The web browser from Google"
-HOMEPAGE="https://www.google.com/chrome/"
-
 if [[ ${PN} == google-chrome ]]; then
 	MY_PN=${PN}-stable
 else
 	MY_PN=${PN}
 fi
 
-KEYWORDS="-* amd64"
-
 MY_P="${MY_PN}_${PV}-1"
 
+DESCRIPTION="The web browser from Google"
+HOMEPAGE="https://www.google.com/chrome/"
 SRC_URI="https://dl.google.com/linux/chrome/deb/pool/main/g/${MY_PN}/${MY_P}_amd64.deb"
 
+S=${WORKDIR}
 LICENSE="google-chrome"
 SLOT="0"
+KEYWORDS="-* amd64"
 IUSE="qt5 qt6 selinux"
 RESTRICT="bindist mirror strip"
 
@@ -73,7 +72,6 @@ RDEPEND="
 
 QA_PREBUILT="*"
 QA_DESKTOP_FILE="usr/share/applications/google-chrome.*\\.desktop"
-S=${WORKDIR}
 CHROME_HOME="opt/google/chrome${PN#google-chrome}"
 
 pkg_nofetch() {

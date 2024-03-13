@@ -10,9 +10,10 @@ if [[ ${PV} == 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/ocristopfer/cockpit-sensors.git"
 else
 	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://github.com/ocristopfer/${PN}/releases/download/v${PV}/cockpit-sensors.tar.xz -> ${P}.gh.tar.xz"
+	SRC_URI="https://github.com/ocristopfer/${PN}/releases/download/${PV}/${PN}.tar.xz -> ${P}.tar.xz"
 fi
 
+S="${WORKDIR}/${PN}"
 LICENSE="LGPL-2.1"
 SLOT="0"
 
@@ -20,8 +21,6 @@ RDEPEND="${DEPEND}
 	app-admin/cockpit
 	sys-apps/lm-sensors
 "
-
-S="${WORKDIR}/${PN}"
 
 src_install() {
 	emake DESTDIR="${D}" PREFIX="${EPREFIX}/usr" install

@@ -6,10 +6,12 @@ EAPI=8
 inherit flag-o-matic systemd autotools multilib
 
 MY_PV=${PV/_rc/RC}
+
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
 SRC_URI="https://www.php.net/distributions/${P}.tar.xz"
 
+S="${WORKDIR}/${PN}-${MY_PV}"
 LICENSE="PHP-3.01
 	BSD
 	Zend-2.0
@@ -17,11 +19,8 @@ LICENSE="PHP-3.01
 	fpm? ( BSD-2 )
 	gd? ( gd )
 	unicode? ( BSD-2 LGPL-2.1 )"
-
 SLOT="$(ver_cut 1-2)"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos"
-
-S="${WORKDIR}/${PN}-${MY_PV}"
 
 # We can build the following SAPIs in the given order
 SAPIS="embed cli cgi fpm apache2 phpdbg"

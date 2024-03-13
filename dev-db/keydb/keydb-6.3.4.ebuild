@@ -7,13 +7,13 @@ MY_PN="KeyDB"
 
 # N.B.: It is no clue in porting to Lua eclasses, as upstream have deviated
 # too far from vanilla Lua, adding their own APIs like lua_enablereadonlytable
-
 inherit edo multiprocessing systemd tmpfiles toolchain-funcs
 
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
 SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
+S="${WORKDIR}/${MY_PN}-${PV}"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
@@ -52,8 +52,6 @@ PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
 )
-
-S="${WORKDIR}/${MY_PN}-${PV}"
 
 src_compile() {
 	local myconf=""
