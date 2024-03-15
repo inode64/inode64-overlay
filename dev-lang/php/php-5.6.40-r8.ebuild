@@ -67,7 +67,7 @@ COMMON_DEPEND="
 	coverage? ( dev-util/lcov )
 	crypt? ( >=dev-libs/libmcrypt-2.4 )
 	curl? ( >=net-misc/curl-7.10.5 )
-	enchant? ( app-text/enchant )
+	enchant? ( app-text/enchant:0 )
 	exif? ( !gd? (
 		media-libs/libjpeg-turbo:0
 		media-libs/libpng:0=

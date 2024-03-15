@@ -88,7 +88,7 @@ COMMON_DEPEND="
 	cdb? ( || ( dev-db/cdb dev-db/tinycdb ) )
 	coverage? ( dev-util/lcov )
 	curl? ( >=net-misc/curl-7.10.5 )
-	enchant? ( <app-text/enchant-2.0:0 )
+	enchant? ( app-text/enchant:0 )
 	ffi? ( >=dev-libs/libffi-3.0.11:= )
 	firebird? ( dev-db/firebird )
 	gd? ( media-libs/libjpeg-turbo:0= media-libs/libpng:0= )
@@ -111,7 +111,7 @@ COMMON_DEPEND="
 	readline? ( sys-libs/readline:0= )
 	session-mm? ( dev-libs/mm )
 	snmp? ( >=net-analyzer/net-snmp-5.2 )
-	sodium? ( dev-libs/libsodium:=[-minimal] )
+	sodium? ( dev-libs/libsodium )
 	spell? ( >=app-text/aspell-0.50 )
 	sqlite? ( >=dev-db/sqlite-3.7.6.3 )
 	ssl? ( dev-libs/openssl:= )
@@ -141,7 +141,6 @@ DEPEND="${COMMON_DEPEND}
 	>=sys-devel/bison-3.0.1"
 
 BDEPEND="virtual/pkgconfig"
-
 
 PATCHES=(
 	"${FILESDIR}"/php-iodbc-header-location.patch
