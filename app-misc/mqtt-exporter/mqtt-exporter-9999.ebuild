@@ -24,7 +24,7 @@ RDEPEND="
 	acct-user/mosquitto
 	acct-group/mosquitto
 	dev-python/paho-mqtt
-	dev-python/prometheus_client
+	dev-python/prometheus-client
 "
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
