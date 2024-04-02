@@ -1,0 +1,13 @@
+BDEPEND=net-libs/nodejs[npm] virtual/pkgconfig
+DEFINED_PHASES=compile install postinst prepare pretend test
+DESCRIPTION=It bridges events and allows you to control your Zigbee devices via MQTT
+EAPI=8
+HOMEPAGE=https://www.zigbee2mqtt.io/
+INHERIT=nodejs-mod systemd tmpfiles
+KEYWORDS=~amd64
+LICENSE=0BSD Apache-2.0 BSD-2 CC-BY-4.0 GPL-3 ISC MIT PYTHON
+RDEPEND=acct-group/zigbee2mqtt acct-user/zigbee2mqtt app-misc/mosquitto net-libs/nodejs:= virtual/tmpfiles
+SLOT=0
+SRC_URI=https://github.com/Koenkk/zigbee2mqtt/archive/1.36.1.tar.gz -> zigbee2mqtt-1.36.1.tar.gz https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/zigbee2mqtt-1.36.1-node_modules.tar.xz
+_eclasses_=nodejs	61abf5050a25bc38bdd14f44e68dee1d	nodejs-mod	90a3f284265e99b489c9657ef05165ad	toolchain-funcs	e56c7649b804f051623c8bc1a1c44084	multilib	c19072c3cd7ac5cb21de013f7e9832e0	systemd	c8b03e8df84486aa991d4396686e8942	tmpfiles	216aa76c3a6fcb5d893c23a0de86048f
+_md5_=664d024e20f464c41167f446b5f7bafc
