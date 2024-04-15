@@ -67,10 +67,6 @@ DEPEND="${RDEPEND}
 "
 BDEPEND="rdp? ( <net-misc/freerdp-3 )"
 
-PATCHES=(
-	"${FILESDIR}"/GUACAMOLE-1900.patch
-)
-
 src_prepare() {
 	default
 
