@@ -112,7 +112,7 @@ src_install() {
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-mysql/target/guacamole-auth-jdbc-mysql-${MY_PV}.jar
 		insinto "${GUACAMOLE_HOME}/lib"
-		doins "${WORKDIR}"/mysql-connector-j-8.0.33/mysql-connector-j-8.0.33.jar
+		doins "${WORKDIR}"/mysql-connector-j-8.3.0/mysql-connector-j-8.3.0.jar
 
 		insinto "/usr/share/${PN}/schema/mysql"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-mysql/schema/" -name '*.sql' -exec doins '{}' +
@@ -128,7 +128,7 @@ src_install() {
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-postgresql/target/guacamole-auth-jdbc-postgresql-${MY_PV}.jar
 		insinto "${GUACAMOLE_HOME}/lib"
-		doins "${WORKDIR}"/postgresql-42.6.0.jar
+		doins "${WORKDIR}"/postgresql-42.7.3.jar
 
 		insinto "/usr/share/${PN}/schema/postgres"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-postgresql/schema/" -name '*.sql' -exec doins '{}' +
