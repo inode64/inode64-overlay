@@ -9,4 +9,8 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">techouse/sqlite3-to-mysql</remote-id>
+		<remote-id type="pypi">sqlite3-to-mysql</remote-id>
+	</upstream>
 </pkgmetadata>

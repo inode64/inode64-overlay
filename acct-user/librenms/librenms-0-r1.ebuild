@@ -10,4 +10,11 @@ ACCT_USER_ID=312
 ACCT_USER_HOME=/opt/librenms
 ACCT_USER_GROUPS=( librenms )
 
+IUSE="apache2 nginx"
+
 acct-user_add_deps
+
+pkg_setup() {
+	use apache2 && ACCT_USER_GROUPS+=( "apache" )
+	use nginx && ACCT_USER_GROUPS+=( "nginx" )
+}
