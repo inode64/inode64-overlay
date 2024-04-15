@@ -10,4 +10,5 @@
 		or scoring IP addresses of SMTP senders according to the country code
 		of the sender's IP address.
 	</longdescription>
+	<remote-id type="github">andrewnimmo/exim-geoipv6-dlfunc</remote-id>
 </pkgmetadata>
