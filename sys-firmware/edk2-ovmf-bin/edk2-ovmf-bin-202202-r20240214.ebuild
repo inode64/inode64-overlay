@@ -1,4 +1,4 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -48,11 +48,11 @@ In order to use the firmware you can run qemu the following way
 		..."
 
 src_install() {
-    rm -rf usr/share/OVMF || die
-    mv usr/share/edk2/ovmf usr/share/edk2-ovmf || die
-    mv usr/share/doc/edk2-ovmf "usr/share/doc/${PF}" || die
+	rm -rf usr/share/OVMF || die
+	mv usr/share/edk2/ovmf usr/share/edk2-ovmf || die
+	mv usr/share/doc/edk2-ovmf "usr/share/doc/${PF}" || die
 
-    rm -rf usr/share/licenses || die
+	rm -rf usr/share/licenses || die
 	mv usr "${ED}" || die
 
 	readme.gentoo_create_doc

@@ -58,11 +58,6 @@ RDEPEND="${BDEPEND}
 
 LIBRENMS_HOME="/opt/librenms"
 
-pkg_setup() {
-	use nginx && usermod -a -G librenms nginx
-	use apache2 && usermod -a -G librenms apache
-}
-
 src_compile() {
 	return
 }

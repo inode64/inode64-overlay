@@ -62,7 +62,7 @@ src_install() {
 	newinitd "${FILESDIR}/go2rtc.initd" go2rtc
 	dotmpfiles "${FILESDIR}"/${PN}.conf
 
-	systemd_dounit "${FILESDIR}/${PN}@.service"
+	systemd_newunit "${FILESDIR}/${PN}.service" "${PN}@.service"
 }
 
 pkg_postinst() {
