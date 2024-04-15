@@ -9,4 +9,6 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
+	<remote-id type="github">onegreyonewhite/pytimeparse2</remote-id>
+	<remote-id type="pypi">pytimeparse2</remote-id>
 </pkgmetadata>
