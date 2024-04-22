@@ -66,8 +66,6 @@ src_install() {
 	diropts -m 0770
 	insinto ${LIBRENMS_HOME}
 
-	dosym ${LIBRENMS_HOME}/lnms /usr/bin/lnms
-
 	insinto /etc/logrotate.d/
 	newins misc/librenms.logrotate librenms
 
@@ -78,7 +76,6 @@ src_install() {
 
 	// Remove developer files
 	rm *.md LICENSE.txt || die
-	find -type f -regex '.*\.gitignore$' -delete || die
 	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
 	rm {.codeclimate.yml,.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.scrutinizer.yml,.styleci.yml,mkdocs.yml} || die
 	rm {phpstan-baseline-deprecated.neon,phpstan-baseline.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
@@ -109,18 +106,22 @@ pkg_postinst() {
 }
 
 pkg_config() {
+	if [ ! -e ${LIBRENMS_HOME}/config.php ]; then
+		einfo "It is necessary to have the configuration file ${LIBRENMS_HOME}/config.php to finish the installation process"
+		die
+	fi
+
 	einfo "Installing cronjobs ..."
 	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/dist/librenms.cron || die
 
 	einfo "Installing composer deps ..."
-	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev
-	if [ -e ${LIBRENMS_HOME}/config.php ]; then
-		einfo "Updating existing installation ..."
-		sudo -u librenms /opt/librenms/lnms migrate
+	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev --ansi
 
-		einfo "Validation installation ..."
-		sudo -u librenms /opt/librenms/validate.php
-	fi
+	einfo "Updating existing installation ..."
+	sudo -u librenms /opt/librenms/lnms migrate
+
+	einfo "Validation installation ..."
+	sudo -u librenms /opt/librenms/validate.php
 
 	einfo "All done."
 }
