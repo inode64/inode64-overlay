@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/librenms/${PN}"
 LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+apache fail2ban mdadm bind ipmi"
+IUSE="apache fail2ban mdadm bind ipmi hddtemp"
 
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
