@@ -9,7 +9,4 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
-	<use>
-		<flag name="nginx">Adds support for nginx</flag>
-	</use>
 </pkgmetadata>
