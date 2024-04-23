@@ -17,8 +17,7 @@ fi
 LICENSE="GPL-3+"
 SLOT="0"
 
-IUSE="amqp apache2 ipmi ldap nginx postgres radius redis"
-REQUIRED_USE="^^ ( apache2 nginx )"
+IUSE="amqp ipmi ldap postgres radius redis"
 
 DEPEND="
 	acct-group/librenms
@@ -66,6 +65,8 @@ src_install() {
 	diropts -m 0770
 	insinto ${LIBRENMS_HOME}
 
+	dosym ${LIBRENMS_HOME}/lnms /usr/bin/lnms
+
 	insinto /etc/logrotate.d/
 	newins misc/librenms.logrotate librenms
 
@@ -106,11 +107,6 @@ pkg_postinst() {
 }
 
 pkg_config() {
-	if [ ! -e ${LIBRENMS_HOME}/config.php ]; then
-		einfo "It is necessary to have the configuration file ${LIBRENMS_HOME}/config.php to finish the installation process"
-		die
-	fi
-
 	einfo "Installing cronjobs ..."
 	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/dist/librenms.cron || die
 
