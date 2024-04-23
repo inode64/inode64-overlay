@@ -71,6 +71,6 @@ src_install() {
 
 	doins "${FILESDIR}"/snmp/*
 
-	fperms +x ${LIBRENMS_AGENT}/snmp/*
-	fperms +x ${LIBRENMS_AGENT}/repo/*
+	fperms +x -R ${LIBRENMS_AGENT}/snmp
+	fperms +x -R ${LIBRENMS_AGENT}/repo
 }
