@@ -73,7 +73,6 @@ DEPEND="
 	app-arch/lz4
 	app-crypt/argon2
 	app-crypt/mit-krb5
-	dev-libs/libedit
 	dev-libs/glib
 	dev-libs/icu
 	dev-libs/libltdl
@@ -171,10 +170,10 @@ src_prepare() {
 	cd ${PKG_MOUNT}
 
 	# Set installation directory
-	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory
+	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory || die
 
 	# Fix categories
-	sed -i -e "s|=Video|=AudioVideo|g" share/*.desktop
+	sed -i -e "s|=Video|=AudioVideo|g" share/*.desktop || die
 
 	# Remove 32bits apps
 	rm LUT/GenOutputLut LUT/GenLut || die
@@ -185,8 +184,12 @@ src_prepare() {
 	rm libs/{libgio*,libglib*,libgmodule*,libgobject*} || die
 
 	# Fix undefined symbol: krb5int_c_deprecated_enctype, version k5crypto_3_MIT
-	rm "DaVinci Control Panels Setup"/libk5crypto.so.3
+	rm "DaVinci Control Panels Setup"/libk5crypto.so.3 || die
 
+	# Remove sqlite because it requires ncurses 5.x
+	rm bin/sqlite3 || die
+
+	# remove dev files
 	rm -rf libs/pkgconfig || die
 
 	# Remove bundled libraries
