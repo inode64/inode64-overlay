@@ -72,6 +72,8 @@ DEPEND="
 	app-arch/brotli
 	app-arch/lz4
 	app-crypt/argon2
+	app-crypt/mit-krb5
+	dev-libs/libedit
 	dev-libs/glib
 	dev-libs/icu
 	dev-libs/libltdl
@@ -181,6 +183,9 @@ src_prepare() {
 	# And fix Davinci Resolve: libpango undefined symbol: g_string_free_and_steal
 	# https://www.reddit.com/r/Fedora/comments/12z32r1/davinci_resolve_libpango_undefined_symbol_g/
 	rm libs/{libgio*,libglib*,libgmodule*,libgobject*} || die
+
+	# Fix undefined symbol: krb5int_c_deprecated_enctype, version k5crypto_3_MIT
+	rm "DaVinci Control Panels Setup"/libk5crypto.so.3
 
 	rm -rf libs/pkgconfig || die
 
