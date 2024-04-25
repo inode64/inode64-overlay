@@ -12,4 +12,8 @@
 	<upstream>
 		<remote-id type="github">librenms/librenms-agent</remote-id>
 	</upstream>
+	<use>
+		<flag name="agent">Enable support for AMQP alert transport</flag>
+		<flag name="snmp">Enable IPMI things</flag>
+	</use>
 </pkgmetadata>
