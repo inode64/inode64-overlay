@@ -43,7 +43,7 @@ DEPEND="${RDEPEND}
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
-	rdp? ( net-misc/freerdp:=[client(+)] )
+	rdp? ( <net-misc/freerdp-3:=[client(+)] )
 	ssh? (
 		net-libs/libssh2
 		x11-libs/pango
@@ -65,7 +65,6 @@ DEPEND="${RDEPEND}
 		dev-util/cunit
 	)
 "
-BDEPEND="rdp? ( <net-misc/freerdp-3 )"
 
 src_prepare() {
 	default
