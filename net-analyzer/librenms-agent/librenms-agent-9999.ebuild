@@ -120,13 +120,14 @@ RDEPEND="
 		app-admin/sudo
 		dev-python/distro
 	)
-	librenms_snmp_app_apache? ( dev-perl/libwww-perl net-misc/curl )
+	librenms_snmp_app_apache? ( dev-python/urllib3 )
 	librenms_snmp_app_bind? ( dev-perl/File-ReadBackwards )
 	librenms_snmp_app_fail2ban? ( dev-perl/JSON )
 	librenms_snmp_app_bind? ( dev-perl/File-ReadBackwards )
 	librenms_snmp_app_borgbackup? ( dev-perl/Config-Tiny dev-perl/File-Slurp dev-perl/JSON dev-perl/String-ShellQuote )
 	librenms_snmp_app_cape? ( dev-perl/Config-Tiny dev-perl/File-Slurp dev-perl/JSON dev-perl/String-ShellQuote )
 	librenms_snmp_app_chip? ( sys-apps/i2c-tools )
+	librenms_snmp_app_doker? ( dev-python/python-dateutil )
 	librenms_snmp_app_dhcp? ( dev-perl/File-Slurp dev-perl/JSON )
 	librenms_snmp_app_fail2ban? ( dev-perl/JSON )
 	librenms_snmp_app_linux_softnet_stat? ( dev-perl/File-Slurp dev-perl/JSON )
