@@ -61,6 +61,10 @@ src_install() {
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}"/etc/env.d/90${PN} || die
+
+	# Hack to gzip frontend files to permit "Accept-Encoding: gzip"
+	gzip -k "${ED}"/usr/lib64/node_modules/zigbee2mqtt/node_modules/zigbee2mqtt-frontend/dist/*.html
+	gzip -k "${ED}"/usr/lib64/node_modules/zigbee2mqtt/node_modules/zigbee2mqtt-frontend/dist/assets/*.js
 }
 
 pkg_postinst() {
