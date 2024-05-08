@@ -34,12 +34,7 @@ src_configure() {
 }
 
 src_compile() {
-	local mygoargs=(
-		-asmflags "-trimpath=${S}"
-		-gcflags "-trimpath=${S}"
-	)
-
-	ego build "${mygoargs[@]}"
+	ego build -trimpath -ldflags "-s -w"
 }
 
 src_test() {
