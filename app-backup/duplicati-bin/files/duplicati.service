@@ -1,0 +1,13 @@
+[Unit]
+Description=Duplicati
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/mono /opt/duplicati/Duplicati.Server.exe
+Restart=on-abort
+EnvironmentFile=-/etc/default/duplicati
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
