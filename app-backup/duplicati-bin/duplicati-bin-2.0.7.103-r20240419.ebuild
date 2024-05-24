@@ -24,11 +24,12 @@ DEPEND="gtk? ( dev-dotnet/gtk-sharp:2 )"
 BDEPEND="app-arch/unzip"
 
 src_install() {
-	rm -rf {OSX ICONS,OSXTrayHost,SQLite,alphavss,runtimes,win-tools,win-x64,win-x86,x64,x86} || die
+	rm -rf {OSX*,SQLite,alphavss,runtimes,win-tools,win-x64,win-x86,x64,x86} || die
 	rm {Duplicati.Service.exe,Duplicati.Service.exe.config,Duplicati.WindowsService.exe,Duplicati.WindowsService.exe.config} || die
 	rm *.dylib || die
 	rm run-script-example.bat || die
 	rm utility-scripts/DuplicatiVerify.ps1 || die
+	find "${D}" -name '*.map' -delete || die
 
 	dodir /opt/duplicati
 	cp -R . "${ED}/opt/duplicati" || die
