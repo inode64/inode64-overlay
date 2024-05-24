@@ -3,7 +3,7 @@ Description=Duplicati
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/mono /opt/duplicati/Duplicati.Server.exe
+ExecStart=/usr/bin/mono /opt/duplicati/Duplicati.Server.exe --server-datafolder=/var/lib/duplicati/
 Restart=on-abort
 EnvironmentFile=-/etc/default/duplicati
 Nice=19
