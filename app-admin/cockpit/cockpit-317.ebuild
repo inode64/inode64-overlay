@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{8..12} )
+PYTHON_COMPAT=( python3_{10..13} )
 inherit autotools pam python-single-r1 tmpfiles
 
 DESCRIPTION="Server Administration Web Interface "
@@ -12,7 +12,7 @@ if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/cockpit-project/cockpit.git"
 else
-	#KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/cockpit-project/${PN}/releases/download/${PV}/${P}.tar.xz"
 fi
 SRC_URI="${SRC_URI} https://www.gentoo.org/assets/img/logo/gentoo-logo.png"
@@ -94,9 +94,6 @@ src_configure() {
 		$(use_enable pcp)
 		$(use_enable doc)
 		--with-pamdir="/$(get_libdir)/security"
-		--with-cockpit-user=cockpit-ws
-		--with-cockpit-ws-instance-user=cockpit-wsinstance
-		--with-cockpit-group=cockpit-ws
 		--localstatedir="${EPREFIX}/var"
 	)
 	econf "${myconf[@]}"
@@ -134,7 +131,7 @@ src_install() {
 }
 
 pkg_postinst() {
-	tmpfiles_process cockpit-tempfiles.conf
+	tmpfiles_process cockpit-ws.conf
 
 	elog ""
 	elog "To enable Cockpit run:"
