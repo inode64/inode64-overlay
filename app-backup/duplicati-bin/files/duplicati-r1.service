@@ -1,0 +1,13 @@
+[Unit]
+Description=Duplicati
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/mono /opt/duplicati/duplicati-server --server-datafolder=/var/lib/duplicati/
+Restart=on-abort
+EnvironmentFile=-/etc/default/duplicati
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
