@@ -8,17 +8,17 @@ inherit tmpfiles systemd
 MY_PN="duplicati"
 MY_BUILDTYPE="$(echo ${PR}|/bin/awk -F'_' '{print $2}')"
 MY_BASE_PV="${PV}_${MY_BUILDTYPE:-canary}_${PR:1:4}-${PR:5:2}-${PR:7:2}"
+MY_NAME="${MY_PN}-${MY_BASE_PV}-linux-x64-gui"
 
 DESCRIPTION="A backup client that securely stores encrypted, incremental, compressed backups."
 HOMEPAGE="https://duplicati.com/"
-SRC_URI="https://github.com/${MY_PN}/${MY_PN}/releases/download/v${PV}-${MY_BASE_PV}/${MY_PN}-${MY_BASE_PV}-linux-x64-gui.zip"
+SRC_URI="https://github.com/${MY_PN}/${MY_PN}/releases/download/v${MY_BASE_PV}/${MY_NAME}.zip"
 
-S="${WORKDIR}"
+S="${WORKDIR}/${MY_NAME}"
 LICENSE="LGPL-2"
 
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-
 
 BDEPEND="app-arch/unzip"
 
