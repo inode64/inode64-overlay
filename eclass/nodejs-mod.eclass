@@ -71,7 +71,7 @@ nodejs-mod_src_prepare() {
 nodejs-mod_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-	push ${NODEJS_MOD_PREFIX} >/dev/null || die
+	pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
     if [[ -d node_modules ]]; then
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
@@ -95,7 +95,7 @@ nodejs-mod_src_compile() {
 nodejs-mod_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-	push ${NODEJS_MOD_PREFIX} >/dev/null || die
+	pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
     if nodejs_has_test; then
         enpm run test || die "test failed"
     fi
@@ -108,7 +108,7 @@ nodejs-mod_src_test() {
 nodejs-mod_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    push ${NODEJS_MOD_PREFIX} >/dev/null || die
+    pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
     nodejs_docs
 
     enpm_clean
