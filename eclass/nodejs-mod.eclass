@@ -48,7 +48,7 @@ RDEPEND+=" net-libs/nodejs:="
 # @ECLASS_VARIABLE: NODEJS_MOD_PREFIX
 # @DESCRIPTION:
 # The directory prefix for the NodeJS module
-NODEJS_MOD_PREFIX="."
+NODEJS_MOD_PREFIX="${NODEJS_MOD_PREFIX:-.}"
 
 # @FUNCTION: nodejs-mod_src_prepare
 # @DESCRIPTION:
