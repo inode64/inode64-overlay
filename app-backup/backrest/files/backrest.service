@@ -1,0 +1,13 @@
+[Unit]
+Description=Backrest Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/backrest -data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json
+Restart=on-failure
+StandardOutput=append:/var/log/backrest/backrest.log
+StandardError=append:/var/log/backrest/backrest.log
+
+[Install]
+WantedBy=multi-user.target
