@@ -144,7 +144,7 @@ nodejs_modules() {
 # @DESCRIPTION:
 # Returns true (0) if is a package
 nodejs_has_package() {
-    [[ -d "${S}"/package ]]
+    [[ -d package ]]
 }
 
 # @FUNCTION: nodejs_docs
@@ -270,7 +270,7 @@ enpm() {
             ;;
         yarn)
             npmargs+=(
-                --cache-folder "${S}/.cache"
+                --cache-folder ".cache"
             )
             yarn "$@" "${npmargs[@]}"
             ;;
@@ -302,8 +302,8 @@ enpm_clean() {
 
     # Cleanups
     for f in ${nodejs_files}; do
-        if [[ -d "${S}/${f}" ]]; then
-            pushd "${S}/${f}" >/dev/null || die
+        if [[ -d "${f}" ]]; then
+            pushd "${f}" >/dev/null || die
             nodejs_remove_dev
             popd >/dev/null || die
         fi
@@ -330,8 +330,8 @@ enpm_install() {
     dodir "$(nodejs_modules)" || die "Could not create DEST folder"
 
     for f in ${nodejs_files}; do
-        if [[ -e "${S}/${f}" ]]; then
-            cp -r "${S}/${f}" "${ED}/$(nodejs_modules)"
+        if [[ -e "${f}" ]]; then
+            cp -r "${f}" "${ED}/$(nodejs_modules)"
         fi
     done
 
