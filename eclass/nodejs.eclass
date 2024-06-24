@@ -342,7 +342,7 @@ enpm_install() {
 
     # Set permissions for executables and libraries
     find -type f -name "*.node" | while read f; do
-    	fperms +x "$(nodejs_modules)/${f}"
+        fperms +x "$(nodejs_modules)/${f}"
     done
     find -type f -executable | while read f; do
         fperms +x "$(nodejs_modules)/${f}"
