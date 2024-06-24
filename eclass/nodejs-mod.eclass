@@ -45,13 +45,18 @@ fi
 
 RDEPEND+=" net-libs/nodejs:="
 
+# @ECLASS_VARIABLE: NODEJS_MOD_PREFIX
+# @DESCRIPTION:
+# The directory prefix for the NodeJS module
+NODEJS_MOD_PREFIX="."
+
 # @FUNCTION: nodejs-mod_src_prepare
 # @DESCRIPTION:
 # Nodejs preparation phase
 nodejs-mod_src_prepare() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    if [[ ! -e package.json ]]; then
+    if [[ ! -e "${NODEJS_MOD_PREFIX}/package.json" ]]; then
         eerror "Unable to locate package.json"
         eerror "Consider not inheriting the NodeJS eclass."
         die "FATAL: Unable to find package.json"
@@ -66,6 +71,7 @@ nodejs-mod_src_prepare() {
 nodejs-mod_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+	push ${NODEJS_MOD_PREFIX} >/dev/null || die
     if [[ -d node_modules ]]; then
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
@@ -80,6 +86,7 @@ nodejs-mod_src_compile() {
         einfo "Run build"
         enpm run build || die "build failed"
     fi
+	popd >/dev/null || die
 }
 
 # @FUNCTION: nodejs-mod_src_test
@@ -88,9 +95,11 @@ nodejs-mod_src_compile() {
 nodejs-mod_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+	push ${NODEJS_MOD_PREFIX} >/dev/null || die
     if nodejs_has_test; then
         enpm run test || die "test failed"
     fi
+    popd >/dev/null || die
 }
 
 # @FUNCTION: nodejs_src_install
@@ -99,10 +108,12 @@ nodejs-mod_src_test() {
 nodejs-mod_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
+    push ${NODEJS_MOD_PREFIX} >/dev/null || die
     nodejs_docs
 
     enpm_clean
     enpm_install
+    popd >/dev/null || die
 }
 
 fi
