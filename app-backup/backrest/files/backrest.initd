@@ -3,7 +3,7 @@
 name="backrest"
 description="backrest Daemon"
 command="/usr/bin/backrest"
-command_args="-data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json"
+command_args="-restic-cmd /usr/sbin/restic -data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json"
 command_background=true
 pidfile="/run/backrest.pid"
 supervisor=supervise-daemon
