@@ -4,7 +4,7 @@
 EAPI=8
 
 NODEJS_MOD_PREFIX="webui"
-inherit go-module nodejs nodejs-mod tmpfiles systemd
+inherit go-module nodejs nodejs-mod systemd tmpfiles
 
 DESCRIPTION="A web UI and orchestrator for restic backup"
 HOMEPAGE="https://github.com/garethgeorge/backrest"
@@ -16,7 +16,11 @@ SRC_URI="https://github.com/garethgeorge/backrest/archive/v${PV}.tar.gz -> ${P}.
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-
+IUSE="test"
+RESTRICT="
+	!test? ( test )
+"
+BDEPEND="test? ( app-backup/restic )"
 RDEPEND="app-backup/restic"
 
 src_configure() {
@@ -45,13 +49,10 @@ src_test() {
 
 src_install() {
 	dobin backrest
-
 	dodoc *.md
 
 	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
-
 	newinitd "${FILESDIR}/${PN}.initd" ${PN}
-
 	systemd_dounit "${FILESDIR}/${PN}.service"
 }
 
