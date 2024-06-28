@@ -122,7 +122,7 @@ src_configure() {
 		--with-group=nut
 		--with-htmlpath=/usr/share/nut/html
 		--with-logfacility=LOG_DAEMON
-		--with-statepath=/var/lib/nut
+		--with-statepath=/run/nut
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
 		--with-systemdtmpfilesdir="/usr/lib/tmpfiles.d"
 		--with-udev-dir="$(get_udevdir)"
