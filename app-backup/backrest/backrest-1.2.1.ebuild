@@ -34,8 +34,8 @@ src_configure() {
 }
 
 src_compile() {
-	nodejs-mod_src_compile
 	pushd webui >/dev/null || die
+	enpm run build || die "build failed"
 	enpm_clean
 	# Fix go test
 	gzip -k dist/index.html || die
