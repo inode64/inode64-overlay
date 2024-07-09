@@ -8,6 +8,7 @@ ExecStart=/usr/bin/backrest -restic-cmd /usr/sbin/restic -data-dir /var/lib/back
 Restart=on-failure
 StandardOutput=append:/var/log/backrest/backrest.log
 StandardError=append:/var/log/backrest/backrest.log
+Environment=XDG_CACHE_HOME=/var/lib/backrest/
 
 [Install]
 WantedBy=multi-user.target
