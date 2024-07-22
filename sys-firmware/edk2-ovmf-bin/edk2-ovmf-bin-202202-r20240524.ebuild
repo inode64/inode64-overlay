@@ -6,7 +6,7 @@ EAPI=8
 inherit readme.gentoo-r1 rpm
 
 MY_PR="${PR:1}"
-MY_REV="4.fc41"
+MY_REV="5.fc41"
 
 DESCRIPTION="UEFI firmware for 64-bit x86 virtual machines"
 HOMEPAGE="https://github.com/tianocore/edk2"
