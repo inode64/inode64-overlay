@@ -24,9 +24,6 @@ DEPEND="
 	acct-user/librenms
 "
 
-BDEPEND="
-	dev-php/composer
-"
 RDEPEND="${BDEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
