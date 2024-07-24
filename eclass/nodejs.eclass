@@ -338,7 +338,9 @@ enpm_install() {
     pushd "${ED}/$(nodejs_modules)" >/dev/null || die
 
     # Reset permissions for executables
-    chmod -R -x "${ED}/$(nodejs_modules)" || die
+    find -type f | while read f; do
+        fperms -x "$(nodejs_modules)"/"${f}"
+    done
 
     # Set permissions for executables and libraries
     find -type f -name "*.node" | while read f; do
