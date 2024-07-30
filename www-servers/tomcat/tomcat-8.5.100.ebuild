@@ -22,7 +22,7 @@ IUSE="extra-webapps"
 
 RESTRICT="test" # can we run them on a production system?
 
-ECJ_SLOT="4.15"
+ECJ_SLOT="4.26"
 
 # we don't use ~ for el and jsp because the same implementation
 # is also present in tomcat 9 and it would be impossible to install
