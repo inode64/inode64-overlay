@@ -119,7 +119,7 @@ parse_argv() {
 		"/@GENTOO_PORTAGE_EPREFIX@etc/conf.d/${instance_name}"
 	)
 }
-	
+
 test_can_deploy() {
 	local no_deploy target
 	for target in "${all_targets[@]}"; do
@@ -248,7 +248,7 @@ remove_instance() {
 	read
 	if [[ ${REPLY} == yes ]]; then
 		rm -rv "${all_targets[@]}"
-	else 
+	else
 		echo "Aborting as requested ..."
 	fi
 }
