@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module systemd
+inherit flag-o-matic go-module systemd
 
 DESCRIPTION="Argo Tunnel client, written in GoLang"
 HOMEPAGE="https://github.com/cloudflare/cloudflared"
@@ -15,6 +15,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
 src_configure() {
+	filter-lto
+
 	export CGO_ENABLED=1
 	export CGO_CFLAGS="${CFLAGS}"
 	export CGO_CPPFLAGS="${CPPFLAGS}"
@@ -25,7 +27,7 @@ src_configure() {
 }
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w" || die
+	ego build -trimpath -ldflags "-s -w" -o "bin/${PN}" ./cmd/${PN} || die
 }
 
 src_test() {
