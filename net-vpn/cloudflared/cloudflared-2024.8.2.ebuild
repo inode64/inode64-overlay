@@ -45,3 +45,11 @@ src_install() {
 	newconfd "${FILESDIR}"/cloudflared.confd cloudflared
 	systemd_dounit "${FILESDIR}"/cloudflared.service
 }
+
+pkg_postinst() {
+    einfo "Please note that Cloudflared uses a custom version of GO that does not support the QUIC protocol."
+    einfo "Instead, you should configure the tunnel to use protocol: http2 in your settings"
+    einfo
+    einfo "This message clearly communicates the information about the custom GO version and provides the alternative configuration option."
+    einfo "https://github.com/cloudflare/go"
+}
