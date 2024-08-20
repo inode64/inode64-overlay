@@ -48,7 +48,7 @@ ruby_add_bdepend "
 	dev-ruby/rqrcode
 	>=dev-ruby/rubyzip-2.3.0:2
 	>=dev-ruby/sanitize-6.0:6
-	dev-util/with_advisory_lock
+	dev-ruby/with_advisory_lock
 "
 
 RDEPEND="
