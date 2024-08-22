@@ -42,7 +42,7 @@ src_test() {
 	cd integration-test
 
 	../composer init \
-	        --no-interaction \
+		--no-interaction \
 		--type=project \
 		--name='gentoo/test' \
 		--description='Composer Test Project' \
