@@ -7,11 +7,11 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( pypy3 python3_{10..13} )
 inherit distutils-r1 pypi
 
-DESCRIPTION="OVS bindings for python"
-HOMEPAGE="https://github.com/openvswitch/ovs/"
+DESCRIPTION="Cron expression parser and evaluator"
+HOMEPAGE="https://github.com/cuu508/cronsim"
 
-LICENSE="Apache-2.0"
+LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="~amd64"
 
-RDEPEND="dev-python/sortedcontainers[${PYTHON_USEDEP}]"
+distutils_enable_tests pytest
