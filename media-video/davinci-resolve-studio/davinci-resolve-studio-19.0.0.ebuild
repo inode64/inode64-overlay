@@ -214,6 +214,48 @@ src_prepare() {
 src_install() {
 	cd ${PKG_MOUNT}
 
+	while IFS= read -r -d '' i; do
+	[[ -f "${i}" && $(od -t x1 -N 4 "${i}") == *"7f 45 4c 46"* ]] || continue
+		einfo "Fixing RPATH of ${i}"
+		patchelf --set-rpath \
+"${PKG_HOME}"'/libs:'\
+"${PKG_HOME}"'/libs/plugins/sqldrivers:'\
+"${PKG_HOME}"'/libs/plugins/xcbglintegrations:'\
+"${PKG_HOME}"'/libs/plugins/imageformats:'\
+"${PKG_HOME}"'/libs/plugins/platforms:'\
+"${PKG_HOME}"'/libs/Fusion:'\
+"${PKG_HOME}"'/plugins:'\
+"${PKG_HOME}"'/bin:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/BlackmagicRawAPI:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/platforms:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/imageformats:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/mediaservice:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/audio:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/xcbglintegrations:'\
+"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/bearer:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/BlackmagicRawAPI:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/mediaservice:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/imageformats:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/audio:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/platforms:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/xcbglintegrations:'\
+"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/bearer:'\
+"${PKG_HOME}"'/Onboarding/plugins/xcbglintegrations:'\
+"${PKG_HOME}"'/Onboarding/plugins/qtwebengine:'\
+"${PKG_HOME}"'/Onboarding/plugins/platforms:'\
+"${PKG_HOME}"'/Onboarding/plugins/imageformats:'\
+"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/platforms:'\
+"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/imageformats:'\
+"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/bearer:'\
+"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards:'\
+"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels:'\
+'$ORIGIN' "${i}" || die "patchelf failed on ${i}"
+	done < <(find "${S}/${PKG_MOUNT}" -type f -size -32M -print0)
+
+	# TODO: Fix QA Notice: Unresolved soname dependencies:
+	#patchelf --replace-needed libsonyxavcenc.so "${PKG_HOME}"/libs/libsonyxavcenc.so "${S}/${PKG_MOUNT}"/bin/resolve \
+	#	|| die "patchelf failed on resolve"
+
 	insinto "${PKG_HOME}"
 	local _dir
 	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
@@ -242,44 +284,6 @@ src_install() {
 
 	insinto /usr/share/mime/packages/
 	doins share/{blackmagicraw.xml,resolve.xml}
-
-	while IFS= read -r -d '' i; do
-	[[ -f "${i}" && $(od -t x1 -N 4 "${i}") == *"7f 45 4c 46"* ]] || continue
-		einfo "Fixing RPATH of ${i}"
-		patchelf --set-rpath \
-'/opt/'"${PKG_HOME}"'/libs:'\
-'/opt/'"${PKG_HOME}"'/libs/plugins/sqldrivers:'\
-'/opt/'"${PKG_HOME}"'/libs/plugins/xcbglintegrations:'\
-'/opt/'"${PKG_HOME}"'/libs/plugins/imageformats:'\
-'/opt/'"${PKG_HOME}"'/libs/plugins/platforms:'\
-'/opt/'"${PKG_HOME}"'/libs/Fusion:'\
-'/opt/'"${PKG_HOME}"'/plugins:'\
-'/opt/'"${PKG_HOME}"'/bin:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/BlackmagicRawAPI:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/platforms:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/imageformats:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/mediaservice:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/audio:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/xcbglintegrations:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/bearer:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/BlackmagicRawAPI:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/mediaservice:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/imageformats:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/audio:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/platforms:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/xcbglintegrations:'\
-'/opt/'"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/bearer:'\
-'/opt/'"${PKG_HOME}"'/Onboarding/plugins/xcbglintegrations:'\
-'/opt/'"${PKG_HOME}"'/Onboarding/plugins/qtwebengine:'\
-'/opt/'"${PKG_HOME}"'/Onboarding/plugins/platforms:'\
-'/opt/'"${PKG_HOME}"'/Onboarding/plugins/imageformats:'\
-'/opt/'"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/platforms:'\
-'/opt/'"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/imageformats:'\
-'/opt/'"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/bearer:'\
-'/opt/'"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards:'\
-'/opt/'"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels:'\
-'$ORIGIN' "${i}" || die "patchelf failed on ${i}"
-	done < <(find "${S}/${PKG_HOME}" -type f -size -32M -print0)
 
 	diropts -m 0777
 	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Fairlight,GPUCache,logs,Media,"Resolve Disk Database",.crashreport,.license,.LUT}
