@@ -99,7 +99,7 @@ src_install() {
 		fperms +x "${DIR}/${exe}"
 	done
 
-	make_wrapper "${PN}" "${DIR}/bin/${PN}.sh"
+	make_wrapper "${PN}" "${DIR}/bin/${PN}"
 	newicon "bin/${PN}.svg" "${PN}.svg"
 	make_desktop_entry "${PN}" "phpstorm" "${PN}" "Development;IDE;"
 
