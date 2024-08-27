@@ -253,7 +253,8 @@ src_install() {
 	done < <(find "${S}/${PKG_MOUNT}" -type f -size -32M -print0)
 
 	# Fix QA Notice: Unresolved soname dependencies:
-	patchelf --replace-needed "${PKG_HOME}"/libs/libsonyxavcenc.so libsonyxavcenc.so "${PKG_HOME}"/bin/resolve \
+	einfo "Fixing libsonyxavcenc.so"
+	patchelf --replace-needed "${PKG_HOME}"/libs/libsonyxavcenc.so libsonyxavcenc.so "${S}/${PKG_MOUNT}"/bin/resolve \
 		|| die "patchelf failed on resolve"
 
 	insinto "${PKG_HOME}"
