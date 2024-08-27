@@ -252,9 +252,9 @@ src_install() {
 '$ORIGIN' "${i}" || die "patchelf failed on ${i}"
 	done < <(find "${S}/${PKG_MOUNT}" -type f -size -32M -print0)
 
-	# TODO: Fix QA Notice: Unresolved soname dependencies:
-	#patchelf --replace-needed libsonyxavcenc.so "${PKG_HOME}"/libs/libsonyxavcenc.so "${S}/${PKG_MOUNT}"/bin/resolve \
-	#	|| die "patchelf failed on resolve"
+	# Fix QA Notice: Unresolved soname dependencies:
+	patchelf --replace-needed "${PKG_HOME}"/libs/libsonyxavcenc.so libsonyxavcenc.so "${PKG_HOME}"/bin/resolve \
+		|| die "patchelf failed on resolve"
 
 	insinto "${PKG_HOME}"
 	local _dir
@@ -323,7 +323,6 @@ src_install() {
 
 	# create configuration for revdep-rebuild
 	echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
-	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
 	insinto "/etc/revdep-rebuild"
 	doins "${T}/80${PN}"
 }
