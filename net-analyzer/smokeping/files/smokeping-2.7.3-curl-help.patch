@@ -1,0 +1,27 @@
+# curl releases after 7.72.0 changed to a shorter help list
+diff --git a/lib/Smokeping/probes/AnotherCurl.pm b/lib/Smokeping/probes/AnotherCurl.pm
+index 952197c..f18a367 100644
+--- a/lib/Smokeping/probes/AnotherCurl.pm
++++ b/lib/Smokeping/probes/AnotherCurl.pm
+@@ -216,7 +216,7 @@ sub test_usage {
+ 
+ 	my $arghashref = $self->features;
+ 	my %arghash = %$arghashref;
+-        my $curl_man = `$bin --help`;
++        my $curl_man = `$bin --help all`;
+         
+ 	for my $feature (keys %arghash) {
+ 		next if $curl_man =~ /\Q$arghash{$feature}/;
+diff --git a/lib/Smokeping/probes/Curl.pm b/lib/Smokeping/probes/Curl.pm
+index 09f67a7..0ea30f0 100644
+--- a/lib/Smokeping/probes/Curl.pm
++++ b/lib/Smokeping/probes/Curl.pm
+@@ -220,7 +220,7 @@ sub test_usage {
+ 
+ 	my $arghashref = $self->features;
+ 	my %arghash = %$arghashref;
+-        my $curl_man = `$bin --help`;
++        my $curl_man = `$bin --help all`;
+         
+ 	for my $feature (keys %arghash) {
+ 		next if $curl_man =~ /\Q$arghash{$feature}/;

@@ -21,7 +21,7 @@ RDEPEND="
 "
 
 python_test() {
-        local -x DJANGO_SETTINGS_MODULE=tests.test_settings
+	local -x DJANGO_SETTINGS_MODULE=tests.test_settings
 	local -x PYTHONPATH="${S}"
 	django-admin test -v 2 || die
 }
