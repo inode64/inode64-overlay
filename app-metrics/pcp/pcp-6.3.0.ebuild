@@ -41,6 +41,7 @@ BDEPEND="
 DEPEND="
 	${PYTHON_DEPS}
 	dev-libs/openssl:=
+	dev-lang/perl:=
 	activemq? ( dev-perl/libwww-perl )
 	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? (
