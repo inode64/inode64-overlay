@@ -4,7 +4,7 @@
 EAPI=8
 
 MODULES_OPTIONAL_USE="modules"
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3_{10..13} )
 
 inherit autotools linux-mod-r1 python-single-r1 systemd tmpfiles
 

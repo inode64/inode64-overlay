@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
-PYTHON_COMPAT=( pypy3 python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} )
 EGIT_REPO_URI="https://github.com/pydanny/${PN}.git"
 
 inherit distutils-r1 git-r3
