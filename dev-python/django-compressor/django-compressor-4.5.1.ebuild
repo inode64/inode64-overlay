@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( pypy3 python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} )
 inherit distutils-r1 pypi
 
 DESCRIPTION="Compresses linked and inline JavaScript or CSS into single cached files"
