@@ -1,0 +1,14 @@
+--- a/src/transport.c.old	2023-12-25 19:42:52.000000000 +0100
++++ b/src/transport.c	2024-09-02 18:49:59.166212186 +0200
+@@ -2117,11 +2117,8 @@
+ 				argn, etext, s);
+   if (addr)
+     {
+-    addr->transport_return = FAIL;
+     addr->message = msg;
+     }
+-  else *errptr = msg;
+-  return TRUE;
+   }
+ return FALSE;
+ }
