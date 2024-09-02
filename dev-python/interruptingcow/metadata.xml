@@ -11,5 +11,6 @@
 	</maintainer>
 	<upstream>
 		<remote-id type="bitbucket">evzijst/interruptingcow</remote-id>
+		<remote-id type="pypi">interruptingcow</remote-id>
 	</upstream>
 </pkgmetadata>
