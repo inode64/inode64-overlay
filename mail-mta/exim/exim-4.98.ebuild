@@ -17,7 +17,7 @@ REQUIRED_USE="
 	dkim? ( ssl !gnutls )
 	gnutls? ( ssl )
 	pkcs11? ( ssl )
-	|| ( berkdb gdbm tdb )
+	|| ( berkdb gdbm tdb sqlite )
 "
 # NOTE on USE="gnutls dane", gnutls[dane] is masked in base, unmasked
 # for x86 and amd64 only (probably due to unbound dep)
@@ -44,7 +44,7 @@ HOMEPAGE="https://www.exim.org/"
 
 SLOT="0"
 LICENSE="GPL-2"
-KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~ppc ppc64 sparc x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 COMMON_DEPEND=">=sys-apps/sed-4.0.5
 	dev-libs/libpcre2:=
@@ -84,7 +84,7 @@ COMMON_DEPEND=">=sys-apps/sed-4.0.5
 		x11-libs/libXt
 		x11-libs/libXaw
 	)
-	sqlite? ( dev-db/sqlite )
+	sqlite? ( dev-db/sqlite:= )
 	radius? ( net-dialup/freeradius-client )
 	virtual/libcrypt:=
 	virtual/libiconv
@@ -119,7 +119,6 @@ src_prepare() {
 	eapply     "${FILESDIR}"/exim-4.69-r1.27021.patch
 	eapply     "${FILESDIR}"/exim-4.97-localscan_dlopen.patch
 	eapply     "${FILESDIR}"/exim-4.97-no-exim_id_update.patch
-	eapply     "${FILESDIR}"/exim-4.97.1-memory-usage-bug-3047.patch # 922780
 	eapply     "${FILESDIR}"/no_tainted.patch # Disable tainted errors
 
 	# oddity, they disable berkdb as hack, and then throw an error when
@@ -168,6 +167,7 @@ src_configure() {
 		-e "s:CONFIGURE_FILE=.*$:CONFIGURE_FILE=${conffile}:" \
 		-e "s:ZCAT_COMMAND=.*$:ZCAT_COMMAND=${EPREFIX}/bin/zcat:" \
 		-e "s:COMPRESS_COMMAND=.*$:COMPRESS_COMMAND=${EPREFIX}/bin/gzip:" \
+		-e "s:^LOOKUP_DBM = yes:# LOOKUP_DBM = yes:" \
 		src/EDITME > Local/Makefile || die
 
 	# work on Local/Makefile from now on
@@ -182,34 +182,40 @@ src_configure() {
 	EOC
 
 	# configure db implementation, Exim always needs one for its hints
-	# database, we prefer tdb and gdbm, since bdb is kind of getting
-	# less and less support
-	if use tdb ; then
+	# database, we prefer sqlite, tdb and gdbm, since bdb is kind of
+	# getting less and less support
+	sed -i \
+		-e 's:^USE_DB=yes:# USE_DB=yes:' \
+		-e 's:^USE_GDBM=yes:# USE_GDBM=yes:' \
+		-e 's:^USE_TDB=yes:# USE_TDB=yes:' \
+		-e 's:^USE_SQLITE=yes:# USE_SQLITE=yes:' \
+		Makefile || die
+	if use sqlite ; then
+		cat >> Makefile <<- EOC
+			USE_SQLITE=yes
+			DBMLIB = -lsqlite3
+		EOC
+	elif use tdb ; then
 		cat >> Makefile <<- EOC
 			USE_TDB=yes
 			DBMLIB = -ltdb
 		EOC
-		sed -i -e 's:^USE_DB=yes:# USE_DB=yes:' Makefile || die
-		sed -i -e 's:^USE_GDBM=yes:# USE_GDBM=yes:' Makefile || die
 	elif use gdbm ; then
 		cat >> Makefile <<- EOC
 			USE_GDBM=yes
 			DBMLIB = -lgdbm
 		EOC
-		sed -i -e 's:^USE_DB=yes:# USE_DB=yes:' Makefile || die
-		sed -i -e 's:^USE_TDB=yes:# USE_TDB=yes:' Makefile || die
 	else # must be berkdb via required_use
 		# use the "native" interfaces to the DBM and CDB libraries, support
 		# passwd and directory lookups by default
 		local DB_VERS="5.3 5.1 4.8 4.7 4.6 4.5 4.4 4.3 4.2 3.2"
 		cat >> Makefile <<- EOC
 			USE_DB=yes
+			LOOKUP_DBM = yes
 			# keep include in CFLAGS because exim.h -> dbstuff.h -> db.h
 			CFLAGS += -I$(db_includedir ${DB_VERS})
 			DBMLIB = -l$(db_libname ${DB_VERS})
 		EOC
-		sed -i -e 's:^USE_GDBM=yes:# USE_GDBM=yes:' Makefile || die
-		sed -i -e 's:^USE_TDB=yes:# USE_TDB=yes:' Makefile || die
 	fi
 
 	# if we use libiconv, now is the time to tell so
