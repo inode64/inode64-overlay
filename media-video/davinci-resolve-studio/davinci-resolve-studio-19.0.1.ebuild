@@ -7,7 +7,7 @@
 EAPI=8
 inherit check-reqs desktop udev xdg
 
-PKG_NAME="DaVinci_Resolve_Studio_19.0_Linux"
+PKG_NAME="DaVinci_Resolve_Studio_19.0.1_Linux"
 PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
@@ -324,6 +324,7 @@ src_install() {
 
 	# create configuration for revdep-rebuild
 	echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
+	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
 	insinto "/etc/revdep-rebuild"
 	doins "${T}/80${PN}"
 }
