@@ -24,6 +24,7 @@ BDEPEND="test? ( app-backup/restic )"
 RDEPEND="app-backup/restic"
 
 src_configure() {
+    export BACKREST_BUILD_VERSION="${PV}"
 	export CGO_ENABLED=1
 	export CGO_CFLAGS="${CFLAGS}"
 	export CGO_CPPFLAGS="${CPPFLAGS}"
