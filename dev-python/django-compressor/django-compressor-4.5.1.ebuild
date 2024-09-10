@@ -3,6 +3,7 @@
 
 EAPI=8
 
+DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{10..13} )
 inherit distutils-r1 pypi
 
@@ -15,12 +16,13 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-    dev-python/django-appconf[${PYTHON_USEDEP}]
-    dev-python/rcssmin[${PYTHON_USEDEP}]
-    dev-python/rjsmin[${PYTHON_USEDEP}]
-    dev-python/six[${PYTHON_USEDEP}]"
+	dev-python/django-appconf[${PYTHON_USEDEP}]
+	dev-python/rcssmin[${PYTHON_USEDEP}]
+	dev-python/rjsmin[${PYTHON_USEDEP}]
+	dev-python/six[${PYTHON_USEDEP}]
+"
 
 python_test() {
-    django-admin.py test --settings=compressor.test_settings compressor ||
+	django-admin.py test --settings=compressor.test_settings compressor ||
 	die "Tests failed with ${EPYTHON}"
 }

@@ -7,50 +7,52 @@ PYTHON_COMPAT=( python3_{10..13} )
 #DISTUTILS_USE_PEP517="no"
 #inherit python-single-r1
 #inherit distutils-r1
-inherit python-any-r1 webapp
+inherit python-single-r1 webapp
 
-DESCRIPTION="A cron monitoring service with a web-based dashboard, API, and notification integrations"
+DESCRIPTION="A cron monitoring service and background task monitoring service"
 HOMEPAGE="https://github.com/healthchecks/healthchecks"
 SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.gh.tar.gz"
 
 LICENSE="BSD"
 KEYWORDS="~amd64 ~arm64"
 
-IUSE="apprise mysql postgres sqlite"
-REQUIRED_USE="|| ( mysql postgres sqlite )"
+IUSE="apprise mysql postgres +sqlite"
+REQUIRED_USE="
+	${PYTHON_REQUIRED_USE}
+	|| ( mysql postgres sqlite )
+"
 
 DOCS="CONTRIBUTING.md README.md SECURITY.md"
 
-DEPEND="
-	${PYTHON_DEPS}
-"
 RDEPEND="
-	${DEPEND}
+	${PYTHON_DEPS}
 	apprise? ( dev-python/apprise )
 	mysql? ( dev-python/mysqlclient )
 	postgres? ( dev-python/psycopg )
 	sqlite? ( dev-lang/python[sqlite] )
-	$(python_gen_any_dep '
-	dev-python/whitenoise[${PYTHON_USEDEP}]
-	dev-python/fido2[${PYTHON_USEDEP}]
-	dev-python/segno[${PYTHON_USEDEP}]
-	dev-python/oncalendar[${PYTHON_USEDEP}]
-	dev-python/cronsim[${PYTHON_USEDEP}]
-	dev-python/pycurl[${PYTHON_USEDEP}]
-	>=dev-python/django-5.1[${PYTHON_USEDEP}]
-	dev-python/django-compressor[${PYTHON_USEDEP}]
-	dev-python/django-stubs-ext[${PYTHON_USEDEP}]
-	dev-python/aiosmtpd[${PYTHON_USEDEP}]
-	dev-python/statsd[${PYTHON_USEDEP}]
-	dev-python/pyotp[${PYTHON_USEDEP}]
-	dev-python/pydantic[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/whitenoise[${PYTHON_USEDEP}]
+		dev-python/fido2[${PYTHON_USEDEP}]
+		dev-python/segno[${PYTHON_USEDEP}]
+		dev-python/oncalendar[${PYTHON_USEDEP}]
+		dev-python/cronsim[${PYTHON_USEDEP}]
+		dev-python/pycurl[${PYTHON_USEDEP}]
+		>=dev-python/django-5.1[${PYTHON_USEDEP}]
+		dev-python/django-compressor[${PYTHON_USEDEP}]
+		dev-python/django-stubs-ext[${PYTHON_USEDEP}]
+		dev-python/aiosmtpd[${PYTHON_USEDEP}]
+		dev-python/statsd[${PYTHON_USEDEP}]
+		dev-python/pyotp[${PYTHON_USEDEP}]
+		dev-python/pydantic[${PYTHON_USEDEP}]
 	')
 "
-
+DEPEND="
+	${RDEPEND}
+"
 PROPERTIES="test_network" #actually sends a test request
 
 pkg_setup() {
-	python-any-r1_pkg_setup
+	python-single-r1_pkg_setup
 	webapp_pkg_setup
 }
 

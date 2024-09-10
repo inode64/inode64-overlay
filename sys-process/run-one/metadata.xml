@@ -10,6 +10,6 @@
 		<name>Proxy Maintainers</name>
 	</maintainer>
 	<upstream>
-		<remote-id type="launchpad">~run-one/~run-one</remote-id>
+		<remote-id type="launchpad">run-one</remote-id>
 	</upstream>
 </pkgmetadata>

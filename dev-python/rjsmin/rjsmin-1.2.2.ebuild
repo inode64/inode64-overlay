@@ -10,7 +10,7 @@ inherit distutils-r1
 DESCRIPTION="Javascript minifier written in python"
 HOMEPAGE="http://opensource.perlig.de/rjsmin/"
 SRC_URI="
-    https://github.com/ndparker/rjsmin/archive/${PV}.tar.gz -> ${P}.gh.tar.gz
+	https://github.com/ndparker/rjsmin/archive/${PV}.tar.gz -> ${P}.gh.tar.gz
 "
 
 LICENSE="Apache-2.0"

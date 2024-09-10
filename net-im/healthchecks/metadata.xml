@@ -9,4 +9,11 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
+	<use>
+		<flag name="apprise">Allow backup monitoring to send notification to a wide variety
+			of services, using <pkg>dev-python/apprise</pkg></flag>
+	</use>
+	<upstream>
+		<remote-id type="github">healthchecks/healthchecks</remote-id>
+	</upstream>
 </pkgmetadata>
