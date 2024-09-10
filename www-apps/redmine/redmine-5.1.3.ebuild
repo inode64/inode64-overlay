@@ -10,9 +10,9 @@ DESCRIPTION="Flexible project management web application using the Ruby on Rails
 HOMEPAGE="https://www.redmine.org/"
 SRC_URI="https://www.redmine.org/releases/${P}.tar.gz"
 
-KEYWORDS="~amd64"
 LICENSE="GPL-2"
 SLOT="0"
+KEYWORDS="~amd64"
 IUSE="fastcgi imagemagick ldap +minimagick mysql passenger pdf postgres +standalone sqlite"
 
 ruby_add_bdepend "

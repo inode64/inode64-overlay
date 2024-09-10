@@ -27,7 +27,7 @@ src_configure() {
 }
 
 src_compile() {
-    local ld_flags="-s -w -X 'main.Version=${PV}' -X 'main.BuildTime=$(date -u '+%Y-%m-%d-%H%M UTC')'"
+	local ld_flags="-s -w -X 'main.Version=${PV}' -X 'main.BuildTime=$(date -u '+%Y-%m-%d-%H%M UTC')'"
 
 	ego build -trimpath -ldflags "${ld_flags}" -o "bin/${PN}" ./cmd/${PN} || die
 }
@@ -47,9 +47,9 @@ src_install() {
 }
 
 pkg_postinst() {
-    einfo "Please note that Cloudflared uses a custom version of GO that does not support the QUIC protocol."
-    einfo "Instead, you should configure the tunnel to use protocol: http2 in your settings"
-    einfo
-    einfo "This message clearly communicates the information about the custom GO version and provides the alternative configuration option."
-    einfo "https://github.com/cloudflare/go"
+	einfo "Please note that Cloudflared uses a custom version of GO that does not support the QUIC protocol."
+	einfo "Instead, you should configure the tunnel to use protocol: http2 in your settings"
+	einfo
+	einfo "This message clearly communicates the information about the custom GO version and provides the alternative configuration option."
+	einfo "https://github.com/cloudflare/go"
 }

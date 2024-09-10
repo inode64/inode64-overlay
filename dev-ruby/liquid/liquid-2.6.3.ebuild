@@ -12,7 +12,7 @@ RUBY_FAKEGEM_EXTRADOC="History.md README.md"
 inherit ruby-fakegem
 
 DESCRIPTION="Template engine for Ruby"
-HOMEPAGE="https://www.liquidmarkup.org/"
+HOMEPAGE="http://www.liquidmarkup.org/"
 
 LICENSE="MIT"
 SLOT="0"

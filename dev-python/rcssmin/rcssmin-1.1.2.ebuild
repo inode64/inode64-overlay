@@ -17,10 +17,10 @@ KEYWORDS="~amd64"
 distutils_enable_tests pytest
 
 src_configure() {
-    export SETUP_CEXT_REQUIRED=1
+	export SETUP_CEXT_REQUIRED=1
 }
 
 python_install_all() {
-    distutils-r1_python_install_all
-    mv "${D}/usr/share/doc/${PN}" "${D}/usr/share/doc/${PF}"
+	distutils-r1_python_install_all
+	mv "${D}/usr/share/doc/${PN}" "${D}/usr/share/doc/${PF}"
 }

@@ -17,18 +17,18 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="
-    dev-python/django[${PYTHON_USEDEP}]
+	dev-python/django[${PYTHON_USEDEP}]
 "
 BDEPEND="
-    test? (
-	app-arch/brotli[python,${PYTHON_USEDEP}]
-    )
+	test? (
+		app-arch/brotli[python,${PYTHON_USEDEP}]
+	)
 "
 
 distutils_enable_tests pytest
 distutils_enable_sphinx docs \
-    dev-python/furo
+	dev-python/furo
 
 pkg_postinst() {
-    optfeature "brotli compression" "app-arch/brotli[python]"
+	optfeature "brotli compression" "app-arch/brotli[python]"
 }
