@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module systemd
+inherit go-module systemd tmpfiles
 
 DESCRIPTION="High-performance HTTP server that implements restic's REST backend API"
 HOMEPAGE="https://github.com/restic/rest-server"
@@ -46,6 +46,8 @@ src_install() {
 	dobin rest-server
 
 	dodoc *.md
+	dotmpfiles "${FILESDIR}"/${PN}.conf
+	newinitd "${FILESDIR}/${PN}.initd" ${PN}
 
 	systemd_dounit examples/systemd/rest-server.{service,socket}
 }

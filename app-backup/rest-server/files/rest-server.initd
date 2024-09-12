@@ -1,0 +1,17 @@
+#!/sbin/openrc-run
+# Copyright 1999-2024 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+REST_SERVER_SSDARGS=${REST_SERVER_SSDARGS:-"--background --wait 1000"}
+REST_SERVER_ARGS=${REST_SERVER_ARGS:-"--log /var/log/rest-server/reset-server.log --path /srv/backup/rest --no-auth"}
+REST_SERVER_TERMTIMEOUT=${REST_SERVER_TERMTIMEOUT:-"TERM/60/KILL/5"}
+
+command="/usr/bin/rest-server"
+command_args="${REST_SERVER_ARGS}"
+start_stop_daemon_args="${REST_SERVER_SSDARGS}"
+#pidfile="/run/rest-server.pid"
+retry="${REST_SERVER_TERMTIMEOUT}"
+
+depend() {
+    need localmount
+}
