@@ -51,3 +51,7 @@ src_install() {
 
 	systemd_dounit examples/systemd/rest-server.{service,socket}
 }
+
+pkg_postinst() {
+	tmpfiles_process rest-server.conf
+}
