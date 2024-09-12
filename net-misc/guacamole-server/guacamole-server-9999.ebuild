@@ -10,7 +10,7 @@ HOMEPAGE="https://guacamole.apache.org/"
 if [[ "${PV}" == *9999 ]]; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
-	EGIT_BRANCH="staging/${PV}"
+	#EGIT_BRANCH="staging/${PV}"
 else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
 fi
