@@ -1,0 +1,27 @@
+#!/bin/bash
+
+die() {
+    echo "###"
+    echo $1
+    echo "###"
+    exit 1
+}
+
+[[ $1 == "clean" ]] && exit 0
+
+declare -r config=./hc/local_settings.py
+
+cd ${MY_INSTALLDIR} || die "cd failed"
+
+chmod +x manage.py
+
+if ! $(grep ^DEBUG ${config}); then
+    echo "DEBUG = False" >>${config}
+fi
+if ! $(grep ^SECRET_KEY ${config}); then
+    echo "SECRET_KEY = \"$(base64 /dev/urandom 2>/dev/null| head -c50)\"" >>${config}
+fi
+
+./manage.py migrate || die "Failed migrate database"
+
+exit 0

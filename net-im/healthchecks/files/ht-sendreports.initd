@@ -1,0 +1,109 @@
+#!/sbin/openrc-run
+# Copyright 1999-2024 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+	after mta
+}
+
+PID_DIR="/run/ht"
+LOG_DIR=${LOG_DIR:-"/var/log/ht"}
+HT_USER=${HT_USER:-"apache"}
+
+list_instance_dirs() {
+	if [ -z "${INSTANCE_DIRS}" ]; then
+		cut -d" " -f4 /var/db/webapps/healthchecks/*/installs 2>/dev/null
+	else
+		printf "%s\n" ${INSTANCE_DIRS}
+	fi
+}
+
+instance_dir_to_name() {
+	local name
+
+	name=${1#/}
+	printf %s "${name}" | awk '{
+		gsub("/", "--");
+		print $0;
+	}'
+}
+
+start_pre() {
+	mkdir -p "${PID_DIR}" "${LOG_DIR}" || return 1
+	chown "${HT_USER}":apache "${LOG_DIR}" || return 1
+}
+
+start() {
+	local instance_dir instance_name ret=1
+
+	IFS="
+"
+	for instance_dir in $(list_instance_dirs); do
+		if [ -d "${instance_dir}" ]; then
+			if [ ! -f "${instance_dir}"/manage.py ]; then
+				ewarn "Healtchecks send reports instance in ${instance_dir} has no manage.py script"
+			else
+				instance_name="$(instance_dir_to_name "${instance_dir}")-sendreports"
+				ebegin "Starting Healtchecks send reports update daemon in ${instance_dir}"
+				start-stop-daemon --start --user "${HT_USER}":apache \
+								  --background --wait 2000 \
+								  --stdout "${LOG_DIR}/${instance_name}.log" \
+								  --stderr "${LOG_DIR}/${instance_name}.log" \
+								  --make-pidfile --pidfile "${PID_DIR}/${instance_name}.pid" \
+								  --exec "${instance_dir}"/manage.py \
+								  -- sendreports --loop --skip-checks
+				eend $? && ret=0
+			fi
+		else
+			eerror "Healtchecks send reports instance in ${instance_dir} is missing"
+		fi
+	done
+	unset IFS
+
+	# Succeed if at least one started.
+	return ${ret}
+}
+
+stop() {
+	local instance_dir instance_name
+
+	IFS="
+"
+	for instance_dir in $(list_instance_dirs); do
+		instance_name="$(instance_dir_to_name "${instance_dir}")-sendreports"
+
+		[ -f "${PID_DIR}/${instance_name}.pid" ] ||
+			[ -f "${instance_dir}"/manage.py ] ||
+			continue
+
+		ebegin "Stopping Healtchecks send reports update daemon in ${instance_dir}"
+		start-stop-daemon --stop --retry 5 --pidfile "${PID_DIR}/${instance_name}.pid" \
+						  --exec "${instance_dir}"/manage.py
+		eend $?
+	done
+	unset IFS
+
+	# Always succeed.
+	return 0
+}
+
+status() {
+	local instance_dir instance_name pid
+
+	IFS="
+"
+	for instance_dir in $(list_instance_dirs); do
+		instance_name="$(instance_dir_to_name "${instance_dir}")-sendreports"
+
+		[ -f "${PID_DIR}/${instance_name}.pid" ] || continue
+
+		if start-stop-daemon --signal 0 --pidfile "${PID_DIR}/${instance_name}.pid"; then
+			# At least one instance is running
+			return 0
+		fi
+	done
+	unset IFS
+
+	# No instances are running
+	return 3
+}
