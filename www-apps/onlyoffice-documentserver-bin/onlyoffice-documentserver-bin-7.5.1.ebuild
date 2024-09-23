@@ -10,10 +10,8 @@ MY_P="ONLYOFFICE-DocumentServer-"${PV}""
 DESCRIPTION="Online office suite comprising viewers and editors for texts, spreadsheets and presentations (binary version)"
 HOMEPAGE="https://www.onlyoffice.com/"
 SRC_URI="
-	amd64? (
-		https://github.com/ONLYOFFICE/DocumentServer/releases/download/v"${PV}"/onlyoffice-documentserver_amd64.deb
+	https://github.com/ONLYOFFICE/DocumentServer/releases/download/v"${PV}"/onlyoffice-documentserver_amd64.deb
 		-> "${P}"_amd64.deb
-	)
 "
 
 S="${WORKDIR}"
