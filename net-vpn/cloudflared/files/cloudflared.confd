@@ -1,4 +1,6 @@
 # Config file for /etc/init.d/cloudflared
 
 # extra options (run cloudflared -h for a list of supported options)
-CLOUDFLARED_OPTS="--config /etc/cloudflared/config.yml"
+#CLOUDFLARED_OPTS=""
+#CLOUDFLARED_USER="root"
+#CLOUDFLARED_GROUP="root"
