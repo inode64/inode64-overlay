@@ -5,7 +5,7 @@ Wants=network.target
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/%I.yml --no-autoupdate run tunnel %I
+ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/%I.yml --no-autoupdate tunnel run %I
 #User=cloudflared
 #Group=cloudflared
 Restart=on-failure
