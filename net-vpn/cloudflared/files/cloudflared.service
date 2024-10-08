@@ -5,15 +5,15 @@ Wants=network.target
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/config.yml --no-autoupdate
-User=cloudflared
-Group=cloudflared
+ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/%I.yml --no-autoupdate run tunnel %I
+#User=cloudflared
+#Group=cloudflared
 Restart=on-failure
 RestartSec=5s
 TimeoutStartSec=0
 
 # Allow cloudflared access to logfile
-ReadWritePaths=/var/log/cloudflared.log
+ReadWritePaths=/var/log/cloudflared/%I.log
 
 # Allow cloudflared to bind ports in the range of 0-1024 and restrict it to
 # that capability

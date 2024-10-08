@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit flag-o-matic go-module systemd
+inherit flag-o-matic go-module systemd tmpfiles
 
 DESCRIPTION="Argo Tunnel client, written in GoLang"
 HOMEPAGE="https://github.com/cloudflare/cloudflared"
@@ -39,14 +39,20 @@ src_test() {
 src_install() {
 	dobin bin/*
 
+	diropts -m0600
+	dodir /etc/cloudflared
 	insinto /etc/cloudflared
-	doins "${FILESDIR}"/config.yml
+	newins "${FILESDIR}"/config.yml config-example.yml
 	newinitd "${FILESDIR}"/cloudflared.initd cloudflared
 	newconfd "${FILESDIR}"/cloudflared.confd cloudflared
-	systemd_dounit "${FILESDIR}"/cloudflared.service
+	systemd_newunit "${FILESDIR}"/cloudflared.service cloudflared@.service
+
+	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
 }
 
 pkg_postinst() {
+	tmpfiles_process ${PN}.tmpfiles.conf
+
 	einfo "Please note that Cloudflared uses a custom version of GO that does not support the QUIC protocol."
 	einfo "Instead, you should configure the tunnel to use protocol: http2 in your settings"
 	einfo
