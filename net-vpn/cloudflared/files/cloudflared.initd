@@ -9,6 +9,7 @@ command_user="${CLOUDFLARED_USER:-cloudflared}:${CLOUDFLARED_GROUP:-cloudflared}
 description="Argo Tunnel client"
 name="Argo Tunnel client"
 pidfile="/run/${RC_SVCNAME}.pid"
+required_files="/etc/cloudflared/${SVCNAME#*.}.yml"
 
 depend() {
 	need net
