@@ -3,10 +3,10 @@
 
 EAPI=8
 
-inherit readme.gentoo-r1 rpm
+inherit readme.gentoo-r1 rpm secureboot
 
 MY_PR="${PR:1}"
-MY_REV="5.fc41"
+MY_REV="1.fc42"
 
 DESCRIPTION="UEFI firmware for 64-bit x86 virtual machines"
 HOMEPAGE="https://github.com/tianocore/edk2"
@@ -17,7 +17,7 @@ LICENSE="BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 
-RDEPEND="!sys-firmware/edk2-ovmf"
+RDEPEND="!sys-firmware/edk2"
 
 DISABLE_AUTOFORMATTING=true
 DOC_CONTENTS="This package contains the tianocore edk2 UEFI firmware for 64-bit x86
@@ -44,8 +44,8 @@ one for yourself. Firmware blobs are commonly labeled
 
 In order to use the firmware you can run qemu the following way
 
-	$ qemu-system-x86_64 \
-		-drive file=/usr/share/edk2-ovmf/OVMF.fd,if=pflash,format=raw,unit=0,readonly=on \
+	$ qemu-system-x86_64 \\
+		-drive file=/usr/share/edk2-ovmf/OVMF.fd,if=pflash,format=raw,unit=0,readonly=on \\
 		..."
 
 src_install() {
@@ -55,6 +55,8 @@ src_install() {
 
 	rm -rf usr/share/licenses || die
 	mv usr "${ED}" || die
+
+	secureboot_auto_sign --in-place
 
 	readme.gentoo_create_doc
 }
