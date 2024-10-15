@@ -40,7 +40,6 @@ src_install() {
 	dobin bin/*
 
 	diropts -m0600
-	dodir /etc/cloudflared
 	insinto /etc/cloudflared
 	newins "${FILESDIR}"/config.yml config-example.yml
 	newinitd "${FILESDIR}"/cloudflared.initd cloudflared
