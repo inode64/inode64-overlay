@@ -4,12 +4,12 @@
 EAPI=8
 inherit desktop wrapper xdg-utils
 
-MY_PV="242.23339.16"
+MY_PV="242.23726.55"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
 HOMEPAGE="https://www.jetbrains.com/phpstorm/"
-SRC_URI="https://download.jetbrains.com/webide/${MY_PN}-${PV}.tar.gz"
+SRC_URI="https://download.jetbrains.com/webide/${MY_PN}-${MY_PV}.tar.gz"
 
 S="${WORKDIR}/${MY_PN}-${MY_PV}"
 LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
