@@ -7,7 +7,7 @@
 EAPI=8
 inherit check-reqs desktop udev xdg
 
-PKG_NAME="DaVinci_Resolve_Studio_19.0.2_Linux"
+PKG_NAME="DaVinci_Resolve_Studio_${PV}_Linux"
 PKG_HOME="/opt/resolve"
 PKG_MOUNT="squashfs-root"
 
