@@ -6,7 +6,7 @@ EAPI=8
 inherit readme.gentoo-r1 rpm secureboot
 
 MY_PR="${PR:1}"
-MY_REV="1.fc42"
+MY_REV="2.fc42"
 
 DESCRIPTION="UEFI firmware for 64-bit x86 virtual machines"
 HOMEPAGE="https://github.com/tianocore/edk2"
