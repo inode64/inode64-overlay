@@ -3,9 +3,12 @@
 
 EAPI=8
 
+inherit rpm
+
 DESCRIPTION="Microsoft ODBC Driver 18 for SQL Server"
-HOMEPAGE="https://techcommunity.microsoft.com/t5/sql-server-blog/bg-p/SQLServer/label-name/SQLServerDrivers"
+HOMEPAGE="https://learn.microsoft.com/en-us/sql/connect/odbc/microsoft-odbc-driver-for-sql-server"
 SRC_URI="https://packages.microsoft.com/rhel/9/prod/Packages/m/msodbcsql18-${PV}-1.x86_64.rpm"
+S="${WORKDIR}"
 
 LICENSE="Microsoft-ODBC"
 SLOT="${PV%%.*}"
