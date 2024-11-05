@@ -54,6 +54,7 @@ find . -name "*.ebuild" | while read -r ebuild; do
 EOF
 	fi
 	ebuild "${ebuild}" digest 2>/dev/null
+	#ebuild "${ebuild}" clean manifest prepare 2>/dev/null
 done
 
 /usr/bin/pkgcheck scan --net
