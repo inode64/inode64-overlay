@@ -20,7 +20,7 @@ depend() {
 }
 
 reload() {
-        ebegin "Reloading ${SVCNAME}"
-        /usr/bin/mercure reload --config /etc/mercure/Caddyfile
-        eend $?
+	ebegin "Reloading ${SVCNAME}"
+	/usr/bin/mercure reload --config /etc/mercure/Caddyfile
+	eend $?
 }
