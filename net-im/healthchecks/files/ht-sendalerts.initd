@@ -51,7 +51,7 @@ start() {
 								  --stderr "${LOG_DIR}/${instance_name}.log" \
 								  --make-pidfile --pidfile "${PID_DIR}/${instance_name}.pid" \
 								  --exec "${instance_dir}"/manage.py \
-								  -- sendalerts --loop --skip-checks
+								  -- sendalerts --skip-checks
 				eend $? && ret=0
 			fi
 		else
