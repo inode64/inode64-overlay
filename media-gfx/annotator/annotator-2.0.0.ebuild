@@ -15,7 +15,7 @@ KEYWORDS="~amd64 ~arm ~x86"
 
 DEPEND="
 	dev-libs/libgee
-	dev-libs/granite
+	>=dev-libs/granite-7.0.0
 	>=x11-libs/gtk+-3.22:3
 	>=gui-libs/libhandy-1.6.0:1
 "
