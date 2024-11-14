@@ -26,7 +26,6 @@ DEPEND="
 
 # The test suite requires memcached to be running.
 RESTRICT='test'
-PATCHES=( "${FILESDIR}/8.0-patches-20211123.patch" )
 
 src_configure() {
 	local PHP_EXT_ECONF_ARGS=( --enable-memcache --with-zlib-dir="${EPREFIX}/usr" $(use_enable session memcache-session) )
