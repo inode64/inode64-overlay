@@ -20,10 +20,3 @@ BDEPEND="test? ( dev-python/freezegun[${PYTHON_USEDEP}] )"
 distutils_enable_tests pytest
 
 DOCS=( {HISTORY,README}.md )
-
-PATCHES=(
-	# bug 638250
-	"${FILESDIR}"/${PN}-1.5.1-test-failure.patch
-	# @asyncio.coroutine removed in py3.11
-	"${FILESDIR}"/${PN}-1.5.2-python311.patch
-)
