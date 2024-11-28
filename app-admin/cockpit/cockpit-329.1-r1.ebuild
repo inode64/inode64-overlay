@@ -26,10 +26,9 @@ RESTRICT="!test? ( test )"
 
 BDEPEND="
 	>=app-crypt/mit-krb5-1.11
-	>=dev-libs/glib-2.50
+	>=dev-libs/glib-2.56
 	>=dev-libs/json-glib-1.4
 	>=net-libs/gnutls-3.6.0
-	>=net-libs/libssh-0.8.5[server]
 	>=sys-apps/systemd-235[policykit]
 	>=sys-auth/polkit-0.105[systemd]
 	doc? (
@@ -45,9 +44,6 @@ BDEPEND="
 	)
 "
 DEPEND="
-	dev-libs/libpwquality
-	dev-python/dbus-python
-	net-libs/nodejs[npm]
 	networkmanager? (
 		firewalld? (
 			net-firewall/firewalld
@@ -57,7 +53,6 @@ DEPEND="
 	pcp? (
 		app-metrics/pcp
 	)
-	sys-apps/accountsservice[systemd]
 	udisks? (
 		sys-fs/udisks[lvm,systemd]
 	)
@@ -91,7 +86,6 @@ src_prepare() {
 src_configure() {
 	local myconf=(
 		$(use_enable debug)
-		$(use_enable pcp)
 		$(use_enable doc)
 		--with-pamdir="/$(get_libdir)/security"
 		--localstatedir="${EPREFIX}/var"
