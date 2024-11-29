@@ -32,8 +32,6 @@ if has nodejs-mod ${INHERITED}; then
     die "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
 
-RDEPEND+=" net-libs/nodejs"
-
 # Upstream does not support stripping go packages
 RESTRICT="test strip"
 
