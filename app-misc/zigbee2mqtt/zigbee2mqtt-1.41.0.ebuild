@@ -27,6 +27,7 @@ RDEPEND="
 	acct-group/zigbee2mqtt
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
+	net-libs/nodejs:=
 	homeassistant? ( || (
 		>=app-misc/homeassistant-2024.4[mosquitto]
 		>=app-misc/homeassistant-min-2024.4[mosquitto]

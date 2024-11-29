@@ -18,6 +18,8 @@ KEYWORDS="~amd64"
 
 NODEJS_EXTRA_FILES="bin constants.js index.js paths.js"
 
+RDEPEND="net-libs/nodejs"
+
 src_install() {
 	nodejs-mod_src_install
 

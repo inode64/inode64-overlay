@@ -43,8 +43,6 @@ if has nodejs-pack ${INHERITED}; then
     die "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
 
-RDEPEND+=" net-libs/nodejs:="
-
 # @ECLASS_VARIABLE: NODEJS_MOD_PREFIX
 # @DESCRIPTION:
 # The directory prefix for the NodeJS module
