@@ -15,6 +15,14 @@ temp_file=$(mktemp "/tmp/$(basename "$0").XXXXXX")
 #done
 
 #
+# Update varibales
+#
+
+sed -i 's/^PYTHON_COMPAT=.*/PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )/' */*/*.ebuild
+#sed -i 's/^EAPI=.*/EAPI=8/' */*/*.ebuild
+
+
+#
 # Trim and convert indents to tabs
 #
 

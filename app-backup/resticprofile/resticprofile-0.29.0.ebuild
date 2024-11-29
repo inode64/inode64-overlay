@@ -15,9 +15,9 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
 RDEPEND="
-    app-backup/restic
-    >=dev-lang/go-1.23.0
-    "
+	app-backup/restic
+	>=dev-lang/go-1.23.0
+"
 
 src_configure() {
 	export CGO_ENABLED=1
