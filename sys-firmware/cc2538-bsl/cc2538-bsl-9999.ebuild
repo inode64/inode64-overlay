@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 inherit python-single-r1
 
 DESCRIPTION="Script to communicate with Texas Instruments CC13xx/CC2538/CC26xx Serial Boot Loader"

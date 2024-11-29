@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 
 inherit autotools elisp-common python-single-r1 tmpfiles bash-completion-r1
 

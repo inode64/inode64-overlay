@@ -54,10 +54,10 @@ GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
 
 pkg_pretend() {
-    # check if java version is 11
-    if [[ $(java -version 2>&1 | head -n 1 | cut -d '"' -f 2 | cut -d '.' -f 1) -ne 11 ]]; then
-	die "Please install and active a Java 11 runtime"
-    fi
+	# check if java version is 11
+	if [[ $(java -version 2>&1 | head -n 1 | cut -d '"' -f 2 | cut -d '.' -f 1) -ne 11 ]]; then
+		die "Please install and active a Java 11 runtime"
+	fi
 }
 
 src_unpack() {

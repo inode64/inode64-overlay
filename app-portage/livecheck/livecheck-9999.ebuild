@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_1{0,1,2} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 DISTUTILS_USE_PEP517=poetry
 PYPI_PN="portage-${PN}"
 inherit distutils-r1 git-r3

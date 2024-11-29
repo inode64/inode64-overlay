@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 inherit bash-completion-r1 desktop flag-o-matic linux-info optfeature
 inherit python-single-r1 systemd tmpfiles toolchain-funcs udev wrapper xdg
 

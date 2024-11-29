@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 inherit distutils-r1 pypi
 
 DESCRIPTION="A Python parser for the lspci command from the pciutils package"
@@ -15,7 +15,7 @@ HOMEPAGE="
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 
 RDEPEND=">=dev-python/cached-property-1.5.1"
 
