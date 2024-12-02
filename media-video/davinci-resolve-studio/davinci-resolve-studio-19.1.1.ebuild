@@ -115,7 +115,7 @@ DEPEND="
 	    gnome-base/gnome-shell
 	)
 	video_cards_amdgpu? ( >=dev-libs/rocm-opencl-runtime-5.5.1 )
-	video_cards_nvidia? ( x11-drivers/nvidia-drivers )
+	video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-550.40.07 )
 "
 RDEPEND="${DEPEND}"
 BDEPEND="
