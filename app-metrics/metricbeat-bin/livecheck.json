@@ -1,0 +1,5 @@
+{
+  "type": "regex",
+  "regex": ",'releases/tag/([0-9\\.]+)",
+  "url": "https://github.com/elastic/beats/releases.atom"
+}
