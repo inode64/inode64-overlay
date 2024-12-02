@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit systemd
+inherit systemd tmpfiles
 
 MY_PN="metricbeat"
 MY_P="${MY_PN}-${PV}-linux-x86_64"
@@ -35,10 +35,12 @@ src_install() {
 	cp -r module "${ED}"/usr/share/${MY_PN}
 	cp -r kibana "${ED}"/usr/share/${MY_PN}
 
-	keepdir /var/lib/${MY_PN}
-	keepdir /var/log/${MY_PN}
-
 	newconfd "${FILESDIR}/${MY_PN}.confd" ${MY_PN}
 	newinitd "${FILESDIR}/${MY_PN}.initd" ${MY_PN}
 	systemd_dounit "${FILESDIR}/${MY_PN}.service"
+    dotmpfiles "${FILESDIR}/${MY_PN}.tmpfiles.conf"
+}
+
+pkg_postinst() {
+	tmpfiles_process metricbeat.tmpfiles.conf
 }

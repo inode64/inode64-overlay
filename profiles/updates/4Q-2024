@@ -1,1 +1,2 @@
 move sys-firmware/edk2-ovmf-bin sys-firmware/edk2-bin
+move app-admin/metricbeat-bin app-metrics/metricbeat-bin
