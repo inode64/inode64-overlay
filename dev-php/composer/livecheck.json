@@ -1,6 +1,6 @@
 {
   "type": "regex",
-  "no_auto_update": true,
   "regex": "releases/tag/([0-9\\.]+)",
-  "url": "https://github.com/composer/composer/releases.atom"
+  "url": "https://github.com/composer/composer/releases.atom",
+  "composer": true
 }
