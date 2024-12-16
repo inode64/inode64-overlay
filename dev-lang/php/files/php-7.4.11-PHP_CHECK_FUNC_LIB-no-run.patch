@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [cross compile specific]
+
+diff -durpN php-7.4.11/build/php.m4 php-7.4.11/build/php.m4
+--- php-7.4.11/build/php.m4	2020-10-09 08:39:51.000000000 -0400
++++ php-7.4.11/build/php.m4	2020-10-09 08:41:08.907202935 -0400
+@@ -1595,13 +1595,6 @@
+   ])
+ 
+   if test "$found" = "yes"; then
+-    ac_libs=$LIBS
+-    LIBS="$LIBS -l$2"
+-    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[found=no])
+-    LIBS=$ac_libs
+-  fi
+-
+-  if test "$found" = "yes"; then
+     PHP_ADD_LIBRARY($2)
+     PHP_DEF_HAVE($1)
+     PHP_DEF_HAVE(lib$2)
