@@ -1,0 +1,24 @@
+diff -durpN php-7.3.3.orig/ext/standard/info.c php-7.3.3/ext/standard/info.c
+--- php-7.3.3.orig/ext/standard/info.c	2019-03-05 08:50:45.000000000 -0500
++++ php-7.3.3/ext/standard/info.c	2019-03-27 06:32:58.744643449 -0400
+@@ -829,9 +829,6 @@ PHPAPI void php_print_info(int flag)
+ #ifdef ARCHITECTURE
+ 		php_info_print_table_row(2, "Architecture", ARCHITECTURE);
+ #endif
+-#ifdef CONFIGURE_COMMAND
+-		php_info_print_table_row(2, "Configure Command", CONFIGURE_COMMAND );
+-#endif
+ 
+ 		if (sapi_module.pretty_name) {
+ 			php_info_print_table_row(2, "Server API", sapi_module.pretty_name );
+diff -durpN php-7.3.3.orig/ext/standard/tests/general_functions/phpinfo.phpt php-7.3.3/ext/standard/tests/general_functions/phpinfo.phpt
+--- php-7.3.3.orig/ext/standard/tests/general_functions/phpinfo.phpt	2019-03-05 08:50:45.000000000 -0500
++++ php-7.3.3/ext/standard/tests/general_functions/phpinfo.phpt	2019-03-27 06:32:58.745643457 -0400
+@@ -20,7 +20,6 @@ PHP Version => %s
+ 
+ System => %s
+ Build Date => %s%a
+-Configure Command => %s
+ Server API => Command Line Interface
+ Virtual Directory Support => %s
+ Configuration File (php.ini) Path => %s

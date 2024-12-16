@@ -1,0 +1,203 @@
+Upstream-Status: Backport [aeaab8ee3e52f74c042a861e394437d6554b36be]
+
+diff -up php-7.4.33/ext/pdo_oci/oci_statement.c.gcc14 php-7.4.33/ext/pdo_oci/oci_statement.c
+--- php-7.4.33/ext/pdo_oci/oci_statement.c.gcc14	2022-10-31 11:36:05.000000000 +0100
++++ php-7.4.33/ext/pdo_oci/oci_statement.c	2024-02-14 15:05:34.224568567 +0100
+@@ -654,7 +654,7 @@ static ssize_t oci_blob_write(php_stream
+ 	return amt;
+ }
+ 
+-static size_t oci_blob_read(php_stream *stream, char *buf, size_t count)
++static ssize_t oci_blob_read(php_stream *stream, char *buf, size_t count)
+ {
+ 	struct oci_lob_self *self = (struct oci_lob_self*)stream->abstract;
+ 	ub4 amt;
+@@ -666,7 +666,7 @@ static size_t oci_blob_read(php_stream *
+ 		NULL, NULL, 0, SQLCS_IMPLICIT);
+ 
+ 	if (r != OCI_SUCCESS && r != OCI_NEED_DATA) {
+-		return (size_t)-1;
++		return -1;
+ 	}
+ 
+ 	self->offset += amt;
+diff -up php-7.4.33/sapi/litespeed/lsapi_main.c.gcc14 php-7.4.33/sapi/litespeed/lsapi_main.c
+--- php-7.4.33/sapi/litespeed/lsapi_main.c.gcc14	2024-02-14 15:09:59.523706463 +0100
++++ php-7.4.33/sapi/litespeed/lsapi_main.c	2024-02-14 15:10:13.979258854 +0100
+@@ -25,6 +25,7 @@
+ #include "zend.h"
+ #include "ext/standard/basic_functions.h"
+ #include "ext/standard/info.h"
++#include "ext/standard/head.h"
+ #include "lsapilib.h"
+ 
+ #include <stdio.h>
+
+
+Adapted for 7.4 from:
+
+From aeaab8ee3e52f74c042a861e394437d6554b36be Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Mon, 9 Sep 2019 21:29:03 +0200
+Subject: [PATCH] Port various autoconf bits to C99 compilers
+
+C99 no longer has implicit function declarations and implicit ints.
+Current GCC versions enable them as an extension, but this will
+change in a future GCC version.
+---
+ Zend/Zend.m4           |  2 ++
+ build/libtool.m4       |  5 +----
+ build/php.m4           | 17 ++++++++++-------
+ configure.ac           |  2 ++
+ ext/standard/config.m4 | 22 ++++++++++++++++++++++
+ 5 files changed, 37 insertions(+), 11 deletions(-)
+
+diff --git a/Zend/Zend.m4 b/Zend/Zend.m4
+index 054e2621a4057..57a12ac36ba60 100644
+--- a/Zend/Zend.m4
++++ b/Zend/Zend.m4
+@@ -157,6 +157,7 @@ AC_MSG_CHECKING(whether double cast to long preserves least significant bits)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <limits.h>
++#include <stdlib.h>
+ 
+ int main()
+ {
+@@ -256,6 +257,7 @@ AC_MSG_CHECKING(for MM alignment and log values)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ typedef union _mm_align_test {
+   void *ptr;
+diff --git a/build/libtool.m4 b/build/libtool.m4
+index f7f51642920f9..577dad4cbe313 100644
+--- a/build/libtool.m4
++++ b/build/libtool.m4
+@@ -945,6 +945,7 @@ else
+ #endif
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ #ifdef RTLD_GLOBAL
+ #  define LT_DLGLOBAL		RTLD_GLOBAL
+diff --git a/build/php.m4 b/build/php.m4
+index 25f5aa762b892..529876b6b67c6 100644
+--- a/build/php.m4
++++ b/build/php.m4
+@@ -1120,7 +1120,7 @@ AC_CACHE_CHECK(for type of reentrant time-related functions, ac_cv_time_r_type,[
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+ 
+-main() {
++int main() {
+ char buf[27];
+ struct tm t;
+ time_t old = 0;
+@@ -1136,7 +1136,7 @@ return (1);
+ ],[
+   AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+-main() {
++int main() {
+   struct tm t, *s;
+   time_t old = 0;
+   char buf[27], *p;
+@@ -1597,7 +1600,7 @@ AC_DEFUN([PHP_CHECK_FUNC_LIB],[
+   if test "$found" = "yes"; then
+     ac_libs=$LIBS
+     LIBS="$LIBS -l$2"
+-    AC_RUN_IFELSE([AC_LANG_SOURCE([[main() { return (0); }]])],[found=yes],[found=no],[found=no])
++    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[found=no])
+     LIBS=$ac_libs
+   fi
+ 
+@@ -2285,7 +2288,7 @@ AC_DEFUN([PHP_TEST_WRITE_STDOUT],[
+ 
+ #define TEXT "This is the test message -- "
+ 
+-main()
++int main()
+ {
+   int n;
+ 
+diff --git a/configure.ac b/configure.ac
+index d759b027517e5..e15b83ca25296 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -665,6 +665,8 @@
+ #include <string.h>
+ #include <netdb.h>
+ #include <sys/types.h>
++#include <string.h>
++#include <stdlib.h>
+ #ifndef AF_INET
+ # include <sys/socket.h>
+ #endif
+diff --git a/ext/standard/config.m4 b/ext/standard/config.m4
+index 9f85ec2b7080d..5b49e5d661f3c 100644
+--- a/ext/standard/config.m4
++++ b/ext/standard/config.m4
+@@ -71,6 +71,9 @@ AC_CACHE_CHECK(for standard DES crypt, ac_cv_crypt_des,[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","rl");
+@@ -98,6 +101,9 @@ AC_CACHE_CHECK(for extended DES crypt, ac_cv_crypt_ext_des,[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","_J9..rasm");
+@@ -125,6 +131,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[15], answer[40];
+@@ -162,6 +171,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[30], answer[70];
+@@ -196,6 +208,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+86];
+@@ -229,6 +244,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+43];
