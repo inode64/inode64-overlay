@@ -83,7 +83,11 @@ src_install() {
 
 	webapp_hook_script "${FILESDIR}"/reconfig
 	webapp_configfile "${MY_HTDOCSDIR}"/hc/local_settings.py
-	webapp_configfile "${MY_HTDOCSDIR}"/templates
+
+	local x
+	for x in $(find templates/ -type f); do
+		webapp_configfile "${MY_HTDOCSDIR}"/${x}
+	done
 
 	webapp_src_install
 

@@ -15,10 +15,10 @@ cd ${MY_INSTALLDIR} || die "cd failed"
 
 chmod +x manage.py
 
-if ! $(grep ^DEBUG ${config}); then
+if ! grep -q ^DEBUG ${config}; then
     echo "DEBUG = False" >>${config}
 fi
-if ! $(grep ^SECRET_KEY ${config}); then
+if ! grep -q ^SECRET_KEY ${config}; then
     echo "SECRET_KEY = \"$(base64 /dev/urandom 2>/dev/null| head -c50)\"" >>${config}
 fi
 
