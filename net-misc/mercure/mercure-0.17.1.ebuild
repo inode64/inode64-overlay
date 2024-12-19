@@ -17,6 +17,10 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-group/mercure
 	acct-user/mercure
+	app-admin/sudo
+	app-crypt/certbot
+	dev-java/openjdk-bin
+	dev-libs/nss
 "
 
 DOCS=(README.md)
