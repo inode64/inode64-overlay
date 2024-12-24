@@ -11,10 +11,8 @@ user=${SVCNAME#*.}
 # Options for start-stop-daemon (default start function)
 command=${PM2}
 command_user=${user}
-pidfile=$(eval echo ~${user})/.pm2/pm2.pid
 
 run_pm2_as_user() {
-	einfo "${PM2} $@"
 	eval sudo -u ${user} ${PM2} $@
 }
 
@@ -40,13 +38,14 @@ start_post() {
 
 start() {
 	ebegin "Starting PM2 process manager..."
-	start-stop-daemon --start --user ${user} --exec ${PM2} resurrect --background --pidfile ${pidfile}
+    run_pm2_as_user resurrect
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping PM2 process manager..."
 	run_pm2_as_user dump
+	run_pm2_as_user delete all
 	run_pm2_as_user kill
 	eend $?
 }
@@ -64,9 +63,9 @@ list() {
 }
 
 update() {
-    ebegin "Updating process"
-    run_pm2_as_user update
-    eend $?
+	ebegin "Updating process"
+	run_pm2_as_user update
+	eend $?
 }
 
 # vim: ts=4
