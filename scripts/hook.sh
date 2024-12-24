@@ -19,6 +19,13 @@ if [ "$cmd" == "post" ]; then
 		git add ${search_dir}/dist/${file}
 		git commit -m "Add distfile for ${cp}"
 	fi
+
+	if [ "$cp" == "net-vpn/cloudflared" ]; then
+		file="${ebuild}-${new_version}-vendor.tar.xz"
+		cp ${distdir}/${file} ${search_dir}/dist/
+		git add ${search_dir}/dist/${file}
+		git commit -m "Add distfile for ${cp}"
+	fi
 fi
 
 exit 0
