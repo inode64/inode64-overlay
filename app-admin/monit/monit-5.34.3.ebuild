@@ -34,6 +34,7 @@ src_configure() {
 	local myeconfargs=(
 		$(use_with pam)
 		$(use_with ssl)
+		--enable-optimized
 	)
 	econf "${myeconfargs[@]}"
 }
