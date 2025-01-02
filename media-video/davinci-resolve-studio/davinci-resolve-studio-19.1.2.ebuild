@@ -68,27 +68,26 @@ KEYWORDS="~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 RESTRICT="mirror strip test"
 
+# media-libs/libpng-compat:1.2 required for bin/BMDPanelFirmware and libs/libQtGui.so.4
+# x11-libs/libXfixes required for libs/libQtGui.so.4
+# x11-libs/libXrender required for libs/libQtGui.so.4
+# x11-libs/libXtst required for libs/libFairlightPage.so
+
 DEPEND="
 	app-arch/brotli
 	app-arch/lz4
-	app-crypt/argon2
 	app-crypt/mit-krb5
 	dev-libs/glib
 	dev-libs/icu
 	dev-libs/libltdl
 	dev-libs/nspr
 	dev-libs/nss
-	dev-qt/qt3d:5[gamepad,qml]
-	dev-qt/qtvirtualkeyboard:5
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/harfbuzz
 	media-libs/libpng-compat:1.2
-	net-dns/libidn2
-	net-libs/nghttp2
 	sys-apps/dbus
-	sys-devel/gcc[openmp]
-	sys-process/numactl
+	sys-devel/gcc
 	virtual/libcrypt
 	virtual/opencl
 	virtual/opengl
