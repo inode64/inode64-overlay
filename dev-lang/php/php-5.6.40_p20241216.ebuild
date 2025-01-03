@@ -11,7 +11,7 @@ DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
 SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/php-5.6.40-patches-1.tar.xz"
 EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
-EGIT_BRANCH="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/PHP-5.6-security-backports-openssl11"
+EGIT_BRANCH="PHP-5.6-security-backports-openssl11"
 EGIT_COMMIT="8e9bde45d8f4cfcf72f5a730f4fccf907eb5c35b"
 
 LICENSE="PHP-3.01
