@@ -9,7 +9,7 @@ PHP_MV="$(ver_cut 1)"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
-SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/php-$(ver_cut 1-3)-patches-1.tar.xz"
+SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/php-$(ver_cut 1-3)-patches-2.tar.xz"
 EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
 EGIT_BRANCH="PHP-5.6-security-backports-openssl11"
 EGIT_COMMIT="8e9bde45d8f4cfcf72f5a730f4fccf907eb5c35b"
@@ -76,7 +76,7 @@ COMMON_DEPEND="
 	>=app-eselect/eselect-php-0.9.1[apache2?,fpm?]
 	>=dev-libs/libpcre-8.32[unicode]
 	fpm? ( acl? ( sys-apps/acl ) )
-	apache2? ( www-servers/apache[apache2_modules_unixd(+),threads=] )
+	apache2? ( www-servers/apache[apache2_modules_unixd(+)] )
 	berkdb? ( || (	sys-libs/db:5.3
 					sys-libs/db:5.1
 					sys-libs/db:4.8
