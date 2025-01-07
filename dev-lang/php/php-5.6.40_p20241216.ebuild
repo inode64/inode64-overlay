@@ -9,7 +9,7 @@ PHP_MV="$(ver_cut 1)"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
-SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/php-5.6.40-patches-1.tar.xz"
+SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/php-$(ver_cut 1-3)-patches-1.tar.xz"
 EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
 EGIT_BRANCH="PHP-5.6-security-backports-openssl11"
 EGIT_COMMIT="8e9bde45d8f4cfcf72f5a730f4fccf907eb5c35b"
@@ -181,7 +181,10 @@ php_install_ini() {
 		-i "${phpinisrc}" || die
 
 	# Set the include path to point to where we want to find PEAR packages
-	sed -e 's|^;include_path = ".:/php/includes".*|include_path = ".:'"${EPREFIX}"'/usr/share/php'${PHP_MV}':'"${EPREFIX}"'/usr/share/php"|' -i "${phpinisrc}" || die
+	sed -e \
+		's|^;include_path = ".:/php/includes".*|'\
+		'include_path = ".:'"${EPREFIX}"'/usr/share/php'${PHP_MV}':'"${EPREFIX}"'/usr/share/php"|' \
+		-i "${phpinisrc}" || die
 
 	insinto "${PHP_INI_DIR#${EPREFIX}}"
 	dodir "${PHP_INI_DIR#${EPREFIX}}"
@@ -296,10 +299,10 @@ src_configure() {
 		$(use_enable threads maintainer-zts)
 	)
 
-    # remove obsolete gcov support
-    our_conf+=(
-        --disable-gcov
-    )
+	# remove obsolete gcov support
+	our_conf+=(
+		--disable-gcov
+	)
 
 	our_conf+=(
 		$(use_enable bcmath)
