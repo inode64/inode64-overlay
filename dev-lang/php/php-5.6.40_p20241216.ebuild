@@ -30,7 +30,7 @@ SAPIS="embed cli cgi fpm apache2"
 # SAPIs and SAPI-specific USE flags (cli SAPI is default on):
 IUSE="${IUSE}
 	${SAPIS/cli/+cli}
-	threads"
+	"
 
 IUSE="${IUSE} acl bcmath berkdb bzip2 calendar cdb cjk
 	crypt +ctype curl debug
@@ -66,7 +66,6 @@ REQUIRED_USE="
 	recode? ( !imap !mysql !mysqli )
 	qdbm? ( !gdbm )
 	readline? ( !libedit )
-	sharedmem? ( !threads )
 "
 
 # The supported (that is, autodetected) versions of BDB are listed in
@@ -296,7 +295,6 @@ src_configure() {
 		--with-libdir="$(get_libdir)"
 		--localstatedir="${EPREFIX}/var"
 		--without-pear
-		$(use_enable threads maintainer-zts)
 	)
 
 	# remove obsolete gcov support
