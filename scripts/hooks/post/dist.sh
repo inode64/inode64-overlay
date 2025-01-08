@@ -13,19 +13,26 @@ distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
 if [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
+    [ "$cp" == "app-backup/backrest" ] || \
+    [ "$cp" == "dev-util/grunt-cli" ] || \
+    [ "$cp" == "sys-process/pm2" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] ; then
 	file="${ebuild}-${new_version}-node_modules.tar.xz"
 	cp ${distdir}/${file} ${search_dir}/dist/
 	git add ${search_dir}/dist/${file}
-	git commit -m "Add distfile for ${cp}"
+	git commit -m "Add node_modules distfile for ${cp}"
 fi
 
 if [ "$cp" == "net-vpn/cloudflared" ] || \
+    [ "$cp" == "app-backup/autorestic" ] || \
+    [ "$cp" == "app-backup/backrest" ] || \
+    [ "$cp" == "app-backup/rest-server" ] || \
+    [ "$cp" == "app-backup/resticprofile" ] || \
     [ "$cp" == "media-video/go2rtc" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
 	cp ${distdir}/${file} ${search_dir}/dist/
 	git add ${search_dir}/dist/${file}
-	git commit -m "Add distfile for ${cp}"
+	git commit -m "Add vendor distfile for ${cp}"
 fi
 
 exit 0
