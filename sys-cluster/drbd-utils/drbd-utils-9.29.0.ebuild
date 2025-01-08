@@ -13,7 +13,7 @@ S="${WORKDIR}/${P/_/}"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="83support +84support pacemaker +udev xen"
+IUSE="+84support pacemaker +udev xen"
 
 DEPEND="
 	sys-apps/keyutils
@@ -21,7 +21,10 @@ DEPEND="
 	udev? ( virtual/udev )
 "
 RDEPEND="${DEPEND}"
-BDEPEND="app-alternatives/lex"
+BDEPEND="
+	app-alternatives/lex
+	virtual/pkgconfig
+"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-9.23.1-respect-flags.patch
@@ -81,13 +84,11 @@ src_configure() {
 		--with-initscripttype=systemd
 		# only used for systemdunitdir and for udevdir; the latter breaks
 		# merged-usr interop
-		PKG_CONFIG=/bin/false
 		--with-systemdunitdir="${EPREFIX}"/usr/lib/systemd/system
 		--with-bashcompletion
 		--with-distro=gentoo
 		--with-prebuiltman
 		--without-rgmanager
-		$(use_with 83support)
 		$(use_with 84support)
 		$(use_with pacemaker)
 		$(use_with udev)
@@ -117,11 +118,6 @@ src_install() {
 	# bug #698304
 	dodir /lib/drbd
 	local i
-	if use 83support; then
-		for i in drbdadm-83 drbdsetup-83; do
-			dosym -r /$(get_libdir)/drbd/"${i}" /lib/drbd/"${i}"
-		done
-	fi
 	if use 84support; then
 		for i in drbdadm-84 drbdsetup-84; do
 			dosym -r /$(get_libdir)/drbd/"${i}" /lib/drbd/"${i}"

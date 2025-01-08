@@ -8,7 +8,6 @@
 	<use>
 		<flag name="xen">Enable Xen integration</flag>
 		<flag name="pacemaker">Enable Pacemaker integration</flag>
-		<flag name="83support">Enable support for drbd driver/module 8.3</flag>
 		<flag name="84support">Enable support for drbd driver/module 8.4</flag>
 	</use>
 	<longdescription>
