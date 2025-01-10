@@ -35,6 +35,8 @@ src_configure() {
 }
 
 src_compile() {
+	# no compile support because lmdb require -fPIC 
+	#nodejs-mod_src_compile
 	pushd webui >/dev/null || die
 	enpm run build || die "build failed"
 	enpm_clean
