@@ -73,6 +73,7 @@ nodejs-mod_src_compile() {
     if [[ -d node_modules ]]; then
         einfo "Compile native addon modules"
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
+            einfo "Compile module ${dir}"
             pushd "${dir}" >/dev/null || die
             # shellcheck disable=SC2046
             npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild --verbose
