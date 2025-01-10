@@ -13,7 +13,6 @@ distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
 if [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
-    [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "dev-util/grunt-cli" ] || \
     [ "$cp" == "sys-process/pm2" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] ; then
