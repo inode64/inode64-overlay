@@ -25,6 +25,7 @@ ruby_add_bdepend "
 	sqlite? ( >=dev-ruby/sqlite3-1.6.0 )
 	dev-ruby/actionpack-xml_parser:2
 	dev-ruby/addressable
+	<=dev-ruby/concurrent-ruby-1.3.4
 	>=dev-ruby/commonmarker-0.23.8
 	>=dev-ruby/csv-3.2.6:3
 	>=dev-ruby/deckar01-task_list-2.3.2
