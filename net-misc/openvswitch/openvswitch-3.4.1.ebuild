@@ -21,7 +21,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 # Check python/ovs/version.py in tarball for dev-python/ovs dep
 RDEPEND="${PYTHON_DEPS}
 	$(python_gen_cond_dep '
-		~dev-python/ovs-2.17.11[${PYTHON_USEDEP}]
+		>=dev-python/ovs-3.4.0[${PYTHON_USEDEP}]
 		dev-python/twisted[${PYTHON_USEDEP}]
 		dev-python/zope-interface[${PYTHON_USEDEP}]
 	')
@@ -38,10 +38,6 @@ BDEPEND="virtual/pkgconfig
 	$(python_gen_cond_dep '
 		dev-python/sphinx[${PYTHON_USEDEP}]
 	')"
-
-PATCHES=(
-	"${FILESDIR}/xcp-interface-reconfigure-2.3.2.patch"
-)
 
 CONFIG_CHECK="~NET_CLS_ACT ~NET_CLS_U32 ~NET_SCH_INGRESS ~NET_ACT_POLICE ~IPV6 ~TUN"
 MODULE_NAMES="openvswitch(net:${S}/datapath/linux)"
@@ -65,11 +61,6 @@ pkg_setup() {
 
 src_prepare() {
 	default
-
-	# Never build kernelmodules, doing this manually
-	sed -i \
-		-e '/^SUBDIRS/d' \
-		datapath/Makefile.in || die "sed failed"
 
 	eautoreconf
 }
