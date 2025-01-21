@@ -26,7 +26,7 @@ BDEPEND="
 "
 
 PATCHES=(
-    "${FILESDIR}"/${P}-fix_variable.patch
+	"${FILESDIR}"/monit-5.34.3-fix_variable.patch
 )
 
 src_prepare() {
