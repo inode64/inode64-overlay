@@ -52,7 +52,7 @@
 	<upstream>
 		<bugs-to>https://bugs.exim.org/</bugs-to>
 		<!-- stupid DTD doesn't allow this
-		<vcs>http://git.exim.org/exim.git</vcs>
+		<vcs>https://git.exim.org/exim.git</vcs>
 		-->
 	</upstream>
 </pkgmetadata>
