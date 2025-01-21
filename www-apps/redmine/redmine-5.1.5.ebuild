@@ -160,7 +160,7 @@ pkg_postinst() {
 		elog "# emerge --config \"=${CATEGORY}/${PF}\""
 		elog
 		elog "For upgrade instructions take a look at:"
-		elog "http://www.redmine.org/wiki/redmine/RedmineUpgrade"
+		elog "https://www.redmine.org/wiki/redmine/RedmineUpgrade"
 	else
 		elog "Execute the following command to initialize environment:"
 		elog
@@ -171,7 +171,7 @@ pkg_postinst() {
 		elog "# emerge --config \"=${CATEGORY}/${PF}\""
 		elog
 		elog "Installation notes are at official site"
-		elog "http://www.redmine.org/wiki/redmine/RedmineInstall"
+		elog "https://www.redmine.org/wiki/redmine/RedmineInstall"
 	fi
 
 	elog
