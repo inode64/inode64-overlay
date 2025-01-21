@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -35,7 +35,7 @@ src_configure() {
 }
 
 src_compile() {
-	# no compile support because lmdb require -fPIC 
+	# no compile support because lmdb require -fPIC
 	#nodejs-mod_src_compile
 	pushd webui >/dev/null || die
 	enpm run build || die "build failed"

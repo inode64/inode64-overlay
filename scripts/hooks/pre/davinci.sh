@@ -20,9 +20,9 @@ _siteurl="https://www.blackmagicdesign.com/api/support/latest-stable-version/dav
 
 
 _useragent="User-Agent: Mozilla/5.0 (X11; Linux ${CARCH}) \
-                        AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/77.0.3865.75 \
-                        Safari/537.36"
+			AppleWebKit/537.36 (KHTML, like Gecko) \
+			Chrome/77.0.3865.75 \
+			Safari/537.36"
 _releaseinfo=$(curl -Ls "$_siteurl")
 
 
@@ -46,20 +46,20 @@ _useragent_escaped="${_useragent// /\\ }"
 
 _siteurl="https://www.blackmagicdesign.com/api/register/us/download/${_downloadId}"
 _srcurl="$(curl \
-           -s \
-           -H 'Host: www.blackmagicdesign.com' \
-           -H 'Accept: application/json, text/plain, */*' \
-           -H 'Origin: https://www.blackmagicdesign.com' \
-           -H "$_useragent" \
-           -H 'Content-Type: application/json;charset=UTF-8' \
-           -H "Referer: https://www.blackmagicdesign.com/support/download/${_referid}/Linux" \
-           -H 'Accept-Encoding: gzip, deflate, br' \
-           -H 'Accept-Language: en-US,en;q=0.9' \
-           -H 'Authority: www.blackmagicdesign.com' \
-           -H 'Cookie: _ga=GA1.2.1849503966.1518103294; _gid=GA1.2.953840595.1518103294' \
-           --data-ascii "$_reqjson" \
-           --compressed \
-           "$_siteurl")"
+	   -s \
+	   -H 'Host: www.blackmagicdesign.com' \
+	   -H 'Accept: application/json, text/plain, */*' \
+	   -H 'Origin: https://www.blackmagicdesign.com' \
+	   -H "$_useragent" \
+	   -H 'Content-Type: application/json;charset=UTF-8' \
+	   -H "Referer: https://www.blackmagicdesign.com/support/download/${_referid}/Linux" \
+	   -H 'Accept-Encoding: gzip, deflate, br' \
+	   -H 'Accept-Language: en-US,en;q=0.9' \
+	   -H 'Authority: www.blackmagicdesign.com' \
+	   -H 'Cookie: _ga=GA1.2.1849503966.1518103294; _gid=GA1.2.953840595.1518103294' \
+	   --data-ascii "$_reqjson" \
+	   --compressed \
+	   "$_siteurl")"
 
 filename=$(basename "${_srcurl%%\?*}")
 

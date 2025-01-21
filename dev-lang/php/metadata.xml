@@ -26,9 +26,6 @@
     <flag name="inifile">Add dbm support for .ini files</flag>
     <flag name="json">Enable JSON support</flag>
     <flag name="ldap-sasl">Add SASL support for the PHP LDAP extension</flag>
-    <flag name="libmysqlclient">
-      Use libmyslclient driver for mysql, mysqli, PDO_Mysql (not recommended)
-    </flag>
     <flag name="lmdb">Enable support for <pkg>dev-db/lmdb</pkg> db backend</flag>
     <flag name="intl">
       Enables the intl extension for extended internalization support
