@@ -25,6 +25,10 @@ BDEPEND="
 	app-alternatives/lex
 "
 
+PATCHES=(
+    "${FILESDIR}"/${P}-fix_variable.patch
+)
+
 src_prepare() {
 	default
 	sed -i -e '/^INSTALL_PROG/s/-s//' Makefile.in || die

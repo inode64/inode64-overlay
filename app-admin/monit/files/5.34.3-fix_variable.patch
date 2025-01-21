@@ -1,0 +1,33 @@
+From 7435721622d863f31b76230ef99a884ccf00e0bc Mon Sep 17 00:00:00 2001
+From: Francisco Javier Felix Belmonte <inode64@gmail.com>
+Date: Tue, 21 Jan 2025 09:48:42 +0000
+Subject: [PATCH] Correctly check the file, use of variable never assigned
+
+---
+ src/p.y | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/p.y b/src/p.y
+index 2446530f..46bf3822 100644
+--- a/src/p.y
++++ b/src/p.y
+@@ -4993,7 +4993,6 @@ static void setstatefile(char *statefile) {
+  * Read a apache htpasswd file and add credentials found for username
+  */
+ static void addhtpasswdentry(char *filename, char *username, Digest_Type dtype) {
+-        char *f = NULL;
+         char *ht_username = NULL;
+         char *ht_passwd = NULL;
+         char buf[STRLEN];
+@@ -5010,7 +5009,7 @@ static void addhtpasswdentry(char *filename, char *username, Digest_Type dtype)
+                         return;
+                 }
+         }
+-        if (! File_isFile(f)) {
++        if (! File_isFile(filename)) {
+                 yyerror2("The htpasswd file '%s' is not a file", filename);
+                 return;
+         }
+-- 
+2.46.2
+
