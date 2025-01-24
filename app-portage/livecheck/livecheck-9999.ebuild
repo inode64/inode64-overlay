@@ -20,5 +20,5 @@ RDEPEND="dev-python/click[${PYTHON_USEDEP}]
 	dev-python/loguru[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
 	dev-python/pyxdg[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}]"
+	dev-python/keyring[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}"
