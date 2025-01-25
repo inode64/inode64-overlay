@@ -27,6 +27,7 @@ if [ "$cp" == "net-vpn/cloudflared" ] || \
     [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
+    [ "$cp" == "dev-php/composer" ] || \
     [ "$cp" == "media-video/go2rtc" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
 	cp ${distdir}/${file} ${search_dir}/dist/
