@@ -6,9 +6,8 @@ EAPI=8
 inherit meson
 
 DESCRIPTION="DBus protocol binding for libvirt native C API"
-HOMEPAGE="https://libvirt.org"
-SRC_URI="https://download.libvirt.org/dbus/${P}.tar.xz"
-
+HOMEPAGE="https://libvirt.org/dbus.html"
+SRC_URI="https://gitlab.com/libvirt/${P}/-/archive/v${PV}/${P}.tar.gz"
 LICENSE="LGPL-2+"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
