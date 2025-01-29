@@ -16,7 +16,6 @@ HOMEPAGE="
 	https://pypi.org/project/wg-meshconf/
 "
 
-S="${WORKDIR}/${P}"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
