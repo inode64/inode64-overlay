@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
-DISTUTILS_USE_PEP517="setuptools"
+DISTUTILS_USE_PEP517="hatchling"
 inherit distutils-r1 pypi
 
 DESCRIPTION="Python wrapper for the Cloudflare v4 API"
@@ -12,25 +12,34 @@ HOMEPAGE="https://pypi.org/project/cloudflare/"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
-DEPEND="dev-python/jsonlines[${PYTHON_USEDEP}]"
-RDEPEND="( ${DEPEND}
-	dev-python/requests[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}] )"
+RDEPEND="
+	dev-python/httpx[${PYTHON_USEDEP}]
+	dev-python/pydantic[${PYTHON_USEDEP}]
+	dev-python/typing-extensions[${PYTHON_USEDEP}]
+	dev-python/anyio[${PYTHON_USEDEP}]
+	dev-python/sniffio[${PYTHON_USEDEP}]
+"
+BDEPEND="
+	test? (
+		dev-python/nox[${PYTHON_USEDEP}]
+		dev-python/mypy[${PYTHON_USEDEP}]
+		dev-python/respx[${PYTHON_USEDEP}]
+		dev-python/pytest-asyncio[${PYTHON_USEDEP}]
+		dev-util/ruff[${PYTHON_USEDEP}]
+		dev-python/time-machine[${PYTHON_USEDEP}]
+		dev-python/dirty-equals[${PYTHON_USEDEP}]
+		dev-python/importlib-metadata[${PYTHON_USEDEP}]
+		dev-python/rich[${PYTHON_USEDEP}]
+	)
+"
+
+DOCS=( {CHANGELOG,CONTRIBUTING,README,SECURITY,api}.md )
 
 PROPERTIES="test_network" #actually sends a test request
 
 distutils_enable_tests pytest
 
-src_prepare() {
-	# don't install tests or examples
-	sed -i -e "s|, 'examples'||" -e "s|'CloudFlare/tests', ||" setup.py || die
-
-	distutils-r1_src_prepare
-}
-
 python_test() {
-	pushd CloudFlare/tests >/dev/null || die
-
 	if [ -z "${CLOUDFLARE_API_TOKEN}" ]; then
 		ewarn "Skipping some tests which require an actual cloudflare api token"
 		ewarn "To run them, provide the token in the environment variable CLOUDFLARE_API_TOKEN"
