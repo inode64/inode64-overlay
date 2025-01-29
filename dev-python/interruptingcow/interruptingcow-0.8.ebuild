@@ -5,14 +5,10 @@ EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
-
-inherit distutils-r1
+inherit distutils-r1 pypi
 
 DESCRIPTION="A watchdog that interrupts long running code"
 HOMEPAGE="https://bitbucket.org/evzijst/interruptingcow"
-SRC_URI="
-	https://files.pythonhosted.org/packages/64/3a/1e58f9e38acb38d42584872150400ddafb6d669700fd9b99f079adce00f6/${P}.tar.gz
-"
 
 LICENSE="MIT"
 SLOT="0"
