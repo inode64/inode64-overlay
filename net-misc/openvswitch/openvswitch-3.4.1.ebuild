@@ -10,8 +10,9 @@ inherit autotools linux-mod-r1 python-single-r1 systemd tmpfiles
 
 DESCRIPTION="Production quality, multilayer virtual switch"
 HOMEPAGE="https://www.openvswitch.org"
-SRC_URI="https://www.openvswitch.org/releases/${P}.tar.gz"
+SRC_URI="https://github.com/${PN}/ovs/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
+S=${WORKDIR}/ovs-${PV}
 LICENSE="Apache-2.0 GPL-2"
 SLOT="0"
 KEYWORDS="amd64 ~arm64 ~ppc64 x86"
