@@ -6,8 +6,9 @@ EAPI=8
 inherit autotools systemd tmpfiles
 
 DESCRIPTION="A powerful latency measurement tool"
-HOMEPAGE="https://oss.oetiker.ch/smokeping/"
-SRC_URI="https://oss.oetiker.ch/smokeping/pub/${P}.tar.gz"
+HOMEPAGE="https://oss.oetiker.ch/smokeping/
+        https://github.com/oetiker/SmokePing"
+SRC_URI="https://github.com/oetiker/SmokePing/releases/download/${PV}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
