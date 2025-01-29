@@ -38,7 +38,7 @@ src_install() {
 	newconfd "${FILESDIR}/${MY_PN}.confd" ${MY_PN}
 	newinitd "${FILESDIR}/${MY_PN}.initd" ${MY_PN}
 	systemd_dounit "${FILESDIR}/${MY_PN}.service"
-    dotmpfiles "${FILESDIR}/${MY_PN}.tmpfiles.conf"
+	dotmpfiles "${FILESDIR}/${MY_PN}.tmpfiles.conf"
 }
 
 pkg_postinst() {

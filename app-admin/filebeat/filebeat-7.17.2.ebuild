@@ -1814,7 +1814,7 @@ LICENSE="Apache-2.0 BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="test"
-BDEPEND="dev-util/mage"
+BDEPEND="dev-build/mage"
 
 src_prepare() {
 	default
@@ -1824,7 +1824,7 @@ src_prepare() {
 }
 
 src_compile() {
-    cd ${PN}
+	cd ${PN}
 	emake
 	mage update
 }
