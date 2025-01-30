@@ -115,12 +115,8 @@ src_install() {
 
 	# bug #698304
 	dodir /lib/drbd
-	local i
-	if use 84support; then
-		for i in drbdadm-84 drbdsetup-84; do
-			dosym -r /$(get_libdir)/drbd/"${i}" /lib/drbd/"${i}"
-		done
-	fi
+	dosym -r /$(get_libdir)/drbd/drbdadm-84 /lib/drbd/drbdadm-84
+	dosym -r /$(get_libdir)/drbd/drbdsetup-84 /lib/drbd/drbdsetup-84
 
 	einstalldocs
 }
