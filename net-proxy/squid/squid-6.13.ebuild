@@ -115,7 +115,7 @@ src_prepare() {
 		INSTALL QUICKSTART \
 		scripts/fileno-to-pathname.pl \
 		scripts/check_cache.pl \
-		tools/cachemgr.cgi.8 \
+		tools/cachemgr.cgi.8.in \
 		tools/purge/conffile.hh \
 		tools/purge/purge.1 || die
 	sed -i -e 's:/usr/local/squid/sbin:/usr/sbin:' \
@@ -138,7 +138,7 @@ src_prepare() {
 	sed -i 's:/var/run/:/run/:g' tools/systemd/squid.service || die
 
 	sed -i -e 's:_LTDL_SETUP:LTDL_INIT([installable]):' \
-		libltdl/configure.ac || die
+		configure.ac || die
 
 	eautoreconf
 }
@@ -370,11 +370,10 @@ src_install() {
 	# Cleanup
 	rm -r "${D}"/run "${D}"/var/cache || die
 
-	dodoc CONTRIBUTORS CREDITS ChangeLog INSTALL QUICKSTART README SPONSORS doc/*.txt
+	dodoc CONTRIBUTORS CREDITS ChangeLog INSTALL QUICKSTART README SPONSORS.list doc/*.txt
 	newdoc src/auth/negotiate/kerberos/README README.kerberos
 	newdoc src/auth/basic/RADIUS/README README.RADIUS
 	newdoc src/acl/external/kerberos_ldap_group/README README.kerberos_ldap_group
-	dodoc RELEASENOTES.html
 
 	if use pam; then
 		newpamd "${FILESDIR}"/squid.pam squid
