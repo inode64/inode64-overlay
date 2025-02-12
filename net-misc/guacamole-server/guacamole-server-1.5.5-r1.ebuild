@@ -43,7 +43,7 @@ DEPEND="${RDEPEND}
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
-	rdp? ( <net-misc/freerdp-3:=[client(+),jpeg] )
+	rdp? ( <net-misc/freerdp-3:=[client(+),ffmpeg,jpeg] )
 	ssh? (
 		net-libs/libssh2
 		x11-libs/pango
