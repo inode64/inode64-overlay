@@ -5,5 +5,7 @@
 		<email>patrick@gentoo.org</email>
 		<name>Patrick Lauer</name>
 	</maintainer>
-	<remote-id type="bitbucket">tildeslash/monit</remote-id>
+	<upstream>
+		<remote-id type="bitbucket">tildeslash/monit</remote-id>
+	</upstream>
 </pkgmetadata>

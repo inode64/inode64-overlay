@@ -8,6 +8,8 @@ inherit meson
 DESCRIPTION="DBus protocol binding for libvirt native C API"
 HOMEPAGE="https://libvirt.org/dbus.html"
 SRC_URI="https://gitlab.com/libvirt/${PN}/-/archive/v${PV}/${PN}-v${PV}.tar.bz2 -> ${P}.tar.bz2"
+S="${WORKDIR}/${PN}-v${PV}"
+
 LICENSE="LGPL-2+"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
@@ -22,5 +24,3 @@ BDEPEND="
 	>=app-emulation/libvirt-3.0.0
 	>=app-emulation/libvirt-glib-0.0.7
 "
-
-S="${WORKDIR}/${PN}-v${PV}"
