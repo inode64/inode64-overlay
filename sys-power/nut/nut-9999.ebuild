@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
-inherit bash-completion-r1 desktop flag-o-matic linux-info optfeature
+inherit bash-completion-r1 desktop linux-info optfeature
 inherit python-single-r1 systemd tmpfiles toolchain-funcs udev wrapper xdg
 
 MY_P=${P/_/-}
@@ -150,8 +150,6 @@ src_configure() {
 		$(use_with zeroconf avahi)
 	)
 
-	filter-lto
-	append-flags -fno-lto
 	tc-export CC CXX AR
 
 	use cgi && myeconfargs+=( --with-cgipath=/usr/share/nut/cgi )
