@@ -106,10 +106,6 @@ RDEPEND="${COMMON_DEPEND}
 	smartcard? ( app-crypt/p11-kit )
 "
 
-PATCHES=(
-	"${FILESDIR}"/freerdp-3.12.0-cmake.patch
-)
-
 option() {
 	usex "$1" ON OFF
 }
