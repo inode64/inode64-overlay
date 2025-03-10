@@ -24,7 +24,7 @@ RDEPEND="
 DOCS=(README.md)
 
 src_configure() {
-	export CGO_ENABLED=1
+	export CGO_ENABLED=0
 	export CGO_CFLAGS="${CFLAGS}"
 	export CGO_CPPFLAGS="${CPPFLAGS}"
 	export CGO_CXXFLAGS="${CXXFLAGS}"
