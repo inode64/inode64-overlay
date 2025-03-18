@@ -42,7 +42,7 @@ BDEPEND="
 	"
 RDEPEND="
 	ldap? ( net-nds/openldap )
-	virtual/jre
+	>=virtual/jre-11:*
 	www-servers/tomcat:9
 	"
 RESTRICT="!test? ( test )"
@@ -55,13 +55,6 @@ MY_PN="guacamole"
 MY_PV="$(ver_cut 1-3)"
 GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
-
-pkg_pretend() {
-	# check if java version is 11
-	if [[ $(java -version 2>&1 | head -n 1 | cut -d '"' -f 2 | cut -d '.' -f 1) -ne 11 ]]; then
-		die "Please install and active a Java 11 runtime"
-	fi
-}
 
 src_unpack() {
 	if [[ "${PV}" == *9999 ]] ; then
@@ -79,6 +72,11 @@ src_unpack() {
 }
 
 src_compile() {
+	# check if java version is 11
+	if [[ $(java -version 2>&1 | head -n 1 | cut -d '"' -f 2 | cut -d '.' -f 1) -ne 11 ]]; then
+		die "Please install and active a Java 11 runtime"
+	fi
+
 	export LC_ALL=C
 	export LANG=en-US.UTF-8
 
