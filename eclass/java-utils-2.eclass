@@ -1580,7 +1580,7 @@ java-pkg_ensure-vm-version-sufficient() {
 java-pkg_is-vm-version-sufficient() {
 	debug-print-function ${FUNCNAME} $*
 
-	depend-java-query --is-sufficient "${DEPEND} ${RDEPEND} ${BDEPEND} ${JAVA_PKG_NV_DEPEND}" > /dev/null
+	depend-java-query --is-sufficient "${DEPEND} ${RDEPEND} ${BDEPEND}" > /dev/null
 	return $?
 }
 
@@ -1691,7 +1691,7 @@ java-pkg_current-vm-matches() {
 #
 # @RETURN: string - Either the lowest possible source, or JAVA_PKG_WANT_SOURCE
 java-pkg_get-source() {
-	echo ${JAVA_PKG_WANT_SOURCE:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND} ${BDEPEND} ${JAVA_PKG_NV_DEPEND}")}
+	echo ${JAVA_PKG_WANT_SOURCE:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND} ${BDEPEND}")}
 }
 
 # @FUNCTION: java-pkg_get-target
@@ -1702,7 +1702,7 @@ java-pkg_get-source() {
 #
 # @RETURN: string - Either the lowest possible target, or JAVA_PKG_WANT_TARGET
 java-pkg_get-target() {
-	echo ${JAVA_PKG_WANT_TARGET:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND} ${BDEPEND} ${JAVA_PKG_NV_DEPEND}")}
+	echo ${JAVA_PKG_WANT_TARGET:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND} ${BDEPEND}")}
 }
 
 # @FUNCTION: java-pkg_get-javac
@@ -2761,11 +2761,11 @@ java-pkg_switch-vm() {
 				fi
 			# otherwise determine a vm from dep string
 			else
-				debug-print "depend-java-query:  NV_DEPEND:	${JAVA_PKG_NV_DEPEND:-${DEPEND}}"
-				GENTOO_VM="$(depend-java-query --get-vm "${JAVA_PKG_NV_DEPEND:-virtual/jdk-$(java-pkg_get-source)}")"
+				debug-print "depend-java-query:  NV_DEPEND:	${DEPEND} ${RDEPEND} ${BDEPEND}"
+				GENTOO_VM="$(depend-java-query --get-vm "${DEPEND} ${RDEPEND} ${BDEPEND}")"
 				if [[ -z "${GENTOO_VM}" || "${GENTOO_VM}" == "None" ]]; then
 					eerror "Unable to determine VM for building from dependencies:"
-					echo "NV_DEPEND: ${JAVA_PKG_NV_DEPEND:-${DEPEND}}"
+					echo "NV_DEPEND: ${DEPEND} ${RDEPEND} ${BDEPEND}"
 					die "Failed to determine VM for building."
 				fi
 			fi
