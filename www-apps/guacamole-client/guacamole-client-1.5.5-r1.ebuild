@@ -36,10 +36,13 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
-BDEPEND=">=dev-java/maven-bin-3.9.6"
+BDEPEND="
+	>=dev-java/maven-bin-3.9.6
+	virtual/jre:11
+	"
 RDEPEND="
 	ldap? ( net-nds/openldap )
-	virtual/jre:11
+	virtual/jre
 	www-servers/tomcat:9
 	"
 RESTRICT="!test? ( test )"
