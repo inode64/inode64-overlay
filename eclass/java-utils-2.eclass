@@ -1702,7 +1702,7 @@ java-pkg_get-source() {
 #
 # @RETURN: string - Either the lowest possible target, or JAVA_PKG_WANT_TARGET
 java-pkg_get-target() {
-	echo ${JAVA_PKG_WANT_TARGET:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND} ${BDEPEND}")}
+	echo ${JAVA_PKG_WANT_TARGET:-$(depend-java-query --get-lowest "${DEPEND} ${RDEPEND}")}
 }
 
 # @FUNCTION: java-pkg_get-javac
@@ -2687,6 +2687,24 @@ java-pkg_get-vm-version() {
 	java-config -g PROVIDES_VERSION
 }
 
+# @FUNCTION: java-pkg_determine-vm-version
+# @INTERNAL
+# @RETURN: Returns the highest supported version
+java-pkg_determine-vm-version() {
+	debug-print-function ${FUNCNAME} $*
+
+        local dep val min_val
+
+	for dep in "${DEPEND}" "${RDEPEND}" "${BDEPEND}"; do
+    		val="$(depend-java-query --get-vm "$dep" 2>/dev/null)"
+	        if [[ -n "$val" ]] && [[ ! "$min_val" || "$val" < "$min_val" ]]; then
+		        min_val="$val"
+	        fi
+        done
+
+	echo "$min_val"
+}
+
 # @FUNCTION: java-pkg_build-vm-from-handle
 # @INTERNAL
 # @RETURN: VM handle of an available JDK
@@ -2762,7 +2780,7 @@ java-pkg_switch-vm() {
 			# otherwise determine a vm from dep string
 			else
 				debug-print "depend-java-query:  NV_DEPEND:	${DEPEND} ${RDEPEND} ${BDEPEND}"
-				GENTOO_VM="$(depend-java-query --get-vm "${DEPEND} ${RDEPEND} ${BDEPEND}")"
+				GENTOO_VM="$(java-pkg_determine-vm-version)"
 				if [[ -z "${GENTOO_VM}" || "${GENTOO_VM}" == "None" ]]; then
 					eerror "Unable to determine VM for building from dependencies:"
 					echo "NV_DEPEND: ${DEPEND} ${RDEPEND} ${BDEPEND}"

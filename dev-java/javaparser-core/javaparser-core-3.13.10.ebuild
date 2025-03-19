@@ -37,6 +37,7 @@ src_prepare() {
 
 	mkdir -p "${PN}/src/main/java/com/github/javaparser"
 	javacc-${JAVACC_SLOT} -GRAMMAR_ENCODING=UTF-8 \
+		-JDK_VERSION=1.8 \
 		-OUTPUT_DIRECTORY="${PN}/src/main/java/com/github/javaparser" \
 		"javaparser-core/src/main/javacc/java.jj" \
 		|| die "Code generation with java.jj failed"
