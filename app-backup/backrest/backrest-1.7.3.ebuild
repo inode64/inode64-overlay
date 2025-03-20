@@ -22,6 +22,7 @@ RESTRICT="
 "
 BDEPEND="test? ( app-backup/restic )"
 RDEPEND="app-backup/restic"
+DEPEND=">=dev-lang/go-1.24"
 
 src_configure() {
 	export BACKREST_BUILD_VERSION="${PV}"
