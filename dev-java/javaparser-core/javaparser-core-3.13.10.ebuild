@@ -21,7 +21,7 @@ JAVACC_SLOT="7.0.4"
 
 BDEPEND="dev-java/javacc:7.0.4
 	<=virtual/jdk-17:*"
-RDEPEND=">=virtual/jre-17:*"
+RDEPEND=">=virtual/jre-1.8:*"
 
 DOCS=( CONTRIBUTING.md changelog.md readme.md )
 

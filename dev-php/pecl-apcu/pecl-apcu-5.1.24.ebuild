@@ -6,11 +6,12 @@ EAPI=8
 PHP_EXT_INI="yes"
 PHP_EXT_NAME="apcu"
 PHP_EXT_ZENDEXT="no"
-USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3"
+USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3 php8-4"
 
 inherit php-ext-pecl-r3
 
 DESCRIPTION="Stripped down version of APC supporting only user cache"
+
 LICENSE="PHP-3.01"
 SLOT="7"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
@@ -45,7 +46,7 @@ src_install() {
 		insinto /usr/share/php7/apcu
 		doins apc.php
 	fi
-	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3; then
+	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
 		insinto /usr/share/php8/apcu
 		doins apc.php
 	fi
@@ -56,7 +57,7 @@ pkg_postinst() {
 	if use php_targets_php7-3 || use php_targets_php7-4; then
 		elog "was installed to ${EPREFIX}/usr/share/php7/apcu/."
 	fi
-	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3; then
+	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
 		elog "was installed to ${EPREFIX}/usr/share/php8/apcu/."
 	fi
 }
