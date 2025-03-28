@@ -18,7 +18,7 @@ KEYWORDS="~amd64 ~x86"
 RDEPEND="
 	acct-group/go2rtc
 	acct-user/go2rtc
-	media-video/ffmpeg[encode,x264,x265,opus]
+	media-video/ffmpeg[x264,x265,opus]
 "
 
 DOCS=(README.md)

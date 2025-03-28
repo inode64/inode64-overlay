@@ -39,7 +39,7 @@ DEPEND="${RDEPEND}
 	acct-user/guacamole
 	dev-libs/openssl:0=
 	|| ( dev-libs/ossp-uuid sys-libs/libuuid )
-	encode? ( media-video/ffmpeg[encode] )
+	encode? ( media-video/ffmpeg )
 	kubernetes? ( net-libs/libwebsockets )
 	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
