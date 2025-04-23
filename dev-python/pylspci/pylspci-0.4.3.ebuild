@@ -19,4 +19,4 @@ KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 
 RDEPEND=">=dev-python/cached-property-1.5.1"
 
-distutils_enable_tests setup.py
+distutils_enable_tests pytest
