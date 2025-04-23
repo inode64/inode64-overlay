@@ -18,8 +18,8 @@ EGIT_REPO_URI="https://github.com/Tatsh/livecheck.git"
 
 RDEPEND="
 	dev-python/click[${PYTHON_USEDEP}]
+	dev-python/defusedxml[${PYTHON_USEDEP}]
 	dev-python/keyring[${PYTHON_USEDEP}]
-	dev-python/platformdirs[${PYTHON_USEDEP}]
 	dev-python/platformdirs[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
 "
