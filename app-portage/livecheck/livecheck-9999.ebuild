@@ -16,9 +16,11 @@ SLOT="0"
 KEYWORDS="~amd64"
 EGIT_REPO_URI="https://github.com/Tatsh/livecheck.git"
 
-RDEPEND="dev-python/click[${PYTHON_USEDEP}]
-	dev-python/loguru[${PYTHON_USEDEP}]
+RDEPEND="
+	dev-python/click[${PYTHON_USEDEP}]
+	dev-python/keyring[${PYTHON_USEDEP}]
+	dev-python/platformdirs[${PYTHON_USEDEP}]
+	dev-python/platformdirs[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
-	dev-python/pyxdg[${PYTHON_USEDEP}]
-	dev-python/keyring[${PYTHON_USEDEP}]"
+"
 DEPEND="${RDEPEND}"
