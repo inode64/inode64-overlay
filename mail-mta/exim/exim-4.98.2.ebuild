@@ -1,9 +1,27 @@
 # Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI="8"
 
 inherit db-use flag-o-matic toolchain-funcs pam systemd
+
+DESCRIPTION="A highly configurable, drop-in replacement for sendmail"
+HOMEPAGE="https://www.exim.org/"
+
+SDIR=$(
+	[[ ${PV} == *_rc* ]]   && echo /test
+	[[ ${PV} == *.*.*.* ]] && echo /fixes
+)
+COMM_URI="https://downloads.exim.org/exim4${SDIR}"
+
+SRC_URI="${COMM_URI}/${P//_rc/-RC}.tar.xz
+	mirror://gentoo/system_filter.exim.gz
+	doc? ( ${COMM_URI}/${PN}-pdf-${PV//_rc/-RC}.tar.xz )"
+S=${WORKDIR}/${P//_rc/-RC}
+
+LICENSE="GPL-2"
+SLOT="0"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 
 IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc +dnsdb doc dovecot-sasl
 dsn gdbm gnutls idn ipv6 ldap lmtp maildir mbx
@@ -30,21 +48,6 @@ REQUIRED_USE="
 # so we make -dane mandatory to use gnutls.  Bleh.
 # We cannot express a required use for berkdb/gdbm/tdb correctly because
 # berkdb and gdbm are both enabled in base profile
-
-SDIR=$([[ ${PV} == *_rc* ]]   && echo /test
-	 [[ ${PV} == *.*.*.* ]] && echo /fixes)
-COMM_URI="https://downloads.exim.org/exim4${SDIR}"
-
-GPV="r0"
-DESCRIPTION="A highly configurable, drop-in replacement for sendmail"
-SRC_URI="${COMM_URI}/${P//_rc/-RC}.tar.xz
-	mirror://gentoo/system_filter.exim.gz
-	doc? ( ${COMM_URI}/${PN}-pdf-${PV//_rc/-RC}.tar.xz )"
-HOMEPAGE="https://www.exim.org/"
-
-SLOT="0"
-LICENSE="GPL-2"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 COMMON_DEPEND=">=sys-apps/sed-4.0.5
 	dev-libs/libpcre2:=
@@ -108,8 +111,6 @@ RDEPEND="${COMMON_DEPEND}
 	selinux? ( sec-policy/selinux-exim )
 	"
 
-S=${WORKDIR}/${P//_rc/-RC}
-
 src_prepare() {
 	# Legacy patches which need a respin for -p1
 	eapply -p0 "${FILESDIR}"/exim-4.14-tail.patch
@@ -119,6 +120,7 @@ src_prepare() {
 	eapply     "${FILESDIR}"/exim-4.69-r1.27021.patch
 	eapply     "${FILESDIR}"/exim-4.97-localscan_dlopen.patch
 	eapply     "${FILESDIR}"/exim-4.97-no-exim_id_update.patch
+	eapply     "${FILESDIR}"/exim-4.98-tidydb-crash.patch # upstream #3144
 	eapply     "${FILESDIR}"/no_tainted.patch # Disable tainted errors
 
 	# oddity, they disable berkdb as hack, and then throw an error when
