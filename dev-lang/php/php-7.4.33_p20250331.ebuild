@@ -9,7 +9,7 @@ inherit flag-o-matic git-r3 systemd autotools multilib
 ## https://github.com/zboszor/meta-parallel-php/tree/main/recipes-php/php/php74
 
 PHP_MV="$(ver_cut 1)"
-PHP_PATCH="php-$(ver_cut 1-3)-patches-1.tar.xz"
+PHP_PATCH="php-$(ver_cut 1-3)-patches-2.tar.xz"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
