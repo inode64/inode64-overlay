@@ -10,6 +10,7 @@ description="Argo Tunnel client"
 name="Argo Tunnel client"
 pidfile="/run/${RC_SVCNAME}.pid"
 required_files="/etc/cloudflared/${SVCNAME#*.}.yml"
+retry=SIGTERM/30/SIGKILL/10
 
 depend() {
 	need net
