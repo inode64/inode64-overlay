@@ -38,24 +38,24 @@ index 3135871..254739c 100644
 +    # Python 3.11: @asyncio.coroutine was removed
 +    from inspect import iscoroutinefunction
 +
- 
- 
+
+
  class cached_property(object):
 @@ -30,22 +36,14 @@ def __get__(self, obj, cls):
-         if obj is None:
-             return self
- 
+	 if obj is None:
+	     return self
+
 -        if asyncio and asyncio.iscoroutinefunction(self.func):
 -            return self._wrap_in_coroutine(obj)
 +        if asyncio and iscoroutinefunction(self.func):
 +            value = asyncio.ensure_future(self.func(obj))
 +        else:
 +            value = self.func(obj)
- 
+
 -        value = obj.__dict__[self.func.__name__] = self.func(obj)
 +        obj.__dict__[self.func.__name__] = value
-         return value
- 
+	 return value
+
 -    def _wrap_in_coroutine(self, obj):
 -        @wraps(obj)
 -        @asyncio.coroutine
@@ -66,7 +66,7 @@ index 3135871..254739c 100644
 -
 -        return wrapper()
 -
- 
+
  class threaded_cached_property(object):
      """
 diff --git a/conftest.py b/conftest.py
@@ -76,36 +76,36 @@ index 0563f64..1c4b618 100644
 @@ -7,13 +7,17 @@
  # Whether the async and await keywords work
  has_async_await = sys.version_info[0] == 3 and sys.version_info[1] >= 5
- 
+
 +# Whether "from asyncio import coroutine" *fails*
 +version_info = sys.version_info
 +dropped_asyncio_coroutine = version_info[0] == 3 and version_info[1] >= 11
 +
- 
+
  print("conftest.py", has_asyncio, has_async_await)
- 
- 
+
+
  collect_ignore = []
- 
+
 -if not has_asyncio:
 +if not has_asyncio or dropped_asyncio_coroutine:
      collect_ignore.append("tests/test_coroutine_cached_property.py")
- 
+
  if not has_async_await:
 diff --git a/tests/test_async_cached_property.py b/tests/test_async_cached_property.py
 index 4ba84f3..d61cc28 100644
 --- a/tests/test_async_cached_property.py
 +++ b/tests/test_async_cached_property.py
 @@ -9,8 +9,7 @@
- 
+
  def unittest_run_loop(f):
      def wrapper(*args, **kwargs):
 -        coro = asyncio.coroutine(f)
 -        future = coro(*args, **kwargs)
 +        future = f(*args, **kwargs)
-         loop = asyncio.get_event_loop()
-         loop.run_until_complete(future)
- 
+	 loop = asyncio.get_event_loop()
+	 loop.run_until_complete(future)
+
 
 From 9b210d12fa73c91743378ba4a966417846e7ea9a Mon Sep 17 00:00:00 2001
 From: Petr Viktorin <encukou@gmail.com>
@@ -137,6 +137,6 @@ index 254739c..944e2f5 100644
 +    except AttributeError:
 +        # Python 3.11: @asyncio.coroutine was removed
 +        from inspect import iscoroutinefunction
- 
- 
+
+
  class cached_property(object):

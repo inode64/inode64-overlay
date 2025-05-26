@@ -14,7 +14,7 @@ index 70f8e19558..a096b62890 100644
 +++ b/extras/command-completion/gluster.bash
 @@ -1,15 +1,5 @@
  #!/bin/bash
- 
+
 -if pidof glusterd > /dev/null 2>&1; then
 -        GLUSTER_SET_OPTIONS="
 -        $(for token in `gluster volume set help 2>/dev/null | grep "^Option:" | cut -d ' ' -f 2`
@@ -26,29 +26,29 @@ index 70f8e19558..a096b62890 100644
 -fi
 -
  GLUSTER_TOP_SUBOPTIONS1="
-         {nfs},
-         {brick},
+	 {nfs},
+	 {brick},
 @@ -161,12 +151,14 @@ GLUSTER_VOLUME_OPTIONS="
-                 },
-                 {reset
-                         {__VOLNAME
+		 },
+		 {reset
+			 {__VOLNAME
 -                                [ $GLUSTER_RESET_OPTIONS ]
 +                                {__VOLOPTIONS
 +                                },
-                         }
-                 },
-                 {set
-                         {__VOLNAME
+			 }
+		 },
+		 {set
+			 {__VOLNAME
 -                                [ $GLUSTER_SET_OPTIONS ]
 +                                {__VOLOPTIONS
 +                                },
-                         }
-                 },
-                 {start
+			 }
+		 },
+		 {start
 @@ -280,6 +272,34 @@ __VOLNAME ()
-         return 0
+	 return 0
  }
- 
+
 +__VOLOPTIONS()
 +{
 +        local zero=0
@@ -79,7 +79,6 @@ index 70f8e19558..a096b62890 100644
 +
  _gluster_throw () {
  #echo $1 >&2
-         COMPREPLY=''
--- 
+	 COMPREPLY=''
+--
 2.41.0
-
