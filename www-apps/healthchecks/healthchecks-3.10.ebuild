@@ -43,6 +43,7 @@ RDEPEND="
 		dev-python/oncalendar[${PYTHON_USEDEP}]
 		dev-python/pycurl[${PYTHON_USEDEP}]
 		dev-python/pydantic[${PYTHON_USEDEP}]
+		dev-python/pyjwt[${PYTHON_USEDEP}]
 		dev-python/pyotp[${PYTHON_USEDEP}]
 		dev-python/segno[${PYTHON_USEDEP}]
 		dev-python/statsd[${PYTHON_USEDEP}]
