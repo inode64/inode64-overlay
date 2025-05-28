@@ -5,7 +5,7 @@ EAPI=8
 
 RUST_OPTIONAL=1
 RUST_REQ_USE="rustfmt"
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
 inherit autotools bash-completion-r1 python-single-r1 rust
 
 DESCRIPTION="NBD client library in userspace"

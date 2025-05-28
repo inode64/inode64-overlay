@@ -29,9 +29,9 @@ pkg_setup() {
 src_install() {
 	webapp_src_preinst
 
-        local DATA="${MY_HOSTROOTDIR}"/documents
-        dodir ${DATA}
-        webapp_serverowned -R "${DATA}"
+	local DATA="${MY_HOSTROOTDIR}"/documents
+	dodir ${DATA}
+	webapp_serverowned -R "${DATA}"
 
 
 	insinto "${MY_HTDOCSDIR}"

@@ -16,18 +16,17 @@ index 2446530f..46bf3822 100644
   */
  static void addhtpasswdentry(char *filename, char *username, Digest_Type dtype) {
 -        char *f = NULL;
-         char *ht_username = NULL;
-         char *ht_passwd = NULL;
-         char buf[STRLEN];
+	 char *ht_username = NULL;
+	 char *ht_passwd = NULL;
+	 char buf[STRLEN];
 @@ -5010,7 +5009,7 @@ static void addhtpasswdentry(char *filename, char *username, Digest_Type dtype)
-                         return;
-                 }
-         }
+			 return;
+		 }
+	 }
 -        if (! File_isFile(f)) {
 +        if (! File_isFile(filename)) {
-                 yyerror2("The htpasswd file '%s' is not a file", filename);
-                 return;
-         }
--- 
+		 yyerror2("The htpasswd file '%s' is not a file", filename);
+		 return;
+	 }
+--
 2.46.2
-
