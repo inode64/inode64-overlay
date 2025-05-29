@@ -18,14 +18,8 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 ruby_add_rdepend "
-	    dev-ruby/actionpack
-	    dev-ruby/activerecord
-	    >=dev-ruby/bundler-1.7
-	    dev-ruby/minitest
-	    dev-ruby/mysql2
-	    dev-ruby/vcard
-	    dev-ruby/spreadsheet
+	    dev-ruby/rails
 	    >=dev-ruby/rake-10.0.0
-	    <=dev-ruby/liquid-3.0.0
+	    =dev-ruby/liquid-4.0.4
 	    dev-ruby/rubyzip
 "
