@@ -7,7 +7,6 @@
 	</maintainer>
 	<use>
 		<flag name="xen">Enable Xen integration</flag>
-		<flag name="pacemaker">Enable Pacemaker integration</flag>
 	</use>
 	<longdescription>
 		The user space tools to control, configure the DRBD driver, as well as integration programs and scripts

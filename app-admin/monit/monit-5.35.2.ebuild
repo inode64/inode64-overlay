@@ -7,7 +7,7 @@ inherit bash-completion-r1 pam systemd
 
 DESCRIPTION="Monitoring and managing daemons or similar programs running on a Unix system"
 HOMEPAGE="https://mmonit.com/monit/"
-SRC_URI="http://mmonit.com/monit/dist/${P}.tar.gz"
+SRC_URI="https://mmonit.com/monit/dist/${P}.tar.gz"
 
 LICENSE="AGPL-3"
 SLOT="0"

@@ -6,7 +6,7 @@ EAPI=8
 inherit webapp
 
 DESCRIPTION="Dolibarr ERP CRM: modern software package to manage your company"
-HOMEPAGE="https://dolibarr.org/"
+HOMEPAGE="https://www.dolibarr.org/"
 SRC_URI="https://github.com/Dolibarr/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
@@ -32,7 +32,6 @@ src_install() {
 	local DATA="${MY_HOSTROOTDIR}"/documents
 	dodir ${DATA}
 	webapp_serverowned -R "${DATA}"
-
 
 	insinto "${MY_HTDOCSDIR}"
 	doins -r htdocs/*

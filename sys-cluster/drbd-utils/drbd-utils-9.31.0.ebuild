@@ -12,11 +12,10 @@ SRC_URI="https://github.com/LINBIT/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="pacemaker +udev xen"
+IUSE="+udev xen"
 
 DEPEND="
 	sys-apps/keyutils
-	pacemaker? ( sys-cluster/pacemaker )
 	udev? ( virtual/udev )
 "
 RDEPEND="${DEPEND}"
@@ -88,12 +87,12 @@ src_configure() {
 		--with-distro=gentoo
 		--with-prebuiltman
 		--without-rgmanager
-		$(use_with pacemaker)
+		--without-pacemaker
 		$(use_with udev)
 		$(use_with xen)
 	)
 
-	econf "${myeconfargs[@]}"
+	econf "${myeconfargs[@]}g"
 }
 
 src_compile() {

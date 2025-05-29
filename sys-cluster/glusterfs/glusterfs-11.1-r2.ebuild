@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..13} python3_13t pypy3 )
+PYTHON_COMPAT=( python3_{11..14} )
 
 inherit autotools elisp-common python-single-r1 tmpfiles bash-completion-r1
 
@@ -13,7 +13,7 @@ SRC_URI="https://github.com/gluster/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="|| ( GPL-2 LGPL-3+ )"
 SLOT="0/${PV%%.*}"
-KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv x86"
+KEYWORDS="amd64 ~arm arm64 ~loong ~ppc ppc64 ~riscv x86"
 
 IUSE="debug emacs +fuse georeplication ipv6 +libtirpc lto firewalld rsyslog selinux static-libs tcmalloc test +uring xml"
 
@@ -43,13 +43,13 @@ RDEPEND="
 	!elibc_glibc? ( sys-libs/argp-standalone )
 	emacs? ( >=app-editors/emacs-23.1:* )
 	firewalld? ( net-firewall/firewalld )
-	fuse? ( sys-fs/fuse )
+	fuse? ( >=sys-fs/fuse-2.7.0:0 )
 	libtirpc? ( net-libs/libtirpc:= )
 	!libtirpc? ( elibc_glibc? ( sys-libs/glibc[rpc(-)] ) )
 	selinux? ( sec-policy/selinux-glusterfs )
 	tcmalloc? ( dev-util/google-perftools )
 	uring? ( sys-libs/liburing:= )
-	xml? ( dev-libs/libxml2 )
+	xml? ( dev-libs/libxml2:= )
 "
 DEPEND="
 	${RDEPEND}
@@ -175,6 +175,8 @@ src_install() {
 	keepdir /var/log/${PN}
 	keepdir /var/lib/glusterd/{events,glusterfind/.keys}
 
+	systemd_dounit extras/systemd/{glusterd,glustereventsd,glusterfssharedstorage,gluster-ta-volume}.service
+
 	# QA
 	rm -r "${ED}/var/run/" || die
 	if ! use static-libs; then
@@ -207,7 +209,9 @@ pkg_postinst() {
 	ewarn "run GlusterFS."
 	echo
 	elog "If you are upgrading from a previous version of ${PN}, please read:"
-	elog "  https://docs.gluster.org/en/latest/Upgrade-Guide/upgrade_to_$(ver_cut '1-2')/"	use emacs && elisp-site-regen
+	elog "  https://docs.gluster.org/en/latest/Upgrade-Guide/upgrade_to_$(ver_cut '1-2')/"
+
+	use emacs && elisp-site-regen
 }
 
 pkg_postrm() {

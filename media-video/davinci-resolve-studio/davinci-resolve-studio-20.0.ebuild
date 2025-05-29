@@ -66,7 +66,7 @@ LICENSE="Blackmagic"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
-RESTRICT="mirror strip test"
+RESTRICT="fetch mirror strip test"
 
 # media-libs/libpng-compat:1.2 required for bin/BMDPanelFirmware and libs/libQtGui.so.4
 # x11-libs/libXfixes required for libs/libQtGui.so.4
