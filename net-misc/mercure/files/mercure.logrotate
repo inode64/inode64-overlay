@@ -1,7 +1,0 @@
-/var/log/mercure/mercure.log {
-	daily
-	missingok
-	rotate 28
-	compress
-	notifempty
-}

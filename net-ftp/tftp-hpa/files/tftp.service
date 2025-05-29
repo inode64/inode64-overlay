@@ -1,8 +1,0 @@
-[Unit]
-Description=Tftp Server
-Requires=tftp.socket
-Documentation=man:in.tftpd
-
-[Service]
-ExecStart=/usr/sbin/in.tftpd -R 4096:32767 -s /srv/tftp
-StandardInput=socket
