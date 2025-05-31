@@ -42,5 +42,5 @@ src_compile() {
 }
 
 src_install() {
-	dosbin cc2538_bsl/cc2538-bsl.py
+	dosbin cc2538_bsl/cc2538_bsl.py
 }
