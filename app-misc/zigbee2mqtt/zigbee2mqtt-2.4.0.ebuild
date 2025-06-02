@@ -7,14 +7,14 @@ inherit nodejs-mod systemd tmpfiles
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
-COMMIT="aec59cb774aa09a793ae41cd60e6a5cef15b293c"
+COMMIT="bdb94da46e0461337f4a61b4f2a6bfa5172f608f"
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/Koenkk/zigbee2mqtt"
 	EGIT_BRANCH="dev"
 	inherit git-r3
 else
-	SRC_URI="https://github.com/Koenkk/zigbee2mqtt/archive/${PV}.tar.gz -> ${P}.tar.gz
+	SRC_URI="https://github.com/Koenkk/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz
 		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
 fi
 
@@ -50,24 +50,24 @@ src_install() {
 	echo "${COMMIT}" > dist/.hash
 
 	echo -e "\nadvanced:" >>data/configuration.yaml
-	echo -e "  network_key: GENERATE" >>data/configuration.yaml
-	echo -e "  pan_id: GENERATE" >>data/configuration.yaml
-	echo -e "  log_directory: /var/log/${PN}" >>data/configuration.yaml
+	echo -e "\n  network_key: GENERATE" >>data/configuration.yaml
+	echo -e "\n  pan_id: GENERATE" >>data/configuration.yaml
+	echo -e "\n  log_directory: /var/log/${PN}" >>data/configuration.yaml
 
 	nodejs-mod_src_install
 
-	keepdir /var/log/${PN}
+	keepdir "/var/log/${PN}"
 
-	insinto /var/lib/${PN}
+	insinto "/var/lib/${PN}"
 	doins data/configuration.yaml
 
-	dotmpfiles "${FILESDIR}"/zigbee2mqtt.conf
+	dotmpfiles "${FILESDIR}/zigbee2mqtt.conf"
 
-	doinitd "${FILESDIR}"/${PN}
+	doinitd "${FILESDIR}/${PN}"
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /etc/env.d
-	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}"/etc/env.d/90${PN} || die
+	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}/etc/env.d/90${PN}" || die
 
 	# Hack to gzip frontend files to permit "Accept-Encoding: gzip"
 	gzip -k "${ED}"/usr/lib64/node_modules/zigbee2mqtt/node_modules/zigbee2mqtt-frontend/dist/*.html
