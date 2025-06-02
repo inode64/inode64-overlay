@@ -12,26 +12,27 @@ ebuild="$(echo "$cp"|cut -d/ -f2)"
 distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
 if [ "$cp" == "app-misc/node-red" ] || \
+    [ "$cp" == "app-misc/zigbee2mqtt" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
     [ "$cp" == "dev-util/grunt-cli" ] || \
-    [ "$cp" == "sys-process/pm2" ] || \
-    [ "$cp" == "app-misc/zigbee2mqtt" ] ; then
+    [ "$cp" == "sys-process/pm2" ] ; then
 	file="${ebuild}-${new_version}-node_modules.tar.xz"
-	cp ${distdir}/${file} ${search_dir}/dist/
-	git add ${search_dir}/dist/${file}
+	cp "${distdir}/${file}" "${search_dir}/dist/"
+	git add "${search_dir}/dist/${file}"
 	git commit -m "Add node_modules distfile for ${cp}"
 fi
 
-if [ "$cp" == "net-vpn/cloudflared" ] || \
-    [ "$cp" == "app-backup/autorestic" ] || \
+if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
     [ "$cp" == "dev-php/composer" ] || \
-    [ "$cp" == "media-video/go2rtc" ] ; then
+    [ "$cp" == "media-video/go2rtc" ] || \
+    [ "$cp" == "sys-process/runitor" ] || \
+    [ "$cp" == "net-vpn/cloudflared" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
-	cp ${distdir}/${file} ${search_dir}/dist/
-	git add ${search_dir}/dist/${file}
+	cp "${distdir}/${file}" "${search_dir}/dist/"
+	git add "${search_dir}/dist/${file}"
 	git commit -m "Add vendor distfile for ${cp}"
 fi
 

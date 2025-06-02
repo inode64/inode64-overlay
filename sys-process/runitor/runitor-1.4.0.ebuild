@@ -7,12 +7,12 @@ inherit flag-o-matic go-module
 
 DESCRIPTION="A command runner with healthchecks.io integration"
 HOMEPAGE="https://github.com/bdd/runitor/"
-SRC_URI="https://github.com/bdd/runitor/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/bdd/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
 
 LICENSE="0BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
-RESTRICT="mirror"
 
 src_configure() {
 	filter-lto
@@ -37,5 +37,5 @@ src_test() {
 }
 
 src_install() {
-	dobin ${PN}
+	dobin "${PN}"
 }
