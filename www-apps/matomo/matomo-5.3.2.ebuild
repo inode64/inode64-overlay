@@ -23,12 +23,6 @@ pkg_setup() {
 src_install() {
 	webapp_src_preinst
 
-	cd matomo || die "Failed to change directory to matomo"
-	dodoc *.md
-	rm -rf tests
-	rm *.md
-	rm LEGALNOTICE LICENSE
-
 	insinto "${MY_HTDOCSDIR}"
 	doins -r .
 
@@ -37,6 +31,7 @@ src_install() {
 	keepdir "${MY_HTDOCSDIR}/tmp"
 
 	webapp_serverowned "${MY_HTDOCSDIR}/js"
+	webapp_serverowned -R "${MY_HTDOCSDIR}/config"
 	webapp_serverowned -R "${MY_HTDOCSDIR}/tmp"
 	webapp_serverowned -R "${MY_HTDOCSDIR}/matomo.js"
 
