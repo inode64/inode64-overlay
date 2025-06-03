@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="8"
@@ -13,13 +13,21 @@ S="${WORKDIR}/${PN}"
 LICENSE="GPL-3"
 KEYWORDS="~amd64 ~arm64"
 
-DEPEND="dev-php/composer"
-RDEPEND=">=dev-lang/php-7.4[gd,pdo]
-	virtual/mysql
+RDEPEND=">=dev-lang/php-7.4[ctype,gd,iconv,mysqli,pcntl,pdo,posix,zip]
 	virtual/httpd-php"
+
+pkg_setup() {
+	webapp_pkg_setup
+}
 
 src_install() {
 	webapp_src_preinst
+
+	cd matomo || die "Failed to change directory to matomo"
+	dodoc *.md
+	rm -rf tests
+	rm *.md
+	rm LEGALNOTICE LICENSE
 
 	insinto "${MY_HTDOCSDIR}"
 	doins -r .
