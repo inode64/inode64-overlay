@@ -27,10 +27,9 @@ SLOT="0"
 
 RDEPEND="${CDEPEND}
 	>=app-crypt/certbot-${PV}[${PYTHON_USEDEP}]
-	>=app-crypt/acme-${PV}[${PYTHON_USEDEP}]
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 	dev-python/dns-lexicon[${PYTHON_USEDEP}]
-	dev-python/cloudflare[${PYTHON_USEDEP}]"
+	<dev-python/cloudflare-2.20.0[${PYTHON_USEDEP}]"
 
 distutils_enable_tests pytest
 distutils_enable_sphinx docs dev-python/sphinx-rtd-theme
