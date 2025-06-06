@@ -9,6 +9,7 @@ DESCRIPTION="Bitbucket self-hosted Pipelines runner"
 HOMEPAGE="https://support.atlassian.com/bitbucket-cloud/docs/runners/"
 SRC_URI="https://product-downloads.atlassian.com/software/bitbucket/pipelines/atlassian-bitbucket-pipelines-runner-${PV}.tar.gz"
 
+S="${WORKDIR}"
 LICENSE="all-rights-reserved"
 SLOT="0"
 KEYWORDS="~amd64"
