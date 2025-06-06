@@ -5,7 +5,4 @@
 		<email>web@inode64.com</email>
 		<description>The INODE64 Gentoo Project</description>
 	</maintainer>
-	<upstream>
-		<remote-id type="github">cloudflare/cloudflared</remote-id>
-	</upstream>
 </pkgmetadata>

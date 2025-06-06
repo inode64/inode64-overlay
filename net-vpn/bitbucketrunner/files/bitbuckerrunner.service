@@ -1,9 +1,0 @@
-[Unit]
-Description=Bitbucket Runner Service
-
-[Service]
-WorkingDirectory=/home/ubuntu/atlassian-bitbucket-pipelines-runner/bin/
-ExecStart=/home/ubuntu/atlassian-bitbucket-pipelines-runner/bin/start.sh --accountUuid {REDACTED} --repositoryUuid {REDACTED} --runnerUuid {REDACTED} --OAuthClientId REDACTED --OAuthClientSecret REDACTED --runtime linux-shell --workingDirectory ../temp
-
-[Install]
-WantedBy=multi-user.target
