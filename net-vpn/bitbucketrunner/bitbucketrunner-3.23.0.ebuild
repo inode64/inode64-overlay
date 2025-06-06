@@ -25,7 +25,7 @@ src_install() {
 	doins bin/runner.jar
 
 	diropts -m0600
-	insinto /etc/bitbucket
+	insinto /etc/bitbucketrunner
 	doins "${FILESDIR}"/logback.xml
 	doins "${FILESDIR}"/tunnel.cfg
 

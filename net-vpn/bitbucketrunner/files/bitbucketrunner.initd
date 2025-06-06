@@ -16,7 +16,6 @@ depend() {
 }
 
 start_pre() {
-    checkconfig || return 1
     set -a            # exportar todo
     . "$CONFIG_FILE"
     set +a
