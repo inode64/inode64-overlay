@@ -27,7 +27,7 @@ src_install() {
 
 	diropts -m0600
 	insinto /etc/bitbucket
-	doins "${FILESDIR}"/logback.yml
+	doins "${FILESDIR}"/logback.xml
 	doins "${FILESDIR}"/tunnel.cfg
 
 	newinitd "${FILESDIR}/bitbucketrunner.initd" bitbucketrunner
