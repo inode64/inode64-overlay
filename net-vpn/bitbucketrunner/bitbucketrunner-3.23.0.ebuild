@@ -21,8 +21,7 @@ RDEPEND="
 "
 
 src_install() {
-	into /opt/bitbucketrunner
-
+	insinto /opt/bitbucketrunner
 	doins bin/runner.jar
 
 	diropts -m0600
