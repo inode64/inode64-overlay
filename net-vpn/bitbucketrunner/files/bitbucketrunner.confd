@@ -1,0 +1,6 @@
+# Change the following settings to match your system, if necessary.
+# The configuration file tunnel.cfg contains sensitive tokens and must be accessible only by the service user.
+# Ensure permissions are set to 600 and not accessible by other users.
+
+#BITBUKECTRUNNER_USER=root
+#BITBUKECTRUNNER_GROUP=root

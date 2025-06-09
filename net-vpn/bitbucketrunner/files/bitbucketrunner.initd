@@ -11,17 +11,40 @@ directory="/opt/bitbucketrunner"
 CONFIG_FILE="/etc/bitbucketrunner/tunnel.cfg"
 required_files="$CONFIG_FILE"
 command_user="root:root"
+command_user="${BITBUKECTRUNNER_USER:-nobody}:${BITBUKECTRUNNER_GROUP:-nobody}"
 retry=SIGTERM/30/SIGKILL/10
 
 depend() {
     need net
 }
 
-start_pre() {
-    set -a            # exportar todo
+checkconfig() {
+	# Check if permissions are correct for user and group to prevent authentication issues
+    checkpath -d -m 0700 -o root:root "${CONFIG_FILE}"
+    set -a
     . "$CONFIG_FILE"
     set +a
-    command_args="-jar \
+
+    checkpath -d -m 0700 -o root:root "${WORKING_DIRECTORY}"
+
+	return 0
+}
+
+
+start_pre() {
+	checkconfig || return 1
+
+    set -a
+    . "$CONFIG_FILE"
+    set +a
+
+    command_args="-jar "
+
+	if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
+		command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
+	fi
+
+    command_args+="
       -Dbitbucket.pipelines.runner.account.uuid=$ACCOUNT_UUID \
       -Dbitbucket.pipelines.runner.repository.uuid=$REPOSITORY_UUID \
       -Dbitbucket.pipelines.runner.uuid=$RUNNER_UUID \
@@ -29,27 +52,12 @@ start_pre() {
       -Dbitbucket.pipelines.runner.oauth.client.secret=$OAUTH_CLIENT_SECRET \
       -Dbitbucket.pipelines.runner.directory.working=$WORKING_DIRECTORY \
       -Dbitbucket.pipelines.runner.environment=$RUNNER_ENVIRONMENT \
-      -Dbitbucket.pipelines.runner.runtime=$RUNTIME \
+      -Dbitbucket.pipelines.runner.runtime=linux-shell \
       -Dbitbucket.pipelines.runner.docker.uri=$DOCKER_URI \
       -Dbitbucket.pipelines.runner.scheduled.state.update.initial.delay.seconds=$SCHEDULED_STATE_UPDATE_INITIAL_DELAY_SECONDS \
       -Dbitbucket.pipelines.runner.scheduled.state.update.period.seconds=$SCHEDULED_STATE_UPDATE_PERIOD_SECONDS \
       -Dbitbucket.pipelines.runner.cleanup.previous.folders=$CLEANUP_PREVIOUS_FOLDERS \
       -Dbitbucket.pipelines.runner.secret.provider.uri=$SECRET_PROVIDER_URI \
-      -Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE \
       -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
       ./runner.jar"
 }
-
-#start() {
-#    ebegin "Iniciando Bitbucket Runner"
-#    start-stop-daemon --start --make-pidfile --pidfile "$pidfile" \
-#        --background --chdir "$directory" \
-#        --exec "$command" -- $command_args
-#    eend $?
-#}
-#
-#stop() {
-#    ebegin "Deteniendo Bitbucket Runner"
-#    start-stop-daemon --stop --pidfile "$pidfile"
-#    eend $?
-#}
