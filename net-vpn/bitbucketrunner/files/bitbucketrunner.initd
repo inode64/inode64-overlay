@@ -10,8 +10,9 @@ command_background="true"
 directory="/opt/bitbucketrunner"
 CONFIG_FILE="/etc/bitbucketrunner/tunnel.cfg"
 required_files="$CONFIG_FILE"
-command_user="root:root"
-command_user="${BITBUKECTRUNNER_USER:-nobody}:${BITBUKECTRUNNER_GROUP:-nobody}"
+BITBUKECTRUNNER_USER=${BITBUKECTRUNNER_USER:-nobody}
+BITBUKECTRUNNER_GROUP=${BITBUKECTRUNNER_GROUP:-nobody}
+command_user="${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP}"
 retry=SIGTERM/30/SIGKILL/10
 
 depend() {
@@ -19,20 +20,21 @@ depend() {
 }
 
 checkconfig() {
-	# Check if permissions are correct for user and group to prevent authentication issues
-    checkpath -d -m 0700 -o root:root "${CONFIG_FILE}"
     set -a
     . "$CONFIG_FILE"
     set +a
 
-    checkpath -d -m 0700 -o root:root "${WORKING_DIRECTORY}"
+    # Check if permissions are correct for user and group to prevent authentication issues
+    checkpath -f -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${CONFIG_FILE}"
+    checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${WORKING_DIRECTORY}"
+    checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} /var/log/bitbucketrunner
 
-	return 0
+    return 0
 }
 
 
 start_pre() {
-	checkconfig || return 1
+    checkconfig || return 1
 
     set -a
     . "$CONFIG_FILE"
@@ -40,9 +42,9 @@ start_pre() {
 
     command_args="-jar "
 
-	if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
-		command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
-	fi
+    if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
+        command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
+    fi
 
     command_args+="
       -Dbitbucket.pipelines.runner.account.uuid=$ACCOUNT_UUID \
