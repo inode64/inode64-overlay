@@ -30,6 +30,7 @@ src_install() {
 	doins "${FILESDIR}"/tunnel.cfg
 
 	newinitd "${FILESDIR}/bitbucketrunner.initd" bitbucketrunner
+	newconfd "${FILESDIR}/bitbucketrunner.confd" bitbucketrunner
 	systemd_douserunit "${FILESDIR}/bitbucketrunner.service"
 
 	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
@@ -37,4 +38,12 @@ src_install() {
 
 pkg_postinst() {
 	tmpfiles_process ${PN}.tmpfiles.conf
+	if [[ ! -d /etc/ssl/certs/java/cacerts ]]; then
+		# Java certificates is necessary for the runner to work properly
+		mkdir -p /etc/ssl/certs/java
+	fi
+	update-ca-certificates -f
+
+	einfo "The configuration file tunnel.cfg contains sensitive tokens and must be accessible only by the service user."
+    einfo "Ensure permissions are set to 600 and not accessible by other users."
 }

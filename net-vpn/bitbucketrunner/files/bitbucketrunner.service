@@ -5,8 +5,8 @@ After=network.target
 [Service]
 EnvironmentFile=/etc/bitbucketrunner/tunnel.cfg
 WorkingDirectory=/opt/bitbucketrunner
-User=bitbucketrunner
-Group=bitbucketrunner
+User=root
+Group=root
 Type=simple
 ExecStart=/bin/sh -ec '
   exec /usr/bin/java -jar \
@@ -17,7 +17,7 @@ ExecStart=/bin/sh -ec '
     -Dbitbucket.pipelines.runner.oauth.client.secret=${OAUTH_CLIENT_SECRET} \
     -Dbitbucket.pipelines.runner.directory.working=${WORKING_DIRECTORY} \
     -Dbitbucket.pipelines.runner.environment=${RUNNER_ENVIRONMENT} \
-    -Dbitbucket.pipelines.runner.runtime=${RUNTIME} \
+    -Dbitbucket.pipelines.runner.runtime=linux-shell \
     -Dbitbucket.pipelines.runner.docker.uri=${DOCKER_URI} \
     -Dbitbucket.pipelines.runner.scheduled.state.update.initial.delay.seconds=${SCHEDULED_STATE_UPDATE_INITIAL_DELAY_SECONDS} \
     -Dbitbucket.pipelines.runner.scheduled.state.update.period.seconds=${SCHEDULED_STATE_UPDATE_PERIOD_SECONDS} \
