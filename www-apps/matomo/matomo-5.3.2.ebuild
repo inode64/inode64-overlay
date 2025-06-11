@@ -30,10 +30,11 @@ src_install() {
 	keepdir "${MY_HTDOCSDIR}/js"
 	keepdir "${MY_HTDOCSDIR}/tmp"
 
-	webapp_serverowned "${MY_HTDOCSDIR}/js"
 	webapp_serverowned -R "${MY_HTDOCSDIR}/config"
-	webapp_serverowned -R "${MY_HTDOCSDIR}/tmp"
+	webapp_serverowned -R "${MY_HTDOCSDIR}/js"
 	webapp_serverowned -R "${MY_HTDOCSDIR}/matomo.js"
+	webapp_serverowned -R "${MY_HTDOCSDIR}/plugins"
+	webapp_serverowned -R "${MY_HTDOCSDIR}/tmp"
 
 	# make executable for cli
 	fperms 755 "${MY_HTDOCSDIR}/console"
