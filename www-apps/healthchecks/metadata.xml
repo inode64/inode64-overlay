@@ -12,6 +12,8 @@
 	<use>
 		<flag name="apprise">Allow backup monitoring to send notification to a wide variety
 			of services, using <pkg>dev-python/apprise</pkg></flag>
+		<flag name="apache">Install Apache required applications</flag>
+		<flag name="nginx">Install Nginx required applications</flag>
 	</use>
 	<upstream>
 		<remote-id type="github">healthchecks/healthchecks</remote-id>

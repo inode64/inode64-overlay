@@ -29,7 +29,7 @@ RDEPEND="
 	apache? ( www-apache/mod_wsgi )
 	apprise? ( dev-python/apprise )
 	mysql? ( dev-python/mysqlclient )
-	nginx? ( www-servers/nginx[nginx_modules_uwsgi] )
+	nginx? ( www-servers/nginx )
 	postgres? ( dev-python/psycopg )
 	sqlite? ( dev-lang/python[sqlite] )
 	!apache? ( !nginx? ( www-servers/uwsgi ) )
@@ -39,7 +39,7 @@ RDEPEND="
 		>=dev-python/django-5.1[${PYTHON_USEDEP}]
 		dev-python/django-compressor[${PYTHON_USEDEP}]
 		dev-python/django-stubs-ext[${PYTHON_USEDEP}]
-		dev-python/fido2[${PYTHON_USEDEP}]
+		<=dev-python/fido2-2.0.0[${PYTHON_USEDEP}]
 		dev-python/oncalendar[${PYTHON_USEDEP}]
 		dev-python/pycurl[${PYTHON_USEDEP}]
 		dev-python/pydantic[${PYTHON_USEDEP}]
