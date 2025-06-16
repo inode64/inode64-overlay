@@ -39,7 +39,7 @@ RDEPEND="
 		>=dev-python/django-5.1[${PYTHON_USEDEP}]
 		dev-python/django-compressor[${PYTHON_USEDEP}]
 		dev-python/django-stubs-ext[${PYTHON_USEDEP}]
-		<=dev-python/fido2-2.0.0[${PYTHON_USEDEP}]
+		=dev-python/fido2-1.2.0[${PYTHON_USEDEP}]
 		dev-python/oncalendar[${PYTHON_USEDEP}]
 		dev-python/pycurl[${PYTHON_USEDEP}]
 		dev-python/pydantic[${PYTHON_USEDEP}]
