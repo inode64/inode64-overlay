@@ -42,9 +42,6 @@ src_prepare() {
 		usr/lib/systemd/system/*.service usr/bin/*.sh || die
 
 	rm -rf var/www/onlyoffice/documentserver/server/schema/{dameng,mysql} || die
-
-	# move template api.js.tpl to api.js
-	mv var/www/onlyoffice/documentserver/web-apps/apps/api/documents/api.js.tpl var/www/onlyoffice/documentserver/web-apps/apps/api/documents/api.js
 }
 
 src_install() {
