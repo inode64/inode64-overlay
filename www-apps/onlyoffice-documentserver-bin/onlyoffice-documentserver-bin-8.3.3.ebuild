@@ -77,9 +77,9 @@ src_install() {
 	fowners ds:ds -R /usr/share/onlyoffice/documentserver
 
 	local lib
-	for lib in libPdfFile.so libXpsFile.so libDjVuFile.so libHtmlRenderer.so \
-		libkernel_network.so libDocxRenderer.so libdoctrenderer.so libHtmlFile2.so \
-		libUnicodeConverter.so libgraphics.so libFb2File.so libEpubFile.so libkernel.so libicudata.so.58 libicuuc.so.58; do
+	for lib in libDjVuFile.so libDocxRenderer.so libEpubFile.so libFb2File.so libHWPFile.so libHtmlFile2.so \
+		libIWorkFile.so libPdfFile.so libUnicodeConverter.so libXpsFile.so libdoctrenderer.so libgraphics.so \
+		libkernel.so libkernel_network.so libicudata.so.58 libicuuc.so.58; do
 		dosym -r "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" "/usr/$(get_libdir)/${lib}" || die
 		fperms +x "/usr/share/onlyoffice/documentserver/server/FileConverter/bin/${lib}" || die
 	done
