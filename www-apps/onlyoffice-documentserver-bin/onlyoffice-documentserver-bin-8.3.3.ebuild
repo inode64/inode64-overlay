@@ -42,6 +42,9 @@ src_prepare() {
 		usr/lib/systemd/system/*.service usr/bin/*.sh || die
 
 	rm -rf var/www/onlyoffice/documentserver/server/schema/{dameng,mysql} || die
+
+	# move template api.js.tpl to api.js
+	mv var/www/onlyoffice/documentserver/web-apps/apps/api/documents/api.js.tpl var/www/onlyoffice/documentserver/web-apps/apps/api/documents/api.js
 }
 
 src_install() {
@@ -57,14 +60,14 @@ src_install() {
 	doins etc/onlyoffice/documentserver/log4js/production.json
 
 	insinto /usr/bin
-	doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh}
+	doins usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh,documentserver-flush-cache.sh}
 
 	insinto /usr/share/onlyoffice
 	doins -r var/www/onlyoffice/documentserver
 
 	keepdir /usr/share/onlyoffice/documentserver/fonts
 
-	fperms +x /usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh}
+	fperms +x /usr/bin/{documentserver-generate-allfonts.sh,documentserver-jwt-status.sh,documentserver-pluginsmanager.sh,documentserver-flush-cache.sh}
 
 	fperms +x /usr/share/onlyoffice/documentserver/npm/json
 	fperms +x /usr/share/onlyoffice/documentserver/server/DocService/docservice
