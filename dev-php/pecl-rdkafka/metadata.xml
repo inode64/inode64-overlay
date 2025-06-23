@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-  <maintainer type="project">
-    <email>php-bugs@gentoo.org</email>
-    <name>PHP</name>
+  <maintainer type="person" proxied="yes">
+    <email>web@inode64.com</email>
+    <name>Fco. Javier Félix</name>
   </maintainer>
-  <maintainer type="person">
-    <email>mjo@gentoo.org</email>
-    <name>Michael Orlitzky</name>
+  <maintainer type="project" proxied="proxy">
+    <email>proxy-maint@gentoo.org</email>
+    <name>Proxy Maintainers</name>
   </maintainer>
   <upstream>
-    <remote-id type="github">Imagick/imagick</remote-id>
+    <remote-id type="github">arnaud-lb/php-rdkafka</remote-id>
   </upstream>
 </pkgmetadata>

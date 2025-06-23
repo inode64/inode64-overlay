@@ -3,33 +3,18 @@
 
 EAPI=8
 
-PHP_EXT_NAME="imagick"
-USE_PHP="php7-3 php7-4 php8-1 php8-2 php8-3 php8-4"
-
-# https://github.com/Imagick/imagick/issues/626
-PHP_EXT_NEEDED_USE="-debug"
+PHP_EXT_NAME="rdkafka"
+USE_PHP="php8-2 php8-3 php8-4"
 
 inherit php-ext-pecl-r3
 
-DESCRIPTION="PHP wrapper for the ImageMagick library"
-HOMEPAGE="https://pecl.php.net/package/imagick https://github.com/Imagick/imagick"
-LICENSE="PHP-3.01"
+DESCRIPTION="AProduction-ready, stable Kafka client for PHP"
+HOMEPAGE="https://github.com/arnaud-lb/php-rdkafka"
+LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
-IUSE="examples test"
-RESTRICT="!test? ( test )"
 
-# imagemagick[-openmp] is needed wrt bug 547922 and upstream
-# https://github.com/Imagick/imagick#openmp
-RDEPEND="media-gfx/imagemagick"
+RDEPEND="dev-libs/librdkafka"
 DEPEND="
 	${RDEPEND}
-	test? ( media-gfx/imagemagick:=[hdri,jpeg,png,svg,truetype,xml] )
 "
-
-PHP_EXT_ECONF_ARGS="--with-imagick=${EPREFIX}/usr"
-
-src_install() {
-	php-ext-pecl-r3_src_install
-	php-ext-source-r3_addtoinifiles "imagick.skip_version_check" "1"
-}
