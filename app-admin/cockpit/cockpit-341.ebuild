@@ -36,12 +36,14 @@ BDEPEND="
 		dev-util/gtk-doc
 	)
 	${PYTHON_DEPS}
-	dev-python/pip
-	test? (
-		dev-python/pytest-asyncio
-		dev-python/pytest-cov
-		dev-python/pytest-timeout
-	)
+	$(python_gen_cond_dep '
+		dev-python/pip[${PYTHON_USEDEP}]
+		test? (
+			dev-python/pytest-asyncio[${PYTHON_USEDEP}]
+			dev-python/pytest-cov[${PYTHON_USEDEP}]
+			dev-python/pytest-timeout[${PYTHON_USEDEP}]
+		)
+	')
 "
 DEPEND="
 	networkmanager? (
