@@ -1,4 +1,4 @@
-# Copyright 2019-2023 Gentoo Authors
+# Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: nodejs.eclass
@@ -17,17 +17,16 @@
 #       https://github.com/samuelbernardo/ssnb-overlay/blob/master/eclass/npm.eclass
 #       https://github.com/gentoo-mirror/lanodanOverlay/blob/master/eclass/nodejs.eclass
 #       https://github.com/Tatsh/tatsh-overlay/blob/master/eclass/yarn.eclass
-
 #
 # Build package for node_modules:
 #   npm:
-#   npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#       npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
 #   yarn:
-#   yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#       yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
 #   Create archive in tar:
-#   tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
+#       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 
 case ${EAPI} in
     8) ;;
@@ -58,12 +57,10 @@ NODEJS_FILES="babel.config.js babel.config.json bin cli.js dist index.js lib nod
 # Can be either files, or directories.
 # Example: NODEJS_EXTRA_FILES="rigger.js modules"
 
-
 # @VARIABLE: MYNPMARGS
 # @DEFAULT_UNSET
 # @DESCRIPTION:
 # User-controlled environment variable containing arguments to be passed to npm
-
 
 case ${NODEJS_MANAGER} in
     npm)
@@ -82,14 +79,14 @@ esac
 # @DESCRIPTION:
 # Returns the package version
 nodejs_version() {
-    node -p "require('./package.json').version"
+    node -p "require('./package.json').version" || die "Failed to extract version from package.json"
 }
 
 # @FUNCTION: nodejs_package
 # @DESCRIPTION:
 # Returns the package name
 nodejs_package() {
-    node -p "require('./package.json').name"
+    node -p "require('./package.json').name" || die "Failed to extract package name from package.json"
 }
 
 # @FUNCTION: nodejs_has_test
@@ -110,25 +107,30 @@ nodejs_has_build() {
 # @DESCRIPTION:
 # Returns true if bin exist
 nodejs_has_bin() {
-    node -p "if (require('./package.json').bin === undefined) { process.exit(1) }" &>/dev/null
+   node -p "if (require('./package.json').bin === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: nodejs_install_bin
 # @DESCRIPTION:
 # Install binary files
 nodejs_install_bin() {
-    local bin_content key value
+    # Create a proper destination
+    local module_path
+    module_path="$(nodejs_modules)"
+    [[ -z "${module_path}" ]] && die "Failed to determine module path"
 
-    bin_content=$(node -e "console.log(JSON.stringify(require('./package.json').bin))")
+    # Use node to safely parse the bin entries
+    local bins
+    bins=$(node -e "console.log(JSON.stringify(require('./package.json').bin))")
 
-    insinto "$(nodejs_modules)"
-    echo "$bin_content" | tr '{},' '\n' | grep ':' | sed -e 's/\"//g' -e 's/,$//'| while IFS=: read -r key value; do
+    insinto "${module_path}"
+    echo "$bins" | tr '{},' '\n' | grep ':' | sed -e 's/\"//g' -e 's/,$//'| while IFS=: read -r key value; do
       key="$(echo "$key" | xargs)"
       value="$(echo "$value" | xargs)"
 
       doins "${value}"
-      fperms +x "$(nodejs_modules)/${value}"
-      dosym -r "$(nodejs_modules)/${value}" "/usr/bin/${key}"
+      fperms +x "${module_path}/${value}"
+      dosym -r "${module_path}/${value}" "/usr/bin/${key}"
     done
 }
 
@@ -136,8 +138,12 @@ nodejs_install_bin() {
 # @DESCRIPTION:
 # Returns location where to install NodeJS
 nodejs_modules() {
+    local package_name
+    package_name=$(nodejs_package)
+    [[ -z "${package_name}" ]] && die "Failed to determine package name"
+
     # shellcheck disable=SC2046
-    echo /usr/$(get_libdir)/node_modules/$(nodejs_package)
+    echo "/usr/$(get_libdir)/node_modules/${package_name}"
 }
 
 # @FUNCTION: nodejs_has_package
@@ -154,8 +160,9 @@ nodejs_docs() {
     # If docs variable is not empty when install docs usually found in NodeJS/NPM packages
     [[ ! "${DOCS}" ]] || return
 
-    local f
+    einfo "Installing documentation"
 
+    local f
     for f in README* HISTORY* ChangeLog AUTHORS NEWS TODO CHANGES \
         THANKS BUGS FAQ CREDITS CHANGELOG* *.md; do
         if [[ -s "${f}" ]]; then
@@ -205,33 +212,59 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -name '*\~' -delete || die
 
+    # Additional files to remove
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(flow\|husky.*\|huskyrc\|lintstagedrc\|commitlintrc\|storybook.*\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(webpack.config.*\|rollup.config.*\|parcel.*\|grunt.*\|gulp.*\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(browserslist.*\|nvmrc\|dockerignore\|stylelintrc.*\|prettierignore\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(appveyor.yml\|circle.yml\|circleci.*\|dependabot.*\|renovate.*\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*/\(jest.config.*\|karma.conf.*\|ava.config.*\|jasmine.*\)$' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*/\(benchmark.*\|example.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
+
+    # Remove development directories
     # shellcheck disable=SC2185
     find -type d \
-        \( \
+    \( \
+        -iwholename '*.deps' -o \
         -iwholename '*.github' -o \
-        -iwholename '*.tscache' -o \
-        -iwholename '*.vscode' -o \
         -iwholename '*.idea' -o \
         -iwholename '*.nyc_output' -o \
-        -iwholename '*.deps' -o \
-        -iwholename '*/man' -o \
-        -iwholename '*/test' -o \
-        -iwholename '*/tests' -o \
-        -iwholename '*/scripts' -o \
-        -iwholename '*/git-hooks' -o \
-        -iwholename '*/prebuilds' -o \
+        -iwholename '*.tscache' -o \
+        -iwholename '*.vscode' -o \
+        -iwholename '*/.storybook' -o \
         -iwholename '*/android-arm' -o \
         -iwholename '*/android-arm64' -o \
-        -iwholename '*/linux-arm64' -o \
-        -iwholename '*/linux-armvy' -o \
-        -iwholename '*/linux-armv7' -o \
+        -iwholename '*/benchmarks' -o \
+        -iwholename '*/coverage' -o \
+        -iwholename '*/darwin-x64' -o \
+        -iwholename '*/darwin-x64+arm64' -o \
+        -iwholename '*/demo' -o \
+        -iwholename '*/doc' -o \
+        -iwholename '*/docs' -o \
+        -iwholename '*/examples' -o \
+        -iwholename '*/fixtures' -o \
+        -iwholename '*/git-hooks' -o \
         -iwholename '*/linux-arm' -o \
+        -iwholename '*/linux-arm64' -o \
+        -iwholename '*/linux-armv6' -o \
+        -iwholename '*/linux-armv7' -o \
+        -iwholename '*/linux-armv8' -o \
+        -iwholename '*/man' -o \
+        -iwholename '*/prebuilds' -o \
+        -iwholename '*/scripts' -o \
+        -iwholename '*/storybook-static' -o \
+        -iwholename '*/test' -o \
+        -iwholename '*/tests' -o \
+        -iwholename '*/win32-arm64' -o \
         -iwholename '*/win32-ia32' -o \
-        -iwholename '*/win32-x64' -o \
-        -iwholename '*/darwin-x64' \
-        -iwholename '*/darwin-x64+arm64' \
-        \) \
-        -exec rm -rvf {} +
+        -iwholename '*/win32-x64' \
+    \) \
+    -exec rm -rvf {} + || ewarn "Failed to remove some directories"
 }
 
 # @FUNCTION: enpm
@@ -251,7 +284,6 @@ enpm() {
     fi
 
     mynpmargs_local=("${mynpmargs[@]}")
-
     npmargs=(
         --color false
         --foreground-scripts
@@ -263,15 +295,19 @@ enpm() {
 
     case ${NODEJS_MANAGER} in
         npm)
-            npmargs+=(
-                --audit false
-            )
+            if ! type -P npm >/dev/null; then
+                eerror "npm is required but not installed or not in PATH"
+                die "npm not available"
+            fi
+            npmargs+=( --audit false )
             npm "$@" "${npmargs[@]}"
             ;;
         yarn)
-            npmargs+=(
-                --cache-folder ".cache"
-            )
+            if ! type -P yarn >/dev/null; then
+                eerror "yarn is required but not installed or not in PATH"
+                die "yarn not available"
+            fi
+            npmargs+=( --cache-folder ".cache" )
             yarn "$@" "${npmargs[@]}"
             ;;
     esac
@@ -285,16 +321,20 @@ enpm_clean() {
 
     local nodejs_files f
 
-    einfo "Clean files"
+    einfo "Cleaning up unnecessary files"
+
     case ${NODEJS_MANAGER} in
         npm)
-            enpm prune --omit=dev || die
+            enpm prune --omit=dev || die "npm prune failed"
             ;;
         yarn)
-            enpm install production || die
-            # TODO
-            #enpm autoclean --init || die
-            #enpm autoclean --force || die
+            enpm install --production || die "yarn install production failed"
+            if type -P yarn >/dev/null && yarn --help | grep -q autoclean; then
+                enpm autoclean --init || ewarn "yarn autoclean --init failed"
+                enpm autoclean --force || ewarn "yarn autoclean --force failed"
+            else
+                ewarn "yarn autoclean not available, skipping additional cleanup"
+            fi
             ;;
     esac
 
@@ -317,9 +357,15 @@ enpm_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
     local nodejs_files f
+    local module_path
+
+    einfo "Installing NodeJS module"
+
+    module_path="$(nodejs_modules)"
+    [[ -z "${module_path}" ]] && die "Failed to determine module path"
 
     if nodejs_has_package; then
-        einfo "Install pack files"
+        einfo "Installing packaged files..."
         enpm --prefix "${ED}"/usr \
             install \
             "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
@@ -327,33 +373,34 @@ enpm_install() {
 
     nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
 
-    dodir "$(nodejs_modules)" || die "Could not create DEST folder"
+    dodir "${module_path}"
 
     for f in ${nodejs_files}; do
         if [[ -e "${f}" ]]; then
-            cp -r "${f}" "${ED}/$(nodejs_modules)"
+            cp -r "${f}" "${ED}/${module_path}" || die "Failed to copy ${f}"
         fi
     done
 
-    pushd "${ED}/$(nodejs_modules)" >/dev/null || die
+    pushd "${ED}/${module_path}" >/dev/null || die
 
-    # Reset permissions for executables
-    find -type f | while read f; do
-        fperms -x "$(nodejs_modules)"/"${f}"
+    # Reset permissions for all files
+    find -type f | while read -r f; do
+        fperms -x "${module_path}/${f}"
     done
 
     # Set permissions for executables and libraries
-    find -type f -name "*.node" | while read f; do
-        fperms +x "$(nodejs_modules)/${f}"
+    find -type f -name "*.node" | while read -r f; do
+        fperms +x "${module_path}/${f}"
     done
-    find -type f -executable | while read f; do
-        fperms +x "$(nodejs_modules)/${f}"
+
+    find -type f -executable | while read -r f; do
+        fperms +x "${module_path}/${f}"
     done
 
     popd >/dev/null || die
 
     if nodejs_has_bin; then
-        einfo "Install binary files"
+        einfo "Installing binary files..."
         nodejs_install_bin
     fi
 }

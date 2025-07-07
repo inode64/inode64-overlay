@@ -1,4 +1,4 @@
-# Copyright 2019-2023 Gentoo Authors
+# Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: nodejs-mod.eclass
@@ -21,13 +21,13 @@
 #
 # Build package for node_modules:
 #   npm:
-#   npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#       npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
 #   yarn:
-#   yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
+#       yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
 #   Create archive in tar:
-#   tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
+#       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 
 case ${EAPI} in
     8) ;;
@@ -69,23 +69,28 @@ nodejs-mod_src_prepare() {
 nodejs-mod_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-	pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
+    pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
+
     if [[ -d node_modules ]]; then
-        einfo "Compile native addon modules"
+        einfo "Compiling native addon modules"
+
+        # Find all binding.gyp files and compile the modules
         find node_modules/ -name binding.gyp -exec dirname {} \; | while read -r dir; do
-            einfo "Compile module ${dir}"
-            pushd "${dir}" >/dev/null || die
+            pushd "${dir}" >/dev/null || die "Failed to change to ${dir} directory"
+
             # shellcheck disable=SC2046
             npm_config_nodedir=/usr/ /usr/$(get_libdir)/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild --verbose
+
             popd >/dev/null || die
         done
     fi
 
     if nodejs_has_build; then
-        einfo "Run build"
+        einfo "Running build script"
         enpm run build || die "build failed"
     fi
-	popd >/dev/null || die
+
+    popd >/dev/null || die
 }
 
 # @FUNCTION: nodejs-mod_src_test
@@ -94,24 +99,30 @@ nodejs-mod_src_compile() {
 nodejs-mod_src_test() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-	pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
+    pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
+
     if nodejs_has_test; then
+        einfo "Running tests"
         enpm run test || die "test failed"
+    else
+        einfo "No tests found in package.json, skipping tests"
     fi
+
     popd >/dev/null || die
 }
 
-# @FUNCTION: nodejs_src_install
+# @FUNCTION: nodejs-mod_src_install
 # @DESCRIPTION:
 # Function for installing the package
 nodejs-mod_src_install() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    pushd ${NODEJS_MOD_PREFIX} >/dev/null || die
-    nodejs_docs
+    pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
 
+    nodejs_docs
     enpm_clean
     enpm_install
+
     popd >/dev/null || die
 }
 

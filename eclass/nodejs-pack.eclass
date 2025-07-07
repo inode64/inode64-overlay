@@ -1,4 +1,4 @@
-# Copyright 2019-2023 Gentoo Authors
+# Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: nodejs-pack.eclass
@@ -32,7 +32,7 @@ if has nodejs-mod ${INHERITED}; then
     die "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
 
-# Upstream does not support stripping go packages
+# Upstream does not support stripping nodejs packages
 RESTRICT="test strip"
 
 # @FUNCTION: nodejs-pack_src_prepare
@@ -41,11 +41,33 @@ RESTRICT="test strip"
 nodejs-pack_src_prepare() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    if ! nodejs_has_package && ! test -e package.json; then
+    # Check for package.json existence
+    if ! nodejs_has_package && [[ ! -e package.json ]]; then
         eerror "Unable to locate package.json"
         eerror "Consider not inheriting the nodejs-pack eclass."
         die "FATAL: Unable to find package.json"
     fi
+
+    # Check if node and npm/yarn are available
+    if ! type -P node >/dev/null; then
+        eerror "Node.js is required but not installed or not in PATH"
+        die "Node.js not available"
+    fi
+
+    case ${NODEJS_MANAGER} in
+        npm)
+            if ! type -P npm >/dev/null; then
+                eerror "npm is required but not installed or not in PATH"
+                die "npm not available"
+            fi
+            ;;
+        yarn)
+            if ! type -P yarn >/dev/null; then
+                eerror "yarn is required but not installed or not in PATH"
+                die "yarn not available"
+            fi
+            ;;
+    esac
 
     default_src_prepare
 }
@@ -56,8 +78,10 @@ nodejs-pack_src_prepare() {
 nodejs-pack_src_compile() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    einfo "Create pack file"
-    enpm --global pack || die "pack failed"
+    einfo "Creating package archive..."
+
+    # Create the package archive
+    enpm --global pack || die "package creation failed"
 }
 
 # @FUNCTION: nodejs-pack_src_install
@@ -68,14 +92,31 @@ nodejs-pack_src_install() {
 
     nodejs_docs
 
-    einfo "Install pack files"
-    enpm --prefix "${ED}"/usr --global \
-        install \
-        "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
+    # Get the package information
+    local package_name package_version package_file module_path
+    package_name=$(nodejs_package)
+    package_version=$(nodejs_version)
+    package_file="${package_name}-${package_version}.tgz"
+    module_path=$(nodejs_modules)
 
-    pushd "${ED}/$(nodejs_modules)" >/dev/null || die
-    nodejs_remove_dev
-    popd >/dev/null || die
+    # Verify package file exists
+    if [[ ! -f "${package_file}" ]]; then
+        die "Package file ${package_file} does not exist"
+    fi
+
+    # Install the package
+    einfo "Installing package ${package_file}"
+    enpm --prefix "${ED}"/usr --global install "${package_file}" || die "package installation failed"
+
+    # Clean up unnecessary files
+    if [[ -d "${ED}/${module_path}" ]]; then
+        pushd "${ED}/${module_path}" >/dev/null || die "Failed to change to module directory"
+        nodejs_remove_dev
+        popd >/dev/null || die
+    else
+        eerror "Module directory ${module_path} not found in ${ED}"
+        die "Installation appears to have failed"
+    fi
 }
 
 fi
