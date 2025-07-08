@@ -24,6 +24,12 @@ checkconfig() {
     . "$CONFIG_FILE"
     set +a
 
+    if [ ! -s /etc/ssl/certs/java/cacerts ]; then
+        einfo "Update certificates"
+        mkdir /etc/ssl/certs/java 2>/dev/null
+        update-ca-certificates
+    fi
+
     # Check if permissions are correct for user and group to prevent authentication issues
     checkpath -f -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${CONFIG_FILE}"
     checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${WORKING_DIRECTORY}"
