@@ -36,8 +36,17 @@ src_compile() {
 	fi
 }
 
+src_test() {
+  emake test
+}
+
 src_install() {
 	dodoc *.md
+
+  diropts -m0700
+  insopts -m0600
+  insinto /etc/nebula/
+  newins examples/config.yml config.example.yml
 
 	if use client; then
 		dobin nebula
