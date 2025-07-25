@@ -43,10 +43,10 @@ src_test() {
 src_install() {
 	dodoc *.md
 
-  diropts -m0700
-  insopts -m0600
-  insinto /etc/nebula/
-  newins examples/config.yml config.example.yml
+	diropts -m0700
+	insopts -m0600
+	insinto /etc/nebula/
+	newins examples/config.yml config.example.yml
 
 	if use client; then
 		dobin nebula
@@ -56,5 +56,13 @@ src_install() {
 
 	if use gencert; then
 		dobin nebula-cert
+	fi
+}
+
+pkg_postinst() {
+	chmod 0600 "${EROOT}"/etc/nebula/* 2>/dev/null
+
+	if use client && use gencert; then
+		ewarn "It is not recommended to use the same lighthouse server as the certificate generator."
 	fi
 }
