@@ -4,8 +4,11 @@
 
 extra_commands="checkconfig"
 
+vpn=${SVCNAME#*.}
+[[ $SVCNAME == nebula ]] && vpn=config
+
 : ${NEBULA_CONFDIR:=${RC_PREFIX%/}/etc/nebula}
-: ${NEBULA_CONFIG:=${NEBULA_CONFDIR}/${SVCNAME:-config.yml}}
+: ${NEBULA_CONFIG:=${NEBULA_CONFDIR}/${vpn}.yml}
 : ${NEBULA_BINARY:=${NEBULA_BINARY}${RC_PREFIX%/}/usr/bin/nebula}
 
 command="${NEBULA_BINARY}"
