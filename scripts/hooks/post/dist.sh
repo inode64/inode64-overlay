@@ -29,7 +29,8 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "dev-php/composer" ] || \
     [ "$cp" == "media-video/go2rtc" ] || \
     [ "$cp" == "sys-process/runitor" ] || \
-    [ "$cp" == "net-vpn/cloudflared" ] ; then
+    [ "$cp" == "net-vpn/cloudflared" ] || \
+      [ "$cp" == "net-vpn/nebula" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
 	cp "${distdir}/${file}" "${search_dir}/dist/"
 	git add "${search_dir}/dist/${file}"
