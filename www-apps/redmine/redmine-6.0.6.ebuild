@@ -43,7 +43,7 @@ ruby_add_bdepend "
 	>=dev-ruby/propshaft-1.1.0:1
 	>=dev-ruby/rack-3.1.3:3.1
 	>=dev-ruby/rails-7.2.2.1:7.2
-	>=dev-ruby/rbpdf-1.21.3
+	>=dev-ruby/rbpdf-1.21.4
 	>=dev-ruby/redcarpet-3.6.0
 	>=dev-ruby/request_store-1.5.0:0
 	dev-ruby/rexml
