@@ -1,4 +1,5 @@
 {
   "type": "metadata",
-  "composer": true
+  "composer": true,
+  "sha_source": " https://github.com/composer/composer/releases"
 }
