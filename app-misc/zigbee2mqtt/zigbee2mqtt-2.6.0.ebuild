@@ -7,7 +7,7 @@ inherit nodejs-mod systemd tmpfiles
 
 DESCRIPTION="It bridges events and allows you to control your Zigbee devices via MQTT"
 HOMEPAGE="https://www.zigbee2mqtt.io/"
-COMMIT="bdb94da46e0461337f4a61b4f2a6bfa5172f608f"
+COMMIT="0bdc3fd1f76aaad71f6231e5b38529e2d2b345e9"
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/Koenkk/zigbee2mqtt"
