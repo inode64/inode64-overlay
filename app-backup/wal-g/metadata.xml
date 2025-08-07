@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>spiderx@spiderx.dp.ua</email>
+		<name>Vladimir Pavljuchenkov</name>
+	</maintainer>
+	<maintainer type="project">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+	WAL-G is an archival restoration tool for Postgres, MySQL, MongoDB,
+	Redis, SQLServer, FoundationDB, etc.
+	</longdescription>
+	<use>
+		<flag name="etcd">Enable etcd support</flag>
+		<flag name="fdb">Enable FoundationDB support</flag>
+		<flag name="gp">Enable GreenplumDB support</flag>
+		<flag name="mongo">Enable MongoDB support</flag>
+		<flag name="redis">Enable Redis support</flag>
+		<flag name="sqlserver">Enable MSSQL support</flag>
+		<flag name="sodium">Use <pkg>dev-libs/libsodium</pkg></flag>
+	</use>
+	<upstream>
+		<remote-id type="github">wal-g/wal-g</remote-id>
+	</upstream>
+</pkgmetadata>
