@@ -11,7 +11,7 @@ HOMEPAGE="https://github.com/garethgeorge/backrest"
 
 SRC_URI="https://github.com/garethgeorge/backrest/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz
-	https://www.inode64.com/dist/${P}-node_modules.tar.xz"
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz
 "
 
 LICENSE="GPL-3"
@@ -45,7 +45,7 @@ src_compile() {
 	# Fix go test
 	gzip -k dist/index.html || die
 	popd >/dev/null || die
-	ego build -trimpath -ldflags "-s -w" -o backrest ./cmd/backrest || die
+	ego build -trimpath -o backrest ./cmd/backrest || die
 }
 
 src_test() {
