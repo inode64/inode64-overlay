@@ -24,6 +24,7 @@ fi
 
 if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/backrest" ] || \
+    [ "$cp" == "app-backup/wal-g" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
     [ "$cp" == "dev-php/composer" ] || \
