@@ -10,6 +10,8 @@ DESCRIPTION="A web UI and orchestrator for restic backup"
 HOMEPAGE="https://github.com/garethgeorge/backrest"
 
 SRC_URI="https://github.com/garethgeorge/backrest/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz"
 "
 
 LICENSE="GPL-3"
