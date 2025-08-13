@@ -176,6 +176,8 @@ nodejs_docs() {
 # @DESCRIPTION:
 # Remove docs, licenses and development files
 nodejs_remove_dev() {
+	# examples is used in node-red , see bug (inode64/inode64-overlay#38)
+
     # Remove license files
     # shellcheck disable=SC2185
     find -type f -iregex '.*/\(...-\)?license\(-...\|-apache\)?\(\.\(md\|rtf\|txt\|markdown\|bsd\)\)?$' -delete || die
@@ -224,7 +226,7 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*/\(jest.config.*\|karma.conf.*\|ava.config.*\|jasmine.*\)$' -delete || die
     # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(benchmark.*\|example.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
+    find -type f -iregex '.*/\(benchmark.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
 
     # Remove development directories
     # shellcheck disable=SC2185
@@ -246,7 +248,6 @@ nodejs_remove_dev() {
         -iwholename '*/demo' -o \
         -iwholename '*/doc' -o \
         -iwholename '*/docs' -o \
-        -iwholename '*/examples' -o \
         -iwholename '*/fixtures' -o \
         -iwholename '*/git-hooks' -o \
         -iwholename '*/linux-arm' -o \
