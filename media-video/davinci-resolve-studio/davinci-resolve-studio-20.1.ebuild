@@ -258,7 +258,7 @@ src_install() {
 
 	insinto "${PKG_HOME}"
 	local _dir
-	for _dir in bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
+	for _dir in "Apple Immersive" bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
 		    "Fairlight Studio Utility" Fusion graphics libs LUT plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
