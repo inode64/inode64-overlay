@@ -286,7 +286,7 @@ src_install() {
 	doins share/{blackmagicraw.xml,resolve.xml}
 
 	diropts -m 0777
-	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Fairlight,GPUCache,logs,Media,"Resolve Disk Database",.crashreport,.license,.LUT}
+	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Fairlight,GPUCache,logs,Media,"Resolve Disk Database",.crashreport,.license,.LUT, "Apple Immersive/Calibration"}
 
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
 
