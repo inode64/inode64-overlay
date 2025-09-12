@@ -261,13 +261,6 @@ src_prepare() {
 			|| die "Failed to fix heimdal crypt library reference"
 	fi
 
-#	eapply -p1 "${FILESDIR}/php-htmltidy-5.8.0.patch"
-#	eapply -p1 "${FILESDIR}/php-5.6-icu-boolean-fix.patch"
-#	eapply -p1 "${FILESDIR}/php-5.6-icu-cxx17.patch"
-#	eapply -p1 "${FILESDIR}/php-5.6-libxml2-2.12.patch"
-#	eapply -p1 "${FILESDIR}/sqlite_icu.path"
-#	eapply -p1 "${FILESDIR}/gcc14.path"
-
 	# Force rebuilding aclocal.m4
 	rm -fr aclocal.m4 autom4te.cache config.cache \
 	    configure main/php_config.h.in || die
