@@ -12,7 +12,7 @@ DESCRIPTION="A cached-property for decorating methods in classes"
 HOMEPAGE="https://github.com/pydanny/cached-property"
 
 LICENSE="BSD"
-SLOT="0"
+SLOT="1"
 KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv ~x86"
 
 BDEPEND="test? ( dev-python/freezegun[${PYTHON_USEDEP}] )"

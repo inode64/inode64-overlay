@@ -5,4 +5,11 @@
 		<email>web@inode64.com</email>
 		<description>The INODE64 Gentoo Project</description>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">slackhq/nebula</remote-id>
+	</upstream>
+	<use>
+		<flag name="client">Enable client</flag>
+		<flag name="gencert">Install the certificate generator</flag>
+	</use>
 </pkgmetadata>

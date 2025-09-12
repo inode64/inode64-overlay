@@ -1,22 +1,19 @@
 <configuration>
-
     <!-- FILE appender con rotación diaria y conservación 14 días -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/bitbucketrunner/tunnel.log</file>
+    	<file>/var/log/bitbucketrunner/tunnel.log</file>
+    	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	        <fileNamePattern>/var/log/bitbucketrunner/tunnel.%d{yyyy-MM-dd}.log</fileNamePattern>
+	        <maxHistory>14</maxHistory>
+	    </rollingPolicy>
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/bitbucketrunner/tunnel.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>14</maxHistory>
-        </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{ISO8601} %-5level [%thread] %logger{36} - %msg%n</pattern>
-        </encoder>
+    	<encoder>
+	        <pattern>%d{ISO8601} %-5level [%thread] %logger{36} - %msg%n</pattern>
+	    </encoder>
     </appender>
 
-    <!-- Salida por defecto -->
+    <!-- Default output -->
     <root level="INFO">
-        <appender-ref ref="FILE"/>
+    	<appender-ref ref="FILE"/>
     </root>
-
 </configuration>

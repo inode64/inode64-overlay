@@ -45,5 +45,5 @@ pkg_postinst() {
 	update-ca-certificates -f
 
 	einfo "The configuration file tunnel.cfg contains sensitive tokens and must be accessible only by the service user."
-    einfo "Ensure permissions are set to 600 and not accessible by other users."
+	einfo "Ensure permissions are set to 600 and not accessible by other users."
 }

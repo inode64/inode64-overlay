@@ -22,17 +22,17 @@ required_dirs="${NEBULA_CONFDIR}"
 required_files="${NEBULA_CONFIG}"
 
 checkconfig() {
-        "${command}" -test ${command_args} || return 1
+	"${command}" -test ${command_args} || return 1
 }
 
 start_pre() {
-        if [ "${RC_CMD}" != "restart" ] ; then
-                checkconfig || return $?
-        fi
+	if [ "${RC_CMD}" != "restart" ] ; then
+		checkconfig || return $?
+	fi
 }
 
 stop_pre() {
-        if [ "${RC_CMD}" = "restart" ] ; then
-                checkconfig || return $?
-        fi
+	if [ "${RC_CMD}" = "restart" ] ; then
+		checkconfig || return $?
+	fi
 }

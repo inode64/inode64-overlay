@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="A scalable overlay networking tool with a focus on performance, simplicity and security"
+DESCRIPTION="Nebula connects devices worldwide with a secure, simple, scalable network"
 HOMEPAGE="https://github.com/slackhq/nebula"
 
 SRC_URI="https://github.com/slackhq/nebula/archive/v${PV}.tar.gz -> ${P}.tar.gz
@@ -37,7 +37,7 @@ src_compile() {
 }
 
 src_test() {
-  emake test
+	emake test
 }
 
 src_install() {

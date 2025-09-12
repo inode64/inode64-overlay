@@ -32,15 +32,15 @@ src_prepare() {
 	default
 
 	case ${ARCH} in
-	        amd64)
-	                cp "${DISTDIR}/cloudflared-${PV}-amd64" cloudflared || die
-	                ;;
-	        arm64)
-	                cp "${DISTDIR}/cloudflared-${PV}-arm64" cloudflared || die
-	                ;;
-	        *)
-	                die "Unsupported arch ${ARCH}"
-	                ;;
+		amd64)
+			cp "${DISTDIR}/cloudflared-${PV}-amd64" cloudflared || die
+			;;
+		arm64)
+			cp "${DISTDIR}/cloudflared-${PV}-arm64" cloudflared || die
+			;;
+		*)
+			die "Unsupported arch ${ARCH}"
+			;;
 	esac
 
 	use doc && (cp "${DISTDIR}/RELEASE_NOTES-${PV}" release_notes || die)

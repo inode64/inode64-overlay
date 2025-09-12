@@ -34,7 +34,7 @@ BDEPEND="
 	dev-libs/libuv
 	discovery? ( net-dns/avahi[dbus] )
 	doc? ( app-text/xmlto )
-	qt5? ( dev-qt/qtsvg:5 )
+	qt5? ( dev-qt/qtsvg:6 )
 	sys-apps/systemd
 "
 

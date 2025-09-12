@@ -10,7 +10,7 @@ RUBY_FAKEGEM_EXTRAINSTALL="config"
 inherit ruby-fakegem
 
 DESCRIPTION="Common libraries for RedmineCRM plugins for Redmine"
-HOMEPAGE="https://www.redminecrm.com/
+HOMEPAGE="https://www.redmineup.com/
 	https://rubygems.org/gems/redmine_crm/"
 
 LICENSE="GPL-2"
@@ -20,6 +20,6 @@ KEYWORDS="~amd64"
 ruby_add_rdepend "
 	    dev-ruby/rails
 	    >=dev-ruby/rake-10.0.0
-	    =dev-ruby/liquid-4.0.4
+	    ~dev-ruby/liquid-4.0.4
 	    dev-ruby/rubyzip
 "

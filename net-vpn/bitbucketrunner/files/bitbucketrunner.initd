@@ -16,56 +16,56 @@ command_user="${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP}"
 retry=SIGTERM/30/SIGKILL/10
 
 depend() {
-    need net
+	need net
 }
 
 checkconfig() {
-    set -a
-    . "$CONFIG_FILE"
-    set +a
+	set -a
+	. "$CONFIG_FILE"
+	set +a
 
-    if [ ! -s /etc/ssl/certs/java/cacerts ]; then
-        einfo "Update certificates"
-        mkdir /etc/ssl/certs/java 2>/dev/null
-        update-ca-certificates
-    fi
+	if [ ! -s /etc/ssl/certs/java/cacerts ]; then
+		einfo "Update certificates"
+		mkdir /etc/ssl/certs/java 2>/dev/null
+		update-ca-certificates
+	fi
 
-    # Check if permissions are correct for user and group to prevent authentication issues
-    checkpath -f -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${CONFIG_FILE}"
-    checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${WORKING_DIRECTORY}"
-    checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} /var/log/bitbucketrunner
+	# Check if permissions are correct for user and group to prevent authentication issues
+	checkpath -f -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${CONFIG_FILE}"
+	checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} "${WORKING_DIRECTORY}"
+	checkpath -d -m 0700 -o ${BITBUKECTRUNNER_USER}:${BITBUKECTRUNNER_GROUP} /var/log/bitbucketrunner
 
-    return 0
+	return 0
 }
 
 
 start_pre() {
-    checkconfig || return 1
+	checkconfig || return 1
 
-    set -a
-    . "$CONFIG_FILE"
-    set +a
+	set -a
+	. "$CONFIG_FILE"
+	set +a
 
-    command_args="-jar "
+	command_args="-jar "
 
-    if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
-        command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
-    fi
+	if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
+		command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
+	fi
 
-    command_args+="
-      -Dbitbucket.pipelines.runner.account.uuid=$ACCOUNT_UUID \
-      -Dbitbucket.pipelines.runner.repository.uuid=$REPOSITORY_UUID \
-      -Dbitbucket.pipelines.runner.uuid=$RUNNER_UUID \
-      -Dbitbucket.pipelines.runner.oauth.client.id=$OAUTH_CLIENT_ID \
-      -Dbitbucket.pipelines.runner.oauth.client.secret=$OAUTH_CLIENT_SECRET \
-      -Dbitbucket.pipelines.runner.directory.working=$WORKING_DIRECTORY \
-      -Dbitbucket.pipelines.runner.environment=$RUNNER_ENVIRONMENT \
-      -Dbitbucket.pipelines.runner.runtime=linux-shell \
-      -Dbitbucket.pipelines.runner.docker.uri=$DOCKER_URI \
-      -Dbitbucket.pipelines.runner.scheduled.state.update.initial.delay.seconds=$SCHEDULED_STATE_UPDATE_INITIAL_DELAY_SECONDS \
-      -Dbitbucket.pipelines.runner.scheduled.state.update.period.seconds=$SCHEDULED_STATE_UPDATE_PERIOD_SECONDS \
-      -Dbitbucket.pipelines.runner.cleanup.previous.folders=$CLEANUP_PREVIOUS_FOLDERS \
-      -Dbitbucket.pipelines.runner.secret.provider.uri=$SECRET_PROVIDER_URI \
-      -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
-      ./runner.jar"
+	command_args+="
+		-Dbitbucket.pipelines.runner.account.uuid=$ACCOUNT_UUID \
+		-Dbitbucket.pipelines.runner.repository.uuid=$REPOSITORY_UUID \
+		-Dbitbucket.pipelines.runner.uuid=$RUNNER_UUID \
+		-Dbitbucket.pipelines.runner.oauth.client.id=$OAUTH_CLIENT_ID \
+		-Dbitbucket.pipelines.runner.oauth.client.secret=$OAUTH_CLIENT_SECRET \
+		-Dbitbucket.pipelines.runner.directory.working=$WORKING_DIRECTORY \
+		-Dbitbucket.pipelines.runner.environment=$RUNNER_ENVIRONMENT \
+		-Dbitbucket.pipelines.runner.runtime=linux-shell \
+		-Dbitbucket.pipelines.runner.docker.uri=$DOCKER_URI \
+		-Dbitbucket.pipelines.runner.scheduled.state.update.initial.delay.seconds=$SCHEDULED_STATE_UPDATE_INITIAL_DELAY_SECONDS \
+		-Dbitbucket.pipelines.runner.scheduled.state.update.period.seconds=$SCHEDULED_STATE_UPDATE_PERIOD_SECONDS \
+		-Dbitbucket.pipelines.runner.cleanup.previous.folders=$CLEANUP_PREVIOUS_FOLDERS \
+		-Dbitbucket.pipelines.runner.secret.provider.uri=$SECRET_PROVIDER_URI \
+		-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
+		./runner.jar"
 }
