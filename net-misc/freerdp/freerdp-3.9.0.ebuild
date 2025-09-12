@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 2011-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,9 +13,11 @@ if [[ ${PV} == *9999 ]]; then
 	esac
 else
 	inherit verify-sig
-	SRC_URI="https://github.com/FreeRDP/FreeRDP/releases/download/${PV}/${P}.tar.gz
-		verify-sig? ( https://github.com/FreeRDP/FreeRDP/releases/download/${PV}/${P}.tar.gz.asc )"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+	MY_P=${P/_/-}
+	S="${WORKDIR}/${MY_P}"
+	SRC_URI="https://pub.freerdp.com/releases/${MY_P}.tar.gz
+		verify-sig? ( https://pub.freerdp.com/releases/${MY_P}.tar.gz.asc )"
+	KEYWORDS="~alpha amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
 	BDEPEND="verify-sig? ( sec-keys/openpgp-keys-akallabeth )"
 	VERIFY_SIG_OPENPGP_KEY_PATH="/usr/share/openpgp-keys/akallabeth.asc"
 fi
@@ -25,7 +27,7 @@ HOMEPAGE="https://www.freerdp.com/"
 
 LICENSE="Apache-2.0"
 SLOT="3"
-IUSE="aad alsa cpu_flags_arm_neon +client cups debug +ffmpeg +fuse gstreamer +icu jpeg kerberos openh264 pulseaudio sdl sdl3 server smartcard systemd test usb valgrind wayland X xinerama xv"
+IUSE="aad alsa cpu_flags_arm_neon +client cups debug +ffmpeg +fuse gstreamer +icu jpeg kerberos openh264 pulseaudio sdl server smartcard systemd test usb valgrind wayland X xinerama xv"
 RESTRICT="!test? ( test )"
 
 BDEPEND+="
@@ -68,6 +70,10 @@ COMMON_DEPEND="
 	kerberos? ( virtual/krb5 )
 	openh264? ( media-libs/openh264:0= )
 	pulseaudio? ( media-libs/libpulse )
+	sdl? (
+		media-libs/libsdl2[haptic(+),joystick(+),sound(+),video(+)]
+		media-libs/sdl2-ttf
+	)
 	server? (
 		X? (
 			x11-libs/libXcursor
@@ -82,14 +88,6 @@ COMMON_DEPEND="
 	smartcard? ( sys-apps/pcsc-lite )
 	systemd? ( sys-apps/systemd:0= )
 	client? (
-		sdl? (
-			media-libs/libsdl2[haptic(+),joystick(+),sound(+),video(+)]
-			media-libs/sdl2-ttf
-		)
-		sdl3? (
-			media-libs/libsdl3
-			media-libs/sdl3-ttf
-		)
 		wayland? (
 			dev-libs/wayland
 			x11-libs/libxkbcommon
@@ -148,8 +146,9 @@ freerdp_configure() {
 		-DWITH_CCACHE=OFF
 		-DWITH_CLIENT=$(option client)
 
-		-DWITH_CLIENT_SDL2=$(option_client sdl)
-		-DWITH_CLIENT_SDL3=$(option_client sdl3)
+		-DWITH_CLIENT_SDL=$(option sdl)
+		# https://bugs.gentoo.org/951452
+		-DWITH_CLIENT_SDL3=OFF
 
 		-DWITH_SAMPLE=OFF
 		-DWITH_CUPS=$(option cups)
