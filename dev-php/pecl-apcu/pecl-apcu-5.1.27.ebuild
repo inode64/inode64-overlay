@@ -46,7 +46,7 @@ src_install() {
 		insinto /usr/share/php7/apcu
 		doins apc.php
 	fi
-	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
+	if use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
 		insinto /usr/share/php8/apcu
 		doins apc.php
 	fi
@@ -57,7 +57,7 @@ pkg_postinst() {
 	if use php_targets_php7-3 || use php_targets_php7-4; then
 		elog "was installed to ${EPREFIX}/usr/share/php7/apcu/."
 	fi
-	if use php_targets_php8-1 || use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
+	if use php_targets_php8-2 || use php_targets_php8-3 || use php_targets_php8-4; then
 		elog "was installed to ${EPREFIX}/usr/share/php8/apcu/."
 	fi
 }
