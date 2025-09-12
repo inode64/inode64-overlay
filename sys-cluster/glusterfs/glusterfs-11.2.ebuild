@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
 
-inherit autotools elisp-common python-single-r1 tmpfiles bash-completion-r1
+inherit autotools elisp-common python-single-r1 tmpfiles systemd bash-completion-r1
 
 DESCRIPTION="GlusterFS is a powerful network/cluster filesystem"
 HOMEPAGE="https://www.gluster.org/ https://github.com/gluster/glusterfs/"
