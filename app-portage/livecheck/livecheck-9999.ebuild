@@ -17,6 +17,7 @@ KEYWORDS="~amd64"
 EGIT_REPO_URI="https://github.com/Tatsh/livecheck.git"
 
 RDEPEND="
+	dev-python/bascom[${PYTHON_USEDEP}]
 	dev-python/click[${PYTHON_USEDEP}]
 	dev-python/colorlog[${PYTHON_USEDEP}]
 	dev-python/defusedxml[${PYTHON_USEDEP}]
