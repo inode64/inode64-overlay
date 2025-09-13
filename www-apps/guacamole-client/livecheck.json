@@ -1,0 +1,6 @@
+{
+  "maven": true,
+  "maven_path": "/guacamole-client-1.6.0",
+  "nodejs": true,
+  "nodejs_path": "/guacamole/src/main/frontend"
+}
