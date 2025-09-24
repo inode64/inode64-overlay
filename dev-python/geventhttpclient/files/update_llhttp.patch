@@ -1,0 +1,172 @@
+diff --git a/ext/_parser.c b/ext/_parser.c
+index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
+--- a/ext/_parser.c
++++ b/ext/_parser.c
+@@ -1,30 +1,31 @@
+ #define PY_SSIZE_T_CLEAN
+ #include <Python.h>
+ #include "Python_compat.h"
+ #include <llhttp.h>
+ #include <stdio.h>
++#include <string.h>
+ 
+ static PyObject * PyExc_HTTPParseError;
+ 
+ enum py_parser_should_keep_alive {
+     KA_INCOMPLETE,
+     KA_FALSE,
+     KA_TRUE,
+ };
+ 
+ typedef struct {
+     PyObject_HEAD
+     llhttp_t* parser;
+     llhttp_errno_t error;
+     const char* reason;
+     enum py_parser_should_keep_alive should_keep_alive;
+ } PyHTTPResponseParser;
+ 
+ static int on_message_begin(llhttp_t* parser)
+ {
+     int fail = 0;
+     PyHTTPResponseParser *self = (PyHTTPResponseParser*) parser->data;
+     PyObject* callable = PyObject_GetAttrString((PyObject*)self, "_on_message_begin");
+     if (callable) {
+         PyObject* result = PyObject_CallObject(callable, NULL);
+         PyObject* exception = PyErr_Occurred();
+diff --git a/ext/_parser.c b/ext/_parser.c
+index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
+--- a/ext/_parser.c
++++ b/ext/_parser.c
+@@ -121,81 +122,112 @@ static int on_header_value(llhttp_t* parser, const char *at, size_t length)
+ static int on_body(llhttp_t* parser, const char *at, size_t length)
+ {
+     int fail = 0;
+     PyHTTPResponseParser *self = (PyHTTPResponseParser*) parser->data;
+     PyObject* callable = PyObject_GetAttrString((PyObject*)self, "_on_body");
+     if (callable) {
+         PyObject* bytearray = PyByteArray_FromStringAndSize(at, length);
+         PyObject* result = PyObject_CallFunctionObjArgs(
+             callable, bytearray, NULL);
+         PyObject* exception = PyErr_Occurred();
+         if (exception != NULL) {
+             fail = -1;
+         } else {
+             if (PyObject_IsTrue(result))
+                 fail = -1;
+         }
+         Py_XDECREF(result);
+         Py_DECREF(callable);
+         Py_DECREF(bytearray);
+     }
+     return fail;
+ }
+ 
+ static llhttp_settings_t _parser_settings = {
+     on_message_begin,
+-    NULL, // on_url
++    NULL,  // on_url
+     on_status,
++    NULL,  // on_method
++    NULL,  // on_version
+     on_header_field,
+     on_header_value,
++    NULL,  // on_chunk_extension_name
++    NULL,  // on_chunk_extension_value
+     on_headers_complete,
+     on_body,
+-    on_message_complete
++    on_message_complete,
++    NULL,  // on_url_complete
++    NULL,  // on_status_complete
++    NULL,  // on_method_complete
++    NULL,  // on_version_complete
++    NULL,  // on_header_field_complete
++    NULL,  // on_header_value_complete
++    NULL,  // on_chunk_extension_name_complete
++    NULL,  // on_chunk_extension_value_complete
++    NULL,  // on_chunk_header
++    NULL,  // on_chunk_complete
++    NULL   // on_reset
+ };
+ 
+ static PyObject*
+ PyHTTPResponseParser_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
+ {
+     PyHTTPResponseParser* self = (PyHTTPResponseParser*)type->tp_alloc(type, 0);
+     if (self != NULL) {
+         self->parser = PyMem_Malloc(sizeof(llhttp_t));
+         if (self->parser == NULL) {
+             return NULL;
+         } else {
+             llhttp_init(self->parser, HTTP_RESPONSE, &_parser_settings);
+             self->parser->data = (void*)self;
+             self->error = HPE_OK;
+             self->reason = 0;
+             self->should_keep_alive = KA_INCOMPLETE;
+         }
+     }
+     return (PyObject*) self;
+ }
+ 
+-static void* set_parser_exception(PyHTTPResponseParser *parser)
++static const char*
++normalize_reason(PyHTTPResponseParser *parser)
+ {
+-    PyObject *args = Py_BuildValue("(s,B)", parser->reason, parser->error);
++    const char *reason = parser->reason;
++    if (parser->error == HPE_INVALID_STATUS && reason != NULL &&
++        strcmp(reason, "Invalid status code") == 0) {
++        return "Invalid response status";
++    }
++    return reason;
++}
++
++static void*
++set_parser_exception(PyHTTPResponseParser *parser)
++{
++    const char *reason = normalize_reason(parser);
++    if (reason == NULL) {
++        reason = "";
++    }
++    PyObject *args = Py_BuildValue("(s,B)", reason, parser->error);
+     if (args == NULL) return PyErr_NoMemory();
+     PyErr_SetObject(PyExc_HTTPParseError, args);
+     Py_DECREF(args);
+     return NULL;
+ }
+ 
+ static size_t size_t_MAX = -1;
+ 
+ static PyObject*
+ PyHTTPResponseParser_feed(PyHTTPResponseParser *self, PyObject* args)
+ {
+     char* buf = NULL;
+     Py_ssize_t buf_len;
+     int succeed = PyArg_ParseTuple(args, "s#", &buf, &buf_len);
+     /* cast Py_ssize_t signed integer to unsigned */
+     size_t unsigned_buf_len = buf_len + size_t_MAX + 1;
+     if (succeed) {
+         PyObject * exception;
+ 
+         /* in case feed is called again after an error occurred */
+         if (self->error != HPE_OK) {
+             return set_parser_exception(self);
+         }
+ 
+         if (buf_len) {
+ 
+EOF
+)
+--- a/setup.py	2025-08-24 11:56:07.000000000 +0200
++++ b/setup.py	2025-09-24 12:15:37.499467441 +0200
+@@ -6,9 +6,6 @@
+     "geventhttpclient._parser",
+     sources=[
+         "ext/_parser.c",
+-        "llhttp/src/api.c",
+-        "llhttp/src/http.c",
+-        "llhttp/src/llhttp.c",
+     ],
+     include_dirs=[
+         "ext",
