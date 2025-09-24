@@ -1,5 +1,5 @@
 diff --git a/ext/_parser.c b/ext/_parser.c
-index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
+index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd864ce4ea82 100644
 --- a/ext/_parser.c
 +++ b/ext/_parser.c
 @@ -1,30 +1,31 @@
@@ -35,10 +35,10 @@ index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba9
          PyObject* result = PyObject_CallObject(callable, NULL);
          PyObject* exception = PyErr_Occurred();
 diff --git a/ext/_parser.c b/ext/_parser.c
-index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
+index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd864ce4ea82 100644
 --- a/ext/_parser.c
 +++ b/ext/_parser.c
-@@ -121,81 +122,112 @@ static int on_header_value(llhttp_t* parser, const char *at, size_t length)
+@@ -121,110 +122,176 @@ static int on_header_value(llhttp_t* parser, const char *at, size_t length)
  static int on_body(llhttp_t* parser, const char *at, size_t length)
  {
      int fail = 0;
@@ -138,6 +138,41 @@ index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba9
  
  static size_t size_t_MAX = -1;
  
++/*
++ * Keep a local copy of llhttp_message_needs_eof() to avoid depending on the
++ * symbol being exported from the bundled llhttp objects. Some build
++ * environments strip the helper, which then leads to runtime linker errors
++ * when importing the extension module. Replicating the upstream logic keeps
++ * behaviour aligned with llhttp while guaranteeing availability.
++ */
++static int
++py_llhttp_message_needs_eof(const llhttp_t* parser)
++{
++    if (parser->type == HTTP_REQUEST) {
++        return 0;
++    }
++
++    /* See RFC 2616 section 4.4 */
++    if (parser->status_code / 100 == 1 || /* 1xx e.g. Continue */
++        parser->status_code == 204 ||     /* No Content */
++        parser->status_code == 304 ||     /* Not Modified */
++        (parser->flags & F_SKIPBODY)) {   /* response to a HEAD request */
++        return 0;
++    }
++
++    /* RFC 7230 3.3.3, see `llhttp__after_headers_complete` */
++    if ((parser->flags & F_TRANSFER_ENCODING) &&
++        (parser->flags & F_CHUNKED) == 0) {
++        return 1;
++    }
++
++    if (parser->flags & (F_CHUNKED | F_CONTENT_LENGTH)) {
++        return 0;
++    }
++
++    return 1;
++}
++
  static PyObject*
  PyHTTPResponseParser_feed(PyHTTPResponseParser *self, PyObject* args)
  {
@@ -155,9 +190,36 @@ index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba9
          }
  
          if (buf_len) {
+             self->error = llhttp_execute(self->parser, buf, unsigned_buf_len);
+             self->reason = self->parser->reason;
+         } else {
+-            if (!llhttp_message_needs_eof(self->parser)) {
++            if (!py_llhttp_message_needs_eof(self->parser)) {
+                 PyErr_SetString(PyExc_HTTPParseError, "Incomplete response.");
+                 return NULL;
+             }
+             self->error = llhttp_finish(self->parser);
+             self->reason = self->parser->reason;
+         }
  
-EOF
-)
+         /* Exception in callbacks */
+         exception = PyErr_Occurred();
+         if (exception != NULL)
+             return NULL;
+ 
+         if (self->error != HPE_OK) {
+             return set_parser_exception(self);
+         }
+ 
+         Py_RETURN_NONE;
+     }
+     return NULL;
+ }
+ 
+ static PyObject*
+ PyHTTPResponseParser_parser_failed(PyHTTPResponseParser* self)
+ {
+     return PyBool_FromLong(self->error != HPE_OK || llhttp_get_errno(self->parser) != HPE_OK);
 --- a/setup.py	2025-08-24 11:56:07.000000000 +0200
 +++ b/setup.py	2025-09-24 12:15:37.499467441 +0200
 @@ -6,9 +6,6 @@
