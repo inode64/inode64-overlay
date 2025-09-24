@@ -23,6 +23,7 @@ DEPEND="
 	dev-python/flask-login[${PYTHON_USEDEP}]
 	dev-python/flask[${PYTHON_USEDEP}]
 	dev-python/gevent[${PYTHON_USEDEP}]
+	dev-python/geventhttpclient[${PYTHON_USEDEP}]
 	dev-python/msgpack[${PYTHON_USEDEP}]
 	dev-python/paho-mqtt[${PYTHON_USEDEP}]
 	dev-python/psutil[${PYTHON_USEDEP}]

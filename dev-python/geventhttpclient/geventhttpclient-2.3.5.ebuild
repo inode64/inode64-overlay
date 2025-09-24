@@ -25,6 +25,7 @@ DEPEND="
     dev-python/certifi
     dev-python/gevent
     dev-python/urllib3
+    net-libs/llhttp
 "
 
 PATCHES=(
