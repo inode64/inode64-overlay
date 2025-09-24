@@ -17,7 +17,11 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND="
+BDEPEND="
+	dev-python/hatch-vcs[${PYTHON_USEDEP}]
+"
+
+RDEPEND="
 	dev-python/configargparse[${PYTHON_USEDEP}]
 	dev-python/flask-cors[${PYTHON_USEDEP}]
 	dev-python/flask-login[${PYTHON_USEDEP}]
@@ -27,21 +31,12 @@ DEPEND="
 	dev-python/msgpack[${PYTHON_USEDEP}]
 	dev-python/paho-mqtt[${PYTHON_USEDEP}]
 	dev-python/psutil[${PYTHON_USEDEP}]
+	dev-python/pytest[${PYTHON_USEDEP}]
 	dev-python/python-engineio[${PYTHON_USEDEP}]
 	dev-python/python-socketio[${PYTHON_USEDEP}]
 	dev-python/pyzmq[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
 	dev-python/werkzeug[${PYTHON_USEDEP}]
-"
-
-BDEPEND="
-	dev-python/hatch-vcs[${PYTHON_USEDEP}]
-	dev-python/hatch[${PYTHON_USEDEP}]
-	dev-python/uv
-"
-
-RDEPEND="
-	dev-python/pytest
 "
 
 python_prepare_all() {
