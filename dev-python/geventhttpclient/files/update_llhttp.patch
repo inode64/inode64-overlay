@@ -1,5 +1,5 @@
 diff --git a/ext/_parser.c b/ext/_parser.c
-index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd864ce4ea82 100644
+index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
 --- a/ext/_parser.c
 +++ b/ext/_parser.c
 @@ -1,30 +1,31 @@
@@ -35,10 +35,10 @@ index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd86
          PyObject* result = PyObject_CallObject(callable, NULL);
          PyObject* exception = PyErr_Occurred();
 diff --git a/ext/_parser.c b/ext/_parser.c
-index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd864ce4ea82 100644
+index b3d687cbe20ea4ae50059699972a127128480af5..2188eb250be77fd7b4a362b4fe34eba982741249 100644
 --- a/ext/_parser.c
 +++ b/ext/_parser.c
-@@ -121,110 +122,176 @@ static int on_header_value(llhttp_t* parser, const char *at, size_t length)
+@@ -121,81 +122,112 @@ static int on_header_value(llhttp_t* parser, const char *at, size_t length)
  static int on_body(llhttp_t* parser, const char *at, size_t length)
  {
      int fail = 0;
@@ -138,41 +138,6 @@ index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd86
  
  static size_t size_t_MAX = -1;
  
-+/*
-+ * Keep a local copy of llhttp_message_needs_eof() to avoid depending on the
-+ * symbol being exported from the bundled llhttp objects. Some build
-+ * environments strip the helper, which then leads to runtime linker errors
-+ * when importing the extension module. Replicating the upstream logic keeps
-+ * behaviour aligned with llhttp while guaranteeing availability.
-+ */
-+static int
-+py_llhttp_message_needs_eof(const llhttp_t* parser)
-+{
-+    if (parser->type == HTTP_REQUEST) {
-+        return 0;
-+    }
-+
-+    /* See RFC 2616 section 4.4 */
-+    if (parser->status_code / 100 == 1 || /* 1xx e.g. Continue */
-+        parser->status_code == 204 ||     /* No Content */
-+        parser->status_code == 304 ||     /* Not Modified */
-+        (parser->flags & F_SKIPBODY)) {   /* response to a HEAD request */
-+        return 0;
-+    }
-+
-+    /* RFC 7230 3.3.3, see `llhttp__after_headers_complete` */
-+    if ((parser->flags & F_TRANSFER_ENCODING) &&
-+        (parser->flags & F_CHUNKED) == 0) {
-+        return 1;
-+    }
-+
-+    if (parser->flags & (F_CHUNKED | F_CONTENT_LENGTH)) {
-+        return 0;
-+    }
-+
-+    return 1;
-+}
-+
  static PyObject*
  PyHTTPResponseParser_feed(PyHTTPResponseParser *self, PyObject* args)
  {
@@ -190,45 +155,95 @@ index b3d687cbe20ea4ae50059699972a127128480af5..65c00691c4f000529e1c18539c2edd86
          }
  
          if (buf_len) {
-             self->error = llhttp_execute(self->parser, buf, unsigned_buf_len);
-             self->reason = self->parser->reason;
-         } else {
--            if (!llhttp_message_needs_eof(self->parser)) {
-+            if (!py_llhttp_message_needs_eof(self->parser)) {
-                 PyErr_SetString(PyExc_HTTPParseError, "Incomplete response.");
-                 return NULL;
-             }
-             self->error = llhttp_finish(self->parser);
-             self->reason = self->parser->reason;
-         }
  
-         /* Exception in callbacks */
-         exception = PyErr_Occurred();
-         if (exception != NULL)
-             return NULL;
+EOF
+)
+--- a/setup.py
++++ b/setup.py
+@@ -1,21 +1,74 @@
+-from distutils.core import setup
++from __future__ import annotations
  
-         if (self->error != HPE_OK) {
-             return set_parser_exception(self);
-         }
+-from setuptools.extension import Extension
++import os
++from ctypes.util import find_library
++from pathlib import Path
++
++from setuptools import Extension, setup
++
++
++def system_llhttp_build_options() -> tuple[list[str], list[str], bool]:
++    """Return (include_dirs, library_dirs, use_system) build options."""
++
++    if os.environ.get("GEVENTHTTPCLIENT_FORCE_BUNDLED_LLHTTP"):
++        return ["ext"], [], False
++
++    libname = os.environ.get("GEVENTHTTPCLIENT_LLHTTP_LIBNAME", "llhttp")
++    libdirs: list[str] = []
++
++    env_libdir = os.environ.get("GEVENTHTTPCLIENT_LLHTTP_LIBDIR")
++    if env_libdir:
++        path = Path(env_libdir)
++        if path.is_dir():
++            libdirs.append(str(path))
++        else:
++            raise RuntimeError(
++                f"GEVENTHTTPCLIENT_LLHTTP_LIBDIR points to missing directory: {env_libdir}"
++            )
++
++    # Honour environments that install llhttp to the default lib paths.
++    if not libdirs and not find_library(libname):
++        return ["ext"], [], False
++
++    include_dirs = ["ext"]
++    env_incdir = os.environ.get("GEVENTHTTPCLIENT_LLHTTP_INCLUDE_DIR")
++    if env_incdir:
++        path = Path(env_incdir)
++        if not path.is_dir():
++            raise RuntimeError(
++                "GEVENTHTTPCLIENT_LLHTTP_INCLUDE_DIR points to missing directory: "
++                f"{env_incdir}"
++            )
++        include_dirs.append(str(path))
++
++    return include_dirs, libdirs, True
++
++
++include_dirs, library_dirs, use_system_llhttp = system_llhttp_build_options()
++
++sources = ["ext/_parser.c"]
++libraries: list[str] = []
++
++if use_system_llhttp:
++    libraries.append(os.environ.get("GEVENTHTTPCLIENT_LLHTTP_LIBNAME", "llhttp"))
++else:
++    sources.extend(
++        [
++            "llhttp/src/api.c",
++            "llhttp/src/http.c",
++            "llhttp/src/llhttp.c",
++        ]
++    )
++    include_dirs.append("llhttp/include")
  
-         Py_RETURN_NONE;
-     }
-     return NULL;
- }
- 
- static PyObject*
- PyHTTPResponseParser_parser_failed(PyHTTPResponseParser* self)
- {
-     return PyBool_FromLong(self->error != HPE_OK || llhttp_get_errno(self->parser) != HPE_OK);
---- a/setup.py	2025-08-24 11:56:07.000000000 +0200
-+++ b/setup.py	2025-09-24 12:15:37.499467441 +0200
-@@ -6,9 +6,6 @@
+ http_parser = Extension(
      "geventhttpclient._parser",
-     sources=[
-         "ext/_parser.c",
+-    sources=[
+-        "ext/_parser.c",
 -        "llhttp/src/api.c",
 -        "llhttp/src/http.c",
 -        "llhttp/src/llhttp.c",
-     ],
-     include_dirs=[
-         "ext",
+-    ],
+-    include_dirs=[
+-        "ext",
+-        "llhttp/include",
+-    ],
++    sources=sources,
++    include_dirs=include_dirs,
++    library_dirs=library_dirs,
++    libraries=libraries,
+ )
+ 
+ setup(
+     ext_modules=[http_parser],
+ )
