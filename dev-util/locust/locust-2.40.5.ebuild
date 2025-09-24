@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DISTUTILS_USE_PEP517=setuptools
+DISTUTILS_USE_PEP517=hatchling
 PYTHON_COMPAT=( python3_{11..14} )
 
 inherit distutils-r1
@@ -32,3 +32,19 @@ DEPEND="
 	dev-python/requests[${PYTHON_USEDEP}]
 	dev-python/werkzeug[${PYTHON_USEDEP}]
 "
+
+BDEPEND="
+	dev-python/hatch-vcs[${PYTHON_USEDEP}]
+	dev-python/hatch[${PYTHON_USEDEP}]
+	dev-python/uv
+"
+
+RDEPEND="
+	dev-python/pytest
+"
+
+python_prepare_all() {
+        distutils-r1_python_prepare_all
+
+        export SETUPTOOLS_SCM_PRETEND_VERSION=${PV}
+}
