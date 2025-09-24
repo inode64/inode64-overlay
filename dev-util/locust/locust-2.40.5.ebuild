@@ -43,4 +43,6 @@ python_prepare_all() {
         distutils-r1_python_prepare_all
 
         export SETUPTOOLS_SCM_PRETEND_VERSION=${PV}
+
+        rm -r locust/test || die
 }
