@@ -14,8 +14,9 @@ distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 if [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
-    [ "$cp" == "dev-util/grunt-cli" ] || \
-    [ "$cp" == "sys-process/pm2" ] ; then
+    [ "$cp" == "dev-util/locust" ] || \
+    [ "$cp" == "sys-process/pm2" ] || \
+    [ "$cp" == "www-apps/guacamole-client" ] ; then
 	file="${ebuild}-${new_version}-node_modules.tar.xz"
 	cp "${distdir}/${file}" "${search_dir}/dist/"
 	git add "${search_dir}/dist/${file}"

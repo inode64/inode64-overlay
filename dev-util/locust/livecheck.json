@@ -1,0 +1,5 @@
+{
+  "nodejs": true,
+  "nodejs_package_manager": "yarn",
+  "nodejs_path": "/locust/webui"
+}

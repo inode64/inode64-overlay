@@ -21,6 +21,7 @@ KEYWORDS="~amd64"
 
 BDEPEND="
 	dev-python/hatch-vcs[${PYTHON_USEDEP}]
+	sys-apps/yarn
 "
 
 RDEPEND="
