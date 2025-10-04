@@ -16,7 +16,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
 RDEPEND="
 	app-backup/restic
-	>=dev-lang/go-1.23.0
+	>=dev-lang/go-1.25.0
 "
 
 src_configure() {
