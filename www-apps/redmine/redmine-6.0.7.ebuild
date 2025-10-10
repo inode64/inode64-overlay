@@ -41,7 +41,7 @@ ruby_add_bdepend "
 	>=dev-ruby/net-smtp-0.4.0
 	>=dev-ruby/nokogiri-1.18.3
 	>=dev-ruby/propshaft-1.1.0:1
-	<=dev-ruby/rack-3.2.0:3.1
+	>=dev-ruby/rack-3.1.3:3.1
 	>=dev-ruby/rails-7.2.2.1:7.2
 	>=dev-ruby/rbpdf-1.21.4
 	>=dev-ruby/redcarpet-3.6.0
@@ -57,6 +57,7 @@ ruby_add_bdepend "
 "
 
 RDEPEND="
+	<=dev-ruby/rack-3.2.0:3.1
 	acct-group/redmine
 	acct-user/redmine
 	imagemagick? ( media-gfx/imagemagick )
