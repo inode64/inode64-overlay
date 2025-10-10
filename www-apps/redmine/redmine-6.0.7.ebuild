@@ -57,7 +57,7 @@ ruby_add_bdepend "
 "
 
 RDEPEND="
-	<=dev-ruby/rack-3.2.0:3.1
+	dev-ruby/rack:3.1
 	acct-group/redmine
 	acct-user/redmine
 	imagemagick? ( media-gfx/imagemagick )
