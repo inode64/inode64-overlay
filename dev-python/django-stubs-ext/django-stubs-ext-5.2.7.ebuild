@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DISTUTILS_USE_PEP517=hatchling
+DISTUTILS_USE_PEP517=uv-build
 PYTHON_COMPAT=( python3_{11..14} )
 inherit distutils-r1 pypi
 
