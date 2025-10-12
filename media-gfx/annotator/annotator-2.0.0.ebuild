@@ -14,10 +14,11 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
 
 DEPEND="
-	dev-libs/libgee
 	>=dev-libs/granite-7.0.0
-	>=x11-libs/gtk+-3.22:3
+	dev-libs/libgee
+	dev-libs/libxml2:=
 	>=gui-libs/libhandy-1.6.0:1
+	>=x11-libs/gtk+-3.22:3
 "
 RDEPEND="${DEPEND}
 	x11-misc/xdg-utils
