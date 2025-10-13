@@ -22,4 +22,5 @@ ruby_add_rdepend "
 	    >=dev-ruby/rake-10.0.0
 	    ~dev-ruby/liquid-4.0.4
 	    dev-ruby/rubyzip
+	    <=dev-ruby/propshaft-1.3.0
 "
