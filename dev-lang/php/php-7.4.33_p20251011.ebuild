@@ -126,7 +126,7 @@ COMMON_DEPEND="
 	truetype? ( =media-libs/freetype-2* )
 	unicode? ( dev-libs/oniguruma:= )
 	webp? ( media-libs/libwebp:0= )
-	xml? ( >=dev-libs/libxml2-2.7.6 )
+	xml? ( >=dev-libs/libxml2-2.7.6:= )
 	xpm? ( x11-libs/libXpm )
 	xslt? ( dev-libs/libxslt )
 	zip? ( >=dev-libs/libzip-1.2.0:= )

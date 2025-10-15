@@ -120,9 +120,9 @@ COMMON_DEPEND="
 	readline? ( sys-libs/readline:0= )
 	recode? ( app-text/recode )
 	sharedmem? ( dev-libs/mm )
-	simplexml? ( >=dev-libs/libxml2-2.6.8 )
+	simplexml? ( >=dev-libs/libxml2-2.6.8:= )
 	snmp? ( >=net-analyzer/net-snmp-5.2 )
-	soap? ( >=dev-libs/libxml2-2.6.8 )
+	soap? ( >=dev-libs/libxml2-2.6.8:= )
 	spell? ( >=app-text/aspell-0.50 )
 	sqlite? ( >=dev-db/sqlite-3.7.6.3 )
 	ssl? ( dev-libs/openssl:= )
@@ -136,17 +136,17 @@ COMMON_DEPEND="
 	)
 	unicode? ( dev-libs/oniguruma:= )
 	vpx? ( media-libs/libvpx:0= )
-	wddx? ( >=dev-libs/libxml2-2.6.8 )
-	xml? ( >=dev-libs/libxml2-2.6.8 )
+	wddx? ( >=dev-libs/libxml2-2.6.8:= )
+	xml? ( >=dev-libs/libxml2-2.6.8:= )
 	xmlrpc? ( >=dev-libs/libxml2-2.6.8 virtual/libiconv )
-	xmlreader? ( >=dev-libs/libxml2-2.6.8 )
-	xmlwriter? ( >=dev-libs/libxml2-2.6.8 )
+	xmlreader? ( >=dev-libs/libxml2-2.6.8:= )
+	xmlwriter? ( >=dev-libs/libxml2-2.6.8:= )
 	xpm? (
 		x11-libs/libXpm
 		media-libs/libjpeg-turbo:0
 		media-libs/libpng:0= sys-libs/zlib:0=
 	)
-	xslt? ( dev-libs/libxslt >=dev-libs/libxml2-2.6.8 )
+	xslt? ( dev-libs/libxslt >=dev-libs/libxml2-2.6.8:= )
 	zip? ( sys-libs/zlib:0= )
 	zlib? ( sys-libs/zlib:0= )
 "
