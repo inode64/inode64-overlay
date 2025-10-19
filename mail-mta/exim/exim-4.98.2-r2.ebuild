@@ -24,9 +24,9 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 
 IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc +dnsdb doc dovecot-sasl
-dsn gdbm gnutls idn ipv6 ldap lmtp maildir mbx
-mysql nis pam perl pkcs11 postgres +prdr proxy radius redis sasl selinux
-socks5 spf sqlite srs +ssl syslog tdb tcpd +tpda"
+	dsn gdbm gnutls gsasl idn ipv6 ldap lmtp maildir mbx
+	mysql nis pam perl pkcs11 postgres +prdr proxy radius redis sasl
+	selinux socks5 spf sqlite srs +ssl syslog +tdb tcpd +tpda"
 REQUIRED_USE="
 	arc? ( dkim spf )
 	dane? ( ssl !gnutls )
@@ -78,6 +78,7 @@ COMMON_DEPEND=">=sys-apps/sed-4.0.5
 	mysql? ( dev-db/mysql-connector-c:= )
 	postgres? ( dev-db/postgresql:= )
 	sasl? ( >=dev-libs/cyrus-sasl-2.1.26-r2 )
+	gsasl? ( net-misc/gsasl )
 	redis? ( dev-libs/hiredis:= )
 	spf? ( >=mail-filter/libspf2-1.2.5-r1 )
 	dmarc? ( mail-filter/opendmarc:= )
@@ -506,6 +507,14 @@ src_configure() {
 	if use dovecot-sasl; then
 		cat >> Makefile <<- EOC
 			AUTH_DOVECOT=yes
+		EOC
+	fi
+
+	# GNU SASL
+	if use gsasl; then
+		cat >> Makefile <<- EOC
+			AUTH_GSASL=yes
+			AUTH_GSASL_PC=libgsasl
 		EOC
 	fi
 
