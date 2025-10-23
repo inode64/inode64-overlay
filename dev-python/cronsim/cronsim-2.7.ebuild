@@ -9,6 +9,7 @@ inherit distutils-r1 pypi
 
 DESCRIPTION="Cron expression parser and evaluator"
 HOMEPAGE="https://github.com/cuu508/cronsim"
+SRC_URI="https://github.com/cuu508/${PN}/archive/${PV}.tar.gz -> ${P}.gh.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
