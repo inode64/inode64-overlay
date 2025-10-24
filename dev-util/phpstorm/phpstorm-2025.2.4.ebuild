@@ -4,7 +4,7 @@
 EAPI=8
 inherit desktop wrapper xdg-utils
 
-MY_PV="252.26830.95"
+MY_PV="252.27397.112"
 MY_PN="PhpStorm"
 
 DESCRIPTION="A complete toolset for web, mobile and enterprise development"
