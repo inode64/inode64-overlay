@@ -6,7 +6,7 @@ EAPI=8
 inherit autotools flag-o-matic git-r3 systemd multilib
 
 PHP_MV="$(ver_cut 1)"
-PHP_PATCH="php-$(ver_cut 1-3)-patches-2.tar.xz"
+PHP_PATCH="php-$(ver_cut 1-3)-patches-3.tar.xz"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
