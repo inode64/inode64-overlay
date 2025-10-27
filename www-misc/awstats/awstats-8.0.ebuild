@@ -6,7 +6,7 @@ EAPI=8
 MY_P=${PN}-${PV%_p*}
 
 DESCRIPTION="AWStats is short for Advanced Web Statistics"
-HOMEPAGE="https://www.awstats.org/"
+HOMEPAGE="https://www.awstats.org/ https://github.com/eldy/AWStats"
 SRC_URI="https://www.awstats.org/files/${P}.tar.gz"
 
 S=${WORKDIR}/${MY_P}

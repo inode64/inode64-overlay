@@ -8,4 +8,7 @@
 	<use>
 		<flag name="geoip2">Enable GeoIP2 API from MaxMind</flag>
 	</use>
+	<upstream>
+		<remote-id type="github">eldy/AWStats</remote-id>
+	</upstream>
 </pkgmetadata>
