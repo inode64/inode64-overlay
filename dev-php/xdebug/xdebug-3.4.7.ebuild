@@ -7,7 +7,7 @@ PHP_EXT_INI="yes"
 PHP_EXT_ZENDEXT="yes"
 PHP_EXT_INIFILE="3.0-xdebug.ini"
 
-USE_PHP="php8-2"
+USE_PHP="php8-2 php8-3 php8-4"
 PHP_EXT_NEEDED_USE="-threads(-)"
 
 MY_PV="${PV/_/}"
