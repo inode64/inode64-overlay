@@ -9,7 +9,7 @@ inherit autotools systemd python-r1
 
 DESCRIPTION="Varnish is a state-of-the-art, high-performance HTTP accelerator"
 HOMEPAGE="https://varnish-cache.org/"
-SRC_URI="http://varnish-cache.org/_downloads/${P}.tgz"
+SRC_URI="https://varnish-cache.org/_downloads/${P}.tgz"
 
 LICENSE="BSD-2 GPL-2"
 SLOT="0/2"

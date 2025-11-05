@@ -97,7 +97,7 @@ COMMON_DEPEND="
 	exif? ( !gd? (
 		media-libs/libjpeg-turbo:0
 		media-libs/libpng:0=
-		sys-libs/zlib:0=
+		virtual/zlib:=
 	) )
 	firebird? ( dev-db/firebird )
 	gd? ( media-libs/libjpeg-turbo:0 media-libs/libpng:0= sys-libs/zlib:0= )
