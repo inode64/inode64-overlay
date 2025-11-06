@@ -130,7 +130,7 @@ COMMON_DEPEND="
 	xpm? ( x11-libs/libXpm )
 	xslt? ( dev-libs/libxslt )
 	zip? ( >=dev-libs/libzip-1.2.0:= )
-	zlib? (virtual/zlib:= )
+	zlib? ( virtual/zlib:= )
 "
 
 RDEPEND="${COMMON_DEPEND}
