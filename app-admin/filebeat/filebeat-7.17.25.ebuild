@@ -36,7 +36,6 @@ src_install() {
 
 	insinto /etc/${PN}
 
-	doins fields.yml
 	doins ${PN}.yml
 	doins ${PN}.reference.yml
 	doins -r modules.d
