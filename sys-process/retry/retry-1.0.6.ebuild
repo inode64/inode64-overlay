@@ -7,7 +7,6 @@ DESCRIPTION="Repeat a command until the command succeeds."
 HOMEPAGE="https://github.com/minfrin/retry"
 SRC_URI="https://github.com/minfrin/${PN}/releases/download/${P}/${P}.tar.gz"
 
-S=${WORKDIR}/${PN}-${P}
 LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
