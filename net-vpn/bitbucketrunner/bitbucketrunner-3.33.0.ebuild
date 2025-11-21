@@ -31,7 +31,7 @@ src_install() {
 
 	newinitd "${FILESDIR}/bitbucketrunner.initd" bitbucketrunner
 	newconfd "${FILESDIR}/bitbucketrunner.confd" bitbucketrunner
-	systemd_newunit "${FILESDIR}/bitbucketrunner.service"
+	systemd_dounit "${FILESDIR}/bitbucketrunner.service"
 
 	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
 }
