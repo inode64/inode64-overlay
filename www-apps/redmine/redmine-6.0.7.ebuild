@@ -54,6 +54,7 @@ ruby_add_bdepend "
 	>=dev-ruby/rubyzip-2.3.0:2
 	>=dev-ruby/sanitize-6.0:6
 	dev-ruby/with_advisory_lock
+	~dev-ruby/rb_sys-0.9.117
 "
 
 RDEPEND="
