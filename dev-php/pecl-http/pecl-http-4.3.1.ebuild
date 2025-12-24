@@ -45,15 +45,15 @@ src_configure() {
 	local PHP_EXT_ECONF_ARGS=(
 		--with-http
 		--without-http-shared-deps
-	        --without-http-libidn-dir
+		--without-http-libidn-dir
 		--without-http-libidnkit2-dir
 		--without-http-libidnkit-dir
 	)
 
-        # Broken upstream autoconf test disables if present at all
-        use icu || PHP_EXT_ECONF_ARGS+=( --without-http-libicu-dir )
+	# Broken upstream autoconf test disables if present at all
+	use icu || PHP_EXT_ECONF_ARGS+=( --without-http-libicu-dir )
 
-        php-ext-source-r3_src_configure
+	php-ext-source-r3_src_configure
 }
 
 src_test() {
