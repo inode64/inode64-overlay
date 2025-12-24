@@ -89,7 +89,7 @@ COMMON_DEPEND="
 	cjk? ( !gd? (
 		media-libs/libjpeg-turbo:0=
 		media-libs/libpng:0=
-		sys-libs/zlib:0=
+		virtual/zlib:0=
 	) )
 	crypt? ( >=dev-libs/libmcrypt-2.4 )
 	curl? ( >=net-misc/curl-7.10.5 )
@@ -100,7 +100,7 @@ COMMON_DEPEND="
 		virtual/zlib:=
 	) )
 	firebird? ( dev-db/firebird )
-	gd? ( media-libs/libjpeg-turbo:0 media-libs/libpng:0= sys-libs/zlib:0= )
+	gd? ( media-libs/libjpeg-turbo:0 media-libs/libpng:0= virtual/zlib:0= )
 	gdbm? ( >=sys-libs/gdbm-1.8.0:0= )
 	gmp? ( dev-libs/gmp:0= )
 	iconv? ( virtual/libiconv )
@@ -132,7 +132,7 @@ COMMON_DEPEND="
 		=media-libs/freetype-2*
 		>=media-libs/t1lib-5.0.0
 		!gd? (
-			media-libs/libjpeg-turbo:0 media-libs/libpng:0= sys-libs/zlib:0= )
+			media-libs/libjpeg-turbo:0 media-libs/libpng:0= virtual/zlib:0= )
 	)
 	unicode? ( dev-libs/oniguruma:= )
 	vpx? ( media-libs/libvpx:0= )
@@ -144,11 +144,11 @@ COMMON_DEPEND="
 	xpm? (
 		x11-libs/libXpm
 		media-libs/libjpeg-turbo:0
-		media-libs/libpng:0= sys-libs/zlib:0=
+		media-libs/libpng:0= virtual/zlib:0=
 	)
 	xslt? ( dev-libs/libxslt >=dev-libs/libxml2-2.6.8:= )
-	zip? ( sys-libs/zlib:0= )
-	zlib? ( sys-libs/zlib:0= )
+	zip? ( virtual/zlib:0= )
+	zlib? ( virtual/zlib:0= )
 "
 
 RDEPEND="${COMMON_DEPEND}
