@@ -11,7 +11,7 @@ if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/eldy/AWStats.git"
 else
-  SRC_URI="https://www.awstats.org/files/${P}.tar.gz"
+	SRC_URI="https://www.awstats.org/files/${P}.tar.gz"
 fi
 
 S=${WORKDIR}/${MY_P}
