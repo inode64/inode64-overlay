@@ -21,7 +21,7 @@ KEYWORDS="~amd64 ~hppa ~ppc64 ~x86"
 IUSE="+session"
 
 DEPEND="
-	sys-libs/zlib
+	virtual/zlib
 "
 
 # The test suite requires memcached to be running.
