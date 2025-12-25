@@ -67,7 +67,7 @@ case ${NODEJS_MANAGER} in
         BDEPEND+=" net-libs/nodejs[npm]"
         ;;
     yarn)
-        BDEPEND+=" sys-apps/yarn"
+        BDEPEND+=" || ( net-libs/nodejs[corepack] sys-apps/yarn )"
         ;;
     *)
         eerror "Unknown value for \${NODEJS_MANAGER}"
