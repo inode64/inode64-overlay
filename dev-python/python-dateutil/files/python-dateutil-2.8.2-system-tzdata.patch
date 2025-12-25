@@ -65,14 +65,14 @@ index 34f11ad..e3f0f94 100644
 
 
  class ZoneInfoFile(object):
-@@ -48,7 +51,7 @@ class ZoneInfoFile(object):
-		     # no metadata in tar file
-		     self.metadata = None
-	 else:
+@@ -48,7 +51,7 @@
+                     # no metadata in tar file
+                     self.metadata = None
+         else:
 -            self.zones = {}
 +            self.zones = dict(iter_zones(ZONEDIRECTORY))
-	     self.metadata = None
-
+             self.metadata = None
+ 
      def get(self, name, default=None):
 @@ -99,7 +102,7 @@ def get_zonefile_instance(new_instance=False):
 	 zif = getattr(get_zonefile_instance, '_cached_instance', None)
