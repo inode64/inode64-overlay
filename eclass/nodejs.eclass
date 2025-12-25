@@ -176,7 +176,7 @@ nodejs_docs() {
 # @DESCRIPTION:
 # Remove docs, licenses and development files
 nodejs_remove_dev() {
-	# examples is used in node-red , see bug (inode64/inode64-overlay#38)
+    # examples is used in node-red , see bug (inode64/inode64-overlay#38)
 
     # Remove license files
     # shellcheck disable=SC2185
@@ -190,7 +190,7 @@ nodejs_remove_dev() {
 
     # Remove TypeScript files
     # shellcheck disable=SC2185
-    find -type f -iregex '.*\.\(tsx?\|jsx\|map\)$' -delete || die
+    find -type f -iregex '.*\.\(tsx\|jsx\|map\)$' -delete || die
     # shellcheck disable=SC2185
     find -type f -name tsconfig.json -delete || die
     # shellcheck disable=SC2185
