@@ -11,8 +11,8 @@ inherit distutils-r1 pypi
 
 DESCRIPTION="Coroutine-based network library"
 HOMEPAGE="
-    https://github.com/geventhttpclient/geventhttpclient
-    https://pypi.org/project/geventhttpclient/
+	https://github.com/geventhttpclient/geventhttpclient
+	https://pypi.org/project/geventhttpclient/
 "
 SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.gh.tar.gz"
 
@@ -21,13 +21,13 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="
-    app-arch/brotli[python]
-    dev-python/certifi
-    dev-python/gevent
-    dev-python/urllib3
-    net-libs/llhttp
+	app-arch/brotli[python]
+	dev-python/certifi
+	dev-python/gevent
+	dev-python/urllib3
+	net-libs/llhttp
 "
 
 PATCHES=(
-    "${FILESDIR}"/update_llhttp.patch
+	"${FILESDIR}"/update_llhttp.patch
 )
