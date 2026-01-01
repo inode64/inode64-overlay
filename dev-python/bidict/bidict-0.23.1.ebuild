@@ -21,7 +21,7 @@ BDEPEND="test? (
 	dev-python/pytest-xdist[${PYTHON_USEDEP}]
 	dev-python/hypothesis[${PYTHON_USEDEP}]
 	dev-python/sortedcollections[${PYTHON_USEDEP}]
-    )
+	)
 "
 
 distutils_enable_tests pytest
