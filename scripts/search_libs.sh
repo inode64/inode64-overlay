@@ -21,6 +21,8 @@ temp_file=$(mktemp /tmp/`basename $0`.XXXXXX)
 
 cat ${temp_file} | while read -r file; do
 	cat ${temp_file} | while read -r dest; do
-		if grep
+		if grep -q "$dest" "$file"; then
+			echo "$file contains $dest"
+		fi
 	done
 done
