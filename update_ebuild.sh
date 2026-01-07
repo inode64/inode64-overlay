@@ -15,10 +15,10 @@ temp_file=$(mktemp "/tmp/$(basename "$0").XXXXXX")
 #done
 
 #
-# Update varibales
+# Update variables
 #
 
-sed -i 's/^PYTHON_COMPAT=.*/PYTHON_COMPAT=( python3_{11..14} )/' */*/*.ebuild
+sed -i 's/^PYTHON_COMPAT=.*/PYTHON_COMPAT=( python3_{11..14} )/' ./*/*/*.ebuild
 #sed -i 's/^EAPI=.*/EAPI=8/' */*/*.ebuild
 
 
