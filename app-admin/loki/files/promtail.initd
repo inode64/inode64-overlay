@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+
+configfile="${PROMTAIL_CONF:-/etc/loki/promtail-local-config.yaml}"
+
+command=/usr/bin/promtail
+command_args="-config.file=${configfile}
+	${PROMTAIL_OPTS}"
+command_background=yes
+command_user=loki:grafana
+make_pidfile=yes
+pidfile=/var/run/promtail.pid
