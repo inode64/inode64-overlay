@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+
+name="alloy"
+description="OpenTelemetry Collector distribution with programmable pipelines"
+
+: ${command_user:="alloy"}
+: ${STORAGE:="/var/lib/alloy"}
+: ${CFGFILE:="/etc/alloy/config.alloy"}
+
+command="/usr/bin/alloy"
+command_args="run --storage.path $STORAGE $command_args $CFGFILE"
+command_background="yes"
+pidfile="/run/$RC_SVCNAME.pid"
+
+depend() {
+	need net
+	after firewall
+}
