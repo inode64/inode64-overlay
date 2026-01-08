@@ -9,19 +9,19 @@ MY_PN="${PN/-bin/}"
 
 DESCRIPTION="Grafana Alloy: A modern distribution of the OpenTelemetry Collector"
 HOMEPAGE="https://github.com/grafana/alloy"
-LICENSE="Apache-2.0"
-SLOT="0"
-KEYWORDS="amd64"
-
-RESTRICT="mirror strip"
 SRC_URI="https://github.com/grafana/${MY_PN}/releases/download/v${PV}/${MY_PN}-linux-amd64.zip -> ${P}.zip"
 
 S="${WORKDIR}"
+LICENSE="Apache-2.0"
+SLOT="0"
+KEYWORDS="amd64"
+RESTRICT="mirror strip"
 
 RDEPEND="${DEPEND}
 	acct-user/alloy
 	acct-group/alloy
 "
+BDEPEND="app-arch/unzip"
 
 src_install() {
 	newbin alloy-linux-amd64 alloy
