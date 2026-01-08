@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -96,9 +96,9 @@ src_install() {
 
 pkg_postinst() {
 	if use server; then
-	        tmpfiles_process loki.tmpfiles.conf
+		tmpfiles_process loki.tmpfiles.conf
 	fi
 	if use promtail; then
-	        tmpfiles_process promtail.tmpfiles.conf
+		tmpfiles_process promtail.tmpfiles.conf
 	fi
 }
