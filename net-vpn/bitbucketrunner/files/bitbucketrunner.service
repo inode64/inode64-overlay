@@ -23,6 +23,7 @@ ExecStart=/bin/sh -ec ' \
     -Dbitbucket.pipelines.runner.scheduled.state.update.period.seconds=${SCHEDULED_STATE_UPDATE_PERIOD_SECONDS} \
     -Dbitbucket.pipelines.runner.cleanup.previous.folders=${CLEANUP_PREVIOUS_FOLDERS} \
     -Dbitbucket.pipelines.runner.secret.provider.uri=${SECRET_PROVIDER_URI} \
+    -Dbitbucket.pipelines.runner.tart.concurrent.runners=$CONCURRENT_RUNNERS \
     -Dlogback.configurationFile=${LOGBACK_CONFIGURATION_FILE} \
     -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
     ./runner.jar \
