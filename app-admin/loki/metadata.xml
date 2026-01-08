@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<!DOCTYPE pkgmetadata
+  SYSTEM 'http://www.gentoo.org/dtd/metadata.dtd'>
+<pkgmetadata>
+  <use>
+    <flag name="promtail">Build the promtail log gathering agent</flag>
+    <flag name="server">Build the loki server</flag>
+    <flag name="tools">Build the loki tools logcli and loki-canary</flag>
+  </use>
+  <upstream>
+    <remote-id type="github">grafana/loki</remote-id>
+  </upstream>
+</pkgmetadata>
