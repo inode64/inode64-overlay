@@ -1,0 +1,274 @@
+#!/bin/bash
+
+set -u
+set -o pipefail
+
+PROG="$(basename "$0")"
+
+MODE=""                    # check | update
+MAILTO=""
+CONFIG="/etc/aide/aide.conf"
+QUIET=0
+REPORT=0
+NOEMAIL_IF_NOCHANGE=0      # if 1: do NOT email when there are no changes (even if -mailto is set)
+
+log() {
+  if [[ "$QUIET" -eq 0 ]]; then
+    echo "$@"
+  fi
+}
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 2
+}
+
+usage() {
+  cat <<EOF
+Usage:
+  $PROG -check  [-mailto <email>] [-config <path>] [-quiet] [-noemailifnochange]
+  $PROG -update [-mailto <email>] [-config <path>] [-quiet] [-noemailifnochange]
+
+Options:
+  -check                Check only (runs: aide --check)
+  -update               Check and update DB (runs: aide --update, then moves DB out -> DB)
+  -mailto <email>       Send an email report. If changes are detected, subject includes how many files/entries changed.
+  -config <path>        AIDE config file (default: /etc/aide/aide.conf)
+  -quiet                Print nothing to stdout/stderr (except fatal errors)
+  -report               Print AIDE report in stdout
+  -noemailifnochange    Do NOT send email when there are no changes (only email on changes)
+
+Examples:
+  $PROG -check
+  $PROG -check  -mailto admin@example.com -noemailifnochange -quiet
+  $PROG -update -config /etc/aide/aide.conf -mailto sec@example.com
+EOF
+}
+
+need_bin() {
+  command -v "$1" >/dev/null 2>&1 || die "Required binary not found in PATH: $1"
+}
+
+# Extract AIDE DB paths from config:
+#   database=file:/var/lib/aide/aide.db
+#   database_out=file:/var/lib/aide/aide.db.new
+parse_db_paths() {
+  local cfg="$1"
+  local db db_out
+
+  db="$(grep -E '^[[:space:]]*database[[:space:]]*=' "$cfg" 2>/dev/null \
+    | grep -v -E '^[[:space:]]*database_out[[:space:]]*=' \
+    | head -n1 | sed -E 's/^[[:space:]]*database[[:space:]]*=[[:space:]]*//')"
+
+  db_out="$(grep -E '^[[:space:]]*database_out[[:space:]]*=' "$cfg" 2>/dev/null \
+    | head -n1 | sed -E 's/^[[:space:]]*database_out[[:space:]]*=[[:space:]]*//')"
+
+  db="${db#file:}"
+  db_out="${db_out#file:}"
+
+  [[ -n "${db:-}" ]] || db="/var/lib/aide/aide.db"
+  [[ -n "${db_out:-}" ]] || db_out="/var/lib/aide/aide.db.new"
+
+  echo "$db" "$db_out"
+}
+
+# Parse summary counters from AIDE output.
+# Returns: total added removed changed
+# If it cannot parse, returns: -1 0 0 0
+parse_change_counts() {
+  local f="$1"
+  local added removed changed total
+
+  added="$(grep -E 'Added entries' "$f" 2>/dev/null | grep -Eo '[0-9]+' | head -n1 || true)"
+  removed="$(grep -E 'Removed entries' "$f" 2>/dev/null | grep -Eo '[0-9]+' | head -n1 || true)"
+  changed="$(grep -E 'Changed entries' "$f" 2>/dev/null | grep -Eo '[0-9]+' | head -n1 || true)"
+
+  [[ -n "${added:-}" ]] || added=0
+  [[ -n "${removed:-}" ]] || removed=0
+  [[ -n "${changed:-}" ]] || changed=0
+
+  total=$((added + removed + changed))
+
+  if ! grep -qE '(Added|Removed|Changed) entries' "$f" 2>/dev/null; then
+    echo "-1 0 0 0"
+  else
+    echo "$total" "$added" "$removed" "$changed"
+  fi
+}
+
+send_mail() {
+  local to="$1"
+  local subject="$2"
+  local body_file="$3"
+
+  if command -v mail >/dev/null 2>&1; then
+    mail -s "$subject" "$to" < "$body_file"
+    return $?
+  fi
+
+  if command -v sendmail >/dev/null 2>&1; then
+    {
+      echo "To: $to"
+      echo "Subject: $subject"
+      echo "MIME-Version: 1.0"
+      echo "Content-Type: text/plain; charset=UTF-8"
+      echo
+      cat "$body_file"
+    } | sendmail -t
+    return $?
+  fi
+
+  return 127
+}
+
+# ----------------- Parse args -----------------
+[[ $# -ge 1 ]] || { usage; exit 1; }
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -check)
+    MODE="check"
+    shift
+    ;;
+  -update)
+    MODE="update"
+    shift
+    ;;
+  -mailto)
+    shift
+    [[ $# -ge 1 ]] || die "-mailto requires an email address"
+    MAILTO="$1"
+    shift
+    ;;
+  -config)
+    shift
+    [[ $# -ge 1 ]] || die "-config requires a file path"
+    CONFIG="$1"
+    shift
+    ;;
+  -quiet)
+    QUIET=1
+    shift
+    ;;
+  -report)
+    REPORT=1
+    shift
+    ;;
+  -noemailifnochange)
+    NOEMAIL_IF_NOCHANGE=1
+    shift
+    ;;
+  -h|--help|-help)
+    usage
+    exit 0
+    ;;
+  *)
+    die "Unknown argument: $1 (use --help)"
+    ;;
+  esac
+done
+
+[[ -n "$MODE" ]] || die "You must specify exactly one mode: -check or -update"
+[[ -r "$CONFIG" ]] || die "Cannot read config file: $CONFIG"
+
+need_bin aide
+
+# Optional warning (AIDE usually needs root to read everything)
+if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+  log "WARNING: not running as root; AIDE may be unable to read some paths."
+fi
+
+# Avoid concurrent runs
+LOCK="/run/${PROG}.lock"
+exec 9>"$LOCK" 2>/dev/null || exec 9>"/tmp/${PROG}.lock"
+if command -v flock >/dev/null 2>&1; then
+  flock -n 9 || die "Another instance is already running (lock: $LOCK)"
+fi
+
+TMP_OUT="$(mktemp -t aide-report.XXXXXX)"
+trap 'rm -f "$TMP_OUT"' EXIT
+
+HOST="$(hostname --fqdn 2>/dev/null || true)"
+
+log "[$(date -Is 2>/dev/null || true)] Running AIDE ($MODE) with config: $CONFIG"
+
+# ----------------- Run AIDE -----------------
+RC=0
+START=$(date +%s)
+
+if [[ "$MODE" == "check" ]]; then
+  aide --config "$CONFIG" --check >"$TMP_OUT" 2>/dev/null || RC=$?
+else
+  aide --config "$CONFIG" --update >"$TMP_OUT" 2>/dev/null || RC=$?
+fi
+
+((result = $(date +%s) - START))
+TIME="$((result / 3600))h $(((result / 60) % 60))m $((result % 60))s"
+
+log "[$(date -Is 2>/dev/null || true)] Finish AIDE with err ($RC) - ${TIME}"
+
+if [[ "$REPORT" -eq 1 ]]; then
+  cat "$TMP_OUT"
+fi
+
+# ----------------- Interpret results -----------------
+read -r TOTAL ADDED REMOVED CHANGED < <(parse_change_counts "$TMP_OUT")
+
+CHANGES_DETECTED=0
+if [[ "$TOTAL" -gt 0 ]]; then
+  CHANGES_DETECTED=1
+elif [[ "$TOTAL" -eq 0 ]]; then
+  CHANGES_DETECTED=0
+else
+  # TOTAL=-1: couldn't parse summary. If RC != 0 assume something happened (changes or error).
+  [[ "$RC" -ne 0 ]] && CHANGES_DETECTED=1
+fi
+
+if [[ "$MODE" == "update" && "$RC" -ne 0 ]]; then
+  # Move database_out -> database (as defined in config)
+  read -r DB DB_OUT < <(parse_db_paths "$CONFIG")
+  if [[ -f "$DB_OUT" ]]; then
+    mv -f "$DB_OUT" "$DB" || die "Failed moving updated DB: $DB_OUT -> $DB"
+    log "Database updated: $DB"
+  else
+    log "NOTE: database_out not found at '$DB_OUT' (check your AIDE config)."
+  fi
+fi
+
+if [[ "$CHANGES_DETECTED" -eq 1 ]]; then
+  if [[ "$TOTAL" -ge 0 ]]; then
+    log "Changes detected: total=$TOTAL (added=$ADDED removed=$REMOVED changed=$CHANGED)"
+  else
+    log "Changes detected (could not calculate exact count from output)."
+  fi
+else
+  log "No changes detected."
+fi
+
+# ----------------- Mail logic -----------------
+# Default: if -mailto is set, send report ALWAYS.
+# If -noemailifnochange is set, only email when changes are detected.
+if [[ -n "$MAILTO" ]]; then
+  SHOULD_MAIL=1
+  if [[ "$NOEMAIL_IF_NOCHANGE" -eq 1 && "$CHANGES_DETECTED" -eq 0 ]]; then
+    SHOULD_MAIL=0
+  fi
+
+  if [[ "$SHOULD_MAIL" -eq 1 ]]; then
+    if [[ "$CHANGES_DETECTED" -eq 1 || "$RC" -ne 0 ]]; then
+      if [[ "$TOTAL" -ge 0 ]]; then
+        SUBJECT="[AIDE][$HOST][$TIME] Changes detected: $TOTAL files/entries"
+      else
+        SUBJECT="[AIDE][$HOST][$TIME] Changes detected (count unknown)"
+      fi
+    else
+      SUBJECT="[AIDE][$HOST][$TIME] No changes"
+    fi
+
+    if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
+      die "Failed sending email (install 'mail' or 'sendmail')."
+    fi
+  fi
+fi
+
+exit "$RC"

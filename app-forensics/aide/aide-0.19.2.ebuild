@@ -95,10 +95,10 @@ src_install() {
 	# Offically, there is no default. Maybe OS based?
 	newins "${FILESDIR}"/aide.conf-r3 aide.conf
 
-	dobin "${FILESDIR}"/dailyaidecheck
+	dobin "${FILESDIR}"/aide-report
 
 	keepdir /var/{lib,log}/${PN}
-	keepdir /etc/${PN}/conf.d
+	keepdir /etc/${PN}/${PN}.conf.d
 }
 
 pkg_postinst() {

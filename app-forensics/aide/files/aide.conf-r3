@@ -1,8 +1,12 @@
 # Example configuration file for AIDE
 # See more: man 5 aide.conf
+@@define DBDIR /var/lib/aide
+@@define LOGDIR /var/log/aide
 
-database_in=file:/var/lib/aide/aide.db
-database_out=file:/var/lib/aide/aide.db.new
+@@define CONTEXT aide
+
+database_in=file:@@{DBDIR}/@@{CONTEXT}.db
+database_out=file:@@{DBDIR}/@@{CONTEXT}.db.new
 
 # Change this to "no" or remove it to not gzip output
 # (only useful on systems with few CPU cycles to spare)
@@ -14,51 +18,69 @@ gzip_dbout=yes
 # Default: changed_attributes
 #report_level=added_removed_attributes
 
-report_url=file:/var/log/aide/aide.log
+report_url=file:@@{LOGDIR}/@@{CONTEXT}.log
 report_url=stdout
 #report_url=stderr
 
 # Here are all the things we can check - these are the default rules
-#
-# p:   permissions
-# ftype: file type
-# i:   inode
-# l:   link name
-# n:   number of links
-# u:   user
-# g:   group
-# s:   size
-# b:   block count
-# m:   mtime (modification time)
-# a:   atime (access time)
-# c:   ctime (change time)
-# S:   check for growing size
-# I:   ignore changed filename
-# ANF: allow new files
-# ARF: allow removed files
-# md5: md5 checksum
-# sha1: sha1 checksum
-# sha256: sha256 checksum
-# sha512: sha512 checksum
-# rmd160: rmd160 checksum
-# tiger: tiger checksum
-# crc32:    crc32 checksum
-# R:   p+ftype+i+l+n+u+g+s+m+c+md5+X
-# L:   p+ftype+i+l+n+u+g+X
-# E:   Empty group
-# X:   acl+selinux+xattrs+e2fsattrs (if groups are explicitly enabled)
-# >:   Growing file p+ftype+l+u+g+i+n+S+X
+
+# List attributes
+# ftype:     file type
+# fstype:    file system type (Linux-only)
+# p:         permissions
+# i:         inode
+# l:         link name (symbolic links only)
+# n:         number of links
+# u:         user
+# g:         group
+# s:         size
+# b:         block count
+# m:         mtime (modification time)
+# a:         atime (access time)
+# c:         ctime (change time)
+# acl        access control list (requires libacl, Linux-only)
+# selinux:   selinux attributes (requires libselinux, Linux-only)
+# xattrs     extended attributes (requires libattr, Linux-only)
+# e2fsattrs  file attributes on a Linux file system (requires libcap)
+# caps       file capabilities (regular files only)
+# S:         check for growing size (DEPRECATED)
+# I:         ignore changed filename
+# growing:   ignore growing file
+# compressed ignore compressed file
+# ANF:       allow new files
+# ARF:       allow removed files
+
+# List Checksums
+# sha256
+# sha512
+# sha512_256
+# sha3_256
+# sha3_512
+# stribog256
+# stribog512
+# md5 (DEPRECATED)
+# sha1 (DEPRECATED )
+# rmd160 (DEPRECATED)
+# gost (DEPRECATED)
+
+# Default groups
+# R:      p+ftype+i+l+n+u+g+s+m+c+sha3_256+X
+# L:      p+ftype+i+l+n+u+g+X
+# >:      Growing file p+ftype+l+u+g+i+n+s+growing+X
+# H:      all compiled in (and not deprecated) hashsums
+# X:      acl+selinux+xattrs+e2fsattrs+caps (if attributes are compiled in)
+# E:      Empty group
 
 # Defines formerly set here have been moved to /etc/default/aide.
 
 # Custom rules
-Binlib = p+i+n+u+g+s+b+m+c+md5+sha256+rmd160
-ConfFiles = p+i+n+u+g+s+b+m+c+md5+sha256+rmd160
-Logs = p+i+n+u+g+growing+s
-Devices = p+i+n+u+g+s+b+c+md5+sha256+rmd160
+Binlib    = p+i+n+u+g+s+b+m+c+sha256
+ConfFiles = p+i+n+u+g+s+b+m+c+sha256
+Logs      = p+i+n+u+g+growing+s
+Devices   = p+i+n+u+g+s+b+c+sha256
 Databases = p+n+u+g
 StaticDir = p+i+n+u+g
-ManPages = p+i+n+u+g+s+b+m+c+md5+sha256+rmd160
+ManPages  = p+i+n+u+g+s+b+m+c+sha256
 
 # Next decide what directories/files you want in the database
 
@@ -109,9 +131,6 @@ ManPages = p+i+n+u+g+s+b+m+c+md5+sha256+rmd160
 
 # You can look through these examples to get further ideas
 
-# MD5 sum files - especially useful with debsums -g
-#/var/lib/dpkg/info/([^\.]+).md5sums u+g+s+m+md5+sha1
-
 # Check crontabs
 #/var/spool/anacron/cron.daily Databases
 #/var/spool/anacron/cron.monthly Databases
@@ -142,4 +161,6 @@ ManPages = p+i+n+u+g+s+b+m+c+md5+sha256+rmd160
 
 # Include rules from /etc/aide/aide.conf.d
 # Files with the x bit set are executed and their output included.
-@@x_include /etc/aide/conf.d ^[a-zA-Z0-9_-]+$
+@@if exists /etc/aide/@@{CONTEXT}.conf.d
+  @@x_include /etc/aide/@@{CONTEXT}.conf.d ^[a-zA-Z0-9_-]+$
+@@endif
