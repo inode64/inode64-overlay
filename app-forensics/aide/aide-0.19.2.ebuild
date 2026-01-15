@@ -42,6 +42,8 @@ BDEPEND="
 
 RESTRICT="!test? ( test )"
 
+PATCHES=( "${FILESDIR}/default_conf.patch" )
+
 DISABLE_AUTOFORMATTING=1
 DOC_CONTENTS="
 Example configuration file was installed at '${EPREFIX}/etc/aide/aide.conf'.

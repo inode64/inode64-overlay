@@ -1,0 +1,37 @@
+diff '--color=auto' -ruN aide.old/src/aide.c aide/src/aide.c
+--- aide.old/src/aide.c	2026-01-15 12:16:29.042632010 +0100
++++ aide/src/aide.c	2026-01-15 12:33:13.789751658 +0100
+@@ -59,6 +59,7 @@
+ db_config* conf;
+ char* before = NULL;
+ char* after = NULL;
++static char* config_override = NULL;
+ 
+ #ifndef MAXHOSTNAMELEN
+ #define MAXHOSTNAMELEN 256
+@@ -271,8 +272,10 @@
+ 	break;
+       }
+       case 'c':{
+-	  conf->config_file=optarg;
+-      log_msg(LOG_LEVEL_INFO,_("(--config): set config file to '%s'"), conf->config_file);
++	free(config_override);
++	config_override = checked_strdup(optarg);
++	conf->config_file = config_override;
++	log_msg(LOG_LEVEL_INFO,_("(--config): set config file to '%s'"), conf->config_file);
+ 	break;
+       }
+       case 'B': {
+@@ -724,7 +727,11 @@
+ 
+   log_msg(LOG_LEVEL_INFO, "parse configuration");
+   update_progress_status(PROGRESS_CONFIG, NULL);
+-  errorno=parse_config(before, conf->config_file, after);
++  char *config_path = conf->config_file;
++  if (config_override) {
++      config_path = config_override;
++  }
++  errorno=parse_config(before, config_path, after);
+   if (errorno==RETFAIL){
+     exit(INVALID_CONFIGURELINE_ERROR);
+   }
