@@ -25,7 +25,7 @@ diff '--color=auto' -ruN aide.old/src/aide.c aide/src/aide.c
 @@ -724,7 +727,11 @@
  
    log_msg(LOG_LEVEL_INFO, "parse configuration");
-   update_progress_status(PROGRESS_CONFIG, NULL);
+   progress_status(PROGRESS_CONFIG, NULL);
 -  errorno=parse_config(before, conf->config_file, after);
 +  char *config_path = conf->config_file;
 +  if (config_override) {
