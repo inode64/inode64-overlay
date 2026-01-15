@@ -179,7 +179,7 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
 fi
 
 # Avoid concurrent runs
-LOCK="/run/${PROG}.lock"
+LOCK="/run/${PROG}_$(basename "$CONFIG").lock"
 exec 9>"$LOCK" 2>/dev/null || exec 9>"/tmp/${PROG}.lock"
 if command -v flock >/dev/null 2>&1; then
   flock -n 9 || die "Another instance is already running (lock: $LOCK)"
