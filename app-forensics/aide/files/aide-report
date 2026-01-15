@@ -271,4 +271,8 @@ if [[ -n "$MAILTO" ]]; then
   fi
 fi
 
-exit "$RC"
+if [[ "$QUIET" -eq 0 ]]; then
+  exit "$RC"
+fi
+
+exit 0
