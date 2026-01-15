@@ -52,6 +52,7 @@ need_bin() {
 # Extract AIDE DB paths from config:
 #   database=file:/var/lib/aide/aide.db
 #   database_out=file:/var/lib/aide/aide.db.new
+# Returns: database_path database_out_path
 parse_db_paths() {
   local cfg="$1"
   local db db_out
@@ -73,6 +74,7 @@ parse_db_paths() {
 }
 
 # Parse summary counters from AIDE output.
+# Extracts the number of added, removed, and changed entries.
 # Returns: total added removed changed
 # If it cannot parse, returns: -1 0 0 0
 parse_change_counts() {
@@ -96,6 +98,8 @@ parse_change_counts() {
   fi
 }
 
+# Send email using available mail command (mail or sendmail)
+# Arguments: to subject body_file
 send_mail() {
   local to="$1"
   local subject="$2"
@@ -179,8 +183,8 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
 fi
 
 # Avoid concurrent runs
-LOCK="/run/${PROG}_$(basename "$CONFIG").lock"
-exec 9>"$LOCK" 2>/dev/null || exec 9>"/tmp/${PROG}.lock"
+CONTEXT=${PROG}_$(basename "$CONFIG")
+exec 9>"/run/${CONTEXT}.lock" 2>/dev/null || exec 9>"/tmp/${CONTEXT}.lock"
 if command -v flock >/dev/null 2>&1; then
   flock -n 9 || die "Another instance is already running (lock: $LOCK)"
 fi
@@ -196,11 +200,17 @@ log "[$(date -Is 2>/dev/null || true)] Running AIDE ($MODE) with config: $CONFIG
 RC=0
 START=$(date +%s)
 
-if [[ "$MODE" == "check" ]]; then
+case "$MODE" in
+check)
   aide --config "$CONFIG" --check >"$TMP_OUT" 2>/dev/null || RC=$?
-else
+  ;;
+update)
   aide --config "$CONFIG" --update >"$TMP_OUT" 2>/dev/null || RC=$?
-fi
+  ;;
+*)
+  die "Unknown mode: $MODE"
+  ;;
+esac
 
 ((result = $(date +%s) - START))
 TIME="$((result / 3600))h $(((result / 60) % 60))m $((result % 60))s"
