@@ -19,7 +19,7 @@ log() {
 }
 
 die() {
-  echo "ERROR: $*" >&2
+  echo "ERROR: $*"
   exit 2
 }
 
@@ -57,12 +57,8 @@ parse_db_paths() {
   local cfg="$1"
   local db db_out
 
-  db="$(grep -E '^[[:space:]]*database[[:space:]]*=' "$cfg" 2>/dev/null \
-    | grep -v -E '^[[:space:]]*database_out[[:space:]]*=' \
-    | head -n1 | sed -E 's/^[[:space:]]*database[[:space:]]*=[[:space:]]*//')"
-
-  db_out="$(grep -E '^[[:space:]]*database_out[[:space:]]*=' "$cfg" 2>/dev/null \
-    | head -n1 | sed -E 's/^[[:space:]]*database_out[[:space:]]*=[[:space:]]*//')"
+  db="$(grep ^database_in: "$cfg" | awk '{print $2}')"
+  db_out="$(grep ^database_out: "$cfg" | awk '{print $2}')"
 
   db="${db#file:}"
   db_out="${db_out#file:}"
@@ -182,15 +178,39 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   log "WARNING: not running as root; AIDE may be unable to read some paths."
 fi
 
+TMP_OUT="$(mktemp -t aide-report.XXXXXX)"
+trap 'rm -f "$TMP_OUT"' EXIT
+
+#
+if ! aide --config "$CONFIG" --config-check -v &>"$TMP_OUT"; then
+  SUBJECT="Bad configuration at '$CONFIG' (check your AIDE config)."
+  if [[ -n "$MAILTO" ]]; then
+    if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
+      log "Failed sending email (install 'mail' or 'sendmail')."
+    fi
+  fi
+  die "$SUBJECT"
+fi
+read -r DB DB_OUT < <(parse_db_paths "$TMP_OUT")
+
+if [[ ! "$DB" ]]; then
+  die "Database_in not found (check your AIDE config)."
+fi
+if [[ ! "$DB_OUT" ]]; then
+  die "Database_out not found (check your AIDE config)."
+fi
+
+if [[ ! -f "$DB" ]]; then
+  log "Database not found, initializing: $DB"
+  MODE="init"
+fi
+
 # Avoid concurrent runs
 CONTEXT=${PROG}_$(basename "$CONFIG")
 exec 9>"/run/${CONTEXT}.lock" 2>/dev/null || exec 9>"/tmp/${CONTEXT}.lock"
 if command -v flock >/dev/null 2>&1; then
   flock -n 9 || die "Another instance is already running (lock: $LOCK)"
 fi
-
-TMP_OUT="$(mktemp -t aide-report.XXXXXX)"
-trap 'rm -f "$TMP_OUT"' EXIT
 
 HOST="$(hostname --fqdn 2>/dev/null || true)"
 
@@ -206,6 +226,9 @@ check)
   ;;
 update)
   aide --config "$CONFIG" --update >"$TMP_OUT" 2>/dev/null || RC=$?
+  ;;
+init)
+  aide --config "$CONFIG" --init >"$TMP_OUT" 2>/dev/null || RC=$?
   ;;
 *)
   die "Unknown mode: $MODE"
@@ -234,25 +257,39 @@ else
   [[ "$RC" -ne 0 ]] && CHANGES_DETECTED=1
 fi
 
-if [[ "$MODE" == "update" && "$RC" -ne 0 ]]; then
-  # Move database_out -> database (as defined in config)
-  read -r DB DB_OUT < <(parse_db_paths "$CONFIG")
-  if [[ -f "$DB_OUT" ]]; then
-    mv -f "$DB_OUT" "$DB" || die "Failed moving updated DB: $DB_OUT -> $DB"
-    log "Database updated: $DB"
+if [[ "$MODE" == "init" ]]; then
+  if [[ -f "$DB_OUT" && "$RC" -eq 0 ]]; then
+    mv -f "$DB_OUT" "$DB" || die "Failed moving DB: $DB_OUT -> $DB"
+    log "Database initialized: $DB"
   else
-    log "NOTE: database_out not found at '$DB_OUT' (check your AIDE config)."
-  fi
-fi
-
-if [[ "$CHANGES_DETECTED" -eq 1 ]]; then
-  if [[ "$TOTAL" -ge 0 ]]; then
-    log "Changes detected: total=$TOTAL (added=$ADDED removed=$REMOVED changed=$CHANGED)"
-  else
-    log "Changes detected (could not calculate exact count from output)."
+    SUBJECT="Bad Database initialization: $DB"
+    if [[ -n "$MAILTO" ]]; then
+      if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
+        log "Failed sending email (install 'mail' or 'sendmail')."
+      fi
+    fi
+    die "$SUBJECT"
   fi
 else
-  log "No changes detected."
+  if [[ "$MODE" == "update" && "$RC" -ne 0 ]]; then
+    # Move database_out -> database (as defined in config)
+    if [[ -f "$DB_OUT" ]]; then
+      mv -f "$DB_OUT" "$DB" || die "Failed moving updated DB: $DB_OUT -> $DB"
+      log "Database updated: $DB"
+    else
+      log "NOTE: database_out not found at '$DB_OUT' (check your AIDE config)."
+    fi
+  fi
+
+  if [[ "$CHANGES_DETECTED" -eq 1 ]]; then
+    if [[ "$TOTAL" -ge 0 ]]; then
+      log "Changes detected: total=$TOTAL (added=$ADDED removed=$REMOVED changed=$CHANGED)"
+    else
+      log "Changes detected (could not calculate exact count from output)."
+    fi
+  else
+    log "No changes detected."
+  fi
 fi
 
 # ----------------- Mail logic -----------------
