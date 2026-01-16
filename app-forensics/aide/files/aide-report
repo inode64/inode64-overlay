@@ -10,7 +10,7 @@ MAILTO=""
 CONFIG="/etc/aide/aide.conf"
 QUIET=0
 REPORT=0
-NOEMAIL_IF_NOCHANGE=0      # if 1: do NOT email when there are no changes (even if -mailto is set)
+NOEMAIL_IF_NOCHANGE=0 # if 1: do NOT email when there are no changes (even if -mailto is set)
 
 log() {
   if [[ "$QUIET" -eq 0 ]]; then
@@ -26,21 +26,21 @@ die() {
 usage() {
   cat <<EOF
 Usage:
-  $PROG -check  [-mailto <email>] [-config <path>] [-quiet] [-noemailifnochange]
-  $PROG -update [-mailto <email>] [-config <path>] [-quiet] [-noemailifnochange]
+  $PROG -check  [-mailto <email[,email2,...]>] [-config <path>] [-quiet] [-noemailifnochange]
+  $PROG -update [-mailto <email[,email2,...]>] [-config <path>] [-quiet] [-noemailifnochange]
 
 Options:
-  -check                Check only (runs: aide --check)
-  -update               Check and update DB (runs: aide --update, then moves DB out -> DB)
-  -mailto <email>       Send an email report. If changes are detected, subject includes how many files/entries changed.
-  -config <path>        AIDE config file (default: /etc/aide/aide.conf)
-  -quiet                Print nothing to stdout/stderr (except fatal errors)
-  -report               Print AIDE report in stdout
-  -noemailifnochange    Do NOT send email when there are no changes (only email on changes)
+  -check                       Check only (runs: aide --check)
+  -update                      Check and update DB (runs: aide --update, then moves DB out -> DB)
+  -mailto <email[,email2,...]> Send an email report to one or more recipients. If changes are detected, subject includes how many files/entries changed.
+  -config <path>               AIDE config file (default: /etc/aide/aide.conf)
+  -quiet                       Print nothing to stdout/stderr (except fatal errors)
+  -report                      Print AIDE report in stdout
+  -noemailifnochange           Do NOT send email when there are no changes (only email on changes)
 
 Examples:
   $PROG -check
-  $PROG -check  -mailto admin@example.com -noemailifnochange -quiet
+  $PROG -check  -mailto admin@example.com,sec@example.com -noemailifnochange -quiet
   $PROG -update -config /etc/aide/aide.conf -mailto sec@example.com
 EOF
 }
@@ -100,6 +100,7 @@ send_mail() {
   local to="$1"
   local subject="$2"
   local body_file="$3"
+  local recip RECIPS
 
   local context="[AIDE][$HOST]"
   if [[ "$(basename "$CONFIG")" != "aide.conf" ]]; then
@@ -107,28 +108,37 @@ send_mail() {
   fi
   subject="$context $subject in $TIME"
 
-  if command -v mail >/dev/null 2>&1; then
-    mail -s "$subject" "$to" < "$body_file"
-    return $?
-  fi
+  # Split recipients
+  IFS=',' read -ra RECIPS <<<"$to"
 
-  if command -v sendmail >/dev/null 2>&1; then
-    {
-      echo "To: $to"
-      echo "Subject: $subject"
-      echo "MIME-Version: 1.0"
-      echo "Content-Type: text/plain; charset=UTF-8"
-      echo
-      cat "$body_file"
-    } | sendmail -t
-    return $?
-  fi
+  local rc=0
+  for recip in "${RECIPS[@]}"; do
+    recip="$(echo "$recip" | xargs)"
 
-  return 127
+    if command -v mail >/dev/null 2>&1; then
+      mail -s "$subject" "$recip" <"$body_file" || rc=$?
+    else
+      {
+        echo "To: $recip"
+        echo "Subject: $subject"
+        echo "MIME-Version: 1.0"
+        echo "Content-Type: text/plain; charset=UTF-8"
+        echo
+        cat "$body_file"
+      } | sendmail -t || rc=$?
+    fi
+
+    if [[ $rc -ne 0 ]]; then
+      log "Failed sending email to $recip"
+    fi
+  done
 }
 
 # ----------------- Parse args -----------------
-[[ $# -ge 1 ]] || { usage; exit 1; }
+[[ $# -ge 1 ]] || {
+  usage
+  exit 1
+}
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -142,8 +152,11 @@ while [[ $# -gt 0 ]]; do
     ;;
   -mailto)
     shift
-    [[ $# -ge 1 ]] || die "-mailto requires an email address"
+    [[ $# -ge 1 ]] || die "-mailto requires at least one email address"
     MAILTO="$1"
+    if ! command -v mail >/dev/null 2>&1 && ! command -v sendmail >/dev/null 2>&1; then
+      die "Failed to find mail or sendmail."
+    fi
     shift
     ;;
   -config)
@@ -164,7 +177,7 @@ while [[ $# -gt 0 ]]; do
     NOEMAIL_IF_NOCHANGE=1
     shift
     ;;
-  -h|--help|-help)
+  -h | --help | -help)
     usage
     exit 0
     ;;
@@ -191,9 +204,7 @@ trap 'rm -f "$TMP_OUT"' EXIT
 if ! aide --config "$CONFIG" --config-check -v &>"$TMP_OUT"; then
   SUBJECT="Bad configuration at '$CONFIG' (check your AIDE config)."
   if [[ -n "$MAILTO" ]]; then
-    if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
-      log "Failed sending email (install 'mail' or 'sendmail')."
-    fi
+    send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"
   fi
   die "$SUBJECT"
 fi
@@ -274,9 +285,7 @@ if [[ "$MODE" == "init" ]]; then
   else
     SUBJECT="Bad Database initialization: $DB"
     if [[ -n "$MAILTO" ]]; then
-      if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
-        log "Failed sending email (install 'mail' or 'sendmail')."
-      fi
+      send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"
     fi
     die "$SUBJECT"
   fi
@@ -322,9 +331,7 @@ if [[ -n "$MAILTO" ]]; then
       SUBJECT="No changes"
     fi
 
-    if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
-      die "Failed sending email (install 'mail' or 'sendmail')."
-    fi
+    send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"
   fi
 fi
 
