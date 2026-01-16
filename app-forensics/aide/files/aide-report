@@ -5,7 +5,7 @@ set -o pipefail
 
 PROG="$(basename "$0")"
 
-MODE=""                    # check | update
+MODE=""
 MAILTO=""
 CONFIG="/etc/aide/aide.conf"
 QUIET=0
@@ -100,6 +100,12 @@ send_mail() {
   local to="$1"
   local subject="$2"
   local body_file="$3"
+
+  local context="[AIDE][$HOST]"
+  if [[ "$(basename "$CONFIG")" != "aide.conf" ]]; then
+    context="${context}[$(basename -s .conf "$CONFIG")]"
+  fi
+  subject="$context $subject in $TIME"
 
   if command -v mail >/dev/null 2>&1; then
     mail -s "$subject" "$to" < "$body_file"
@@ -236,9 +242,13 @@ init)
 esac
 
 ((result = $(date +%s) - START))
-TIME="$((result / 3600))h $(((result / 60) % 60))m $((result % 60))s"
+TIME="$((result / 60))m $((result % 60))s"
 
-log "[$(date -Is 2>/dev/null || true)] Finish AIDE with err ($RC) - ${TIME}"
+if [[ "$RC" -eq 0 ]]; then
+  log "[$(date -Is 2>/dev/null || true)] Finish AIDE in ${TIME}"
+else
+  log "[$(date -Is 2>/dev/null || true)] Finish AIDE with err ($RC) in ${TIME}"
+fi
 
 if [[ "$REPORT" -eq 1 ]]; then
   cat "$TMP_OUT"
@@ -304,12 +314,12 @@ if [[ -n "$MAILTO" ]]; then
   if [[ "$SHOULD_MAIL" -eq 1 ]]; then
     if [[ "$CHANGES_DETECTED" -eq 1 || "$RC" -ne 0 ]]; then
       if [[ "$TOTAL" -ge 0 ]]; then
-        SUBJECT="[AIDE][$HOST][$TIME] Changes detected: $TOTAL files/entries"
+        SUBJECT="Changes detected: $TOTAL files/entries"
       else
-        SUBJECT="[AIDE][$HOST][$TIME] Changes detected (count unknown)"
+        SUBJECT="Changes detected (count unknown)"
       fi
     else
-      SUBJECT="[AIDE][$HOST][$TIME] No changes"
+      SUBJECT="No changes"
     fi
 
     if ! send_mail "$MAILTO" "$SUBJECT" "$TMP_OUT"; then
