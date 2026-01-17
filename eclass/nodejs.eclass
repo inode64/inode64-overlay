@@ -228,16 +228,17 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*/\(benchmark.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
 
+	# TODO: Exclude/include binary and glibc/musl to remove   
     # Remove development directories
     # shellcheck disable=SC2185
     find -type d \
     \( \
-        -iwholename '*.deps' -o \
-        -iwholename '*.github' -o \
-        -iwholename '*.idea' -o \
-        -iwholename '*.nyc_output' -o \
-        -iwholename '*.tscache' -o \
-        -iwholename '*.vscode' -o \
+        -iwholename '*/.deps' -o \
+        -iwholename '*/.github' -o \
+        -iwholename '*/.idea' -o \
+        -iwholename '*/.nyc_output' -o \
+        -iwholename '*/.tscache' -o \
+        -iwholename '*/.vscode' -o \
         -iwholename '*/.storybook' -o \
         -iwholename '*/android-arm' -o \
         -iwholename '*/android-arm64' -o \
@@ -263,7 +264,8 @@ nodejs_remove_dev() {
         -iwholename '*/tests' -o \
         -iwholename '*/win32-arm64' -o \
         -iwholename '*/win32-ia32' -o \
-        -iwholename '*/win32-x64' \
+        -iwholename '*/win32-x64' -o \
+        -iwholename '*/*-musl' \
     \) \
     -exec rm -rvf {} + || ewarn "Failed to remove some directories"
 }
