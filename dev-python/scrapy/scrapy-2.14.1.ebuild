@@ -35,6 +35,7 @@ RDEPEND="dev-python/cssselect[${PYTHON_USEDEP}]
 	>=dev-python/twisted-18.9.0[${PYTHON_USEDEP}]
 	dev-python/w3lib[${PYTHON_USEDEP}]
 	dev-python/zope-interface[${PYTHON_USEDEP}]
+	dev-python/defusedxml[${PYTHON_USEDEP}]
 "
 BDEPEND="
 	test? (
