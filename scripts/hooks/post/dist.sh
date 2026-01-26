@@ -18,9 +18,7 @@ if [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "sys-process/pm2" ] || \
     [ "$cp" == "www-apps/guacamole-client" ] ; then
 	file="${ebuild}-${new_version}-node_modules.tar.xz"
-	cp "${distdir}/${file}" "${search_dir}/dist/"
-	git add "${search_dir}/dist/${file}"
-	git commit -m "Add node_modules distfile for ${cp}"
+	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
 fi
 
 if [ "$cp" == "app-backup/autorestic" ] || \
@@ -32,11 +30,9 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "media-video/go2rtc" ] || \
     [ "$cp" == "sys-process/runitor" ] || \
     [ "$cp" == "net-vpn/cloudflared" ] || \
-      [ "$cp" == "net-vpn/nebula" ] ; then
+    [ "$cp" == "net-vpn/nebula" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
-	cp "${distdir}/${file}" "${search_dir}/dist/"
-	git add "${search_dir}/dist/${file}"
-	git commit -m "Add vendor distfile for ${cp}"
+	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
 fi
 
 exit 0
