@@ -9,7 +9,7 @@ DESCRIPTION="High-performance HTTP server that implements restic's REST backend 
 HOMEPAGE="https://github.com/restic/rest-server"
 
 SRC_URI="https://github.com/restic/rest-server/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
+	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="BSD-2"
 SLOT="0"

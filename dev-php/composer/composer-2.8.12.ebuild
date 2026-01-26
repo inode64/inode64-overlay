@@ -7,7 +7,7 @@ inherit bash-completion-r1 git-r3
 
 DESCRIPTION="Dependency Manager for PHP"
 HOMEPAGE="https://github.com/composer/composer"
-SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
+SRC_URI="https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 EGIT_REPO_URI="https://github.com/${PN}/${PN}"
 EGIT_COMMIT="8413f50f097774e0601400e5599b5f38866fa3f4"

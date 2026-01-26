@@ -9,7 +9,7 @@ DESCRIPTION="Nebula connects devices worldwide with a secure, simple, scalable n
 HOMEPAGE="https://github.com/slackhq/nebula"
 
 SRC_URI="https://github.com/slackhq/nebula/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
+	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="MIT"
 SLOT="0"

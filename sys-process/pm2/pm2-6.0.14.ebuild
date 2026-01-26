@@ -9,7 +9,7 @@ DESCRIPTION="Process manager for Node.js applications with a built-in load balan
 HOMEPAGE="https://pm2.keymetrics.io/"
 SRC_URI="
 	https://github.com/Unitech/pm2/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz
 "
 
 LICENSE="AGPL-3 Apache-2.0 BSD-2 ISC MIT public-domain"

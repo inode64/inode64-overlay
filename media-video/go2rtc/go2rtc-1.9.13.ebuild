@@ -8,7 +8,7 @@ inherit go-module systemd tmpfiles
 DESCRIPTION="Ultimate camera streaming application"
 HOMEPAGE="https://github.com/AlexxIT/go2rtc"
 SRC_URI="https://github.com/AlexxIT/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz
+	https://www.inode64.com/dist/${P}-vendor.tar.xz
 "
 
 LICENSE="MIT"

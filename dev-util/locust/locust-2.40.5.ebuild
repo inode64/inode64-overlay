@@ -12,7 +12,7 @@ DESCRIPTION="Developer friendly load testing framework"
 HOMEPAGE="https://locust.io
 	https://github.com/locustio/locust"
 SRC_URI="https://github.com/locustio/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.gh.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz
 "
 
 LICENSE="MIT"

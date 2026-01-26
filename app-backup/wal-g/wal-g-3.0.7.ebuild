@@ -10,7 +10,7 @@ COMMIT="6ea13b9"
 DESCRIPTION="Archival restoration tool for databases"
 HOMEPAGE="https://github.com/wal-g/wal-g"
 SRC_URI="https://github.com/${PN}/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz
+	https://www.inode64.com/dist/${P}-vendor.tar.xz
 "
 
 LICENSE="Apache-2.0 GPL-3+"

@@ -8,7 +8,7 @@ inherit go-module
 DESCRIPTION="High level CLI utility for restic"
 HOMEPAGE="https://github.com/cupcakearmy/autorestic"
 SRC_URI="https://github.com/cupcakearmy/autorestic/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
+	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="Apache-2.0"
 SLOT="0"

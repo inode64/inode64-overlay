@@ -15,7 +15,7 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/Koenkk/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz
-		https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-node_modules.tar.xz"
+		https://www.inode64.com/dist/${P}-node_modules.tar.xz"
 fi
 
 LICENSE="0BSD Apache-2.0 BSD-2 CC-BY-4.0 GPL-3 ISC MIT PYTHON"

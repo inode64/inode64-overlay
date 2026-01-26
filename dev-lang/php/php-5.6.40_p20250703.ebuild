@@ -10,7 +10,7 @@ PHP_PATCH="php-$(ver_cut 1-3)-patches-3.tar.xz"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
-SRC_URI="https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${PHP_PATCH}"
+SRC_URI="https://www.inode64.com/dist/${PHP_PATCH}"
 EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
 EGIT_BRANCH="PHP-5.6-security-backports-openssl11"
 EGIT_COMMIT="e99f10067aca03ed6ab79739d09a817cc0fcfcaa"

@@ -8,7 +8,7 @@ inherit go-module
 DESCRIPTION="Configuration profiles manager and scheduler for restic backup"
 HOMEPAGE="https://github.com/creativeprojects/resticprofile"
 SRC_URI="https://github.com/creativeprojects/resticprofile/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://raw.githubusercontent.com/inode64/inode64-overlay/main/dist/${P}-vendor.tar.xz"
+	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="GPL-3"
 SLOT="0"
