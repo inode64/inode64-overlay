@@ -6,7 +6,7 @@
 # Fco. Javier Félix <web@inode64.com>
 # @AUTHOR:
 # Fco. Javier Félix <web@inode64.com>
-# @SUPPORTED_EAPIS: 8
+# @SUPPORTED_EAPIS: 8 9
 # @BLURB: An eclass for build NodeJS projects
 # @DESCRIPTION:
 # An eclass providing functions to build NodeJS projects
@@ -29,13 +29,13 @@
 #   Create archive in tar:
 #       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 
+if [[ -z ${_NODEJS_MOD_ECLASS} ]]; then
+	_NODEJS_MOD_ECLASS=1
+
 case ${EAPI} in
-    8) ;;
+    8|9) ;;
     *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
-
-if [[ -z ${_NODEJS_MOD_ECLASS} ]]; then
-_NODEJS_MOD_ECLASS=1
 
 inherit nodejs
 

@@ -6,7 +6,7 @@
 # Fco. Javier Félix <web@inode64.com>
 # @AUTHOR:
 # Fco. Javier Félix <web@inode64.com>
-# @SUPPORTED_EAPIS: 8
+# @SUPPORTED_EAPIS: 8 9
 # @BLURB: An eclass for build NodeJS projects
 # @DESCRIPTION:
 # An eclass providing functions to build NodeJS projects
@@ -28,13 +28,13 @@
 #   Create archive in tar:
 #       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 
+if [[ -z ${_NODEJS_ECLASS} ]]; then
+	_NODEJS_ECLASS=1
+
 case ${EAPI} in
-    8) ;;
+    8|9) ;;
     *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
-
-if [[ -z ${_NODEJS_ECLASS} ]]; then
-_NODEJS_ECLASS=1
 
 # @ECLASS_VARIABLE: NODEJS_MANAGER
 # @PRE_INHERIT
@@ -228,7 +228,7 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*/\(benchmark.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
 
-	# TODO: Exclude/include binary and glibc/musl to remove   
+	# TODO: Exclude/include binary and glibc/musl to remove
     # Remove development directories
     # shellcheck disable=SC2185
     find -type d \
