@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -127,6 +127,6 @@ pkg_config() {
 	DATABASE_OUT="$(< "${CONFIG}" grep "^database_out[[:space:]]*=[[:space:]]*file:/" | head -n 1 | cut -d: -f2)"
 
 	if aide --init; then
-	        cp -f "$DATABASE_OUT" "$DATABASE"
+		cp -f "$DATABASE_OUT" "$DATABASE"
 	fi
 }

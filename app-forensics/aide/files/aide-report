@@ -323,9 +323,9 @@ if [[ -n "$MAILTO" ]]; then
   if [[ "$SHOULD_MAIL" -eq 1 ]]; then
     if [[ "$CHANGES_DETECTED" -eq 1 || "$RC" -ne 0 ]]; then
       if [[ "$TOTAL" -ge 0 ]]; then
-        SUBJECT="Changes detected: $TOTAL files/entries"
+	      SUBJECT="Changes detected: $TOTAL files/entries"
       else
-        SUBJECT="Changes detected (count unknown)"
+	      SUBJECT="Changes detected (count unknown)"
       fi
     else
       SUBJECT="No changes"
