@@ -25,27 +25,15 @@ BDEPEND="test? ( app-backup/restic )"
 RDEPEND="app-backup/restic"
 DEPEND=">=dev-lang/go-1.24"
 
-src_configure() {
-	export BACKREST_BUILD_VERSION="${PV}"
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
 	# no compile support because lmdb require -fPIC
 	#nodejs-mod_src_compile
 	pushd webui >/dev/null || die
 	enpm run build || die "build failed"
-	enpm_clean
 	# Fix go test
 	gzip -k dist/index.html || die
 	popd >/dev/null || die
-	ego build -trimpath -o backrest ./cmd/backrest || die
+	ego build -trimpath -ldflags="-s -w" -ldflags "-X 'main.version=${PV}' -X 'main.commit=${PR}'" -o backrest ./cmd/backrest || die
 }
 
 src_test() {
