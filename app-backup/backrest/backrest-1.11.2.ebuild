@@ -25,6 +25,9 @@ BDEPEND="test? ( app-backup/restic )"
 RDEPEND="app-backup/restic"
 DEPEND=">=dev-lang/go-1.24"
 
+# TODO: Remove this!!
+RESTRICT="network-sandbox"
+
 src_compile() {
 	# no compile support because lmdb require -fPIC
 	#nodejs-mod_src_compile
