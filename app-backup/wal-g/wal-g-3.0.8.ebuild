@@ -30,6 +30,7 @@ src_configure() {
 	export CGO_CPPFLAGS="${CPPFLAGS}"
 	export CGO_CXXFLAGS="${CXXFLAGS}"
 	export CGO_LDFLAGS="${LDFLAGS}"
+	export GOEXPERIMENT=jsonv2
 
 	default
 }
