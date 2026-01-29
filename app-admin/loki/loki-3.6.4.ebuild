@@ -32,7 +32,7 @@ src_configure() {
 src_compile() {
 	if use server; then
 		einfo "Building cmd/${PN}/${PN}..."
-		ego build -pgo=auto -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN} || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN} || die
 	fi
 
 	if use tools; then
