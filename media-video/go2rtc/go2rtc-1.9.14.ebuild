@@ -23,18 +23,8 @@ RDEPEND="
 
 DOCS=(README.md)
 
-src_configure() {
-	export CGO_ENABLED=0
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
-	ego build -trimpath -ldflags "-s -w"
+	ego build -pgo=auto -trimpath -ldflags "-s -w"
 }
 
 src_test() {

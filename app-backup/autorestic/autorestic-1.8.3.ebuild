@@ -16,16 +16,6 @@ KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
 RDEPEND="app-backup/restic"
 
-src_configure() {
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
 	ego build -trimpath -ldflags "-s -w" || die
 }

@@ -25,11 +25,6 @@ RDEPEND="brotli? ( app-arch/brotli:= )
 	sodium? ( dev-libs/libsodium:= )"
 
 src_configure() {
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
 	export GOEXPERIMENT=jsonv2
 
 	default

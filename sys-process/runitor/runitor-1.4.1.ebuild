@@ -14,22 +14,10 @@ LICENSE="0BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
-src_configure() {
-	filter-lto
-
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
 	local ld_flags="-s -w"
 
-	ego build -trimpath -ldflags "${ld_flags}" ./cmd/${PN} || die
+	ego build -trimpath -ldflags "-s -w" ./cmd/${PN} || die
 }
 
 src_test() {

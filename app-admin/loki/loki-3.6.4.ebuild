@@ -22,15 +22,9 @@ RDEPEND="acct-group/grafana
 DEPEND="${RDEPEND}"
 
 src_configure() {
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
 	VPREFIX="github.com/grafana/${PN}/v3/pkg/util/build"
 
-	export EGO_LDFLAGS="-extldflags \"${LDFLAGS}\" -s -w -X ${VPREFIX}.Branch=main -X ${VPREFIX}.Version=${PV} -X ${VPREFIX}.Revision=${PR} -X ${VPREFIX}.BuildUser=${PN} -X ${VPREFIX}.BuildDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+	export EGO_LDFLAGS="-s -w -X ${VPREFIX}.Branch=main -X ${VPREFIX}.Version=${PV} -X ${VPREFIX}.Revision=${PR} -X ${VPREFIX}.BuildUser=${PN} -X ${VPREFIX}.BuildDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
 	default
 }
@@ -38,7 +32,7 @@ src_configure() {
 src_compile() {
 	if use server; then
 		einfo "Building cmd/${PN}/${PN}..."
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN} || die
+		ego build -pgo=auto -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN} || die
 	fi
 
 	if use tools; then

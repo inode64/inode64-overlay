@@ -19,16 +19,6 @@ RDEPEND="
 	>=dev-lang/go-1.25.0
 "
 
-src_configure() {
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
 	ego build -trimpath -ldflags "-s -w" || die
 }

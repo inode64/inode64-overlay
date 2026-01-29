@@ -24,16 +24,6 @@ src_prepare() {
 	sed -i -e 's|/path/to/backups|/srv/backups|g' examples/systemd/rest-server.service || die
 }
 
-src_configure() {
-	export CGO_ENABLED=1
-	export CGO_CFLAGS="${CFLAGS}"
-	export CGO_CPPFLAGS="${CPPFLAGS}"
-	export CGO_CXXFLAGS="${CXXFLAGS}"
-	export CGO_LDFLAGS="${LDFLAGS}"
-
-	default
-}
-
 src_compile() {
 	ego build -trimpath -ldflags "-s -w" -o rest-server ./cmd/rest-server || die
 }
