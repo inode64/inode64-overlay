@@ -24,7 +24,7 @@ RDEPEND="
 DOCS=(README.md)
 
 src_compile() {
-	ego build -pgo=auto -trimpath -ldflags "-s -w"
+	CGO_ENABLED=0 ego build -trimpath -ldflags "-s -w"
 }
 
 src_test() {
