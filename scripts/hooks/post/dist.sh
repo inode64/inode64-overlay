@@ -11,7 +11,7 @@ hash_date=${7:-}
 ebuild="$(echo "$cp"|cut -d/ -f2)"
 distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
-. ~/.inode64
+. /etc/portage/inode64.conf
 
 if [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] || \
