@@ -1,68 +1,58 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit unpacker systemd xdg desktop
+inherit rpm systemd xdg desktop
 
 DESCRIPTION="Cloudflare Warp Client"
-HOMEPAGE="https://one.one.one.one"
-SRC_URI="https://pkg.cloudflareclient.com/pool/jammy/main/c/cloudflare-warp/cloudflare-warp_${PV}_amd64.deb"
-
+HOMEPAGE="https://1.1.1.1"
+SRC_URI="
+	https://downloads.cloudflareclient.com/v1/download/fedora35-intel/version/${PV}
+		-> ${P}.x86_64.rpm
+"
 S="${WORKDIR}"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
-KEYWORDS="~amd64"
-IUSE="systemd +systray dex"
+KEYWORDS="-* ~amd64"
+IUSE="+gui"
 RESTRICT="bindist mirror"
-RDEPEND="
+
+DEPEND="
+	dev-libs/glib
+	dev-libs/nspr
 	dev-libs/nss
 	net-firewall/nftables
+	net-libs/libpcap
 	sys-apps/dbus
-	dex? ( net-libs/libpcap )
-	systray? (
-		app-arch/brotli
-		sys-fs/cryptsetup
-		x11-libs/gtk+:3[wayland,X,xinerama]
+	x11-libs/cairo
+	gui? (
+		x11-libs/gdk-pixbuf:2
+		x11-libs/gtk+:3
+		x11-libs/pango
 	)
 "
-
-QA_PREBUILT="/bin/warp-cli /bin/warp-dex /bin/warp-diag /bin/warp-svc /bin/warp-taskbar"
+RDEPEND="${DEPEND}"
 
 src_unpack() {
-	unpack_deb ${A}
+	rpm_unpack ${A}
 }
 
 src_install() {
-	into /
-	dobin bin/warp-cli
-	dobin bin/warp-diag
-	dobin bin/warp-svc
-	doinitd "${FILESDIR}/warp-svc"
-	systemd_dounit lib/systemd/system/warp-svc.service
+	dobin bin/warp-{cli,dex,diag,svc}
+	systemd_dounit opt/cloudflare-warp/warp-svc.service
 
-	# warp-dex relies on "libpcap.so.0.8" which is not in tree.
-	if use dex; then
-		dobin bin/warp-dex
-	fi
+	if use gui; then
+		dobin bin/{warp-desktop-svc,warp-taskbar}
+		systemd_douserunit usr/lib/systemd/user/warp-desktop-svc.service
+		domenu usr/share/applications/com.cloudflare.WarpTaskbar.desktop
 
-	if use systray; then
-		dobin bin/warp-taskbar
-		systemd_douserunit usr/lib/systemd/user/warp-taskbar.service
-
-		doicon -s scalable $(ls usr/share/icons/hicolor/scalable/apps/*.svg)
+		doicon -s scalable usr/share/icons/hicolor/scalable/apps/*.svg
 		insinto /usr/share/warp/images
-		doins $(ls usr/share/warp/images/*.png)
-
-		desktopfile=$( \
-			usex systemd \
-			usr/share/applications/com.cloudflare.WarpTaskbar.desktop \
-			"${FILESDIR}/com.cloudflare.WarpTaskbar.desktop" \
-		)
-		domenu $desktopfile
+		doins usr/share/warp/images/*.png
 
 		insinto /etc/xdg/autostart
-		doins $desktopfile
+		doins etc/xdg/autostart/com.cloudflare.WarpTaskbar.desktop
 	fi
 }
