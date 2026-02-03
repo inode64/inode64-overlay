@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
-DISTUTILS_USE_PEP517=setuptools
+DISTUTILS_USE_PEP517=hatchling
 inherit distutils-r1 pypi
 
 DESCRIPTION="Utility to extract data from XML/HTML documents using XPath or CSS selectors"
@@ -37,11 +37,6 @@ distutils_enable_tests pytest
 distutils_enable_sphinx docs \
 	dev-python/sphinx-notfound-page \
 	dev-python/sphinx-rtd-theme
-
-src_prepare() {
-	distutils-r1_src_prepare
-	sed "/pytest-runner/d" -i setup.py || die
-}
 
 python_test() {
 	epytest --ignore=docs
