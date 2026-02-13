@@ -113,7 +113,7 @@ DEPEND="
 	    dev-db/postgresql
 	    gnome-base/gnome-shell
 	)
-	video_cards_amdgpu? ( >=dev-libs/rocm-opencl-runtime-5.5.1 )
+	video_cards_amdgpu? ( >=dev-libs/rocm-opencl-runtime-5.5.1 media-libs/mesa[-video_cards_radeon] )
 	video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-550.40.07 )
 "
 RDEPEND="${DEPEND}"
@@ -323,7 +323,7 @@ src_install() {
 
 	# create configuration for revdep-rebuild
 	echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
-	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so\"" >> "${T}/80${PN}" || die
+	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so libcuda.so.1\"" >> "${T}/80${PN}" || die
 	insinto "/etc/revdep-rebuild"
 	doins "${T}/80${PN}"
 }
