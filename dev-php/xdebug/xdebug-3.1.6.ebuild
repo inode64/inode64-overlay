@@ -8,7 +8,6 @@ PHP_EXT_ZENDEXT="yes"
 PHP_EXT_INIFILE="3.0-xdebug.ini"
 
 USE_PHP="php7-3 php7-4"
-PHP_EXT_NEEDED_USE="-threads(-)"
 
 MY_PV="${PV/_/}"
 MY_PV="${MY_PV/rc/RC}"
@@ -18,15 +17,18 @@ inherit php-ext-source-r3
 DESCRIPTION="A PHP debugging and profiling extension"
 HOMEPAGE="https://xdebug.org/"
 # Using tarball from GitHub for tests
-#SRC_URI="https://pecl.php.net/get/${PN}-${MY_PV}.tgz"
 SRC_URI="https://github.com/xdebug/xdebug/archive/${MY_PV}.tar.gz -> ${P}.tar.gz"
-
 S="${WORKDIR}/${PN}-${MY_PV}"
 LICENSE="Xdebug"
-SLOT="0"
-KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
-RESTRICT="test"
+SLOT="3"
 
+KEYWORDS="~amd64 ~hppa ~ppc64 ~x86"
+IUSE="test"
+
+RESTRICT="!test? ( test )"
+
+RDEPEND="${DEPEND}"
+BDEPEND="test? ( dev-lang/php:*[cgi,phpdbg] )"
 DOCS=( README.rst CREDITS )
 PHP_EXT_ECONF_ARGS=()
 
@@ -37,7 +39,8 @@ src_test() {
 		TEST_PHP_EXECUTABLE="${PHPCLI}" \
 		TEST_PHP_CGI_EXECUTABLE="${PHPCGI}" \
 		TEST_PHPDBG_EXECUTABLE="${PHPCLI}dbg" \
-		 "${PHPCLI}" run-xdebug-tests.php
+		TEST_PHP_ARGS="-n -d foo=yes -d session.save_path=/tmp -d zend_extension=${PHP_EXT_S}/modules/xdebug.so" \
+		"${PHPCLI}" run-xdebug-tests.php -q -x -j4 --show-diff || die
 	done
 }
 
@@ -46,7 +49,4 @@ pkg_postinst() {
 	ewarn "installed as a dependency, and not all users will want xdebug to be"
 	ewarn "enabled by default. If you want to enable it, you should edit the"
 	ewarn "ini file and set xdebug.mode to one or more modes e.g. develop,debug,trace"
-	elog ""
-	elog "The 3.0 major release changes many options."
-	elog "Review https://xdebug.org/docs/upgrade_guide for differences from 2.x"
 }
