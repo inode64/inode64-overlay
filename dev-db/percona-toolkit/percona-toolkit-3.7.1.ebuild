@@ -7,7 +7,7 @@ inherit go-module perl-module
 
 DESCRIPTION="Advanced command-line tools to perform a variety of MySQL and system tasks"
 HOMEPAGE="https://www.percona.com/software/mysql-tools/percona-toolkit"
-SRC_URI="https://www.percona.com/downloads/${PN}/${PV}/source/tarball/${P}.tar.gz"
+SRC_URI="https://github.com/percona/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="|| ( GPL-2 Artistic )"
 SLOT="0"
