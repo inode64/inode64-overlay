@@ -35,6 +35,10 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
+QA_PREBUILT="
+	usr/bin/warp-.*
+"
+
 src_unpack() {
 	rpm_unpack ${A}
 }
