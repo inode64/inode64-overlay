@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{10..14} )
 
 inherit autotools bash-completion-r1 dot-a python-single-r1
 
@@ -17,7 +17,7 @@ SRC_URI="https://download.libguestfs.org/libnbd/${MY_PV_1}-${SD}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~amd64 ~loong ~ppc64 ~sparc ~x86"
+KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~sparc ~x86"
 IUSE="examples fuse gnutls go ocaml python test"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
@@ -48,6 +48,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-1.24.0-build-Remove-automagic-compiling-of-examples.patch"
 	"${FILESDIR}/${PN}-1.24.0-Makefile.am-Conditionally-compile-some-SUBDIRS.patch"
 	"${FILESDIR}/${PN}-1.24.0-build-define-TLS_PRIORITY-unconditionally.patch"
+	"${FILESDIR}/${PN}-1.22.5-which-hunt.patch"
 )
 
 pkg_setup() {
@@ -91,7 +92,7 @@ src_configure() {
 		$(use_enable ocaml)
 		$(use_enable python)
 		$(use_with gnutls)
-		$(use_with !gnutls with-tls-priority NORMAL)
+		--with-bash-completions
 		--disable-rust
 		--disable-ublk # Not in portage
 		--with-libxml2
@@ -99,6 +100,7 @@ src_configure() {
 
 	export bashcompdir="$(get_bashcompdir)"
 
+	BASH_COMPLETION_CFLAGS=" " BASH_COMPLETION_LIBS=" "\
 	econf "${myeconfargs[@]}"
 }
 
@@ -107,6 +109,7 @@ src_install() {
 
 	use fuse || bashcomp_alias nbdsh nbdfuse
 	bashcomp_alias nbdsh nbdublk
+	use python || bashcomp_alias nbdsh nbddiscard nbdzero
 
 	use ocaml && strip-lto-bytecode
 
