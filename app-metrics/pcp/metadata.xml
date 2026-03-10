@@ -3,7 +3,7 @@
 <pkgmetadata>
     <longdescription lang="en">
         Performance Co-Pilot (PCP) provides a framework and services to support system-level performance monitoring and
-        management. It presents a unifying abstraction for all of the performance data in a system, and many tools for
+        management. It presents a unifying abstraction for all the performance data in a system, and many tools for
         interrogating, retrieving and processing that data.
     </longdescription>
     <maintainer type="person" proxied="yes">
