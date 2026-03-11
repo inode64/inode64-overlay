@@ -13,7 +13,8 @@ distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
 . /etc/portage/inode64.conf
 
-if [ "$cp" == "app-misc/node-red" ] || \
+if [ "$cp" == "app-backup/backrest" ] || \
+    [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
     [ "$cp" == "dev-util/locust" ] || \
