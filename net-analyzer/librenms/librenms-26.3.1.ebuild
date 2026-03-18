@@ -76,7 +76,7 @@ src_install() {
 	rm *.md LICENSE.txt || die
 	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
 	rm {.editorconfig,.git-blame-ignore-revs,.php-cs-fixer.php,.styleci.yml,mkdocs.yml} || die
-	rm {phpstan-baseline-deprecated.neon,phpstan-baseline.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
+	rm {phpstan-baseline-deprecated.neon,phpstan-legacy.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
 	rm -rf {.github,doc,licenses,tests} || die
 	cp -r . "${D}"${LIBRENMS_HOME}
 
