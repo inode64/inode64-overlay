@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit systemd tmpfiles
+inherit flag-o-matic systemd tmpfiles
 
 DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
 HOMEPAGE="https://guacamole.apache.org/"
@@ -68,6 +68,9 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	default
+
+	append-cflags -Wno-error=deprecated-declarations
+	append-cflags -std=gnu17
 
 	if [[ "${PV}" == *9999 ]]; then
 		eautoreconf -fi
