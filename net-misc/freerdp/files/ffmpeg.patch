@@ -1,0 +1,43 @@
+--- a/libfreerdp/codec/dsp_ffmpeg.c	2024-10-21 15:36:02.000000000 +0200
++++ b/libfreerdp/codec/dsp_ffmpeg.c	2026-03-28 11:16:44.947447513 +0100
+@@ -256,7 +256,13 @@
+ 			break;
+ 
+ 		case AV_CODEC_ID_AAC:
+-			context->context->profile = FF_PROFILE_AAC_MAIN;
++#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(60, 31, 102)
++			context->context->profile = FF_PROFILE_AAC_MAIN;
++#elif LIBAVCODEC_VERSION_INT < AV_VERSION_INT(62, 11, 100)
++			context->context->profile = AV_PROFILE_AAC_MAIN;
++#else
++			context->context->profile = AV_PROFILE_AAC_LOW;
++#endif
+ 			break;
+ 
+ 		default:
+--- a/libfreerdp/codec/h264_ffmpeg.c	2024-10-21 15:36:02.000000000 +0200
++++ b/libfreerdp/codec/h264_ffmpeg.c	2026-03-28 11:23:17.663971321 +0100
+@@ -102,10 +102,10 @@
+ 
+ 	if (sys->codecEncoderContext)
+ 	{
+-		avcodec_close(sys->codecEncoderContext);
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 69, 100)
+ 		avcodec_free_context(&sys->codecEncoderContext);
+ #else
++		avcodec_close(sys->codecEncoderContext);
+ 		av_free(sys->codecEncoderContext);
+ #endif
+ 	}
+@@ -511,10 +511,10 @@
+ 
+ 	if (sys->codecDecoderContext)
+ 	{
+-		avcodec_close(sys->codecDecoderContext);
+ #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 69, 100)
+ 		avcodec_free_context(&sys->codecDecoderContext);
+ #else
++		avcodec_close(sys->codecDecoderContext);
+ 		av_free(sys->codecDecoderContext);
+ #endif
+ 	}

@@ -108,6 +108,10 @@ RDEPEND="${COMMON_DEPEND}
 	smartcard? ( app-crypt/p11-kit )
 "
 
+PATCHES=(
+	"${FILESDIR}/ffmpeg.patch"
+)
+
 option() {
 	usex "$1" ON OFF
 }
