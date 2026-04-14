@@ -1,0 +1,53 @@
+diff '--color=auto' -ruN monit/src/http/cervlet.c monit.old/src/http/cervlet.c
+--- monit/src/http/cervlet.c	2026-04-14 16:04:49.776774727 +0200
++++ monit.old/src/http/cervlet.c	2026-04-14 12:27:06.993017029 +0200
+@@ -1972,42 +1972,41 @@
+         if (s->start)
+                 StringBuffer_append(res->outputbuffer,
+                                     "<td>"
+-                                    "<form method=POST action=%s>"
++                                    "<form method=POST action=''>"
+                                     "<input type=hidden name='securitytoken' value='%s'>"
+                                     "<input type=hidden value='start' name=action>"
+                                     "<input type=submit value='Start service'>"
+                                     "</form>"
+-                                    "</td>", s->name_urlescaped, res->token);
++                                    "</td>", res->token);
+         /* Stop program */
+         if (s->stop)
+                 StringBuffer_append(res->outputbuffer,
+                                     "<td>"
+-                                    "<form method=POST action=%s>"
++                                    "<form method=POST action=''>"
+                                     "<input type=hidden name='securitytoken' value='%s'>"
+                                     "<input type=hidden value='stop' name=action>"
+                                     "<input type=submit value='Stop service'>"
+                                     "</form>"
+-                                    "</td>", s->name_urlescaped, res->token);
++                                    "</td>", res->token);
+         /* Restart program */
+         if ((s->start && s->stop) || s->restart)
+                 StringBuffer_append(res->outputbuffer,
+                                     "<td>"
+-                                    "<form method=POST action=%s>"
++                                    "<form method=POST action=''>"
+                                     "<input type=hidden name='securitytoken' value='%s'>"
+                                     "<input type=hidden value='restart' name=action>"
+                                     "<input type=submit value='Restart service'>"
+                                     "</form>"
+-                                    "</td>", s->name_urlescaped, res->token);
++                                    "</td>", res->token);
+         /* (un)monitor */
+         StringBuffer_append(res->outputbuffer,
+                                     "<td>"
+-                                    "<form method=POST action=%s>"
++                                    "<form method=POST action=''>"
+                                     "<input type=hidden name='securitytoken' value='%s'>"
+                                     "<input type=hidden value='%s' name=action>"
+                                     "<input type=submit value='%s'>"
+                                     "</form>"
+                                     "</td>",
+-                                    s->name_urlescaped,
+                                     res->token,
+                                     s->monitor ? "unmonitor" : "monitor",
+                                     s->monitor ? "Disable monitoring" : "Enable monitoring");
