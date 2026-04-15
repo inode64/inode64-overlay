@@ -51,3 +51,61 @@ diff '--color=auto' -ruN monit/src/http/cervlet.c monit.old/src/http/cervlet.c
                                      res->token,
                                      s->monitor ? "unmonitor" : "monitor",
                                      s->monitor ? "Disable monitoring" : "Enable monitoring");
+diff '--color=auto' -ruN monit.old/src/http/processor.c monit/src/http/processor.c
+--- monit/src/http/processor.c	2026-04-14 12:17:00.464690088 +0200
++++ monit/src/http/processor.c	2026-04-14 16:34:09.907281981 +0200
+@@ -449,7 +449,7 @@
+                 if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
+                         set_header(res, "Strict-Transport-Security", "max-age=63072000");
+                 if (is_authenticated(req, res)) {
+-                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
++                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; Path=/; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
+                         if (IS(req->method, METHOD_GET))
+                                 Impl.doGet(req, res);
+                         else if (IS(req->method, METHOD_POST))
+@@ -775,6 +775,7 @@
+                         return false;
+                 }
+                 const char *cookieName = "securitytoken=";
++                bool csrfCookieFound = false;
+                 for (int i = 0, j = 0; cookie[i]; i++) {
+                         if (_isCookieSeparator(cookie[i])) {
+                                 // Cookie separator
+@@ -791,6 +792,7 @@
+                                 }
+                         } else if (j == 14) {
+                                 // Cookie value
++                                csrfCookieFound = true;
+                                 char cookieValue[STRLEN] = {};
+                                 strncpy(cookieValue, cookie + i, sizeof(cookieValue) - 1);
+                                 for (int k = 0; cookieValue[k]; k++) {
+@@ -799,15 +801,17 @@
+                                                 break;
+                                         }
+                                 }
+-                                if (! Str_authcmp(cookieValue, token)) {
+-                                        Log_error("HttpRequest: access denied -- client [%s]: CSRF token mismatch\n", NVLSTR(Socket_getRemoteHost(req->S)));
+-                                        send_error(req, res, SC_FORBIDDEN, "Invalid CSRF Token");
+-                                        return false;
+-                                }
+-                                return true;
++                                if (Str_authcmp(cookieValue, token))
++                                        return true;
++                                // Multiple securitytoken cookies may be present (different cookie paths).
++                                // Keep scanning and accept if any cookie value matches the submitted token.
++                                j = 0;
+                         }
+                 }
+-                Log_error("HttpRequest: access denied -- client [%s]: no CSRF token in cookie\n", NVLSTR(Socket_getRemoteHost(req->S)));
++                if (csrfCookieFound)
++                        Log_error("HttpRequest: access denied -- client [%s]: CSRF token mismatch\n", NVLSTR(Socket_getRemoteHost(req->S)));
++                else
++                        Log_error("HttpRequest: access denied -- client [%s]: no CSRF token in cookie\n", NVLSTR(Socket_getRemoteHost(req->S)));
+                 send_error(req, res, SC_FORBIDDEN, "Invalid CSRF Token");
+                 return false;
+         }
+@@ -961,4 +965,3 @@
+         }
+         return 0;
+ }
+-
