@@ -1,111 +1,265 @@
-diff '--color=auto' -ruN monit/src/http/cervlet.c monit.old/src/http/cervlet.c
---- monit/src/http/cervlet.c	2026-04-14 16:04:49.776774727 +0200
-+++ monit.old/src/http/cervlet.c	2026-04-14 12:27:06.993017029 +0200
-@@ -1972,42 +1972,41 @@
-         if (s->start)
-                 StringBuffer_append(res->outputbuffer,
-                                     "<td>"
--                                    "<form method=POST action=%s>"
-+                                    "<form method=POST action=''>"
-                                     "<input type=hidden name='securitytoken' value='%s'>"
-                                     "<input type=hidden value='start' name=action>"
-                                     "<input type=submit value='Start service'>"
-                                     "</form>"
--                                    "</td>", s->name_urlescaped, res->token);
-+                                    "</td>", res->token);
-         /* Stop program */
-         if (s->stop)
-                 StringBuffer_append(res->outputbuffer,
-                                     "<td>"
--                                    "<form method=POST action=%s>"
-+                                    "<form method=POST action=''>"
-                                     "<input type=hidden name='securitytoken' value='%s'>"
-                                     "<input type=hidden value='stop' name=action>"
-                                     "<input type=submit value='Stop service'>"
-                                     "</form>"
--                                    "</td>", s->name_urlescaped, res->token);
-+                                    "</td>", res->token);
-         /* Restart program */
-         if ((s->start && s->stop) || s->restart)
-                 StringBuffer_append(res->outputbuffer,
-                                     "<td>"
--                                    "<form method=POST action=%s>"
-+                                    "<form method=POST action=''>"
-                                     "<input type=hidden name='securitytoken' value='%s'>"
-                                     "<input type=hidden value='restart' name=action>"
-                                     "<input type=submit value='Restart service'>"
-                                     "</form>"
--                                    "</td>", s->name_urlescaped, res->token);
-+                                    "</td>", res->token);
-         /* (un)monitor */
-         StringBuffer_append(res->outputbuffer,
-                                     "<td>"
--                                    "<form method=POST action=%s>"
-+                                    "<form method=POST action=''>"
-                                     "<input type=hidden name='securitytoken' value='%s'>"
-                                     "<input type=hidden value='%s' name=action>"
-                                     "<input type=submit value='%s'>"
-                                     "</form>"
-                                     "</td>",
--                                    s->name_urlescaped,
-                                     res->token,
-                                     s->monitor ? "unmonitor" : "monitor",
-                                     s->monitor ? "Disable monitoring" : "Enable monitoring");
-diff '--color=auto' -ruN monit.old/src/http/processor.c monit/src/http/processor.c
---- monit/src/http/processor.c	2026-04-14 12:17:00.464690088 +0200
-+++ monit/src/http/processor.c	2026-04-14 16:34:09.907281981 +0200
-@@ -449,7 +449,7 @@
+commit ba34d25a07692104f212cbb8a459647f8a5717de
+Author: INODE64 <ffelix@inode64.com>
+Date:   Wed Apr 15 13:26:00 2026 +0200
+
+    Add basepath support for reverse proxy configurations
+
+diff --git a/doc/monit.pod b/doc/monit.pod
+index 37b253e0..59c6b0f5 100644
+--- a/doc/monit.pod
++++ b/doc/monit.pod
+@@ -767,6 +767,7 @@ Syntax for TCP port:
+ 
+   SET HTTPD PORT <number>
+       [ADDRESS <hostname | IP-address>]
++      [BASEPATH <path>]
+       [[with] SSL {pemfile: <path>}]
+       ALLOW <user:password | IP-address | IP-range>+
+ 
+@@ -792,6 +793,15 @@ if the ADDRESS option is not used:
+      use address 127.0.0.1
+      allow username:password
+ 
++B<BASEPATH> sets URL path prefix used by Monit when generating HTTP redirects
++and session cookie path. This is useful when Monit runs behind a reverse proxy
++which publishes Monit under a sub-path such as C</monit-xxx>. Example:
++
++ set httpd
++     port 2812
++     basepath /monit-xxx
++     allow username:password
++
+ Monit HTTP over TCP supports both IP version 4 and 6. Support is
+ transparent and does not require any special configuration. If the bind
+ I<address> is B<not> specified as in this example:
+diff --git a/monitrc b/monitrc
+index 9a6ec816..6de7b390 100644
+--- a/monitrc
++++ b/monitrc
+@@ -159,6 +159,7 @@ set log syslog
+ #
+ set httpd port 2812 and
+     use address localhost  # only accept connection from localhost (drop if you use M/Monit)
++    #basepath /monit-xxx   # optional reverse-proxy URL prefix (without trailing slash)
+     allow localhost        # allow localhost to connect to the server and
+     allow admin:monit      # require user 'admin' with password 'monit'
+     #with ssl {            # enable SSL/TLS and set path to server certificate
+diff --git a/src/gc.c b/src/gc.c
+index 4549c3e8..ccd98e0a 100644
+--- a/src/gc.c
++++ b/src/gc.c
+@@ -118,6 +118,7 @@ void gc(void) {
+         }
+         if (Run.httpd.flags & Httpd_Unix)
+                 FREE(Run.httpd.socket.unix.path);
++        FREE(Run.httpd.basepath);
+         if (Run.MailFormat.from)
+                 Address_free(&(Run.MailFormat.from));
+         if (Run.MailFormat.replyto)
+diff --git a/src/http/cervlet.c b/src/http/cervlet.c
+index 8f69cc1e..deb3172b 100644
+--- a/src/http/cervlet.c
++++ b/src/http/cervlet.c
+@@ -722,6 +722,7 @@ static void _formatAddress(HttpResponse res, const char *type, Address_T addr) {
+  * to handle a POST request.
+  */
+ static void doPost(HttpRequest req, HttpResponse res) {
++        char *location = NULL;
+         set_content_type(res, "text/html");
+         if (ACTION(RUNTIME))
+                 handle_runtime_action(req, res);
+@@ -744,9 +745,12 @@ static void doPost(HttpRequest req, HttpResponse res) {
+             if (res->status <= 300) {
+                 // #1009: Redirect back to the same url so a reload in the browser does not perform a POST again
+                 set_status(res, SC_MOVED_TEMPORARILY);
+-                set_header(res, "Location", "%s", req->url);
++                if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/") && Str_startsWith(req->url, "/"))
++                        location = Str_cat("%s%s", Run.httpd.basepath, req->url);
++                set_header(res, "Location", "%s", location ? location : req->url);
+             }
+         }
++        FREE(location);
+ }
+ 
+ 
+diff --git a/src/http/processor.c b/src/http/processor.c
+index de140fa9..98b13984 100644
+--- a/src/http/processor.c
++++ b/src/http/processor.c
+@@ -449,7 +449,8 @@ static void do_service(Socket_T s) {
                  if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
                          set_header(res, "Strict-Transport-Security", "max-age=63072000");
                  if (is_authenticated(req, res)) {
 -                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
-+                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; Path=/; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
++                        const char *path = (Run.httpd.basepath && *Run.httpd.basepath) ? Run.httpd.basepath : "/";
++                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; Path=%s; HttpOnly; SameSite=strict%s", res->token, path, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
                          if (IS(req->method, METHOD_GET))
                                  Impl.doGet(req, res);
                          else if (IS(req->method, METHOD_POST))
-@@ -775,6 +775,7 @@
-                         return false;
-                 }
-                 const char *cookieName = "securitytoken=";
-+                bool csrfCookieFound = false;
-                 for (int i = 0, j = 0; cookie[i]; i++) {
-                         if (_isCookieSeparator(cookie[i])) {
-                                 // Cookie separator
-@@ -791,6 +792,7 @@
-                                 }
-                         } else if (j == 14) {
-                                 // Cookie value
-+                                csrfCookieFound = true;
-                                 char cookieValue[STRLEN] = {};
-                                 strncpy(cookieValue, cookie + i, sizeof(cookieValue) - 1);
-                                 for (int k = 0; cookieValue[k]; k++) {
-@@ -799,15 +801,17 @@
-                                                 break;
-                                         }
-                                 }
--                                if (! Str_authcmp(cookieValue, token)) {
--                                        Log_error("HttpRequest: access denied -- client [%s]: CSRF token mismatch\n", NVLSTR(Socket_getRemoteHost(req->S)));
--                                        send_error(req, res, SC_FORBIDDEN, "Invalid CSRF Token");
--                                        return false;
--                                }
--                                return true;
-+                                if (Str_authcmp(cookieValue, token))
-+                                        return true;
-+                                // Multiple securitytoken cookies may be present (different cookie paths).
-+                                // Keep scanning and accept if any cookie value matches the submitted token.
-+                                j = 0;
-                         }
-                 }
--                Log_error("HttpRequest: access denied -- client [%s]: no CSRF token in cookie\n", NVLSTR(Socket_getRemoteHost(req->S)));
-+                if (csrfCookieFound)
-+                        Log_error("HttpRequest: access denied -- client [%s]: CSRF token mismatch\n", NVLSTR(Socket_getRemoteHost(req->S)));
-+                else
-+                        Log_error("HttpRequest: access denied -- client [%s]: no CSRF token in cookie\n", NVLSTR(Socket_getRemoteHost(req->S)));
-                 send_error(req, res, SC_FORBIDDEN, "Invalid CSRF Token");
-                 return false;
-         }
-@@ -961,4 +965,3 @@
-         }
-         return 0;
+diff --git a/src/l.l b/src/l.l
+index cb0b1633..760b1ae3 100644
+--- a/src/l.l
++++ b/src/l.l
+@@ -404,6 +404,7 @@ hardlink(s)?      { return HARDLINK; }
+ uptime            { return UPTIME; }
+ responsetime      { return RESPONSETIME; }
+ basedir           { return BASEDIR; }
++basepath          { return BASEPATH; }
+ slot(s)?          { return SLOT; }
+ eventqueue        { return EVENTQUEUE; }
+ not               { return NOT; }
+diff --git a/src/monit.h b/src/monit.h
+index 1260bac8..8efe0df3 100644
+--- a/src/monit.h
++++ b/src/monit.h
+@@ -1412,6 +1412,7 @@ struct Run_T {
+                         } unix;
+                 } socket;
+                 Auth_T credentials;
++                char *basepath;      /**< Optional base path for reverse proxy deployments */
+         } httpd;
+ 
+         /** An object holding program relevant "environment" data, see: env.c */
+diff --git a/src/p.y b/src/p.y
+index 8f472f71..28cd5532 100644
+--- a/src/p.y
++++ b/src/p.y
+@@ -294,6 +294,7 @@ static void  setlogfile(char *);
+ static void  setpidfile(char *);
+ static void  setidfile(char *);
+ static void  setstatefile(char *);
++static void  sethttpdbasepath(char *);
+ static void  reset_sslset(void);
+ static void  reset_mailset(void);
+ static void  reset_mailserverset(void);
+@@ -383,9 +384,9 @@ int yydebug = 1;
+ %token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 SWAP
+ %token MODE ACTIVE PASSIVE MANUAL ONREBOOT NOSTART LASTSTATE
+ %token CORE CPU TOTALCPU CPUUSER CPUSYSTEM CPUWAIT CPUNICE CPUHARDIRQ CPUSOFTIRQ CPUSTEAL CPUGUEST CPUGUESTNICE
+-%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET HOSTHEADER
++%token GROUP REQUEST DEPENDS BASEDIR BASEPATH SLOT EVENTQUEUE SECRET HOSTHEADER
+ %token UID EUID GID MMONIT INSTANCE USERNAME PASSWORD DATABASE
+-%token TIME ATIME CTIME MTIME CHANGED MILLISECOND SECOND MINUTE HOUR DAY MONTH 
++%token TIME ATIME CTIME MTIME CHANGED MILLISECOND SECOND MINUTE HOUR DAY MONTH
+ %token SSLV2 SSLV3 TLSV1 TLSV11 TLSV12 TLSV13 CERTMD5 AUTO
+ %token NOSSLV2 NOSSLV3 NOTLSV1 NOTLSV11 NOTLSV12 NOTLSV13
+ %token BYTE KILOBYTE MEGABYTE GIGABYTE
+@@ -1243,6 +1244,7 @@ httpdoption     : ssl
+                 | allowselfcert
+                 | signature
+                 | bindaddress
++                | basepath
+                 | allow
+                 | httpdport
+                 | httpdsocket
+@@ -1339,6 +1341,11 @@ bindaddress     : ADDRESS STRING {
+                   }
+                 ;
+ 
++basepath        : BASEPATH PATH {
++                        sethttpdbasepath($2);
++                  }
++                ;
++
+ allow           : ALLOW STRING':'STRING readonly {
+                         addcredentials($2, $4, Digest_Cleartext, $<number>5);
+                   }
+@@ -3623,7 +3630,7 @@ bool parse(char *controlfile) {
+ 
+ /* ----------------------------------------------------------------- Private */
+ 
+-        
++
+ static void yydeprecated(const char *s, ...) {
+         assert(s);
+         char *msg = NULL;
+@@ -3634,7 +3641,7 @@ static void yydeprecated(const char *s, ...) {
+         Log_warning("%s:%i: %s\n", currentfile, lineno, msg);
+         FREE(msg);
  }
--
+-                
++
+ 
+ /**
+  * Initialize objects used by the parser.
+@@ -3664,6 +3671,7 @@ static void preparse(void) {
+         Run.mmonitcredentials        = NULL;
+         Run.httpd.flags              = Httpd_Disabled | Httpd_Signature;
+         Run.httpd.credentials        = NULL;
++        Run.httpd.basepath           = NULL;
+         memset(&(Run.httpd.socket), 0, sizeof(Run.httpd.socket));
+         Run.mailserver_timeout       = SMTP_TIMEOUT;
+         Run.eventlist_dir            = NULL;
+@@ -4243,9 +4251,9 @@ static void addsize(Size_T ss) {
+ static void addnlink(NLink_T ss) {
+         NLink_T s;
+         struct stat buf;
+-    
++
+         assert(ss);
+-    
++
+         NEW(s);
+         s->operator     = ss->operator;
+         s->nlink        = ss->nlink;
+@@ -4257,10 +4265,10 @@ static void addnlink(NLink_T ss) {
+                 if (s->initialized)
+                         s->nlink = (unsigned long long)buf.st_nlink;
+         }
+-    
++
+         s->next = current->nlinklist;
+         current->nlinklist = s;
+-    
++
+         reset_nlinkset();
+ }
+ 
+@@ -4457,7 +4465,7 @@ static void addlinkstatus(Service_T s, LinkStatus_T L) {
+                 if (l->check_invers != L->check_invers)
+                         yyerror2("Mixing link up and down tests is not supported");
+         }
+-                        
++
+         if (L->check_invers)
+                 s->inverseStatus = true;
+ 
+@@ -5113,6 +5121,26 @@ static void setstatefile(char *statefile) {
+ }
+ 
+ 
++/*
++ * Reset the httpd basepath if changed
++ */
++static void sethttpdbasepath(char *basepath) {
++        assert(basepath);
++        if (! Str_startsWith(basepath, "/")) {
++                yyerror2("The httpd basepath '%s' is invalid (basepath must start with '/')", basepath);
++                FREE(basepath);
++                return;
++        }
++        if (strlen(basepath) > 1 && Str_endsWith(basepath, "/"))
++                basepath[strlen(basepath) - 1] = 0;
++        if (Run.httpd.basepath) {
++                yywarning2("The 'basepath' option can be specified only once, the last value will be used\n");
++                FREE(Run.httpd.basepath);
++        }
++        Run.httpd.basepath = basepath;
++}
++
++
+ /*
+  * Read a apache htpasswd file and add credentials found for username
+  */
+diff --git a/src/util.c b/src/util.c
+index 067868c0..886502d1 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -762,6 +762,7 @@ void Util_printRunList(void) {
+                         printf(" %-18s = %s\n", "httpd unix socket", Run.httpd.socket.unix.path);
+                         printf(" %-18s = %s\n", "httpd unix readonly", Run.httpd.socket.unix.readonly ? "Enabled" : "Disabled");
+                 }
++                printf(" %-18s = %s\n", "httpd basepath", Run.httpd.basepath ? Run.httpd.basepath : "/");
+                 printf(" %-18s = %s\n", "httpd signature", Run.httpd.flags & Httpd_Signature ? "Enabled" : "Disabled");
+                 printf(" %-18s = %s\n", "httpd auth. style",
+                        Run.httpd.credentials && Engine_hasAllow() ? "Basic Authentication and Host/Net allow list" : Run.httpd.credentials ? "Basic Authentication" : Engine_hasAllow() ? "Host/Net allow list" : "No authentication!");
