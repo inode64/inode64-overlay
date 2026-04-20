@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="project">
+    <email>b@edevau.net</email>
+    <name>Andreas Billmeier</name>
+  </maintainer>
+  <upstream>
+    <remote-id type="pypi">yamlloader</remote-id>
+    <remote-id type="github">Phynix/yamlloader</remote-id>
+    <maintainer status="unknown">
+      <email>jonas.eschle@phynix.science</email>
+      <name>Jonas Eschle "Mayou36"</name>
+    </maintainer>
+  </upstream>
+</pkgmetadata>
