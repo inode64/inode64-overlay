@@ -1,0 +1,49 @@
+From aaed47b40d313a1d960cf08b261ae7a744a6ba02 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Mon, 20 Apr 2026 15:51:34 +0200
+Subject: [PATCH] migrate to yamlloader
+
+migrate to yamlloader
+---
+ indexdigest/formatters/yaml.py | 4 ++--
+ setup.py                       | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/indexdigest/formatters/yaml.py b/indexdigest/formatters/yaml.py
+index 162d61b..294f882 100644
+--- a/indexdigest/formatters/yaml.py
++++ b/indexdigest/formatters/yaml.py
+@@ -6,7 +6,7 @@ from __future__ import absolute_import
+ from collections import OrderedDict
+ 
+ import yaml
+-import yamlordereddictloader
++import yamlloader
+ 
+ import indexdigest
+ 
+@@ -45,7 +45,7 @@ def format_yaml(database, reports):
+     report['reports'] = [format_report(item) for item in reports]
+ 
+     return yaml.dump(report,
+-                     Dumper=yamlordereddictloader.Dumper,
++                     Dumper=yamlloader.ordereddict.Dumper,
+                      default_flow_style=False,
+                      explicit_start=True,
+                      explicit_end=True)
+diff --git a/setup.py b/setup.py
+index de75d03..458d0b8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -56,7 +56,7 @@ setup(
+         'mysqlclient==2.2.7',
+         'sql_metadata==2.19.0',
+         'termcolor==3.1.0',
+-        'yamlordereddictloader==0.4.2'
++        'yamlloader==1.6.0'
+     ],
+     entry_points={
+         'console_scripts': [
+-- 
+2.52.0
+
