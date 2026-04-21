@@ -4,7 +4,7 @@
 EAPI=8
 
 # supports ROCM/HIP >=5.5, but we define 6.1 due to the eclass
-ROCM_VERSION="6.1"
+ROCM_VERSION="7.2"
 inherit cuda rocm
 inherit cmake
 inherit flag-o-matic go-module linux-info systemd toolchain-funcs
