@@ -1,8 +1,20 @@
-commit ba34d25a07692104f212cbb8a459647f8a5717de
-Author: INODE64 <ffelix@inode64.com>
-Date:   Wed Apr 15 13:26:00 2026 +0200
+From bc310e61a36dda6509bb267876b0a3e2b274627b Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Wed, 15 Apr 2026 13:26:00 +0200
+Subject: [PATCH] Add basepath support for reverse proxy configurations
 
-    Add basepath support for reverse proxy configurations
+Add basepath support for reverse proxy configurations
+---
+ doc/monit.pod        | 10 ++++++++++
+ monitrc              |  1 +
+ src/gc.c             |  1 +
+ src/http/cervlet.c   |  6 +++++-
+ src/http/processor.c |  5 ++++-
+ src/l.l              |  1 +
+ src/monit.h          |  1 +
+ src/p.y              | 41 ++++++++++++++++++++++++++++++++---------
+ src/util.c           |  1 +
+ 9 files changed, 56 insertions(+), 11 deletions(-)
 
 diff --git a/doc/monit.pod b/doc/monit.pod
 index 37b253e0..59c6b0f5 100644
@@ -83,16 +95,18 @@ index 8f69cc1e..deb3172b 100644
  
  
 diff --git a/src/http/processor.c b/src/http/processor.c
-index de140fa9..98b13984 100644
+index de140fa9..ba8d84ea 100644
 --- a/src/http/processor.c
 +++ b/src/http/processor.c
-@@ -449,7 +449,8 @@ static void do_service(Socket_T s) {
+@@ -449,7 +449,10 @@ static void do_service(Socket_T s) {
                  if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
                          set_header(res, "Strict-Transport-Security", "max-age=63072000");
                  if (is_authenticated(req, res)) {
 -                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
-+                        const char *path = (Run.httpd.basepath && *Run.httpd.basepath) ? Run.httpd.basepath : "/";
-+                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; Path=%s; HttpOnly; SameSite=strict%s", res->token, path, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
++                        char path[256] = "";
++                        if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/"))
++                                snprintf(path, sizeof(path), "; Path=%s", Run.httpd.basepath);
++                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600%s; HttpOnly; SameSite=strict%s", res->token, path, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
                          if (IS(req->method, METHOD_GET))
                                  Impl.doGet(req, res);
                          else if (IS(req->method, METHOD_POST))
@@ -121,7 +135,7 @@ index 1260bac8..8efe0df3 100644
  
          /** An object holding program relevant "environment" data, see: env.c */
 diff --git a/src/p.y b/src/p.y
-index 8f472f71..28cd5532 100644
+index 8f472f71..baa7f932 100644
 --- a/src/p.y
 +++ b/src/p.y
 @@ -294,6 +294,7 @@ static void  setlogfile(char *);
@@ -224,7 +238,7 @@ index 8f472f71..28cd5532 100644
          if (L->check_invers)
                  s->inverseStatus = true;
  
-@@ -5113,6 +5121,26 @@ static void setstatefile(char *statefile) {
+@@ -5113,6 +5121,21 @@ static void setstatefile(char *statefile) {
  }
  
  
@@ -233,11 +247,6 @@ index 8f472f71..28cd5532 100644
 + */
 +static void sethttpdbasepath(char *basepath) {
 +        assert(basepath);
-+        if (! Str_startsWith(basepath, "/")) {
-+                yyerror2("The httpd basepath '%s' is invalid (basepath must start with '/')", basepath);
-+                FREE(basepath);
-+                return;
-+        }
 +        if (strlen(basepath) > 1 && Str_endsWith(basepath, "/"))
 +                basepath[strlen(basepath) - 1] = 0;
 +        if (Run.httpd.basepath) {
@@ -263,3 +272,6 @@ index 067868c0..886502d1 100644
                  printf(" %-18s = %s\n", "httpd signature", Run.httpd.flags & Httpd_Signature ? "Enabled" : "Disabled");
                  printf(" %-18s = %s\n", "httpd auth. style",
                         Run.httpd.credentials && Engine_hasAllow() ? "Basic Authentication and Host/Net allow list" : Run.httpd.credentials ? "Basic Authentication" : Engine_hasAllow() ? "Host/Net allow list" : "No authentication!");
+-- 
+2.53.0
+
