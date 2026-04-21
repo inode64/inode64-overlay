@@ -1,23 +1,25 @@
-From bc310e61a36dda6509bb267876b0a3e2b274627b Mon Sep 17 00:00:00 2001
+From ec79dc8a752f57a6ecda4bdcfa5ba624895752e9 Mon Sep 17 00:00:00 2001
 From: INODE64 <ffelix@inode64.com>
 Date: Wed, 15 Apr 2026 13:26:00 +0200
 Subject: [PATCH] Add basepath support for reverse proxy configurations
 
 Add basepath support for reverse proxy configurations
+
+Add basepath support for reverse proxy configurations
 ---
- doc/monit.pod        | 10 ++++++++++
+ doc/monit.pod        | 14 ++++++++++++++
  monitrc              |  1 +
  src/gc.c             |  1 +
  src/http/cervlet.c   |  6 +++++-
- src/http/processor.c |  5 ++++-
+ src/http/processor.c | 38 ++++++++++++++++++++++++++++----------
  src/l.l              |  1 +
  src/monit.h          |  1 +
  src/p.y              | 41 ++++++++++++++++++++++++++++++++---------
  src/util.c           |  1 +
- 9 files changed, 56 insertions(+), 11 deletions(-)
+ 9 files changed, 84 insertions(+), 20 deletions(-)
 
 diff --git a/doc/monit.pod b/doc/monit.pod
-index 37b253e0..59c6b0f5 100644
+index 37b253e0..2f8fe893 100644
 --- a/doc/monit.pod
 +++ b/doc/monit.pod
 @@ -767,6 +767,7 @@ Syntax for TCP port:
@@ -28,13 +30,17 @@ index 37b253e0..59c6b0f5 100644
        [[with] SSL {pemfile: <path>}]
        ALLOW <user:password | IP-address | IP-range>+
  
-@@ -792,6 +793,15 @@ if the ADDRESS option is not used:
+@@ -792,6 +793,19 @@ if the ADDRESS option is not used:
       use address 127.0.0.1
       allow username:password
  
-+B<BASEPATH> sets URL path prefix used by Monit when generating HTTP redirects
-+and session cookie path. This is useful when Monit runs behind a reverse proxy
-+which publishes Monit under a sub-path such as C</monit-xxx>. Example:
++B<BASEPATH> sets the URL path prefix used by Monit. This is useful when Monit
++runs behind a reverse proxy that publishes Monit under a sub-path such as
++C</monit-xxx>. When set, Monit only accepts requests whose URL starts with the
++configured basepath (others receive HTTP 404), strips the prefix before
++dispatching, and uses it for HTTP redirects and the session cookie C<Path>
++attribute. The reverse proxy should forward the prefix to Monit (do not strip
++it at the proxy). Example:
 +
 + set httpd
 +     port 2812
@@ -95,21 +101,54 @@ index 8f69cc1e..deb3172b 100644
  
  
 diff --git a/src/http/processor.c b/src/http/processor.c
-index de140fa9..ba8d84ea 100644
+index de140fa9..61dd6082 100644
 --- a/src/http/processor.c
 +++ b/src/http/processor.c
-@@ -449,7 +449,10 @@ static void do_service(Socket_T s) {
-                 if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
-                         set_header(res, "Strict-Transport-Security", "max-age=63072000");
-                 if (is_authenticated(req, res)) {
+@@ -446,16 +446,34 @@ static void do_service(Socket_T s) {
+         volatile HttpResponse res = create_HttpResponse(s);
+         volatile HttpRequest req = create_HttpRequest(s);
+         if (res && req) {
+-                if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
+-                        set_header(res, "Strict-Transport-Security", "max-age=63072000");
+-                if (is_authenticated(req, res)) {
 -                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600; HttpOnly; SameSite=strict%s", res->token, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
-+                        char path[256] = "";
-+                        if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/"))
-+                                snprintf(path, sizeof(path), "; Path=%s", Run.httpd.basepath);
-+                        set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600%s; HttpOnly; SameSite=strict%s", res->token, path, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
-                         if (IS(req->method, METHOD_GET))
-                                 Impl.doGet(req, res);
-                         else if (IS(req->method, METHOD_POST))
+-                        if (IS(req->method, METHOD_GET))
+-                                Impl.doGet(req, res);
+-                        else if (IS(req->method, METHOD_POST))
+-                                Impl.doPost(req, res);
+-                        else
+-                                send_error(req, res, SC_NOT_IMPLEMENTED, "Method not implemented");
++                bool basepath_ok = true;
++                if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/")) {
++                        size_t bplen = strlen(Run.httpd.basepath);
++                        if (strncmp(req->url, Run.httpd.basepath, bplen) == 0 && (req->url[bplen] == '\0' || req->url[bplen] == '/')) {
++                                const char *rest = req->url + bplen;
++                                char *new_url = Str_dup(*rest ? rest : "/");
++                                FREE(req->url);
++                                req->url = new_url;
++                        } else {
++                                basepath_ok = false;
++                                send_error(req, res, SC_NOT_FOUND, "Not Found");
++                        }
++                }
++                if (basepath_ok) {
++                        if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
++                                set_header(res, "Strict-Transport-Security", "max-age=63072000");
++                        if (is_authenticated(req, res)) {
++                                char path[256] = "";
++                                if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/"))
++                                        snprintf(path, sizeof(path), "; Path=%s", Run.httpd.basepath);
++                                set_header(res, "Set-Cookie", "securitytoken=%s; Max-Age=600%s; HttpOnly; SameSite=strict%s", res->token, path, (Run.httpd.socket.net.ssl.flags & SSL_Enabled) ? "; Secure" : "");
++                                if (IS(req->method, METHOD_GET))
++                                        Impl.doGet(req, res);
++                                else if (IS(req->method, METHOD_POST))
++                                        Impl.doPost(req, res);
++                                else
++                                        send_error(req, res, SC_NOT_IMPLEMENTED, "Method not implemented");
++                        }
+                 }
+                 send_response(req, res);
+         }
 diff --git a/src/l.l b/src/l.l
 index cb0b1633..760b1ae3 100644
 --- a/src/l.l
