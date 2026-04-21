@@ -15,35 +15,34 @@ index 162d61b..294f882 100644
 +++ b/indexdigest/formatters/yaml.py
 @@ -6,7 +6,7 @@ from __future__ import absolute_import
  from collections import OrderedDict
- 
+
  import yaml
 -import yamlordereddictloader
 +import yamlloader
- 
+
  import indexdigest
- 
+
 @@ -45,7 +45,7 @@ def format_yaml(database, reports):
      report['reports'] = [format_report(item) for item in reports]
- 
+
      return yaml.dump(report,
 -                     Dumper=yamlordereddictloader.Dumper,
 +                     Dumper=yamlloader.ordereddict.Dumper,
-                      default_flow_style=False,
-                      explicit_start=True,
-                      explicit_end=True)
+		      default_flow_style=False,
+		      explicit_start=True,
+		      explicit_end=True)
 diff --git a/setup.py b/setup.py
 index de75d03..458d0b8 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -56,7 +56,7 @@ setup(
-         'mysqlclient==2.2.7',
-         'sql_metadata==2.19.0',
-         'termcolor==3.1.0',
+	 'mysqlclient==2.2.7',
+	 'sql_metadata==2.19.0',
+	 'termcolor==3.1.0',
 -        'yamlordereddictloader==0.4.2'
 +        'yamlloader==1.6.0'
      ],
      entry_points={
-         'console_scripts': [
--- 
+	 'console_scripts': [
+--
 2.52.0
-

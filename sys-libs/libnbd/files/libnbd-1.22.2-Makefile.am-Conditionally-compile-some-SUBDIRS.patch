@@ -14,18 +14,18 @@ index f31e067..1d00ebd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -42,30 +42,49 @@ SUBDIRS = \
- 	common/utils \
- 	lib \
- 	docs \
+	common/utils \
+	lib \
+	docs \
 -	examples \
- 	valgrind \
- 	. \
- 	tests \
+	valgrind \
+	. \
+	tests \
 -	python \
 -	sh \
- 	info \
- 	copy \
- 	dump \
+	info \
+	copy \
+	dump \
 -	fuse \
 -	ublk \
 -	ocaml \
@@ -34,11 +34,11 @@ index f31e067..1d00ebd 100644
 -	golang \
 -	golang/examples \
 -	rust \
- 	interop \
- 	fuzzing \
- 	bash-completion \
- 	$(NULL)
- 
+	interop \
+	fuzzing \
+	bash-completion \
+	$(NULL)
+
 +if HAVE_FUSE
 +SUBDIRS += fuse
 +endif
@@ -63,7 +63,7 @@ index f31e067..1d00ebd 100644
 +SUBDIRS += rust
 +endif
 +
- if BUILD_EXAMPLES 
+ if BUILD_EXAMPLES
  SUBDIRS += examples
 +if HAVE_OCAML
 +SUBDIRS += ocaml/examples
@@ -72,8 +72,7 @@ index f31e067..1d00ebd 100644
 +SUBDIRS += golang/examples
 +endif
  endif
- 
- noinst_SCRIPTS = run
--- 
-2.49.0
 
+ noinst_SCRIPTS = run
+--
+2.49.0

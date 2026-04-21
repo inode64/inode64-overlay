@@ -119,12 +119,12 @@ send_mail() {
       mail -s "$subject" "$recip" <"$body_file" || rc=$?
     else
       {
-        echo "To: $recip"
-        echo "Subject: $subject"
-        echo "MIME-Version: 1.0"
-        echo "Content-Type: text/plain; charset=UTF-8"
-        echo
-        cat "$body_file"
+	echo "To: $recip"
+	echo "Subject: $subject"
+	echo "MIME-Version: 1.0"
+	echo "Content-Type: text/plain; charset=UTF-8"
+	echo
+	cat "$body_file"
       } | sendmail -t || rc=$?
     fi
 
