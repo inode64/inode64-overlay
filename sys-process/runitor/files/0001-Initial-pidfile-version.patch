@@ -1,0 +1,465 @@
+From c8e53a11ed0612db2245ee2fab9ad5f05b63c815 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Wed, 22 Apr 2026 14:42:46 +0200
+Subject: [PATCH] Initial pidfile version
+
+---
+ README.md                      |  28 ++++++-
+ cmd/runitor/main.go            |  20 +++++
+ cmd/runitor/pidfile.go         |  94 +++++++++++++++++++++++
+ cmd/runitor/pidfile_test.go    | 135 +++++++++++++++++++++++++++++++++
+ cmd/runitor/pidfile_unix.go    |  42 ++++++++++
+ cmd/runitor/pidfile_windows.go |  55 ++++++++++++++
+ 6 files changed, 373 insertions(+), 1 deletion(-)
+ create mode 100644 cmd/runitor/pidfile.go
+ create mode 100644 cmd/runitor/pidfile_test.go
+ create mode 100644 cmd/runitor/pidfile_unix.go
+ create mode 100644 cmd/runitor/pidfile_windows.go
+
+diff --git a/README.md b/README.md
+index 41a34d0..e2bdcd7 100644
+--- a/README.md
++++ b/README.md
+@@ -109,10 +109,34 @@ command right away and reset the interval.
+ 
+ 	pkill -ALRM runitor
+ 
++### Preventing Overlapping Runs
++
++Pass `-pidfile PATH` to prevent concurrent execution. At startup runitor
++takes an exclusive OS-level lock on the file, writes its PID into it, and
++holds both until it exits. If another live runitor already holds the file,
++the new invocation logs a message naming the holder's PID and exits with
++status 0 without pinging healthchecks.io or executing the command.
++
++	runitor -pidfile /tmp/backup.pid -slug backup -- ./nightly-backup.sh
++
++The path is chosen by the user. Two invocations sharing the same `-pidfile`
++are serialized regardless of what follows `--`, which is useful for commands
++whose argv varies between runs:
++
++	runitor -pidfile /tmp/tarsnap.pid -- tarsnap -f backup-$(date +%F_%H)
++
++A pidfile left behind by a crashed runitor is not a problem: the OS has
++already released the underlying lock, so the next runitor invocation
++re-acquires it and overwrites the stale PID.
++
++Combined with `-every` or `-at`, the pidfile is held for the entire lifetime
++of the runitor process, which lets external schedulers detect that runitor
++itself is already active.
++
+ 
+ ## Usage
+ 
+-	runitor [-uuid uuid] -- command
++	runitor [-uuid uuid] [-pidfile path] -- command
+ 
+ ### Flags
+ 	-api-retries uint
+@@ -141,6 +165,8 @@ command right away and reset the interval.
+ 	      Ping type to send when command exits successfully (exit-code|success|fail|log (default success))
+ 	-ping-body-limit uint
+ 	      If non-zero, truncate the ping body to its last N bytes, including a truncation notice. (default 10000)
++	-pidfile string
++	      Path to a PID file that prevents concurrent runitor instances from running simultaneously
+ 	-ping-key string
+ 	      Ping Key (env: $PING_KEY). Use 'file:' prefix for indirection
+ 	-quiet
+diff --git a/cmd/runitor/main.go b/cmd/runitor/main.go
+index 697fea8..62f47ac 100644
+--- a/cmd/runitor/main.go
++++ b/cmd/runitor/main.go
+@@ -163,6 +163,7 @@ func main() {
+ 	noStartPing := flag.Bool("no-start-ping", false, "Don't send start ping")
+ 	noOutputInPing := flag.Bool("no-output-in-ping", false, "Don't send command's output in pings")
+ 	noRunId := flag.Bool("no-run-id", false, "Don't generate and send a run id per run in pings")
++	pidfile := flag.String("pidfile", "", "Path to a PID file that prevents concurrent runitor instances from running simultaneously")
+ 	pingBodyLimit := flag.Uint("ping-body-limit", 10_000, "If non-zero, truncate the ping body to its last N bytes, including a truncation notice.")
+ 	version := flag.Bool("version", false, "Show version")
+ 
+@@ -237,6 +238,24 @@ func main() {
+ 	retries := max(0, *apiRetries) // has to be >= 0
+ 
+ 	cmd := flag.Args()
++	// Acquire user-provided pidfile so concurrent invocations skip execution.
++  var pf *Pidfile
++  if *pidfile != "" {
++  	pf, err = acquirePidfile(*pidfile)
++  	if err != nil {
++  		if errors.Is(err, errPidfileBusy) {
++  			if pid := readPidfile(*pidfile); pid != 0 {
++  				log.Printf("pidfile %s held by pid %d; exiting", *pidfile, pid)
++  			} else {
++  				log.Printf("pidfile %s held by another instance; exiting", *pidfile)
++  			}
++  			os.Exit(0)
++  		}
++   			log.Fatal(err)
++   		}
++  	setupSignalHandler(pf)
++  }
++   
+ 	client := &APIClient{
+ 		BaseURL: *apiURL,
+ 		Retries: retries,
+@@ -271,6 +290,7 @@ func main() {
+ 
+ 	// One-shot mode. Exit with command's exit code.
+ 	if *every == 0 && *at == "" {
++		pf.Release()
+ 		os.Exit(exitCode)
+ 	}
+ 
+diff --git a/cmd/runitor/pidfile.go b/cmd/runitor/pidfile.go
+new file mode 100644
+index 0000000..905fb72
+--- /dev/null
++++ b/cmd/runitor/pidfile.go
+@@ -0,0 +1,94 @@
++// Copyright (c) Berk D. Demir and the runitor contributors.
++// SPDX-License-Identifier: 0BSD
++package main
++
++import (
++	"errors"
++	"fmt"
++	"io"
++	"os"
++	"os/signal"
++	"strconv"
++	"strings"
++	"sync"
++	"syscall"
++)
++
++// errPidfileBusy signals that another live runitor already holds the file.
++var errPidfileBusy = errors.New("pidfile is held by another process")
++
++// Pidfile is an acquired exclusive hold on a user-provided path with our PID
++// recorded inside. Closing it releases the hold and removes the file.
++type Pidfile struct {
++	file *os.File
++	once sync.Once
++}
++
++// Release drops the hold and cleans up the file. Safe to call multiple times
++// and concurrently; only the first invocation actually releases.
++func (p *Pidfile) Release() {
++	if p == nil || p.file == nil {
++		return
++	}
++	p.once.Do(func() { releasePidfile(p.file) })
++}
++
++// acquirePidfile opens path, takes an exclusive OS-level lock on it, and
++// records the current PID. If another live runitor already holds the file,
++// returns errPidfileBusy. A stale file left behind by a crashed runitor is
++// commandeered: the OS lock is re-taken and the PID is overwritten.
++func acquirePidfile(path string) (*Pidfile, error) {
++	f, err := openAndLockPidfile(path)
++	if err != nil {
++		return nil, err
++	}
++	if err := writePID(f, os.Getpid()); err != nil {
++		f.Close()
++		return nil, fmt.Errorf("could not write pidfile: %w", err)
++	}
++	return &Pidfile{file: f}, nil
++}
++
++// readPidfile reads and parses the PID from path. Returns 0 if the file is
++// missing, empty, or malformed.
++func readPidfile(path string) int {
++	data, err := os.ReadFile(path)
++	if err != nil {
++		return 0
++	}
++	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
++	if err != nil || pid <= 0 {
++		return 0
++	}
++	return pid
++}
++
++// writePID truncates f and writes pid followed by a newline.
++func writePID(f *os.File, pid int) error {
++	if err := f.Truncate(0); err != nil {
++		return err
++	}
++	if _, err := f.Seek(0, io.SeekStart); err != nil {
++		return err
++	}
++	_, err := fmt.Fprintf(f, "%d\n", pid)
++	return err
++}
++
++// setupSignalHandler arranges for the pidfile to be released on termination
++// signals. Installing the handler causes Go to bypass its default terminate-
++// on-signal behavior, so we exit explicitly with 128+signum to match shell
++// conventions (SIGINT → 130, SIGTERM → 143, SIGHUP → 129).
++func setupSignalHandler(pf *Pidfile) {
++	c := make(chan os.Signal, 1)
++	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
++
++	go func() {
++		sig := <-c
++		pf.Release()
++		if s, ok := sig.(syscall.Signal); ok {
++			os.Exit(128 + int(s))
++		}
++		os.Exit(1)
++	}()
++}
+diff --git a/cmd/runitor/pidfile_test.go b/cmd/runitor/pidfile_test.go
+new file mode 100644
+index 0000000..8b2ff84
+--- /dev/null
++++ b/cmd/runitor/pidfile_test.go
+@@ -0,0 +1,135 @@
++// Copyright (c) Berk D. Demir and the runitor contributors.
++// SPDX-License-Identifier: 0BSD
++package main
++
++import (
++	"errors"
++	"os"
++	"path/filepath"
++	"strconv"
++	"strings"
++	"testing"
++)
++
++func TestAcquirePidfileWritesOurPID(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	pf, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("acquire: %v", err)
++	}
++	defer pf.Release()
++
++	if got := readPidfile(path); got != os.Getpid() {
++		t.Errorf("pidfile contains %d, expected %d", got, os.Getpid())
++	}
++}
++
++func TestAcquirePidfileBusy(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	first, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("first acquire: %v", err)
++	}
++	defer first.Release()
++
++	second, err := acquirePidfile(path)
++	if !errors.Is(err, errPidfileBusy) {
++		t.Errorf("second acquire: expected errPidfileBusy, got (%v, %v)", second, err)
++	}
++	if second != nil {
++		second.Release()
++	}
++}
++
++func TestPidfileReleaseRemovesFile(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	pf, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("acquire: %v", err)
++	}
++	pf.Release()
++
++	if _, err := os.Stat(path); !os.IsNotExist(err) {
++		t.Errorf("expected pidfile removed, stat err = %v", err)
++	}
++}
++
++func TestPidfileReleaseIdempotent(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	pf, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("acquire: %v", err)
++	}
++	pf.Release()
++	pf.Release() // must not panic
++}
++
++func TestAcquireAfterStalePidfile(t *testing.T) {
++	// Simulate a pidfile left on disk by a crashed runitor: the file
++	// exists with a stale PID but no live process holds the OS lock.
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	if err := os.WriteFile(path, []byte("99999\n"), 0644); err != nil {
++		t.Fatalf("seed stale pidfile: %v", err)
++	}
++
++	pf, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("acquire after stale: %v", err)
++	}
++	defer pf.Release()
++
++	if got := readPidfile(path); got != os.Getpid() {
++		t.Errorf("stale PID not overwritten; got %d, expected %d", got, os.Getpid())
++	}
++}
++
++func TestReadPidfile(t *testing.T) {
++	dir := t.TempDir()
++	cases := []struct {
++		name    string
++		content string
++		seed    bool
++		want    int
++	}{
++		{"missing", "", false, 0},
++		{"empty", "", true, 0},
++		{"whitespace", "   \n", true, 0},
++		{"garbage", "not a number", true, 0},
++		{"negative", "-1", true, 0},
++		{"zero", "0", true, 0},
++		{"valid", "12345", true, 12345},
++		{"trailing newline", "67890\n", true, 67890},
++		{"leading whitespace", "  42\n", true, 42},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			path := filepath.Join(dir, strings.ReplaceAll(c.name, " ", "_")+".pid")
++			if c.seed {
++				if err := os.WriteFile(path, []byte(c.content), 0644); err != nil {
++					t.Fatalf("seed: %v", err)
++				}
++			}
++			if got := readPidfile(path); got != c.want {
++				t.Errorf("readPidfile(%q)=%d, want %d", c.content, got, c.want)
++			}
++		})
++	}
++}
++
++func TestWritePIDFormat(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "runitor.pid")
++	pf, err := acquirePidfile(path)
++	if err != nil {
++		t.Fatalf("acquire: %v", err)
++	}
++	defer pf.Release()
++
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		t.Fatalf("read: %v", err)
++	}
++	s := strings.TrimSpace(string(raw))
++	if _, err := strconv.Atoi(s); err != nil {
++		t.Errorf("pidfile content %q is not a decimal integer: %v", s, err)
++	}
++}
+diff --git a/cmd/runitor/pidfile_unix.go b/cmd/runitor/pidfile_unix.go
+new file mode 100644
+index 0000000..cefef4d
+--- /dev/null
++++ b/cmd/runitor/pidfile_unix.go
+@@ -0,0 +1,42 @@
++// Copyright (c) Berk D. Demir and the runitor contributors.
++// SPDX-License-Identifier: 0BSD
++
++//go:build unix
++
++package main
++
++import (
++	"errors"
++	"fmt"
++	"os"
++	"syscall"
++)
++
++// openAndLockPidfile opens path (creating it if needed) and takes a
++// non-blocking exclusive flock. The flock is automatically released by the
++// kernel if runitor dies, so a stale file left on disk doesn't permanently
++// block future invocations.
++func openAndLockPidfile(path string) (*os.File, error) {
++	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0644)
++	if err != nil {
++		return nil, fmt.Errorf("could not open pidfile: %w", err)
++	}
++	if err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
++		f.Close()
++		if errors.Is(err, syscall.EWOULDBLOCK) || errors.Is(err, syscall.EAGAIN) {
++			return nil, errPidfileBusy
++		}
++		return nil, fmt.Errorf("could not lock pidfile: %w", err)
++	}
++	return f, nil
++}
++
++// releasePidfile removes the file before dropping the flock so that a new
++// runitor opening the same path right after us creates a fresh inode
++// instead of racing on our about-to-be-unlinked one.
++func releasePidfile(f *os.File) {
++	path := f.Name()
++	os.Remove(path)
++	_ = syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
++	f.Close()
++}
+diff --git a/cmd/runitor/pidfile_windows.go b/cmd/runitor/pidfile_windows.go
+new file mode 100644
+index 0000000..4957a21
+--- /dev/null
++++ b/cmd/runitor/pidfile_windows.go
+@@ -0,0 +1,55 @@
++// Copyright (c) Berk D. Demir and the runitor contributors.
++// SPDX-License-Identifier: 0BSD
++
++//go:build windows
++
++package main
++
++import (
++	"errors"
++	"fmt"
++	"os"
++	"syscall"
++)
++
++// errSharingViolation is Windows' ERROR_SHARING_VIOLATION, not exported by
++// the stdlib syscall package.
++const errSharingViolation syscall.Errno = 32
++
++// openAndLockPidfile opens path with exclusive write share (readers are
++// still allowed so operators can inspect the PID file while runitor runs).
++// Another runitor trying to open the same path receives
++// ERROR_SHARING_VIOLATION which we translate to errPidfileBusy.
++//
++// Unlike the Unix path, the file is NOT removed automatically on crash. A
++// follow-up runitor re-opens and overwrites the stale PID, matching the
++// classic Unix pidfile semantics.
++func openAndLockPidfile(path string) (*os.File, error) {
++	u16, err := syscall.UTF16PtrFromString(path)
++	if err != nil {
++		return nil, fmt.Errorf("invalid pidfile path %q: %w", path, err)
++	}
++	h, err := syscall.CreateFile(
++		u16,
++		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
++		syscall.FILE_SHARE_READ,
++		nil,
++		syscall.OPEN_ALWAYS,
++		syscall.FILE_ATTRIBUTE_NORMAL,
++		0,
++	)
++	if err != nil {
++		if errors.Is(err, errSharingViolation) {
++			return nil, errPidfileBusy
++		}
++		return nil, fmt.Errorf("could not open pidfile: %w", err)
++	}
++	return os.NewFile(uintptr(h), path), nil
++}
++
++// releasePidfile closes the handle and removes the file.
++func releasePidfile(f *os.File) {
++	path := f.Name()
++	f.Close()
++	os.Remove(path)
++}
+-- 
+2.53.0
+
