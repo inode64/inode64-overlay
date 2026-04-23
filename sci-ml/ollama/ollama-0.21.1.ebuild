@@ -109,7 +109,6 @@ RDEPEND="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-9999-use-GNUInstallDirs.patch"
-	"${FILESDIR}/${PN}-0.18.0-make-installing-runtime-deps-optional.patch"
 )
 
 pkg_pretend() {
@@ -259,6 +258,7 @@ src_configure() {
 	local mycmakeargs=(
 		-DOLLAMA_INSTALL_RUNTIME_DEPS="no"
 		-DGGML_CCACHE="no"
+		-Wno-dev
 
 		# backends end up in /usr/bin otherwise
 		-DGGML_BACKEND_DL="yes"
@@ -344,7 +344,7 @@ src_configure() {
 			-DCMAKE_HIP_ARCHITECTURES="$(get_amdgpu_flags)"
 			-DCMAKE_HIP_PLATFORM="amd"
 			# ollama doesn't honor the default cmake options
-			-DAMDGPU_TARGETS="$(get_amdgpu_flags)"
+			-DGPU_TARGETS="$(get_amdgpu_flags)"
 		)
 
 		local -x HIP_PATH="${ESYSROOT}/usr"
