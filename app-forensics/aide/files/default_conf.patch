@@ -1,15 +1,14 @@
-From 127eea404023815d98dc330a363f886e9ec7685b Mon Sep 17 00:00:00 2001
-From: Fco Javier Felix <ffelix@inode64.com>
-Date: Fri, 16 Jan 2026 21:38:41 +0100
-Subject: [PATCH 1/2] Add support for configuration file override and version
- printing
+From bfe5b859214772fed76ed04e29224fdd4e028a3e Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 23 Apr 2026 15:29:59 +0200
+Subject: [PATCH] Add support for configuration file override and version
 
 ---
- src/aide.c | 63 ++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 52 insertions(+), 11 deletions(-)
+ src/aide.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
 diff --git a/src/aide.c b/src/aide.c
-index 6f728a9d..54a3d18a 100644
+index 6f728a9..e487e47 100644
 --- a/src/aide.c
 +++ b/src/aide.c
 @@ -59,6 +59,8 @@
@@ -21,46 +20,32 @@ index 6f728a9d..54a3d18a 100644
  
  #ifndef MAXHOSTNAMELEN
  #define MAXHOSTNAMELEN 256
-@@ -149,16 +151,32 @@ static void print_version(void)
+@@ -149,16 +151,20 @@ static void print_version(void)
    fprintf(stdout, "Compile-time options:\n%s\n", AIDECOMPILEOPTIONS);
    fprintf(stdout, "Default config values:\n");
    fprintf(stdout, "config file: %s\n", conf->config_file?conf->config_file:"<none>");
-+  const char *database_in = NULL;
-+  const char *database_out = NULL;
-+  if (conf->database_in.url) {
-+      database_in = conf->database_in.url->raw;
-+  }
-+  if (conf->database_out.url) {
-+      database_out = conf->database_out.url->raw;
-+  }
++  const char *database_in = conf->database_in.url ? conf->database_in.url->raw :
  #ifdef DEFAULT_DB
 -  fprintf(stdout, "database_in: %s\n", DEFAULT_DB);
--#else
++      DEFAULT_DB;
+ #else
 -  fprintf(stdout, "database_in: <none>\n");
-+  if (!database_in) {
-+      database_in = DEFAULT_DB;
-+  }
++      "<none>";
  #endif
-+  if (!database_in) {
-+      database_in = "<none>";
-+  }
++  const char *database_out = conf->database_out.url ? conf->database_out.url->raw :
  #ifdef DEFAULT_DB_OUT
 -  fprintf(stdout, "database_out: %s\n", DEFAULT_DB_OUT),
--#else
++      DEFAULT_DB_OUT;
+ #else
 -  fprintf(stdout, "database_out: <none>\n"),
-+  if (!database_out) {
-+      database_out = DEFAULT_DB_OUT;
-+  }
++      "<none>";
  #endif
-+  if (!database_out) {
-+      database_out = "<none>";
-+  }
 +  fprintf(stdout, "database_in: %s\n", database_in);
 +  fprintf(stdout, "database_out: %s\n", database_out);
  
    fprintf(stdout, "\nAvailable compiled-in attributes:\n");
    DB_ATTR_TYPE extra_attributes = get_groupval("X");
-@@ -267,12 +285,14 @@ static void read_param(int argc,char**argv)
+@@ -267,12 +273,14 @@ static void read_param(int argc,char**argv)
  	break;
        }
        case 'v':{
@@ -78,7 +63,7 @@ index 6f728a9d..54a3d18a 100644
  	break;
        }
        case 'B': {
-@@ -418,7 +438,7 @@ static void read_param(int argc,char**argv)
+@@ -418,7 +426,7 @@ static void read_param(int argc,char**argv)
        }
    }
  
@@ -87,7 +72,7 @@ index 6f728a9d..54a3d18a 100644
      fprintf(stderr, "%s: extra parameter: '%s'\n", argv[0], argv[optind]);
      exit(INVALID_ARGUMENT_ERROR);
    }
-@@ -676,6 +696,23 @@ int main(int argc,char**argv)
+@@ -676,6 +684,23 @@ int main(int argc,char**argv)
    log_msg(LOG_LEVEL_INFO, "read command line parameters");
    read_param(argc,argv);
  
@@ -111,82 +96,6 @@ index 6f728a9d..54a3d18a 100644
    int stderr_isatty = isatty(STDERR_FILENO);
    if (stderr_isatty == 0) {
          log_msg(LOG_LEVEL_DEBUG, "isatty() failed for 'STDERR_FILENO': %s", strerror(errno));
-@@ -724,7 +761,11 @@ int main(int argc,char**argv)
- 
-   log_msg(LOG_LEVEL_INFO, "parse configuration");
-   update_progress_status(PROGRESS_CONFIG, NULL);
--  errorno=parse_config(before, conf->config_file, after);
-+  char *config_path = conf->config_file;
-+  if (config_override) {
-+      config_path = config_override;
-+  }
-+  errorno=parse_config(before, config_path, after);
-   if (errorno==RETFAIL){
-     exit(INVALID_CONFIGURELINE_ERROR);
-   }
+-- 
+2.53.0
 
-From eee053037c3e5dc6bca7c4200e0a6365c0b0fb4f Mon Sep 17 00:00:00 2001
-From: INODE64 <ffelix@inode64.com>
-Date: Thu, 23 Apr 2026 14:57:25 +0200
-Subject: [PATCH 2/2] refactoring
-
----
- src/aide.c | 34 +++++++++-------------------------
- 1 file changed, 9 insertions(+), 25 deletions(-)
-
-diff --git a/src/aide.c b/src/aide.c
-index 54a3d18a..e487e478 100644
---- a/src/aide.c
-+++ b/src/aide.c
-@@ -151,30 +151,18 @@ static void print_version(void)
-   fprintf(stdout, "Compile-time options:\n%s\n", AIDECOMPILEOPTIONS);
-   fprintf(stdout, "Default config values:\n");
-   fprintf(stdout, "config file: %s\n", conf->config_file?conf->config_file:"<none>");
--  const char *database_in = NULL;
--  const char *database_out = NULL;
--  if (conf->database_in.url) {
--      database_in = conf->database_in.url->raw;
--  }
--  if (conf->database_out.url) {
--      database_out = conf->database_out.url->raw;
--  }
-+  const char *database_in = conf->database_in.url ? conf->database_in.url->raw :
- #ifdef DEFAULT_DB
--  if (!database_in) {
--      database_in = DEFAULT_DB;
--  }
-+      DEFAULT_DB;
-+#else
-+      "<none>";
- #endif
--  if (!database_in) {
--      database_in = "<none>";
--  }
-+  const char *database_out = conf->database_out.url ? conf->database_out.url->raw :
- #ifdef DEFAULT_DB_OUT
--  if (!database_out) {
--      database_out = DEFAULT_DB_OUT;
--  }
-+      DEFAULT_DB_OUT;
-+#else
-+      "<none>";
- #endif
--  if (!database_out) {
--      database_out = "<none>";
--  }
-   fprintf(stdout, "database_in: %s\n", database_in);
-   fprintf(stdout, "database_out: %s\n", database_out);
- 
-@@ -761,11 +749,7 @@ int main(int argc,char**argv)
- 
-   log_msg(LOG_LEVEL_INFO, "parse configuration");
-   update_progress_status(PROGRESS_CONFIG, NULL);
--  char *config_path = conf->config_file;
--  if (config_override) {
--      config_path = config_override;
--  }
--  errorno=parse_config(before, config_path, after);
-+  errorno=parse_config(before, conf->config_file, after);
-   if (errorno==RETFAIL){
-     exit(INVALID_CONFIGURELINE_ERROR);
-   }
