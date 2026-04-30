@@ -1,10 +1,10 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 2024-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 # supports ROCM/HIP >=5.5, but we define 6.1 due to the eclass
-ROCM_VERSION="7.2"
+ROCM_VERSION="6.1"
 inherit cuda rocm
 inherit cmake
 inherit flag-o-matic go-module linux-info systemd toolchain-funcs
@@ -92,7 +92,7 @@ COMMON_DEPEND="
 
 DEPEND="
 	${COMMON_DEPEND}
-	>=dev-lang/go-1.23.4
+	>=dev-lang/go-1.24.1
 "
 BDEPEND="
 	vulkan? (
@@ -109,6 +109,7 @@ RDEPEND="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-9999-use-GNUInstallDirs.patch"
+	"${FILESDIR}/${PN}-0.18.0-make-installing-runtime-deps-optional.patch"
 )
 
 pkg_pretend() {
@@ -258,7 +259,6 @@ src_configure() {
 	local mycmakeargs=(
 		-DOLLAMA_INSTALL_RUNTIME_DEPS="no"
 		-DGGML_CCACHE="no"
-		-Wno-dev
 
 		# backends end up in /usr/bin otherwise
 		-DGGML_BACKEND_DL="yes"
@@ -344,7 +344,7 @@ src_configure() {
 			-DCMAKE_HIP_ARCHITECTURES="$(get_amdgpu_flags)"
 			-DCMAKE_HIP_PLATFORM="amd"
 			# ollama doesn't honor the default cmake options
-			-DGPU_TARGETS="$(get_amdgpu_flags)"
+			-DAMDGPU_TARGETS="$(get_amdgpu_flags)"
 		)
 
 		local -x HIP_PATH="${ESYSROOT}/usr"
