@@ -23,70 +23,69 @@ fi
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="
-	cheetah cherrypy ldap libcloud libvirt genshi gnupg keyring mako
-	mongodb neutron nova portage profile redis selinux test raet
-	+zeromq vim-syntax
+	cheetah ldap libcloud libvirt genshi keyring mako
+	mongodb nova portage profile redis selinux test test-full
+	raet +zeromq vim-syntax
 "
 
 RDEPEND="
 	sys-apps/pciutils
 	dev-libs/openssl:0=[-bindist(-)]
-	dev-python/aiohttp[${PYTHON_USEDEP}]
-	>=dev-python/cherrypy-18.6.1[${PYTHON_USEDEP}]
-	>=dev-python/cryptography-42.0.0[${PYTHON_USEDEP}]
-	>=dev-python/distro-1.5[${PYTHON_USEDEP}]
-	dev-python/importlib-metadata[${PYTHON_USEDEP}]
+	>=dev-python/aiohttp-3.13.3[${PYTHON_USEDEP}]
+	>=dev-python/cffi-2.0.0[${PYTHON_USEDEP}]
+	>=dev-python/cherrypy-18.10.0[${PYTHON_USEDEP}]
+	>=dev-python/cryptography-42.0.2[${PYTHON_USEDEP}]
+	>=dev-python/distro-1.8.0[${PYTHON_USEDEP}]
+	>=dev-python/frozenlist-1.5.0[${PYTHON_USEDEP}]
+	>=dev-python/immutables-0.21[${PYTHON_USEDEP}]
+	>=dev-python/importlib-metadata-8.7.0[${PYTHON_USEDEP}]
+	>=dev-python/jaraco-functools-4.1.0[${PYTHON_USEDEP}]
+	>=dev-python/jaraco-text-4.0.0[${PYTHON_USEDEP}]
 	>=dev-python/jinja2-3.1.5[${PYTHON_USEDEP}]
-	dev-python/jmespath[${PYTHON_USEDEP}]
-	dev-python/libnacl[${PYTHON_USEDEP}]
-	dev-python/looseversion[${PYTHON_USEDEP}]
-	>=dev-python/msgpack-1.0.0[${PYTHON_USEDEP}]
-	>=dev-python/packaging-21.3[${PYTHON_USEDEP}]
-	>=dev-python/psutil-5.0.0[${PYTHON_USEDEP}]
+	>=dev-python/jmespath-1.0.1[${PYTHON_USEDEP}]
+	>=dev-python/libnacl-1.7.1[${PYTHON_USEDEP}]
+	>=dev-python/looseversion-1.3.0[${PYTHON_USEDEP}]
+	>=dev-python/markupsafe-2.1.3[${PYTHON_USEDEP}]
+	>=dev-python/msgpack-1.0.7[${PYTHON_USEDEP}]
+	>=dev-python/packaging-24.0[${PYTHON_USEDEP}]
+	>=dev-python/psutil-5.9.6[${PYTHON_USEDEP}]
 	>=dev-python/pycryptodome-3.19.1[${PYTHON_USEDEP}]
 	>=dev-python/pyopenssl-24.0.0[${PYTHON_USEDEP}]
-	>=dev-python/python-dateutil-2.8.1[${PYTHON_USEDEP}]
-	dev-python/python-gnupg[${PYTHON_USEDEP}]
+	>=dev-python/python-dateutil-2.8.2[${PYTHON_USEDEP}]
+	>=dev-python/python-gnupg-0.5.2[${PYTHON_USEDEP}]
 	>=dev-python/pyyaml-6.0.1[${PYTHON_USEDEP}]
-	>=dev-python/markupsafe-2.1.2[${PYTHON_USEDEP}]
-	>=dev-python/requests-2.32.3[${PYTHON_USEDEP}]
-	>=dev-python/urllib3-1.26.18[${PYTHON_USEDEP}]
-	>=dev-python/jaraco-text-4.0.0[${PYTHON_USEDEP}]
-	>=dev-python/jaraco-functools-4.1.0[${PYTHON_USEDEP}]
-	dev-python/setproctitle[${PYTHON_USEDEP}]
-	dev-python/setuptools[${PYTHON_USEDEP}]
-	dev-python/tomli[${PYTHON_USEDEP}]
-	>=dev-python/tornado-6.4.1[${PYTHON_USEDEP}]
-	dev-python/watchdog[${PYTHON_USEDEP}]
+	>=dev-python/requests-2.32.5[${PYTHON_USEDEP}]
+	>=dev-python/setproctitle-1.3.2[${PYTHON_USEDEP}]
+	>=dev-python/setuptools-80.10.2[${PYTHON_USEDEP}]
+	dev-python/tomli-w[${PYTHON_USEDEP}]
+	>=dev-python/tornado-6.5.4[${PYTHON_USEDEP}]
+	>=dev-python/urllib3-2.6.3[${PYTHON_USEDEP}]
+	>=dev-python/watchdog-3.0.0[${PYTHON_USEDEP}]
+	>=dev-python/zipp-3.19.0[${PYTHON_USEDEP}]
 	libcloud? (
-		>=dev-python/aiohttp-3.9.0[${PYTHON_USEDEP}]
-		dev-python/aiosignal[${PYTHON_USEDEP}]
-		>=dev-python/apache-libcloud-2.5.0[${PYTHON_USEDEP}]
-		dev-python/async-timeout[${PYTHON_USEDEP}]
+		>=dev-python/aiosignal-1.3.1[${PYTHON_USEDEP}]
+		>=dev-python/apache-libcloud-3.7.0[${PYTHON_USEDEP}]
+		>=dev-python/async-timeout-4.0.3[${PYTHON_USEDEP}]
 	)
-	mako? ( dev-python/mako[${PYTHON_USEDEP}] )
+	mako? ( >=dev-python/mako-1.2.4[${PYTHON_USEDEP}] )
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
 	libvirt? (
 		dev-python/libvirt-python[${PYTHON_USEDEP}]
 	)
 	raet? (
-		>=dev-python/libnacl-1.0.0[${PYTHON_USEDEP}]
 		>=dev-python/ioflo-1.1.7[${PYTHON_USEDEP}]
 		>=dev-python/raet-0.6.0[${PYTHON_USEDEP}]
 	)
-	cheetah? ( >=dev-python/cheetah3-3.2.2[${PYTHON_USEDEP}] )
-	genshi? ( dev-python/genshi[${PYTHON_USEDEP}] )
+	cheetah? ( >=dev-python/cheetah3-3.2.6[${PYTHON_USEDEP}] )
+	genshi? ( >=dev-python/genshi-0.7.7[${PYTHON_USEDEP}] )
 	mongodb? ( dev-python/pymongo[${PYTHON_USEDEP}] )
 	portage? ( sys-apps/portage[${PYTHON_USEDEP}] )
-	keyring? ( dev-python/keyring[${PYTHON_USEDEP}] )
-	redis? ( dev-python/redis[${PYTHON_USEDEP}] )
+	keyring? ( >=dev-python/keyring-5.7.1[${PYTHON_USEDEP}] )
+	redis? ( >=dev-python/redis-3.5.3[${PYTHON_USEDEP}] )
 	selinux? ( sec-policy/selinux-salt )
-	nova? ( >=dev-python/python-novaclient-2.17.0[${PYTHON_USEDEP}] )
-	neutron? ( >=dev-python/python-neutronclient-2.3.6[${PYTHON_USEDEP}] )
-	gnupg? ( dev-python/python-gnupg[${PYTHON_USEDEP}] )
 	profile? ( dev-python/yappi[${PYTHON_USEDEP}] )
 	vim-syntax? ( app-vim/salt-vim )
-	zeromq? ( >=dev-python/pyzmq-19.0.0[${PYTHON_USEDEP}] )
+	zeromq? ( >=dev-python/pyzmq-25.1.2[${PYTHON_USEDEP}] )
 "
 BDEPEND="
 	sys-apps/findutils
@@ -97,26 +96,28 @@ BDEPEND="
 		dev-python/apache-libcloud[${PYTHON_USEDEP}]
 		dev-python/boto3[${PYTHON_USEDEP}]
 		>=dev-python/certifi-2024.7.4[${PYTHON_USEDEP}]
-		dev-python/cherrypy[${PYTHON_USEDEP}]
 		>=dev-python/jsonschema-3.0[${PYTHON_USEDEP}]
 		dev-python/mako[${PYTHON_USEDEP}]
 		>=dev-python/mock-2.0.0[${PYTHON_USEDEP}]
+		>=dev-python/more-itertools-10.8.0[${PYTHON_USEDEP}]
 		>=dev-python/moto-2.0.0[${PYTHON_USEDEP}]
-		<dev-python/moto-5[${PYTHON_USEDEP}]
+		dev-python/passlib[${PYTHON_USEDEP}]
 		dev-python/bcrypt[${PYTHON_USEDEP}]
+		>=dev-python/filelock-3.20.3[${PYTHON_USEDEP}]
 		dev-python/pip[${PYTHON_USEDEP}]
 		dev-python/pygit2[${PYTHON_USEDEP}]
 		dev-python/pyinotify[${PYTHON_USEDEP}]
 		>=dev-python/pyopenssl-23.0.0[${PYTHON_USEDEP}]
 		>=dev-python/pytest-7.2.0[${PYTHON_USEDEP}]
-		>=dev-python/pytest-salt-factories-1.0.0_rc29[${PYTHON_USEDEP}]
+		>=dev-python/pytest-salt-factories-1.0.5[${PYTHON_USEDEP}]
 		dev-python/pytest-helpers-namespace[${PYTHON_USEDEP}]
 		dev-python/pytest-subtests[${PYTHON_USEDEP}]
 		dev-python/pytest-shell-utilities[${PYTHON_USEDEP}]
 		dev-python/pytest-skip-markers[${PYTHON_USEDEP}]
 		dev-python/pytest-system-statistics[${PYTHON_USEDEP}]
 		dev-python/pytest-custom-exit-code[${PYTHON_USEDEP}]
-		net-dns/bind-tools
+		dev-python/pytest-rerunfailures[${PYTHON_USEDEP}]
+		net-dns/bind
 		>=dev-python/virtualenv-20.3.0[${PYTHON_USEDEP}]
 		dev-util/yamllint[${PYTHON_USEDEP}]
 		!x86? ( >=dev-python/boto3-1.21.46[${PYTHON_USEDEP}] )
@@ -137,8 +138,16 @@ RESTRICT="
 PATCHES=(
 	"${FILESDIR}/salt-3003-gentoolkit-revdep.patch"
 	"${FILESDIR}/salt-3006.9-pam-module.patch"
-	"${FILESDIR}/salt-3007.1-python-3.13-urllib-parse.patch"
 )
+
+pkg_pretend() {
+	if use nova ; then
+		ewarn " "
+		ewarn "OpenStack Nova support requested but is currently not available."
+		ewarn "If you require it, please file a bug at https://bugs.gentoo.org/"
+		ewarn " "
+	fi
+}
 
 python_prepare_all() {
 	local -a remove_test_files=(
@@ -383,6 +392,9 @@ python_prepare_all() {
 	# axe the boto dep (bug #888235)
 	find "${S}/tests" -name 'test_boto_*.py' -delete || die
 
+	# removes contextvars, see bug: https://bugs.gentoo.org/799431
+	sed -i '/^contextvars/d' requirements/base.txt || die
+
 	# called_once should be assert_called_once_with
 	find "${S}/tests" -name '*.py' -print0 \
 		| xargs -0 -- sed -i -e 's:[.]called_once:.assert_called_once:g' -- || die
@@ -407,14 +419,39 @@ python_install_all() {
 
 python_test() {
 	local -a EPYTEST_DESELECT=(
+		# Takes several hours to run
+		tests/integration/states/
+		tests/pytests/unit/modules/
+		tests/unit/modules/
+		tests/unit/states/
+
+		# Relies on removed functionality (OpenSSL.crypto.CRL, removed in PyOpenSSL 24.3.0)
+		tests/integration/modules/test_tls.py::TLSModuleTest::test_revoked_cert_should_return_False_from_validate
+		tests/integration/modules/test_tls.py::TLSModuleTest::test_validating_revoked_cert_with_no_crl_file_should_return_False
+		tests/integration/modules/test_tls.py::TLSModuleTest::test_with_existing_ca_signing_csr_should_produce_valid_cert
+
+		# Broken (RuntimeError: The helper being called was not registered)
+		tests/pytests/functional/modules/cmd/test_script.py
+		tests/pytests/functional/modules/state/requisites/
+		tests/pytests/functional/modules/state/test_state.py
+		tests/pytests/functional/states/test_blockdev.py
+
 		# doesn't like the distutils warning
 		tests/pytests/integration/cli/test_batch.py::test_batch_retcode
 		tests/pytests/integration/cli/test_batch.py::test_multiple_modules_in_batch
 
 		# hangs indefinitely
+		tests/pytests/functional/cli/test_salt_deltaproxy.py::test_exit_status_correct_usage_large_number_of_minions
+		tests/pytests/functional/transport/server/test_publish_server.py::test_publsh_server
+		tests/pytests/unit/auth/test_auth.py::test_cve_2021_3244
 		tests/pytests/unit/test_minion.py::test_master_type_disable
 
 		# needs root
+		tests/integration/modules/test_lxc.py::LXCModuleTest
+		tests/pytests/functional/modules/cmd/test_runas.py::test_runas
+		tests/pytests/functional/states/file/test_directory.py::test_directory_max_depth
+		tests/pytests/functional/states/file/test_directory.py::test_issue_12209_follow_symlinks
+		tests/pytests/functional/states/file/test_managed.py::test_owner_after_setuid
 		tests/pytests/unit/modules/test_cmdmod.py::test_runas_env_sudo_group
 		tests/pytests/unit/modules/test_portage_config.py::test_enforce_nice_config
 		tests/unit/modules/test_saltcheck.py::SaltcheckTestCase::test_run_test_muliassert
@@ -532,6 +569,7 @@ python_test() {
 		tests/pytests/unit/utils/test_network.py::test_isportopen
 
 		# tests that need root access
+		tests/integration/modules/test_cmdmod.py::CMDModuleTest::test_quotes_runas
 		tests/unit/modules/test_saltcheck.py::SaltcheckTestCase::test_call_salt_command
 		tests/unit/modules/test_saltcheck.py::SaltcheckTestCase::test_call_salt_command2
 		tests/unit/modules/test_saltcheck.py::SaltcheckTestCase::test_run_test_1
@@ -592,12 +630,26 @@ python_test() {
 		)
 		export "${test_exports[@]}"
 
+		if use test-full; then
+			einfo "Running slow tests."
+			SLOW_TESTS="--run-slow"
+		else
+			SLOW_TESTS=""
+		fi
+
 		cleanup() { rm -rf "${TMPDIR}" || die; }
 
 		trap cleanup EXIT
 
 		addwrite "${TMPDIR}"
 
-		epytest --run-slow
+		epytest ${SLOW_TESTS} \
+				tests/integration/ \
+				tests/pytests/functional/ \
+				tests/pytests/pkg/ \
+				tests/pytests/unit/renderers/ \
+				tests/pytests/unit/serializers/ \
+				tests/support/ \
+				tests/unit/
 	)
 }
