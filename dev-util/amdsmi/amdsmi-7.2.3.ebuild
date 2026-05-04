@@ -12,14 +12,14 @@ ESMI_PV=4.2
 
 DESCRIPTION="AMD System Management Interface for managing and monitoring GPUs"
 HOMEPAGE="
-	https://github.com/ROCm/amdsmi
+	https://github.com/ROCm/rocm-systems
 	https://rocm.docs.amd.com/projects/amdsmi/en/latest/
 "
 SRC_URI="
-	https://github.com/ROCm/amdsmi/archive/refs/tags/rocm-${PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/${PN}.tar.gz -> ${P}.tar.gz
 	https://github.com/amd/esmi_ib_library/archive/refs/tags/${ESMI_PN}-${ESMI_PV}.tar.gz
 "
-S="${WORKDIR}/amdsmi-rocm-${PV}"
+S="${WORKDIR}"
 ESMI_S="${WORKDIR}/esmi_ib_library-${ESMI_PN}-${ESMI_PV}"
 
 LICENSE="MIT"

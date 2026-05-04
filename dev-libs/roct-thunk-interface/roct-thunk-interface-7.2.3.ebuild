@@ -14,7 +14,7 @@ if [[ ${PV} == *9999 ]] ; then
 	S="${WORKDIR}/${P}/projects/rocr-runtime/libhsakmt"
 else
 	SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/rocr-runtime.tar.gz -> ${P}.tar.gz"
-	S="${WORKDIR}/rocr-runtime/libhsakmt"
+	S="${WORKDIR}"
 	KEYWORDS="~amd64"
 fi
 
@@ -40,9 +40,9 @@ RESTRICT="!test? ( test )"
 CMAKE_BUILD_TYPE=Release
 
 PATCHES=(
-	"${FILESDIR}/${PN}-7.1.0-functions.patch"
-	"${FILESDIR}/kfdtest-6.1.0-skipIPCtest.patch"
-	"${FILESDIR}/kfdtest-6.2.4-fix-llvm-header.patch"
+	"${FILESDIR}/${PN}-7.2.3-functions.patch"
+	"${FILESDIR}/kfdtest-7.2.3-skipIPCtest.patch"
+	"${FILESDIR}/kfdtest-7.2.3-fix-llvm-header.patch"
 )
 
 test_wrapper() {
