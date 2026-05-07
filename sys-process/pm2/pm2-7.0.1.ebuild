@@ -14,7 +14,7 @@ SRC_URI="
 
 LICENSE="AGPL-3 Apache-2.0 BSD-2 ISC MIT public-domain"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS=""
 
 NODEJS_EXTRA_FILES="bin constants.js index.js paths.js"
 
