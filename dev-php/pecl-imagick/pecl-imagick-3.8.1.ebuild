@@ -4,7 +4,7 @@
 EAPI=8
 
 PHP_EXT_NAME="imagick"
-USE_PHP="php7-3 php7-4 php8-2 php8-3 php8-4 php8-5"
+USE_PHP="php5-6 php7-3 php7-4 php8-2 php8-3 php8-4 php8-5"
 
 # https://github.com/Imagick/imagick/issues/626
 PHP_EXT_NEEDED_USE="-debug"
@@ -25,7 +25,7 @@ RESTRICT="!test? ( test )"
 RDEPEND="media-gfx/imagemagick:="
 
 # While it does support skipping tests, the test suite for pecl-imagick
-# doesn't accomodate many imagemagick build options. We could curate a
+# doesn't accommodate many imagemagick build options. We could curate a
 # list of tests to remove in src_prepare() based on what USE flags are
 # set, but in my opinion, it would break too frequently.
 DEPEND="
@@ -34,6 +34,10 @@ DEPEND="
 "
 
 PHP_EXT_ECONF_ARGS="--with-imagick=${EPREFIX}/usr"
+                                                                                                                                                                                                                                                                                          
+pkg_setup() {                                                                                                                                                                                                                                                                             
+  export SED=/bin/sed                                                                                                                                                                                                                                                               
+}                                                                                                                                                                                                                                                                                         
 
 src_prepare() {
 	# Test fails with ImageMagick >=7.1.2
