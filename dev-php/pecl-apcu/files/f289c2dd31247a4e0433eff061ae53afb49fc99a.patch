@@ -1,0 +1,29 @@
+From f289c2dd31247a4e0433eff061ae53afb49fc99a Mon Sep 17 00:00:00 2001
+From: Anatol Belski <ab@php.net>
+Date: Sat, 15 Apr 2017 17:51:16 +0200
+Subject: [PATCH] mitigate github issue #223
+
+---
+ apc_sma.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/apc_sma.c b/apc_sma.c
+index 7dd9c4f6..9ed1b580 100644
+--- a/apc_sma.c
++++ b/apc_sma.c
+@@ -309,10 +309,11 @@ PHP_APCU_API void apc_sma_api_init(apc_sma_t* sma, void** data, apc_sma_expunge_
+         if(sma->num != 1) 
+ 			memcpy(&mask[strlen(mask)-6], "XXXXXX", 6);
+ #else
+-        sma->segs[i] = apc_shm_attach(
+-			apc_shm_create(i, sma->size TSRMLS_CC), 
+-			sma->size TSRMLS_CC
+-		);
++        {
++            int j = apc_shm_create(i, sma->size TSRMLS_CC);
++            SetLastError(0);
++            sma->segs[i] = apc_shm_attach(j, sma->size TSRMLS_CC);
++        }
+ #endif
+         
+         sma->segs[i].size = sma->size;

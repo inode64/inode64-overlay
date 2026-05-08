@@ -1,0 +1,180 @@
+From 6209f405a35f31b1f76f128c530f6874677031f4 Mon Sep 17 00:00:00 2001
+From: Joe Watkins <krakjoe@php.net>
+Date: Thu, 29 Sep 2016 14:24:56 +0100
+Subject: [PATCH] bailout after engine fails
+
+---
+ apc_cache.c    | 24 ++++++++++++++++++++++--
+ apc_iterator.c | 24 +++++++++++++++++++++++-
+ 2 files changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/apc_cache.c b/apc_cache.c
+index 4ae57935..9f3a9bc7 100644
+--- a/apc_cache.c
++++ b/apc_cache.c
+@@ -993,7 +993,7 @@ PHP_APCU_API zend_bool apc_cache_update(apc_cache_t* cache, char *strkey, zend_u
+ {
+     apc_cache_slot_t** slot;
+ 	
+-    zend_bool retval = 0;
++    zend_bool retval = 0, bailout = 0;
+     zend_ulong h, s;
+ 
+     if(apc_cache_busy(cache TSRMLS_CC))
+@@ -1049,11 +1049,17 @@ PHP_APCU_API zend_bool apc_cache_update(apc_cache_t* cache, char *strkey, zend_u
+ 			/* set next slot */
+ 		    slot = &(*slot)->next;
+ 		}
++	} zend_catch {
++		bailout = 1;
+ 	} zend_end_try();
+ 
+ 	/* unlock header */
+ 	APC_UNLOCK(cache->header);
+ 
++	if (bailout) {
++		zend_bailout();
++	}
++
+     return 0;
+ }
+ /* }}} */
+@@ -1532,6 +1538,7 @@ PHP_APCU_API zval* apc_cache_info(apc_cache_t* cache, zend_bool limited TSRMLS_D
+     zval *slots = NULL;
+     apc_cache_slot_t* p;
+     zend_ulong i, j;
++	zend_bool bailout = 0;
+ 
+     if (!cache) {
+         return NULL;
+@@ -1599,11 +1606,17 @@ PHP_APCU_API zval* apc_cache_info(apc_cache_t* cache, zend_bool limited TSRMLS_D
+ 		    add_assoc_zval(info, "deleted_list", gc);
+ 		    add_assoc_zval(info, "slot_distribution", slots);
+ 		}
++	} zend_catch {
++		bailout = 1;
+ 	} zend_end_try();
+ 
+ 	/* unlock header */
+ 	APC_RUNLOCK(cache->header);
+ 
++	if (bailout) {
++		zend_bailout();
++	}
++
+     return info;
+ }
+ /* }}} */
+@@ -1617,7 +1630,8 @@ PHP_APCU_API zval* apc_cache_stat(apc_cache_t* cache,
+     zval *stat;
+     apc_cache_slot_t** slot;
+ 	zend_ulong h, s;
+-    
++    zend_bool bailout = 0;
++
+ 	/* calculate hash and slot */
+ 	apc_cache_hash_slot(cache, strkey, keylen, &h, &s);
+ 	
+@@ -1650,10 +1664,16 @@ PHP_APCU_API zval* apc_cache_stat(apc_cache_t* cache,
+ 			/* next */
+ 			slot = &(*slot)->next;		
+ 		}
++	} zend_catch {
++		bailout = 1;
+ 	} zend_end_try();
+ 
+     APC_RUNLOCK(cache->header);
+     
++	if (bailout) {
++		zend_bailout();
++	}
++
+     return stat;
+ }
+ 
+diff --git a/apc_iterator.c b/apc_iterator.c
+index 95d13e78..33f99f9d 100644
+--- a/apc_iterator.c
++++ b/apc_iterator.c
+@@ -227,6 +227,7 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+     apc_cache_slot_t **slot;
+     apc_iterator_item_t *item;
+     time_t t;
++	zend_bool bailout = 0;
+ 
+     t = apc_time();
+ 
+@@ -253,11 +254,18 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+ 		    }
+ 		    iterator->slot_idx++;
+ 		}
++	} zend_catch {
++		bailout = 1;
+ 	} zend_end_try();
+ 
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
+     iterator->stack_idx = 0;
++
++	if (bailout) {
++		zend_bailout();
++	}
++
+     return count;
+ }
+ /* }}} */
+@@ -267,6 +275,7 @@ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+     int count=0;
+     apc_cache_slot_t **slot;
+     apc_iterator_item_t *item;
++	zend_bool bailout = 0;
+ 
+ 	APC_RLOCK(apc_user_cache->header);
+     
+@@ -287,12 +296,18 @@ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+ 		    }
+ 		    slot = &(*slot)->next;
+ 		}
++	} zend_catch {
++		bailout = 1;
+ 	} zend_end_try();
+ 
+     iterator->slot_idx += count;
+     iterator->stack_idx = 0;
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
++	if (bailout) {
++		zend_bailout();
++	}
++
+     return count;
+ }
+ /* }}} */
+@@ -301,7 +316,8 @@ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+ static void apc_iterator_totals(apc_iterator_t *iterator TSRMLS_DC) {
+     apc_cache_slot_t **slot;
+     int i;
+-	
++	zend_bool bailout = 0;
++
+ 	APC_RLOCK(apc_user_cache->header);
+ 
+     zend_try {
+@@ -316,11 +332,17 @@ static void apc_iterator_totals(apc_iterator_t *iterator TSRMLS_DC) {
+ 		        slot = &(*slot)->next;
+ 		    }
+ 		}
++	} zend_catch {
++		bailout = 1;	
+ 	} zend_end_try();
+ 
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
+     iterator->totals_flag = 1;
++
++	if (bailout) {
++		zend_bailout();
++	}
+ }
+ /* }}} */
+ 

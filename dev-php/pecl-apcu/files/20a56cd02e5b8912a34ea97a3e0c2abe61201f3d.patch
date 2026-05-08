@@ -1,0 +1,22 @@
+From 20a56cd02e5b8912a34ea97a3e0c2abe61201f3d Mon Sep 17 00:00:00 2001
+From: Joe Watkins <krakjoe@php.net>
+Date: Mon, 21 Nov 2016 05:43:04 +0000
+Subject: [PATCH] needs sizeof for key and sizeof-1 for value
+
+---
+ php_apc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/php_apc.c b/php_apc.c
+index a1cf8c24..d697159b 100644
+--- a/php_apc.c
++++ b/php_apc.c
+@@ -269,7 +269,7 @@ static PHP_MINIT_FUNCTION(apcu)
+ 	
+     /* Disable APC in cli mode unless overridden by apc.enable_cli */
+     if (!APCG(enable_cli) && !strcmp(sapi_module.name, "cli")) {
+-		zend_alter_ini_entry("apc.enabled", sizeof("apc.enabled"), "0", sizeof("0"), PHP_INI_SYSTEM, PHP_INI_STAGE_STARTUP);
++		zend_alter_ini_entry("apc.enabled", sizeof("apc.enabled"), "0", sizeof("0")-1, PHP_INI_SYSTEM, PHP_INI_STAGE_STARTUP);
+     }
+ 
+ 	/* only run initialization if APC is enabled */

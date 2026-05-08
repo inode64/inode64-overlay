@@ -36,7 +36,7 @@ DEPEND="
 PHP_EXT_ECONF_ARGS="--with-imagick=${EPREFIX}/usr"
                                                                                                                                                                                                                                                                                           
 pkg_setup() {                                                                                                                                                                                                                                                                             
-  export SED=/bin/sed                                                                                                                                                                                                                                                               
+	export SED=/bin/sed                                                                                                                                                                                                                                                               
 }                                                                                                                                                                                                                                                                                         
 
 src_prepare() {

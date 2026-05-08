@@ -28,6 +28,19 @@ IUSE+=" ${LUSE/lock-pthreadrw/+lock-pthreadrw}"
 
 REQUIRED_USE="^^ ( $LUSE )"
 
+PATCHES=(
+	"${FILESDIR}/fbec873118715249f072b32ddd08e5014176cfe2.patch
+	"${FILESDIR}/4314aad7e505c45d1fb7cdd01c9a6e1d766d29fc.patch
+	"${FILESDIR}/6209f405a35f31b1f76f128c530f6874677031f4.patch
+	"${FILESDIR}/3a34c9566ace6d5b84fcc5f41a2e44064a718399.patch
+	"${FILESDIR}/20a56cd02e5b8912a34ea97a3e0c2abe61201f3d.patch
+	"${FILESDIR}/f289c2dd31247a4e0433eff061ae53afb49fc99a.patch
+)
+
+pkg_setup() {                                                                                                                                                                                                                                                                             
+	export SED=/bin/sed                                                                                                                                                                                                                                                               
+}                                                                                                                                                                                                                                                                                         
+
 src_prepare() {
 	if use php_targets_php5-6 ; then
 		php-ext-source-r3_src_prepare
