@@ -34,10 +34,10 @@ DEPEND="
 "
 
 PHP_EXT_ECONF_ARGS="--with-imagick=${EPREFIX}/usr"
-                                                                                                                                                                                                                                                                                          
-pkg_setup() {                                                                                                                                                                                                                                                                             
-	export SED=/bin/sed                                                                                                                                                                                                                                                               
-}                                                                                                                                                                                                                                                                                         
+
+pkg_setup() {
+	export SED=/bin/sed
+}
 
 src_prepare() {
 	# Test fails with ImageMagick >=7.1.2

@@ -23,17 +23,17 @@ index 37b253e0..2f8fe893 100644
 --- a/doc/monit.pod
 +++ b/doc/monit.pod
 @@ -767,6 +767,7 @@ Syntax for TCP port:
- 
+
    SET HTTPD PORT <number>
        [ADDRESS <hostname | IP-address>]
 +      [BASEPATH <path>]
        [[with] SSL {pemfile: <path>}]
        ALLOW <user:password | IP-address | IP-range>+
- 
+
 @@ -792,6 +793,19 @@ if the ADDRESS option is not used:
       use address 127.0.0.1
       allow username:password
- 
+
 +B<BASEPATH> sets the URL path prefix used by Monit. This is useful when Monit
 +runs behind a reverse proxy that publishes Monit under a sub-path such as
 +C</monit-xxx>. When set, Monit only accepts requests whose URL starts with the
@@ -67,13 +67,13 @@ index 4549c3e8..ccd98e0a 100644
 --- a/src/gc.c
 +++ b/src/gc.c
 @@ -118,6 +118,7 @@ void gc(void) {
-         }
-         if (Run.httpd.flags & Httpd_Unix)
-                 FREE(Run.httpd.socket.unix.path);
+	 }
+	 if (Run.httpd.flags & Httpd_Unix)
+		 FREE(Run.httpd.socket.unix.path);
 +        FREE(Run.httpd.basepath);
-         if (Run.MailFormat.from)
-                 Address_free(&(Run.MailFormat.from));
-         if (Run.MailFormat.replyto)
+	 if (Run.MailFormat.from)
+		 Address_free(&(Run.MailFormat.from));
+	 if (Run.MailFormat.replyto)
 diff --git a/src/http/cervlet.c b/src/http/cervlet.c
 index 8f69cc1e..deb3172b 100644
 --- a/src/http/cervlet.c
@@ -83,31 +83,31 @@ index 8f69cc1e..deb3172b 100644
   */
  static void doPost(HttpRequest req, HttpResponse res) {
 +        char *location = NULL;
-         set_content_type(res, "text/html");
-         if (ACTION(RUNTIME))
-                 handle_runtime_action(req, res);
+	 set_content_type(res, "text/html");
+	 if (ACTION(RUNTIME))
+		 handle_runtime_action(req, res);
 @@ -744,9 +745,12 @@ static void doPost(HttpRequest req, HttpResponse res) {
-             if (res->status <= 300) {
-                 // #1009: Redirect back to the same url so a reload in the browser does not perform a POST again
-                 set_status(res, SC_MOVED_TEMPORARILY);
+	     if (res->status <= 300) {
+		 // #1009: Redirect back to the same url so a reload in the browser does not perform a POST again
+		 set_status(res, SC_MOVED_TEMPORARILY);
 -                set_header(res, "Location", "%s", req->url);
 +                if (Run.httpd.basepath && ! IS(Run.httpd.basepath, "/") && Str_startsWith(req->url, "/"))
 +                        location = Str_cat("%s%s", Run.httpd.basepath, req->url);
 +                set_header(res, "Location", "%s", location ? location : req->url);
-             }
-         }
+	     }
+	 }
 +        FREE(location);
  }
- 
- 
+
+
 diff --git a/src/http/processor.c b/src/http/processor.c
 index de140fa9..61dd6082 100644
 --- a/src/http/processor.c
 +++ b/src/http/processor.c
 @@ -446,16 +446,34 @@ static void do_service(Socket_T s) {
-         volatile HttpResponse res = create_HttpResponse(s);
-         volatile HttpRequest req = create_HttpRequest(s);
-         if (res && req) {
+	 volatile HttpResponse res = create_HttpResponse(s);
+	 volatile HttpRequest req = create_HttpRequest(s);
+	 if (res && req) {
 -                if (Run.httpd.socket.net.ssl.flags & SSL_Enabled)
 -                        set_header(res, "Strict-Transport-Security", "max-age=63072000");
 -                if (is_authenticated(req, res)) {
@@ -146,9 +146,9 @@ index de140fa9..61dd6082 100644
 +                                else
 +                                        send_error(req, res, SC_NOT_IMPLEMENTED, "Method not implemented");
 +                        }
-                 }
-                 send_response(req, res);
-         }
+		 }
+		 send_response(req, res);
+	 }
 diff --git a/src/l.l b/src/l.l
 index cb0b1633..760b1ae3 100644
 --- a/src/l.l
@@ -166,13 +166,13 @@ index 1260bac8..8efe0df3 100644
 --- a/src/monit.h
 +++ b/src/monit.h
 @@ -1412,6 +1412,7 @@ struct Run_T {
-                         } unix;
-                 } socket;
-                 Auth_T credentials;
+			 } unix;
+		 } socket;
+		 Auth_T credentials;
 +                char *basepath;      /**< Optional base path for reverse proxy deployments */
-         } httpd;
- 
-         /** An object holding program relevant "environment" data, see: env.c */
+	 } httpd;
+
+	 /** An object holding program relevant "environment" data, see: env.c */
 diff --git a/src/p.y b/src/p.y
 index 8f472f71..baa7f932 100644
 --- a/src/p.y
@@ -192,95 +192,95 @@ index 8f472f71..baa7f932 100644
 -%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET HOSTHEADER
 +%token GROUP REQUEST DEPENDS BASEDIR BASEPATH SLOT EVENTQUEUE SECRET HOSTHEADER
  %token UID EUID GID MMONIT INSTANCE USERNAME PASSWORD DATABASE
--%token TIME ATIME CTIME MTIME CHANGED MILLISECOND SECOND MINUTE HOUR DAY MONTH 
+-%token TIME ATIME CTIME MTIME CHANGED MILLISECOND SECOND MINUTE HOUR DAY MONTH
 +%token TIME ATIME CTIME MTIME CHANGED MILLISECOND SECOND MINUTE HOUR DAY MONTH
  %token SSLV2 SSLV3 TLSV1 TLSV11 TLSV12 TLSV13 CERTMD5 AUTO
  %token NOSSLV2 NOSSLV3 NOTLSV1 NOTLSV11 NOTLSV12 NOTLSV13
  %token BYTE KILOBYTE MEGABYTE GIGABYTE
 @@ -1243,6 +1244,7 @@ httpdoption     : ssl
-                 | allowselfcert
-                 | signature
-                 | bindaddress
+		 | allowselfcert
+		 | signature
+		 | bindaddress
 +                | basepath
-                 | allow
-                 | httpdport
-                 | httpdsocket
+		 | allow
+		 | httpdport
+		 | httpdsocket
 @@ -1339,6 +1341,11 @@ bindaddress     : ADDRESS STRING {
-                   }
-                 ;
- 
+		   }
+		 ;
+
 +basepath        : BASEPATH PATH {
 +                        sethttpdbasepath($2);
 +                  }
 +                ;
 +
  allow           : ALLOW STRING':'STRING readonly {
-                         addcredentials($2, $4, Digest_Cleartext, $<number>5);
-                   }
+			 addcredentials($2, $4, Digest_Cleartext, $<number>5);
+		   }
 @@ -3623,7 +3630,7 @@ bool parse(char *controlfile) {
- 
+
  /* ----------------------------------------------------------------- Private */
- 
--        
+
+-
 +
  static void yydeprecated(const char *s, ...) {
-         assert(s);
-         char *msg = NULL;
+	 assert(s);
+	 char *msg = NULL;
 @@ -3634,7 +3641,7 @@ static void yydeprecated(const char *s, ...) {
-         Log_warning("%s:%i: %s\n", currentfile, lineno, msg);
-         FREE(msg);
+	 Log_warning("%s:%i: %s\n", currentfile, lineno, msg);
+	 FREE(msg);
  }
--                
+-
 +
- 
+
  /**
   * Initialize objects used by the parser.
 @@ -3664,6 +3671,7 @@ static void preparse(void) {
-         Run.mmonitcredentials        = NULL;
-         Run.httpd.flags              = Httpd_Disabled | Httpd_Signature;
-         Run.httpd.credentials        = NULL;
+	 Run.mmonitcredentials        = NULL;
+	 Run.httpd.flags              = Httpd_Disabled | Httpd_Signature;
+	 Run.httpd.credentials        = NULL;
 +        Run.httpd.basepath           = NULL;
-         memset(&(Run.httpd.socket), 0, sizeof(Run.httpd.socket));
-         Run.mailserver_timeout       = SMTP_TIMEOUT;
-         Run.eventlist_dir            = NULL;
+	 memset(&(Run.httpd.socket), 0, sizeof(Run.httpd.socket));
+	 Run.mailserver_timeout       = SMTP_TIMEOUT;
+	 Run.eventlist_dir            = NULL;
 @@ -4243,9 +4251,9 @@ static void addsize(Size_T ss) {
  static void addnlink(NLink_T ss) {
-         NLink_T s;
-         struct stat buf;
--    
+	 NLink_T s;
+	 struct stat buf;
+-
 +
-         assert(ss);
--    
+	 assert(ss);
+-
 +
-         NEW(s);
-         s->operator     = ss->operator;
-         s->nlink        = ss->nlink;
+	 NEW(s);
+	 s->operator     = ss->operator;
+	 s->nlink        = ss->nlink;
 @@ -4257,10 +4265,10 @@ static void addnlink(NLink_T ss) {
-                 if (s->initialized)
-                         s->nlink = (unsigned long long)buf.st_nlink;
-         }
--    
+		 if (s->initialized)
+			 s->nlink = (unsigned long long)buf.st_nlink;
+	 }
+-
 +
-         s->next = current->nlinklist;
-         current->nlinklist = s;
--    
+	 s->next = current->nlinklist;
+	 current->nlinklist = s;
+-
 +
-         reset_nlinkset();
+	 reset_nlinkset();
  }
- 
+
 @@ -4457,7 +4465,7 @@ static void addlinkstatus(Service_T s, LinkStatus_T L) {
-                 if (l->check_invers != L->check_invers)
-                         yyerror2("Mixing link up and down tests is not supported");
-         }
--                        
+		 if (l->check_invers != L->check_invers)
+			 yyerror2("Mixing link up and down tests is not supported");
+	 }
+-
 +
-         if (L->check_invers)
-                 s->inverseStatus = true;
- 
+	 if (L->check_invers)
+		 s->inverseStatus = true;
+
 @@ -5113,6 +5121,21 @@ static void setstatefile(char *statefile) {
  }
- 
- 
+
+
 +/*
 + * Reset the httpd basepath if changed
 + */
@@ -304,13 +304,12 @@ index 067868c0..886502d1 100644
 --- a/src/util.c
 +++ b/src/util.c
 @@ -762,6 +762,7 @@ void Util_printRunList(void) {
-                         printf(" %-18s = %s\n", "httpd unix socket", Run.httpd.socket.unix.path);
-                         printf(" %-18s = %s\n", "httpd unix readonly", Run.httpd.socket.unix.readonly ? "Enabled" : "Disabled");
-                 }
+			 printf(" %-18s = %s\n", "httpd unix socket", Run.httpd.socket.unix.path);
+			 printf(" %-18s = %s\n", "httpd unix readonly", Run.httpd.socket.unix.readonly ? "Enabled" : "Disabled");
+		 }
 +                printf(" %-18s = %s\n", "httpd basepath", Run.httpd.basepath ? Run.httpd.basepath : "/");
-                 printf(" %-18s = %s\n", "httpd signature", Run.httpd.flags & Httpd_Signature ? "Enabled" : "Disabled");
-                 printf(" %-18s = %s\n", "httpd auth. style",
-                        Run.httpd.credentials && Engine_hasAllow() ? "Basic Authentication and Host/Net allow list" : Run.httpd.credentials ? "Basic Authentication" : Engine_hasAllow() ? "Host/Net allow list" : "No authentication!");
--- 
+		 printf(" %-18s = %s\n", "httpd signature", Run.httpd.flags & Httpd_Signature ? "Enabled" : "Disabled");
+		 printf(" %-18s = %s\n", "httpd auth. style",
+			Run.httpd.credentials && Engine_hasAllow() ? "Basic Authentication and Host/Net allow list" : Run.httpd.credentials ? "Basic Authentication" : Engine_hasAllow() ? "Host/Net allow list" : "No authentication!");
+--
 2.53.0
-

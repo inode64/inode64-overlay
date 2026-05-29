@@ -14,7 +14,7 @@ index 5009c26a..b32607e5 100644
 @@ -1538,63 +1538,65 @@ PHP_APCU_API zval* apc_cache_info(apc_cache_t* cache, zend_bool limited TSRMLS_D
      /* read lock header */
      APC_RLOCK(cache->header);
- 
+
 -    array_init(info);
 -    add_assoc_long(info, "num_slots", cache->nslots);
 -    add_assoc_long(info, "ttl", cache->ttl);
@@ -36,7 +36,7 @@ index 5009c26a..b32607e5 100644
 +		add_assoc_double(info, "expunges", (double)cache->header->nexpunges);
 +		add_assoc_long(info, "start_time", cache->header->stime);
 +		add_assoc_double(info, "mem_size", (double)cache->header->mem_size);
- 
+
  #ifdef MULTIPART_EVENT_FORMDATA
 -    add_assoc_long(info, "file_upload_progress", 1);
 +		add_assoc_long(info, "file_upload_progress", 1);
@@ -51,7 +51,7 @@ index 5009c26a..b32607e5 100644
 -    add_assoc_stringl(info, "memory_type", "IPC shared", sizeof("IPC shared")-1, 1);
 +		add_assoc_stringl(info, "memory_type", "IPC shared", sizeof("IPC shared")-1, 1);
  #endif
- 
+
 -    if (!limited) {
 -        /* For each hashtable slot */
 -        ALLOC_INIT_ZVAL(list);
@@ -76,7 +76,7 @@ index 5009c26a..b32607e5 100644
 +		    /* For each hashtable slot */
 +		    ALLOC_INIT_ZVAL(list);
 +		    array_init(list);
- 
+
 -        /* For each slot pending deletion */
 -        ALLOC_INIT_ZVAL(gc);
 -        array_init(gc);
@@ -104,23 +104,22 @@ index 5009c26a..b32607e5 100644
 +		        zval *link = apc_cache_link_info(cache, p TSRMLS_CC);
 +		        add_next_index_zval(gc, link);
 +		    }
-+		    
++
 +		    add_assoc_zval(info, "cache_list", list);
 +		    add_assoc_zval(info, "deleted_list", gc);
 +		    add_assoc_zval(info, "slot_distribution", slots);
 +		}
 +	} zend_end_try();
- 
+
 -        for (p = cache->header->gc; p != NULL; p = p->next) {
 -            zval *link = apc_cache_link_info(cache, p TSRMLS_CC);
 -            add_next_index_zval(gc, link);
 -        }
--        
+-
 -        add_assoc_zval(info, "cache_list", list);
 -        add_assoc_zval(info, "deleted_list", gc);
 -        add_assoc_zval(info, "slot_distribution", slots);
 -    }
--	
- 	/* unlock header */
- 	APC_RUNLOCK(cache->header);
- 
+-
+	/* unlock header */
+	APC_RUNLOCK(cache->header);

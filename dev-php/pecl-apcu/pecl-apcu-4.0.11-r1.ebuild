@@ -37,9 +37,9 @@ PATCHES=(
 	"${FILESDIR}/f289c2dd31247a4e0433eff061ae53afb49fc99a.patch"
 )
 
-pkg_setup() {                                                                                                                                                                                                                                                                             
-	export SED=/bin/sed                                                                                                                                                                                                                                                               
-}                                                                                                                                                                                                                                                                                         
+pkg_setup() {
+	export SED=/bin/sed
+}
 
 src_prepare() {
 	if use php_targets_php5-6 ; then

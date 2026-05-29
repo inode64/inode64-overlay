@@ -17,7 +17,7 @@ index 6f728a9..e487e47 100644
  char* after = NULL;
 +static char* config_override = NULL;
 +static bool print_version_requested = false;
- 
+
  #ifndef MAXHOSTNAMELEN
  #define MAXHOSTNAMELEN 256
 @@ -149,16 +151,20 @@ static void print_version(void)
@@ -42,16 +42,16 @@ index 6f728a9..e487e47 100644
  #endif
 +  fprintf(stdout, "database_in: %s\n", database_in);
 +  fprintf(stdout, "database_out: %s\n", database_out);
- 
+
    fprintf(stdout, "\nAvailable compiled-in attributes:\n");
    DB_ATTR_TYPE extra_attributes = get_groupval("X");
 @@ -267,12 +273,14 @@ static void read_param(int argc,char**argv)
- 	break;
+	break;
        }
        case 'v':{
 -	print_version();
 +        print_version_requested = true;
- 	break;
+	break;
        }
        case 'c':{
 -	  conf->config_file=optarg;
@@ -60,13 +60,13 @@ index 6f728a9..e487e47 100644
 +	config_override = checked_strdup(optarg);
 +	conf->config_file = config_override;
 +	log_msg(LOG_LEVEL_INFO,_("(--config): set config file to '%s'"), conf->config_file);
- 	break;
+	break;
        }
        case 'B': {
 @@ -418,7 +426,7 @@ static void read_param(int argc,char**argv)
        }
    }
- 
+
 -  if(optind<argc){
 +  if(!print_version_requested && optind<argc){
      fprintf(stderr, "%s: extra parameter: '%s'\n", argv[0], argv[optind]);
@@ -75,7 +75,7 @@ index 6f728a9..e487e47 100644
 @@ -676,6 +684,23 @@ int main(int argc,char**argv)
    log_msg(LOG_LEVEL_INFO, "read command line parameters");
    read_param(argc,argv);
- 
+
 +  if (print_version_requested) {
 +      if (config_override) {
 +          log_msg(LOG_LEVEL_INFO, "parse configuration");
@@ -95,7 +95,6 @@ index 6f728a9..e487e47 100644
 +
    int stderr_isatty = isatty(STDERR_FILENO);
    if (stderr_isatty == 0) {
-         log_msg(LOG_LEVEL_DEBUG, "isatty() failed for 'STDERR_FILENO': %s", strerror(errno));
--- 
+	 log_msg(LOG_LEVEL_DEBUG, "isatty() failed for 'STDERR_FILENO': %s", strerror(errno));
+--
 2.53.0
-
