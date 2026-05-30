@@ -29,9 +29,9 @@ else
 			https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/hip-tests.tar.gz -> hip-tests-${PV}.tar.gz
 		)
 	"
-	S="${WORKDIR}"
+	S="${WORKDIR}/clr"
 	TEST_S="${WORKDIR}/hip-tests/catch"
-	HIP_S="${WORKDIR}"
+	HIP_S="${WORKDIR}/${PN}"
 	KEYWORDS="~amd64"
 	SLOT="0/$(ver_cut 1-2)"
 fi

@@ -10,7 +10,7 @@ DESCRIPTION="Radeon Open Compute OpenCL Compatible Runtime"
 HOMEPAGE="https://github.com/ROCm/rocm-systems/tree/develop/projects/clr"
 
 SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/clr.tar.gz -> rocm-clr-${PV}.tar.gz"
-S="${WORKDIR}"
+S="${WORKDIR}/clr"
 
 LICENSE="Apache-2.0 MIT"
 SLOT="0/$(ver_cut 1-2)"

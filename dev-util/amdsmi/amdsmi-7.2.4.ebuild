@@ -19,7 +19,7 @@ SRC_URI="
 	https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/${PN}.tar.gz -> ${P}.tar.gz
 	https://github.com/amd/esmi_ib_library/archive/refs/tags/${ESMI_PN}-${ESMI_PV}.tar.gz
 "
-S="${WORKDIR}"
+S="${WORKDIR}/${PN}"
 ESMI_S="${WORKDIR}/esmi_ib_library-${ESMI_PN}-${ESMI_PV}"
 
 LICENSE="MIT"

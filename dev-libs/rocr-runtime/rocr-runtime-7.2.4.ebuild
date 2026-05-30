@@ -10,10 +10,10 @@ inherit cmake flag-o-matic llvm-r2
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/ROCm/ROCR-Runtime/"
 	inherit git-r3
-	S="${WORKDIR}/${P}"
+	S="${WORKDIR}/${PN}"
 else
 	SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/${PN}.tar.gz -> ${P}.tar.gz"
-	S="${WORKDIR}"
+	S="${WORKDIR}/${PN}"
 	KEYWORDS="~amd64"
 fi
 
