@@ -4,7 +4,7 @@
 EAPI=8
 PYTHON_COMPAT=( python3_{11..14} )
 
-DISTUTILS_USE_PEP517=standalone
+DISTUTILS_USE_PEP517=setuptools
 inherit systemd distutils-r1
 
 DESCRIPTION="Salt is a remote execution and configuration manager"
@@ -17,7 +17,7 @@ if [[ ${PV} == 9999* ]]; then
 	EGIT_BRANCH="develop"
 else
 	inherit pypi
-	KEYWORDS=""
+	KEYWORDS="~amd64 ~riscv ~x86"
 fi
 
 LICENSE="Apache-2.0"
@@ -135,6 +135,11 @@ RESTRICT="
 	x86? ( test )
 "
 
+PATCHES=(
+	"${FILESDIR}/salt-3003-gentoolkit-revdep.patch"
+	"${FILESDIR}/salt-3006.9-pam-module.patch"
+)
+
 pkg_pretend() {
 	if use nova ; then
 		ewarn " "
@@ -148,9 +153,11 @@ python_prepare_all() {
 	local -a remove_test_files=(
 		# remove tests with external dependencies that may not be available, and
 		# tests that don't work in sandbox
+		tests/integration/externalapi/test_venafiapi.py
 		tests/integration/modules/test_rabbitmq.py
 		tests/integration/modules/test_supervisord.py
 		tests/integration/states/test_match.py
+		tests/pytests/functional/fileserver/hgfs/test_hgfs.py
 		tests/pytests/functional/loader/test_loader.py
 		tests/pytests/functional/modules/file/test_readlink.py
 		tests/pytests/functional/modules/file/test_symlink.py
@@ -159,24 +166,34 @@ python_prepare_all() {
 		tests/pytests/functional/modules/state/test_mako_renderer.py
 		tests/pytests/functional/modules/state/test_pyobjects_renderer.py
 		tests/pytests/functional/modules/test_aptpkg.py
+		tests/pytests/functional/modules/test_dockermod.py
 		tests/pytests/functional/modules/test_etcd_mod.py
 		tests/pytests/functional/modules/test_grains.py
 		tests/pytests/functional/modules/test_mac_service.py
 		tests/pytests/functional/modules/test_saltcheck.py
 		tests/pytests/functional/modules/test_saltutil.py
 		tests/pytests/functional/modules/test_test.py
+		tests/pytests/functional/pillar/hg_pillar/test_hg_pillar.py
 		tests/pytests/functional/pillar/test_git_pillar.py
 		tests/pytests/functional/pillar/test_gpg.py
+		tests/pytests/functional/returners/test_etcd_return.py
 		tests/pytests/functional/runners/test_winrepo.py
+		tests/pytests/functional/sdb/test_etcd_db.py
 		tests/pytests/functional/state/test_masterless_tops.py
 		tests/pytests/functional/states/file/test_keyvalue.py
 		tests/pytests/functional/states/file/test_patch.py
 		tests/pytests/functional/states/file/test_rename.py
 		tests/pytests/functional/states/rabbitmq
+		tests/pytests/functional/states/test_docker_container.py
+		tests/pytests/functional/states/test_docker_network.py
 		tests/pytests/functional/states/test_etcd_mod.py
 		tests/pytests/functional/states/test_module.py
+		tests/pytests/functional/states/test_mysql.py
+		tests/pytests/functional/states/test_svn.py
+		tests/pytests/functional/states/test_virtualenv_mod.py
 		tests/pytests/functional/test_version.py
 		tests/pytests/functional/utils/gitfs
+		tests/pytests/functional/utils/test_vault.py
 		tests/pytests/integration/cli/test_syndic_eauth.py
 		tests/pytests/integration/daemons/test_memory_leak.py
 		tests/pytests/integration/grains/test_grains.py
@@ -194,6 +211,8 @@ python_prepare_all() {
 		tests/pytests/integration/modules/test_file.py
 		tests/pytests/integration/modules/test_jinja.py
 		tests/pytests/integration/modules/test_pillar.py
+		tests/pytests/integration/modules/test_vault.py
+		tests/pytests/integration/modules/test_virt.py
 		tests/pytests/integration/modules/test_x509_v2.py
 		tests/pytests/integration/proxy/test_deltaproxy.py
 		tests/pytests/integration/proxy/test_shell.py
@@ -204,6 +223,8 @@ python_prepare_all() {
 		tests/pytests/integration/runners/test_jobs.py
 		tests/pytests/integration/runners/test_manage.py
 		tests/pytests/integration/runners/test_saltutil.py
+		tests/pytests/integration/runners/test_vault.py
+		tests/pytests/integration/sdb/test_vault.py
 		tests/pytests/integration/ssh/state/test_pillar_override.py
 		tests/pytests/integration/ssh/state/test_retcode_highstate_verification_requisite_fail.py
 		tests/pytests/integration/ssh/state/test_retcode_pillar_render_exception.py
@@ -247,9 +268,12 @@ python_prepare_all() {
 		tests/pytests/pkg/integration/test_python.py
 		tests/pytests/scenarios/compat/test_with_versions.py
 		tests/pytests/unit/loader/test_lazy.py
+		tests/pytests/unit/modules/test_mongodb.py
 		tests/pytests/unit/modules/test_mysql.py
 		tests/pytests/unit/modules/test_schedule.py
 		tests/pytests/unit/modules/test_yaml.py
+		tests/pytests/unit/pillar/test_consul_pillar.py
+		tests/pytests/unit/pillar/test_mysql.py
 		tests/pytests/unit/pillar/test_pillar.py
 		tests/pytests/unit/renderers/test_yamlex.py
 		tests/pytests/unit/roster/test_ansible.py
@@ -264,8 +288,15 @@ python_prepare_all() {
 		tests/pytests/unit/utils/test_versions.py
 		tests/pytests/unit/utils/test_x509.py
 		tests/unit/ext/test_ipaddress.py
+		tests/unit/modules/test_boto_elb.py
+		tests/unit/modules/test_boto_secgroup.py
+		tests/unit/modules/test_boto_vpc.py
+		tests/unit/modules/test_elasticsearch.py
+		tests/unit/modules/test_k8s.py
+		tests/unit/modules/test_kubernetesmod.py
 		tests/unit/modules/test_vsphere.py
 		tests/unit/netapi/rest_tornado/test_saltnado.py
+		tests/unit/states/test_boto_vpc.py
 		tests/unit/test_module_names.py
 		tests/unit/test_zypp_plugins.py
 		tests/unit/utils/test_extend.py
@@ -323,19 +354,34 @@ python_prepare_all() {
 		tests/pytests/unit/test_client.py
 		tests/pytests/unit/utils/test_aws.py
 		tests/pytests/unit/utils/test_http.py
+		tests/unit/modules/test_boto3_elasticsearch.py
+		tests/unit/modules/test_boto3_route53.py
 		tests/unit/modules/test_network.py
+		tests/unit/modules/test_zcbuildout.py
+		tests/unit/states/test_zcbuildout.py
 
 		# tests require root access
 		tests/integration/pillar/test_git_pillar.py
+		tests/integration/states/test_lxd_container.py
+		tests/integration/states/test_lxd_image.py
+		tests/integration/states/test_lxd_profile.py
+		tests/integration/states/test_supervisord.py
 		tests/pytests/functional/cache/test_mysql.py
 		tests/pytests/functional/cli/test_salt.py
 		tests/pytests/functional/modules/test_mysql.py
+		tests/pytests/functional/modules/test_vault.py
 		tests/pytests/functional/states/file/test_accumulated.py
 		tests/pytests/scenarios/performance/test_performance.py
 		tests/pytests/unit/cloud/test_map.py
+		tests/pytests/unit/engines/test_slack_bolt_engine.py
 		tests/pytests/unit/modules/state/test_state.py
 		tests/pytests/unit/modules/state/test_top_file_merge.py
+		tests/pytests/unit/proxy/test_netmiko_px.py
+		tests/pytests/unit/proxy/test_ssh_sample.py
 		tests/pytests/unit/roster/test_sshknownhosts.py
+
+		# tests that require boto
+		tests/pytests/unit/engines/test_sqs_events.py
 
 		# first test always fails
 		tests/pytests/unit/utils/parsers/test_log_parsers.py
@@ -345,6 +391,9 @@ python_prepare_all() {
 
 	# axe the boto dep (bug #888235)
 	find "${S}/tests" -name 'test_boto_*.py' -delete || die
+
+	# removes contextvars, see bug: https://bugs.gentoo.org/799431
+	sed -i '/^contextvars/d' requirements/base.txt || die
 
 	# called_once should be assert_called_once_with
 	find "${S}/tests" -name '*.py' -print0 \
