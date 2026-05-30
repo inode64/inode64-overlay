@@ -11,7 +11,7 @@ SRC_URI="https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 EGIT_REPO_URI="https://github.com/${PN}/${PN}"
 EGIT_COMMIT="c13824d95608b15913a7c0def0a3dea4474b71fc"
-EGIT_BRANCH="2.10.0"
+EGIT_BRANCH="main"
 
 LICENSE="MIT"
 SLOT="0"
