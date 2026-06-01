@@ -3,14 +3,14 @@
 
 EAPI="8"
 
-FIREFOX_PATCHSET="firefox-140esr-patches-07.tar.xz"
+FIREFOX_PATCHSET="firefox-140esr-patches-10.tar.xz"
 SPIDERMONKEY_PATCHSET="spidermonkey-140-patches-02.tar.xz"
 
-LLVM_COMPAT=( 19 20 21 22 )
+LLVM_COMPAT=( 20 21 22 )
 RUST_NEEDS_LLVM=1
 RUST_MIN_VER=1.82.0
 
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 PYTHON_REQ_USE="ncurses,ssl,xml(+)"
 
 WANT_AUTOCONF="2.1"
@@ -62,8 +62,8 @@ SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}
 	${PATCH_URIS[@]}"
 S="${WORKDIR}/firefox-${PV%_*}"
 LICENSE="MPL-2.0"
-SLOT="$(ver_cut 1)"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+SLOT="$(ver_cut 1)/140.11.0"
+KEYWORDS="amd64 ~arm arm64 ~loong ~ppc ppc64 ~riscv x86"
 
 IUSE="clang cpu_flags_arm_neon debug +jit test"
 
@@ -439,7 +439,7 @@ src_test() {
 		die "Smoke-test failed: did interpreter initialization fail?"
 	fi
 
-	cp "${FILESDIR}"/spidermonkey-${SLOT}-known-test-failures.txt "${T}"/known_test_failures.list || die
+	cp "${FILESDIR}"/spidermonkey-140-known-test-failures.txt "${T}"/known_test_failures.list || die
 	./mach jstests --exclude-file="${T}"/known_test_failures.list || die
 }
 
