@@ -1,61 +1,91 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 2025-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 DISTUTILS_USE_PEP517=pdm-backend
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_14 )
+#may be not stricly required
+PYTHON_REQ_USE="threads(+)"
 
-inherit distutils-r1 optfeature
+inherit distutils-r1 optfeature pypi
 
-DESCRIPTION="FastAPI framework, high performance, easy to learn, ready for production"
-HOMEPAGE="
-	https://fastapi.tiangolo.com/
-	https://pypi.org/project/fastapi/
-	https://github.com/fastapi/fastapi
-"
-
-if [[ ${PV} == 9999 ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/fastapi/fastapi.git"
-else
-	inherit pypi
-	KEYWORDS="~amd64"
-fi
+DESCRIPTION="High performance framework, easy to learn, fast to code, ready for production"
+HOMEPAGE="https://fastapi.tiangolo.com/ https://pypi.org/project/fastapi/"
 
 LICENSE="MIT"
 SLOT="0"
+KEYWORDS="~amd64"
 
 RDEPEND="
-	>=dev-python/annotated-doc-0.0.2[${PYTHON_USEDEP}]
-	>=dev-python/pydantic-2.9.0[${PYTHON_USEDEP}]
+	>=dev-python/annotated-doc-0.0.4[${PYTHON_USEDEP}]
 	>=dev-python/starlette-0.46.0[${PYTHON_USEDEP}]
+	>=dev-python/pydantic-2.9.0[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.8.0[${PYTHON_USEDEP}]
 	>=dev-python/typing-inspection-0.4.2[${PYTHON_USEDEP}]
 "
-# Tests need a sprawl of dev-python/* deps (pwdlib, sqlmodel,
-# strawberry-graphql, pydantic-extra-types) that live in ::guru only.
-# Forking them all just to run fastapi's test suite is overkill for our
-# overlay's needs — RESTRICT them and rely on upstream CI.
-RESTRICT="test"
 
-python_prepare_all() {
-	# Dont install fastapi executable as fastapi-cli is supposed to handle it
-	sed -i -e '/\[project.scripts\]/,/^$/d' pyproject.toml || die
+#FIXME: add missing deps
+BDEPEND="test? (
+	dev-python/a2wsgi[${PYTHON_USEDEP}]
+	dev-python/dirty-equals[${PYTHON_USEDEP}]
+	dev-python/flask[${PYTHON_USEDEP}]
+	dev-python/inline-snapshot[${PYTHON_USEDEP}]
+	dev-python/pytest-timeout[${PYTHON_USEDEP}]
+	dev-python/python-multipart[${PYTHON_USEDEP}]
+	dev-python/sqlalchemy[${PYTHON_USEDEP}]
+	dev-python/typer[${PYTHON_USEDEP}]
+)"
 
-	distutils-r1_python_prepare_all
+# 3k tests+, so use xdist to speed them up
+EPYTEST_XDIST=1
+distutils_enable_tests pytest
+
+# There are some JSON response tests that will exercise orjson or ujson if they are available.
+# These are properly skipped if the optional dependencies are not installed at the cost of a little spam.
+python_test() {
+	local EPYTEST_IGNORE=(
+		# python/strawberry-graphql (in guru, test dep only)
+		tests/test_tutorial/test_graphql/test_tutorial001.py
+		# dev-python/sqlmodel (in guru, test dep only)
+		tests/test_tutorial/test_sql_databases/test_tutorial001.py
+		tests/test_tutorial/test_sql_databases/test_tutorial002.py
+		# dev-python/fastapi-cli (missing, test and optfeature)
+		tests/test_fastapi_cli.py
+		# dev-python/pwdlib (in guru, test dep only)
+		tests/test_tutorial/test_security/test_tutorial004.py
+		tests/test_tutorial/test_security/test_tutorial005.py
+		# Wants dev-python/multipart _just_ to complain that it's not the right multipart lib.
+		tests/test_multipart_installation.py
+		# scripts/tests use CliRunner.isolated_filesystem() removed in recent typer
+		scripts/tests
+	)
+	local EPYTEST_DESELECT=(
+		# Requires investigation - missing ./image.png test file (?)
+		tests/test_tutorial/test_additional_responses/test_tutorial004.py::test_path_operation_img
+	)
+	epytest
 }
 
 pkg_postinst() {
-	optfeature "commandline interface" dev-python/fastapi-cli
-	optfeature "test client" dev-python/httpx
-	optfeature "templates" dev-python/jinja2
-	optfeature "forms and file uploads" dev-python/python-multipart
-	optfeature "validate emails" dev-python/email-validator
-	optfeature "uvicorn with uvloop" dev-python/uvicorn
-	optfeature "settings management" dev-python/pydantic-settings
-	optfeature "extra Pydantic data types" dev-python/pydantic-extra-types
-	optfeature_header "Alternative JSON responses"
-	optfeature "ORJSONResponse" dev-python/orjson
-	optfeature "UJSONResponse" dev-python/ujson
+	# not part of any upstream extra
+	optfeature "alternative JSON library" "dev-python/ujson" # orjson, too but it's deprecated
+
+	# pyproject.toml:project.optional-dependencies.standard
+	# Following optfeatures should be exposed, but missing deps
+	#	optfeature "fastAPI CLI" "dev-python/fastapi-cli" - missing - depends on this package!
+	#	optfeature "compressed file support" "dev-python/fastar" - missing
+	#	optfeature "pydantic extra types support" "dev-python/pydantic-extra-types" - in guru
+	optfeature_header "standard extras"
+	optfeature "ASGI server support" "dev-python/uvicorn"
+	optfeature "email validation support" "dev-python/email-validator"
+	optfeature "TestClient for testing FastAPI applications" "dev-python/httpx"
+	optfeature "templating support" "dev-python/jinja2"
+	optfeature "multipart form data support" "dev-python/python-multipart"
+	optfeature "settings management support" "dev-python/pydantic-settings"
+
+	# pyproject.toml:project.optional-dependencies.all - includes all the above plus:
+	optfeature_header "all extras"
+	optfeature "session middleware support" "dev-python/itsdangerous"
+	optfeature "YAML support" "dev-python/pyyaml"
 }
