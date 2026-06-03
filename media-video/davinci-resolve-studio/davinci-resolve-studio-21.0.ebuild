@@ -1,9 +1,6 @@
 # Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# TODO:
-#	Panel Daemon is don't installed
-
 EAPI=8
 inherit check-reqs desktop udev xdg
 
@@ -21,21 +18,64 @@ LIBS_SYM="
 	libs/libaprutil-1.so
 	libs/libaprutil-1.so.0
 	libs/libaprutil-1.so.0.6.1
-	libs/libcdt.so
-	libs/libcdt.so.5
-	libs/libcgraph.so
-	libs/libcgraph.so.6
 	libs/libcrypto.so.1.1
 	libs/libcurl.so
-	libs/libgvc.so
-	libs/libgvc.so.6
-	libs/libgvpr.so
-	libs/libgvpr.so.2
+	libs/libdns_sd.so.1
+	libs/libgstapp-1.0.so
+	libs/libgstapp-1.0.so.0
+	libs/libgstapp-1.0.so.0.2003.0
+	libs/libgstaudio-1.0.so
+	libs/libgstaudio-1.0.so.0
+	libs/libgstaudio-1.0.so.0.2003.0
+	libs/libgstbase-1.0.so
+	libs/libgstbase-1.0.so.0
+	libs/libgstbase-1.0.so.0.2003.0
+	libs/libgstcodecparsers-1.0.so
+	libs/libgstcodecparsers-1.0.so.0
+	libs/libgstcodecparsers-1.0.so.0.2003.0
+	libs/libgstcodecs-1.0.so
+	libs/libgstcodecs-1.0.so.0
+	libs/libgstcodecs-1.0.so.0.2003.0
+	libs/libgstnet-1.0.so
+	libs/libgstnet-1.0.so.0
+	libs/libgstnet-1.0.so.0.2003.0
+	libs/libgstpbutils-1.0.so
+	libs/libgstpbutils-1.0.so.0
+	libs/libgstpbutils-1.0.so.0.2003.0
+	libs/libgstreamer-1.0.so
+	libs/libgstreamer-1.0.so.0
+	libs/libgstreamer-1.0.so.0.2003.0
+	libs/libgstrtp-1.0.so
+	libs/libgstrtp-1.0.so.0
+	libs/libgstrtp-1.0.so.0.2003.0
+	libs/libgstsctp-1.0.so
+	libs/libgstsctp-1.0.so.0
+	libs/libgstsctp-1.0.so.0.2003.0
+	libs/libgstsdp-1.0.so
+	libs/libgstsdp-1.0.so.0
+	libs/libgstsdp-1.0.so.0.2003.0
+	libs/libgsttag-1.0.so
+	libs/libgsttag-1.0.so.0
+	libs/libgsttag-1.0.so.0.2003.0
+	libs/libgstvideo-1.0.so
+	libs/libgstvideo-1.0.so.0
+	libs/libgstvideo-1.0.so.0.2003.0
+	libs/libgstwebrtc-1.0.so
+	libs/libgstwebrtc-1.0.so.0
+	libs/libgstwebrtc-1.0.so.0.2003.0
+	libs/libjxl.so
+	libs/libjxl.so.0.11
+	libs/libjxl.so.0.11.1
+	libs/libjxl_cms.so
+	libs/libjxl_cms.so.0.11
+	libs/libjxl_cms.so.0.11.1
+	libs/libjxl_threads.so
+	libs/libjxl_threads.so.0.11
+	libs/libjxl_threads.so.0.11.1
+	libs/libluajit-5.1.so.2
 	libs/liborc-0.4.so
 	libs/liborc-0.4.so.0
 	libs/liborc-0.4.so.0.32.0
-	libs/libpathplan.so
-	libs/libpathplan.so.4
 	libs/libpq.so.5
 	libs/libsoxr.so
 	libs/libsoxr.so.0
@@ -44,12 +84,23 @@ LIBS_SYM="
 	libs/libsrtp2.so.2.4.0
 	libs/libssl.so.1.1
 	libs/libtbb.so.2
-	libs/libtbb_debug.so.2
 	libs/libtbbmalloc.so.2
 	libs/libtbbmalloc_proxy.so.2
-	libs/libxdot.so
-	libs/libxdot.so.4
-	libs/libxdot.so.4.0.0
+	libs/libsharpyuv.so
+	libs/libsharpyuv.so.0
+	libs/libsharpyuv.so.0.1.1
+	libs/libwebp.so
+	libs/libwebp.so.7
+	libs/libwebp.so.7.1.10
+	libs/libwebpdecoder.so
+	libs/libwebpdecoder.so.3
+	libs/libwebpdecoder.so.3.1.10
+	libs/libwebpdemux.so
+	libs/libwebpdemux.so.2
+	libs/libwebpdemux.so.2.0.16
+	libs/libwebpmux.so
+	libs/libwebpmux.so.3
+	libs/libwebpmux.so.3.1.1
 	libs/libxmlsec1-openssl.so
 	libs/libxmlsec1.so
 	Fairlight Studio Utility/libavahi-common.so.3
@@ -68,9 +119,6 @@ KEYWORDS="~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 RESTRICT="fetch mirror strip test"
 
-# media-libs/libpng-compat:1.2 required for bin/BMDPanelFirmware and libs/libQtGui.so.4
-# x11-libs/libXfixes required for libs/libQtGui.so.4
-# x11-libs/libXrender required for libs/libQtGui.so.4
 # x11-libs/libXtst required for libs/libFairlightPage.so
 
 DEPEND="
@@ -85,7 +133,6 @@ DEPEND="
 	gnome-base/librsvg
 	media-gfx/graphite2
 	media-libs/harfbuzz
-	media-libs/libpng-compat:1.2
 	sys-apps/dbus
 	sys-devel/gcc
 	virtual/libcrypt
@@ -93,19 +140,22 @@ DEPEND="
 	virtual/opengl
 	x11-libs/libX11
 	x11-libs/libXext
-	x11-libs/libXfixes
 	x11-libs/libXrandr
-	x11-libs/libXrender
 	x11-libs/libXtst
 	x11-libs/libxcb
 	!bundled-libs? (
-		<dev-libs/openssl-3.0
+		dev-libs/openssl-compat:1.1.1
 		dev-cpp/tbb
+		dev-lang/luajit
 		dev-lang/orc
 		dev-libs/apr
 		dev-libs/xmlsec
-		media-gfx/graphviz
 		media-libs/freeglut
+		media-libs/gst-plugins-bad
+		media-libs/gst-plugins-base
+		media-libs/gstreamer
+		media-libs/libjxl
+		media-libs/libwebp
 		media-libs/soxr
 		net-dns/avahi[mdnsresponder-compat]
 		net-libs/libsrtp
@@ -146,12 +196,12 @@ include_dir() {
 }
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="24G"
+	CHECKREQS_DISK_BUILD="30G"
 
 	check-reqs_pkg_pretend
 }
 pkg_setup() {
-	CHECKREQS_DISK_BUILD="24G"
+	CHECKREQS_DISK_BUILD="30G"
 
 	check-reqs_pkg_pretend
 }
@@ -199,8 +249,13 @@ src_prepare() {
 			fi
 		done
 
+		# NOTE: graphviz is kept bundled even with -bundled-libs. DaVinci ships an
+		# old graphviz (libcdt.so.5 / libcgraph.so.6 / libgvc.so.6 / libgvcodec.so)
+		# whose sonames are ABI-incompatible with current media-gfx/graphviz
+		# (libcdt.so.6 / libcgraph.so.8 / libgvc.so.7). The bundled libs/graphviz/
+		# plugins (config6) are self-contained, so they must not be removed.
+
 		# remove some libraries
-		rm -rf libs/graphviz || die
 		find -name "libgcc_s.so.1" -delete || die
 		find -name "libusb*" -delete || die
 	fi
@@ -258,7 +313,8 @@ src_install() {
 
 	insinto "${PKG_HOME}"
 	local _dir
-	for _dir in "Apple Immersive" bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest Certificates Control "DaVinci Control Panels Setup" \
+	for _dir in "Apple Immersive" bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest \
+		    Certificates Control "DaVinci Control Panels Setup" \
 		    "Fairlight Studio Utility" Fusion graphics libs LUT plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
@@ -269,6 +325,18 @@ src_install() {
 
 	insinto "${PKG_HOME}"/share
 	doins share/{default-config.dat,default_cm_config.bin,log-conf.xml}
+
+	# DaVinci control-panel driver framework (libDaVinciPanelAPI.so etc.).
+	# post_install.sh: install_dvpanel_libs() -> tar -xf ... -C /usr/lib64
+	dodir "/usr/$(get_libdir)"
+	tar -xf share/panels/dvpanel-framework-linux-x86_64.tgz \
+		-C "${ED}/usr/$(get_libdir)" || die "failed to unpack dvpanel framework"
+
+	# OFX render plugin, so other OFX hosts can use the Resolve renderer.
+	# post_install.sh: install_resolve_plugin() -> /usr/OFX/Plugins
+	insinto "/usr/OFX/Plugins"
+	doins -r "share/DaVinci Resolve Renderer.ofx.bundle"
+	fperms +x "/usr/OFX/Plugins/DaVinci Resolve Renderer.ofx.bundle/Contents/Linux-x86-64/DaVinci Resolve Renderer.ofx"
 
 	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
 	dodoc "Technical Documentation"/{"DaVinci Remote Panel.txt","User Configuration folders and customization.txt"}
@@ -296,6 +364,7 @@ src_install() {
 	newmenu share/DaVinciResolveCaptureLogs.desktop com.blackmagicdesign.resolve-CaptureLogs.desktop
 	newmenu share/blackmagicraw-player.desktop com.blackmagicdesign.rawplayer.desktop
 	newmenu share/blackmagicraw-speedtest.desktop com.blackmagicdesign.rawspeedtest.desktop
+	newmenu share/DaVinciRemoteMonitoring.desktop com.blackmagicdesign.resolve-DaVinciRemoteMonitoring.desktop
 
 	newmenu "${FILESDIR}"/defaults.list com.blackmagicdesign.list
 
@@ -311,6 +380,7 @@ src_install() {
 		newicon -s ${res} graphics/blackmagicraw-speedtest_${res}x${res}_apps.png blackmagicraw-speedtest.png
 		newicon -s ${res} graphics/blackmagicraw-player_${res}x${res}_apps.png blackmagicraw-player.png
 		newicon -s ${res} -c mimetypes graphics/application-x-braw-clip_${res}x${res}_mimetypes.png application-x-braw-clip
+		newicon -s ${res} -c mimetypes graphics/application-x-braw-sidecar_${res}x${res}_mimetypes.png application-x-braw-sidecar
 	done
 
 	for res in 64 128; do
