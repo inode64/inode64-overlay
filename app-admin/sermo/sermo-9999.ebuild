@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit git-r3 go-module
+inherit git-r3 go-module systemd
 
 DESCRIPTION="Sermo is a safe service monitoring and control system for Linux."
 HOMEPAGE="https://github.com/inode64/sermo"
@@ -27,4 +27,8 @@ src_compile() {
 
 src_test() {
     ego test || die "test failed"
+}
+
+pkg_postinst() {
+	tmpfiles_process sermo.conf
 }
