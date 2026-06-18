@@ -18,19 +18,19 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-        dev-python/numpy[${PYTHON_USEDEP}]
-        dev-python/networkx[${PYTHON_USEDEP}]
-        dev-python/rapidfuzz[${PYTHON_USEDEP}]
-        dev-libs/tree-sitter-python
-        dev-libs/tree-sitter-go
-        dev-libs/tree-sitter-typescript
-        dev-libs/tree-sitter-javascript
-        dev-libs/tree-sitter-rust
-        dev-libs/tree-sitter-java
-        dev-libs/tree-sitter-c
-	dev-libs/tree-sitter-cpp
-	dev-libs/tree-sitter-ruby
 	dev-libs/tree-sitter-bash
+	dev-libs/tree-sitter-cpp
 	dev-libs/tree-sitter-json
+	dev-libs/tree-sitter-ruby
+	dev-libs/tree-sitter-c
+	dev-libs/tree-sitter-go
+	dev-libs/tree-sitter-java
+	dev-libs/tree-sitter-javascript
+	dev-libs/tree-sitter-python
+	dev-libs/tree-sitter-rust
+	dev-libs/tree-sitter-typescript
+	dev-python/networkx[${PYTHON_USEDEP}]
+	dev-python/numpy[${PYTHON_USEDEP}]
+	dev-python/rapidfuzz[${PYTHON_USEDEP}]
 "
 DEPEND="${RDEPEND}"
