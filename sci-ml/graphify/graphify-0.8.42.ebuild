@@ -9,7 +9,9 @@ DISTUTILS_USE_PEP517=setuptools
 inherit distutils-r1
 
 DESCRIPTION="AI coding assistant skill"
-HOMEPAGE="https://pypi.org/project/graphify/"
+HOMEPAGE="https://github.com/safishamsi/graphify"
+SRC_URI="https://github.com/safishamsi/${PN}/archive/v${PV}.tar.gz -> ${MY_P}.gh.tar.gz"                                                                                                                                                                                                  
+
 
 LICENSE="MIT"
 SLOT="0"
