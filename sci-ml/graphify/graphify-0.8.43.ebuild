@@ -10,7 +10,7 @@ inherit distutils-r1
 
 DESCRIPTION="AI coding assistant skill"
 HOMEPAGE="https://github.com/safishamsi/graphify"
-SRC_URI="https://github.com/safishamsi/${PN}/archive/v${PV}.tar.gz -> ${MY_P}.gh.tar.gz"                                                                                                                                                                                                  
+SRC_URI="https://github.com/safishamsi/${PN}/archive/v${PV}.tar.gz -> ${P}.gh.tar.gz"
 
 
 LICENSE="MIT"
