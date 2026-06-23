@@ -17,12 +17,18 @@ KEYWORDS="~amd64 ~x86"
 IUSE="+client gencert"
 REQUIRED_USE="|| ( client gencert )"
 
+src_configure() {
+	export EGO_LDFLAGS="-s -w -X main.Build=${PV}"
+
+	default
+}
+
 src_compile() {
 	if use client; then
-		ego build -trimpath -ldflags "-s -w" -o nebula ./cmd/nebula/ || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula ./cmd/nebula/ || die
 	fi
 	if use gencert; then
-		ego build -trimpath -ldflags "-s -w" -o nebula-cert ./cmd/nebula-cert/|| die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula-cert ./cmd/nebula-cert/|| die
 	fi
 }
 
