@@ -30,7 +30,7 @@ src_configure() {
 	default
 }
 src_compile() {
-	DATE="$(date -u '+%Y-%m-%d-%H%M UTC')"
+	DATE="$(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" '+%Y-%m-%d-%H%M UTC')"
 	TAGS="$(usex brotli brotli '' '' '') $(usex lzo lzo '' '' '') $(usex sodium libsodium '' '' '')"
 	for db in etcd fdb gp mongo mysql postgres redis sqlserver ; do
 		if use "$db" ; then

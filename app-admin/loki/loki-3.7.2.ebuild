@@ -24,7 +24,7 @@ DEPEND="${RDEPEND}"
 src_configure() {
 	VPREFIX="github.com/grafana/${PN}/v3/pkg/util/build"
 
-	export EGO_LDFLAGS="-s -w -X ${VPREFIX}.Branch=main -X ${VPREFIX}.Version=${PV} -X ${VPREFIX}.Revision=${PR} -X ${VPREFIX}.BuildUser=${PN} -X ${VPREFIX}.BuildDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+	export EGO_LDFLAGS="-s -w -X ${VPREFIX}.Branch=main -X ${VPREFIX}.Version=${PV} -X ${VPREFIX}.Revision=${PR} -X ${VPREFIX}.BuildUser=${PN} -X ${VPREFIX}.BuildDate=$(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" +'%Y-%m-%dT%H:%M:%SZ')"
 
 	default
 }
