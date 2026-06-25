@@ -19,8 +19,9 @@ RESTRICT="mirror strip"
 
 RDEPEND="acct-group/grafana
 	acct-user/${PN}"
-DEPEND="${RDEPEND}"
-
+DEPEND=">=dev-lang/go-1.26.4
+	${RDEPEND}
+"
 src_configure() {
 	VPREFIX="github.com/grafana/${PN}/v3/pkg/util/build"
 
