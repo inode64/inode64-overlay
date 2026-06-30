@@ -1,4 +1,4 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -102,6 +102,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
+		-DLLAMA_BUILD_WEBUI=OFF
 		-DLLAMA_BUILD_TESTS=OFF
 		-DLLAMA_BUILD_EXAMPLES=$(usex examples)
 		-DLLAMA_BUILD_SERVER=ON
@@ -160,7 +161,7 @@ src_configure() {
 
 src_install() {
 	cmake_src_install
-	dobin "${BUILD_DIR}/bin/rpc-server"
+	dobin "${BUILD_DIR}/bin/ggml-rpc-server"
 
 	# avoid clashing with whisper.cpp
 	rm -rf "${ED}/usr/include"
