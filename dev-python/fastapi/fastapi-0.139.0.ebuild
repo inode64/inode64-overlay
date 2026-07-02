@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=pdm-backend
-PYTHON_COMPAT=( python3_14 )
+PYTHON_COMPAT=( python3_{11..14} )
 #may be not stricly required
 PYTHON_REQ_USE="threads(+)"
 
