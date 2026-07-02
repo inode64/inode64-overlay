@@ -4,14 +4,18 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=pdm-backend
-PYTHON_COMPAT=( python3_{12..14} )
+PYTHON_COMPAT=( python3_14 )
 #may be not stricly required
 PYTHON_REQ_USE="threads(+)"
 
 inherit distutils-r1 optfeature pypi
 
 DESCRIPTION="High performance framework, easy to learn, fast to code, ready for production"
-HOMEPAGE="https://fastapi.tiangolo.com/ https://pypi.org/project/fastapi/"
+HOMEPAGE="
+	https://fastapi.tiangolo.com/
+	https://github.com/fastapi/fastapi/
+	https://pypi.org/project/fastapi/
+"
 
 LICENSE="MIT"
 SLOT="0"
@@ -26,17 +30,20 @@ RDEPEND="
 "
 
 #FIXME: add missing deps
-BDEPEND="test? (
-	dev-python/a2wsgi[${PYTHON_USEDEP}]
-	dev-python/dirty-equals[${PYTHON_USEDEP}]
-	dev-python/flask[${PYTHON_USEDEP}]
-	dev-python/inline-snapshot[${PYTHON_USEDEP}]
-	dev-python/pytest-timeout[${PYTHON_USEDEP}]
-	dev-python/python-multipart[${PYTHON_USEDEP}]
-	dev-python/sqlalchemy[${PYTHON_USEDEP}]
-	dev-python/typer[${PYTHON_USEDEP}]
-)"
+BDEPEND="
+	test? (
+		dev-python/a2wsgi[${PYTHON_USEDEP}]
+		dev-python/dirty-equals[${PYTHON_USEDEP}]
+		dev-python/flask[${PYTHON_USEDEP}]
+		dev-python/httpx[${PYTHON_USEDEP}]
+		dev-python/httpx2[${PYTHON_USEDEP}]
+		dev-python/python-multipart[${PYTHON_USEDEP}]
+		dev-python/sqlalchemy[${PYTHON_USEDEP}]
+		dev-python/typer[${PYTHON_USEDEP}]
+	)
+"
 
+EPYTEST_PLUGINS=( anyio inline-snapshot pytest-timeout )
 # 3k tests+, so use xdist to speed them up
 EPYTEST_XDIST=1
 distutils_enable_tests pytest
@@ -63,6 +70,11 @@ python_test() {
 	local EPYTEST_DESELECT=(
 		# Requires investigation - missing ./image.png test file (?)
 		tests/test_tutorial/test_additional_responses/test_tutorial004.py::test_path_operation_img
+
+		# Broken by brotli being available, also fragile to random ordering
+		tests/test_tutorial/test_header_param_models/test_tutorial001.py::test_header_param_model_invalid
+		tests/test_tutorial/test_header_param_models/test_tutorial003.py::test_header_param_model_invalid
+		tests/test_tutorial/test_header_param_models/test_tutorial003.py::test_header_param_model_no_underscore
 	)
 	epytest
 }
