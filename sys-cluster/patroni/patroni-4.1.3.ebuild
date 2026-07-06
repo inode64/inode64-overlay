@@ -38,7 +38,7 @@ RDEPEND="
 "
 
 src_install() {
-	default
+	distutils-r1_src_install
 
 	keepdir /etc/patroni
 	fowners postgres:postgres /etc/patroni
