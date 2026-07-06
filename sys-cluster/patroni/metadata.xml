@@ -13,4 +13,12 @@
 		<remote-id type="pypi">patroni</remote-id>
 		<remote-id type="github">zalando/patroni</remote-id>
 	</upstream>
+	<use>
+		<flag name="s3">
+			Add support for AWS services
+		</flag>
+		<flag name="etcd">
+			Use Etcd as Distributed Configuration Store (DCS)
+		</flag>
+	</use>
 </pkgmetadata>
