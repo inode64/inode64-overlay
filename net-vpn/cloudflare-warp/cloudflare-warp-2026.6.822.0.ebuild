@@ -73,9 +73,7 @@ src_install() {
 		cp -r "${S}"/usr/lib/warp/* "${D}"/usr/libexec/warp/ || die
 
 		# Fix permissions
-		find "${D}"/usr/libexec/warp -type f -name "*.so*" | while read exe; do
-			fperms +x "${exe}" || die
-		done
+		fperms +x /usr/libexec/warp/lib/*.so || die
 
 		dosym ../libexec/warp/warp-taskbar usr/bin/warp-taskbar
 		systemd_douserunit usr/lib/systemd/user/warp-taskbar.service
