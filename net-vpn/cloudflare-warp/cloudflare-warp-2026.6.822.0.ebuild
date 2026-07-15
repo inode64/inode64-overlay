@@ -72,6 +72,11 @@ src_install() {
 		mkdir -p "${D}"/usr/libexec/warp || die
 		cp -r "${S}"/usr/lib/warp/* "${D}"/usr/libexec/warp/ || die
 
+		# Fix permissions
+		find "${D}"/usr/libexec/warp -type f -name "*.so*" | while read exe; do
+			fperms +x "${exe}" || die
+		done
+
 		dosym ../libexec/warp/warp-taskbar usr/bin/warp-taskbar
 		systemd_douserunit usr/lib/systemd/user/warp-taskbar.service
 		domenu usr/share/applications/com.cloudflare.WarpTaskbar.desktop
