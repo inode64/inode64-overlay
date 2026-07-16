@@ -21,6 +21,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="30bits server"
 RESTRICT="mirror"
 
+BDEPEND="dev-util/patchelf" 
 RDEPEND="
 	app-arch/brotli
 	app-arch/zstd[lz4]
@@ -52,18 +53,28 @@ QA_PREBUILT="opt/${P}/*"
 src_prepare() {
 	default
 
+	patchelf --set-rpath '$ORIGIN' \
+		plugins/jcef-plugin/jcef/jcef_helper \
+		plugins/jcef-plugin/jcef/libjcef.so
+
+
 	local remove_me=(
 		help/ReferenceCardForMac.pdf
-		lib/async-profiler/aarch64
-		lib/async-profiler/amd64/dbghelp.dll
 		lib/async-profiler/amd64/jniSymbolsResolver.dll
+		lib/async-profiler/amd64/dbghelp.dll
 		lib/async-profiler/amd64/libasyncProfiler.dll
 		lib/async-profiler/amd64/symsrv.dll
 		lib/async-profiler/libasyncProfiler.dylib
-		plugins/gateway-plugin/lib/remote-dev-workers/{remote-dev-worker-darwin-amd64,remote-dev-worker-darwin-arm64,remote-dev-worker-linux-arm64,remote-dev-worker-windows-amd64.exe,remote-dev-worker-windows-arm64.exe}
-		plugins/platform-ijent-impl/ijent-aarch64-unknown-linux-musl-release
-		plugins/platform-ijent-impl/ijent-x86_64-unknown-linux-musl-release
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-darwin-amd64
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-darwin-arm64
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-windows-amd64.exe
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-linux-arm64
+		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-windows-arm64.exe
+		plugins/platform-ijent-bundledBinaries/ijent-aarch64-unknown-linux-musl-release
+		plugins/platform-ijent-bundledBinaries/ijent-x86_64-unknown-linux-musl-release
 	)
+
+	rm -rvf lib/async-profiler/aarch64 || die
 
 	if ! use server; then
 		remove_me+=( plugins/remote-dev-server/selfcontained )
