@@ -37,10 +37,11 @@ index b0bdcc7..2681721 100644
      {
        gsl_vector_complex_const_view vi = gsl_matrix_complex_const_column(evec, i);
        double nrm_v = gsl_blas_dznrm2(&vi.vector);
--      gsl_test_rel (nrm_v, 1.0, N * GSL_DBL_EPSILON, "%s, normalized(%d), %s",
-+      gsl_test_rel (nrm_v, 1.0, N*N * 10.0 * GSL_DBL_EPSILON, "%s, normalized(%d), %s",
-		     desc, i, desc2);
+-      gsl_test_rel (nrm_v, 1.0, N * GSL_DBL_EPSILON, "%s, normalized(%d), %s", 
++      gsl_test_rel (nrm_v, 1.0, N*N * 10.0 * GSL_DBL_EPSILON, "%s, normalized(%d), %s", 
+                     desc, i, desc2);
      }
-
---
+ 
+-- 
 2.44.2
+
