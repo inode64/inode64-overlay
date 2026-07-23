@@ -26,6 +26,7 @@ RESTRICT="test"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-11.0-extras-defer-invoking-of-gluster-volume-set-help-as-.patch"
+	"${FILESDIR}/${PN}-11.2-sys-types.h-for-off64_t.patch"
 )
 
 # sys-apps/util-linux is required for libuuid
@@ -59,7 +60,6 @@ DEPEND="
 		app-benchmarks/dbench
 		dev-libs/xxhash
 		dev-vcs/git
-		virtual/perl-Test-Harness
 		dev-libs/yajl
 		sys-fs/xfsprogs
 		sys-apps/attr
@@ -111,7 +111,7 @@ src_configure() {
 		$(use_enable lto) \
 		$(use_enable static-libs static) \
 		$(use_enable test cmocka) \
-		$(use_enable uring linux-io-uring) \
+		$(use_enable uring linux-io_uring) \
 		$(use_enable xml xml-output) \
 		$(usex ipv6 --with-ipv6-default "") \
 		$(usex libtirpc "" --without-libtirpc) \
