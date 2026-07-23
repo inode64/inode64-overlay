@@ -23,9 +23,9 @@ src_install() {
 	dobin backrest
 	dodoc *.md
 
-	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
-	newinitd "${FILESDIR}/${PN}.initd" ${PN}
-	systemd_dounit "${FILESDIR}/${PN}.service"
+	dotmpfiles "${FILESDIR}/backrest.tmpfiles.conf"
+	newinitd "${FILESDIR}/backrest.initd" backrest
+	systemd_dounit "${FILESDIR}/backrest.service"
 }
 
 pkg_postinst() {
