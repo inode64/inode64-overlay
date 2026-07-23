@@ -11,7 +11,7 @@ EGIT_REPO_URI="https://bitbucket.org/tildeslash/monit.git"
 
 LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
+KEYWORDS=""
 IUSE="pam ssl"
 
 RDEPEND="virtual/zlib:=
