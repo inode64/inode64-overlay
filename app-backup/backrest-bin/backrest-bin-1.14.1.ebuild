@@ -9,6 +9,8 @@ DESCRIPTION="A web UI and orchestrator for restic backup"
 HOMEPAGE="https://github.com/garethgeorge/backrest"
 SRC_URI="https://github.com/garethgeorge/backrest/releases/download/v${PV}/backrest_Linux_x86_64.tar.gz -> ${P}.tar.gz"
 
+S="${WORKDIR}"
+
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
