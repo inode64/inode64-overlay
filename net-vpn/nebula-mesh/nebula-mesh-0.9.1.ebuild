@@ -9,7 +9,7 @@ DESCRIPTION="Self-hosted control plane for the Nebula mesh VPN"
 HOMEPAGE="https://github.com/forgekeep/nebula-mesh"
 
 SRC_URI="https://github.com/forgekeep/nebula-mesh/archive/v${PV}.tar.gz -> ${P}.tar.gz
-    https://www.inode64.com/dist/${P}-vendor.tar.xz
+	https://www.inode64.com/dist/${P}-vendor.tar.xz
 "
 
 LICENSE="MIT"
@@ -27,6 +27,7 @@ RDEPEND="
 	mgmt? (
 		acct-group/nebula-mgmt
 		acct-user/nebula-mgmt
+		dev-libs/openssl
 	)
 	agent? ( net-vpn/nebula )
 "
@@ -87,42 +88,46 @@ src_install() {
 
 pkg_postinst() {
 	if use agent; then
-		elog "Copy ${CONFIG_AGENT_FILE}.example to ${CONFIG_AGENT_FILE}"
+		elog "Copy /etc/nebula-agent/agent.example.yml to ${CONFIG_AGENT_FILE}"
 		elog "and adjust it before starting the nebula-agent service."
 
 		tmpfiles_process nebula-agent.tmpfiles.conf
 	fi
 	if use mgmt; then
-		elog "Copy ${CONFIG_MGMT_FILE}.example to ${CONFIG_MGMT_FILE}"
+		elog "Copy /etc/nebula-mgmt/server.example.yml to ${CONFIG_MGMT_FILE}"
 		elog "and adjust it before starting the nebula-mgmt service."
 
 		tmpfiles_process nebula-mgmt.tmpfiles.conf
 
-    if [[ ! -e "${EROOT}${DATABASE_FILE}" ]]; then
-      elog
-      elog "Execute the following command to finish installation:"
-      elog
-      elog "# emerge --config \"=${CATEGORY}/${PF}\""
-    fi
+		if [[ ! -e "${EROOT}${DATABASE_FILE}" ]]; then
+			elog
+			elog "Execute the following command to finish installation:"
+			elog
+			elog "# emerge --config \"=${CATEGORY}/${PF}\""
+		fi
 	fi
 }
 
 pkg_config() {
-  einfo
-  einfo "Initializing database."
-  einfo
-  
-  if [[ ! -e "${CONFIG_MGMT_FILE}" ]]; then
-    cat >> "${CONFIG_MGMT_FILE}" <<-EOF || die
-      listen: 127.0.0.1:8080
-      data_dir: ${DATA_DIR}
-      db_path: ${DATABASE_FILE}
-      log_level: info
-      master_key: \"$(openssl rand -base64 32)\"
-    EOF
-    chown nebula-mgmt:nebula-mgmt "${CONFIG_MGMT_FILE}"
-  fi
-  
-  /usr/bin/nebula-mgmt init --config "${CONFIG_MGMT_FILE}"
-  chown nebula-mgmt:nebula-mgmt "${DATABASE_FILE}"
+	if ! use mgmt; then
+		einfo "Nothing to configure: the mgmt USE flag is disabled."
+		return
+	fi
+
+	if [[ ! -e "${EROOT}${CONFIG_MGMT_FILE}" ]]; then
+		einfo "Creating ${EROOT}${CONFIG_MGMT_FILE}"
+		cat > "${EROOT}${CONFIG_MGMT_FILE}" <<-EOF || die
+			listen: 127.0.0.1:8080
+			data_dir: ${DATA_DIR}
+			db_path: ${DATABASE_FILE}
+			log_level: info
+			master_key: "$(openssl rand -base64 32)"
+		EOF
+		chmod 0600 "${EROOT}${CONFIG_MGMT_FILE}" || die
+		chown nebula-mgmt:nebula-mgmt "${EROOT}${CONFIG_MGMT_FILE}" || die
+	fi
+
+	einfo "Initializing database."
+	"${EROOT}"/usr/bin/nebula-mgmt init --config "${EROOT}${CONFIG_MGMT_FILE}" || die
+	chown nebula-mgmt:nebula-mgmt "${EROOT}${DATABASE_FILE}" || die
 }
