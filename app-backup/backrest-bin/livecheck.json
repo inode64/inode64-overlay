@@ -1,0 +1,5 @@
+{
+  "gomodule": true,
+  "nodejs": true,
+  "nodejs_path": "/webui"
+}
