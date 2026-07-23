@@ -112,17 +112,17 @@ pkg_config() {
   einfo "Initializing database."
   einfo
   
-  if [[ ! -e ${CONFIG_MGMT_FILE} ]]; then
-    cat >> ${CONFIG_MGMT_FILE} <<-EOF
+  if [[ ! -e "${CONFIG_MGMT_FILE}" ]]; then
+    cat >> "${CONFIG_MGMT_FILE}" <<-EOF || die
       listen: 127.0.0.1:8080
       data_dir: ${DATA_DIR}
       db_path: ${DATABASE_FILE}
       log_level: info
-      master_key: "$(openssl rand -base64 32)"
+      master_key: \"$(openssl rand -base64 32)\"
     EOF
-    chown nebula-mgmt:nebula-mgmt ${CONFIG_MGMT_FILE}
+    chown nebula-mgmt:nebula-mgmt "${CONFIG_MGMT_FILE}"
   fi
   
-  /usr/bin/nebula-mgmt init --config ${CONFIG_MGMT_FILE}
+  /usr/bin/nebula-mgmt init --config "${CONFIG_MGMT_FILE}"
   chown nebula-mgmt:nebula-mgmt "${DATABASE_FILE}"
 }
