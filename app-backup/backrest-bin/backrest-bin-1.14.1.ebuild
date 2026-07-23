@@ -16,7 +16,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RDEPEND="
   app-backup/restic
-  !app-backupt/backrest
+  !app-backup/backrest
 "
 
 src_install() {

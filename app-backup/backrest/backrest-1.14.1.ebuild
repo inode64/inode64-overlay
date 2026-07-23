@@ -24,7 +24,7 @@ RESTRICT="
 BDEPEND="test? ( app-backup/restic )"
 RDEPEND="
   app-backup/restic
-  !app-backupt/backrest-bin
+  !app-backup/backrest-bin
 "
 DEPEND=">=dev-lang/go-1.26"
 
