@@ -12,7 +12,6 @@ SRC_URI="https://github.com/garethgeorge/backrest/download/v${PV}/backrest_Linux
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-BDEPEND="test? ( app-backup/restic )"
 RDEPEND="
   app-backup/restic
   !app-backupt/backrest
