@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module systemd
+inherit go-module systemd tmpfiles
 
 DESCRIPTION="Self-hosted control plane for the Nebula mesh VPN"
 HOMEPAGE="https://github.com/forgekeep/nebula-mesh"
@@ -18,13 +18,11 @@ KEYWORDS="~amd64 ~x86"
 IUSE="+agent mgmt"
 REQUIRED_USE="|| ( agent mgmt )"
 
-DEPEND="
+RDEPEND="
 	mgmt? (
 		acct-group/nebula-mgmt
 		acct-user/nebula-mgmt
 	)
-"
-RDEPEND="
 	agent? ( net-vpn/nebula )
 "
 
@@ -72,9 +70,7 @@ src_install() {
 		fperms 0700 /etc/nebula-mgmt
 		fowners -R nebula-mgmt:nebula-mgmt /etc/nebula-mgmt
 
-		keepdir /var/lib/nebula-mgmt
-		fowners nebula-mgmt:nebula-mgmt /var/lib/nebula-mgmt
-		fperms 0750 /var/lib/nebula-mgmt
+		dotmpfiles "${FILESDIR}/nebula-mgmt.tmpfiles.conf"
 
 		newinitd "${FILESDIR}/nebula-mgmt.initd" nebula-mgmt
 		newconfd "${FILESDIR}/nebula-mgmt.confd" nebula-mgmt
@@ -90,9 +86,9 @@ pkg_postinst() {
 	if use mgmt; then
 		elog "Copy /etc/nebula-mgmt/server.example.yml to /etc/nebula-mgmt/server.yml"
 		elog "and adjust it before starting the nebula-mgmt service."
-		elog
-		elog "For non-interactive startup, create /etc/nebula-mgmt/passphrase.env"
-		elog "(mode 0600) containing:"
-		elog "    NEBULA_MGMT_CA_PASSPHRASE=your-passphrase-here"
 	fi
+}
+
+pkg_postinst() {
+	tmpfiles_process nebula-mgmt.tmpfiles.conf
 }

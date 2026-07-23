@@ -61,3 +61,7 @@ src_install() {
 
 	dotmpfiles "${FILESDIR}/cloudflared.tmpfiles.conf"
 }
+
+pkg_postinst() {
+	tmpfiles_process cloudflared.tmpfiles.conf
+}
