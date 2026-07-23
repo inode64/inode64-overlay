@@ -9,7 +9,7 @@ DESCRIPTION="Self-hosted control plane for the Nebula mesh VPN"
 HOMEPAGE="https://github.com/forgekeep/nebula-mesh"
 
 SRC_URI="https://github.com/forgekeep/nebula-mesh/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	https://www.inode64.com/dist/${P}-vendor.tar.xz"
+"
 
 LICENSE="MIT"
 SLOT="0"
