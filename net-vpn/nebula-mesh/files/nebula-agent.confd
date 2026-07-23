@@ -1,0 +1,7 @@
+# /etc/conf.d/nebula-agent
+
+# Path to the agent configuration file
+#NEBULA_AGENT_CONFIG="/etc/nebula-agent/agent.yml"
+
+# Extra options passed to nebula-agent
+#NEBULA_AGENT_OPTS=""

@@ -1,0 +1,15 @@
+# /etc/conf.d/nebula-mgmt
+
+# Path to the server configuration file
+#NEBULA_MGMT_CONFIG="/etc/nebula-mgmt/server.yml"
+
+# User and group the management server runs as
+#NEBULA_MGMT_USER="nebula-mgmt"
+#NEBULA_MGMT_GROUP="nebula-mgmt"
+
+# File with the CA passphrase for non-interactive startup (mode 0600).
+# Format: NEBULA_MGMT_CA_PASSPHRASE=your-passphrase-here
+#NEBULA_MGMT_PASSPHRASE_ENV="/etc/nebula-mgmt/passphrase.env"
+
+# Extra options passed to nebula-mgmt serve
+#NEBULA_MGMT_OPTS=""

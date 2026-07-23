@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<description>The INODE64 Gentoo Project</description>
+	</maintainer>
+	<use>
+		<flag name="agent">Build the nebula-agent daemon that runs on each Nebula host and polls the management server for updates</flag>
+		<flag name="mgmt">Build the nebula-mgmt management server (HTTP API, web UI and CLI)</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">forgekeep/nebula-mesh</remote-id>
+	</upstream>
+</pkgmetadata>

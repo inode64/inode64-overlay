@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+: ${NEBULA_MGMT_CONFIG:=/etc/nebula-mgmt/server.yml}
+: ${NEBULA_MGMT_USER:=nebula-mgmt}
+: ${NEBULA_MGMT_GROUP:=nebula-mgmt}
+: ${NEBULA_MGMT_PASSPHRASE_ENV:=/etc/nebula-mgmt/passphrase.env}
+
+command="/usr/bin/nebula-mgmt"
+command_args="serve --config ${NEBULA_MGMT_CONFIG} ${NEBULA_MGMT_OPTS}"
+command_user="${NEBULA_MGMT_USER}:${NEBULA_MGMT_GROUP}"
+
+supervisor="supervise-daemon"
+
+description="Nebula mesh management server"
+
+required_files="${NEBULA_MGMT_CONFIG}"
+
+depend() {
+	need net localmount
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o "${NEBULA_MGMT_USER}:${NEBULA_MGMT_GROUP}" /var/lib/nebula-mgmt
+
+	# Equivalent to the EnvironmentFile= of the upstream systemd unit
+	if [ -f "${NEBULA_MGMT_PASSPHRASE_ENV}" ]; then
+		. "${NEBULA_MGMT_PASSPHRASE_ENV}"
+		export NEBULA_MGMT_CA_PASSPHRASE
+	fi
+}

@@ -1,0 +1,19 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+: ${NEBULA_AGENT_CONFIG:=/etc/nebula-agent/agent.yml}
+
+command="/usr/bin/nebula-agent"
+command_args="--config ${NEBULA_AGENT_CONFIG} ${NEBULA_AGENT_OPTS}"
+
+supervisor="supervise-daemon"
+
+description="Nebula mesh management agent"
+
+required_files="${NEBULA_AGENT_CONFIG}"
+
+depend() {
+	need net
+	after nebula
+}
