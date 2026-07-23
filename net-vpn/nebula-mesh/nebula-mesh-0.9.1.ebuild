@@ -18,6 +18,11 @@ KEYWORDS="~amd64 ~x86"
 IUSE="+agent mgmt"
 REQUIRED_USE="|| ( agent mgmt )"
 
+DATA_DIR="/var/lib/nebula-mgmt"
+DATABASE_FILE="${DATA_DIR}/nebula.db"
+CONFIG_MGMT_FILE="/etc/nebula-mgmt/server.yml"
+CONFIG_AGENT_FILE="/etc/nebula-agent/agent.yml"
+
 RDEPEND="
 	mgmt? (
 		acct-group/nebula-mgmt
@@ -82,31 +87,42 @@ src_install() {
 
 pkg_postinst() {
 	if use agent; then
-		elog "Copy /etc/nebula-agent/agent.example.yml to /etc/nebula-agent/agent.yml"
+		elog "Copy ${CONFIG_AGENT_FILE}.example to ${CONFIG_AGENT_FILE}"
 		elog "and adjust it before starting the nebula-agent service."
 
 		tmpfiles_process nebula-agent.tmpfiles.conf
 	fi
 	if use mgmt; then
-		elog "Copy /etc/nebula-mgmt/server.example.yml to /etc/nebula-mgmt/server.yml"
+		elog "Copy ${CONFIG_MGMT_FILE}.example to ${CONFIG_MGMT_FILE}"
 		elog "and adjust it before starting the nebula-mgmt service."
 
 		tmpfiles_process nebula-mgmt.tmpfiles.conf
+
+    if [[ ! -e "${EROOT}${DATABASE_FILE}" ]]; then
+      elog
+      elog "Execute the following command to finish installation:"
+      elog
+      elog "# emerge --config \"=${CATEGORY}/${PF}\""
+    fi
 	fi
-	
-  if [[ ! -e "${EROOT}/var/lib/nebula-mgmt/nebula.db" ]]; then
-        elog
-        elog "Execute the following command to finish installation:"
-        elog
-        elog "# emerge --config \"=${CATEGORY}/${PF}\""
-  fi
 }
 
 pkg_config() {
-        einfo
-        einfo "Initializing database."
-        einfo
-
-        /usr/bin/nebula-mgmt init --config /etc/nebula-mgmt/server.yml
-        chown nebula-mgmt:nebula-mgmt /var/lib/nebula-mgmt/nebula.db
+  einfo
+  einfo "Initializing database."
+  einfo
+  
+  if [[ ! -e ${CONFIG_MGMT_FILE} ]]; then
+    cat >> ${CONFIG_MGMT_FILE} <<-EOF
+      listen: 127.0.0.1:8080
+      data_dir: ${DATA_DIR}
+      db_path: ${DATABASE_FILE}
+      log_level: info
+      master_key: "$(openssl rand -base64 32)"
+    EOF
+    chown nebula-mgmt:nebula-mgmt ${CONFIG_MGMT_FILE}
+  fi
+  
+  /usr/bin/nebula-mgmt init --config ${CONFIG_MGMT_FILE}
+  chown nebula-mgmt:nebula-mgmt "${DATABASE_FILE}"
 }
