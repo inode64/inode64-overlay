@@ -6,6 +6,8 @@
 
 command="/usr/bin/nebula-agent"
 command_args="--config ${NEBULA_AGENT_CONFIG} ${NEBULA_AGENT_OPTS}"
+error_log=/var/log/nebula-agent/error.log
+output_log=/var/log/nebula-agent/error.log
 
 supervisor="supervise-daemon"
 

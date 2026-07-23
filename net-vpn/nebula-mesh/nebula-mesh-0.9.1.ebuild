@@ -59,6 +59,8 @@ src_install() {
 		newinitd "${FILESDIR}/nebula-agent.initd" nebula-agent
 		newconfd "${FILESDIR}/nebula-agent.confd" nebula-agent
 		systemd_dounit deploy/systemd/nebula-agent.service
+
+		dotmpfiles "${FILESDIR}/nebula-agent.tmpfiles.conf"
 	fi
 
 	if use mgmt; then
@@ -70,11 +72,11 @@ src_install() {
 		fperms 0700 /etc/nebula-mgmt
 		fowners -R nebula-mgmt:nebula-mgmt /etc/nebula-mgmt
 
-		dotmpfiles "${FILESDIR}/nebula-mgmt.tmpfiles.conf"
-
 		newinitd "${FILESDIR}/nebula-mgmt.initd" nebula-mgmt
 		newconfd "${FILESDIR}/nebula-mgmt.confd" nebula-mgmt
 		systemd_dounit deploy/systemd/nebula-mgmt.service
+
+		dotmpfiles "${FILESDIR}/nebula-mgmt.tmpfiles.conf"
 	fi
 }
 
@@ -82,13 +84,29 @@ pkg_postinst() {
 	if use agent; then
 		elog "Copy /etc/nebula-agent/agent.example.yml to /etc/nebula-agent/agent.yml"
 		elog "and adjust it before starting the nebula-agent service."
+
+		tmpfiles_process nebula-agent.tmpfiles.conf
 	fi
 	if use mgmt; then
 		elog "Copy /etc/nebula-mgmt/server.example.yml to /etc/nebula-mgmt/server.yml"
 		elog "and adjust it before starting the nebula-mgmt service."
+
+		tmpfiles_process nebula-mgmt.tmpfiles.conf
 	fi
+	
+  if [[ ! -e "${EROOT}/var/lib/nebula-mgmt/nebula.db" ]]; then
+        elog
+        elog "Execute the following command to finish installation:"
+        elog
+        elog "# emerge --config \"=${CATEGORY}/${PF}\""
+  fi
 }
 
-pkg_postinst() {
-	tmpfiles_process nebula-mgmt.tmpfiles.conf
+pkg_config() {
+        einfo
+        einfo "Initializing database."
+        einfo
+
+        /usr/bin/nebula-mgmt init --config /etc/nebula-mgmt/server.yml
+        chown nebula-mgmt:nebula-mgmt /var/lib/nebula-mgmt/nebula.db
 }
