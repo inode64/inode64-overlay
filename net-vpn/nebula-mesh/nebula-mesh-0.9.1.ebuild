@@ -32,6 +32,10 @@ RDEPEND="
 	agent? ( net-vpn/nebula )
 "
 
+PATCHES=(
+        "${FILESDIR}/0001-feat-host-introduc~house-relay-role.patch"
+)
+
 src_prepare() {
 	default
 
