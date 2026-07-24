@@ -1,0 +1,1149 @@
+From 273bbfe000c8df7ff92d56dfc16dbd8190544607 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Fri, 24 Jul 2026 12:47:59 +0200
+Subject: [PATCH] feat(firewall): add per-host inbound firewall rules
+ configuration
+
+---
+ README.md                                    |   2 +-
+ docs/agent.md                                |  21 +-
+ internal/api/enroll.go                       |   3 +
+ internal/api/firewall_render_test.go         |  40 +++
+ internal/api/hosts_firewall_advanced_test.go |  89 +++++++
+ internal/configgen/firewall_test.go          |  85 ++++++-
+ internal/configgen/generator.go              |   5 +-
+ internal/configgen/marshal.go                |   8 +-
+ internal/mobilebundle/builder.go             |   3 +
+ internal/mobilebundle/builder_test.go        |  48 ++++
+ internal/models/host.go                      |  25 +-
+ internal/models/hostdiff.go                  |  22 ++
+ internal/models/hostdiff_test.go             |  42 ++++
+ internal/models/validate_ip.go               |  64 +++++
+ internal/models/validate_ip_test.go          |  62 +++++
+ internal/web/advanced.go                     |  18 ++
+ internal/web/advanced_firewall_test.go       | 251 +++++++++++++++++++
+ internal/web/form_state.go                   |  70 +++---
+ internal/web/templates/host_edit.html        |   3 +-
+ internal/web/templates/host_new.html         |   6 +-
+ 20 files changed, 825 insertions(+), 42 deletions(-)
+ create mode 100644 internal/api/hosts_firewall_advanced_test.go
+ create mode 100644 internal/web/advanced_firewall_test.go
+
+diff --git a/README.md b/README.md
+index 6b5c54b..be48527 100644
+--- a/README.md
++++ b/README.md
+@@ -83,7 +83,7 @@ When this beats hand-rolled scripts or a managed service:
+ - **Multi-address overlays** — networks and hosts can carry multiple overlay IPs (e.g. for dual-stack or multi-segment routing).
+ - **Per-host advanced overrides** — `listen_host`, `mtu`, `tun_device`, `punchy`, `unsafe_routes` opt-in per host without touching the network default. Host records are editable via UI/API after creation (`PATCH /api/v1/hosts/{id}`).
+ - **Audit trail** — every mutating UI / API / CLI call is recorded with actor, action, target, plus a stable `ca_id` on host events.
+-- **Per-network firewall rules** — managed declaratively via API, distributed to all hosts.
++- **Per-network firewall rules** — managed declaratively via API, distributed to all hosts; plus additive per-host inbound rules (`advanced.firewall_inbound`) to open ports for specific groups on a single host.
+ - **Production-ready basics** — `/healthz`, `/readyz`, Prometheus exporter at `/metrics` (legacy `expvar` view at `/debug/vars`), built-in cert-expiry alerter (audit + webhook + per-host Prometheus gauge), structured `slog` logs, optional in-process TLS, SQLite (WAL) with tracked migrations.
+ - **Tiny footprint** — two static binaries (~15–25 MiB each), SQLite, no external deps. Runs on a $5 VM.
+ 
+diff --git a/docs/agent.md b/docs/agent.md
+index 84c6d96..d0484f1 100644
+--- a/docs/agent.md
++++ b/docs/agent.md
+@@ -285,6 +285,9 @@ object in the API:
+     "punchy": false,              // disable hole-punching for this host
+     "unsafe_routes": [
+       { "route": "192.168.10.0/24", "via": "10.0.0.99" }
++    ],
++    "firewall_inbound": [
++      { "port": "22", "proto": "tcp", "group": "admin" }
+     ]
+   }
+ }
+@@ -297,7 +300,23 @@ advanced block. Server-side validation rejects:
+ - `mtu` outside the 576–9216 range;
+ - non-IP `listen_host`;
+ - whitespace or slashes in `tun_device`;
+-- malformed CIDR or non-IP `via` in `unsafe_routes`.
++- malformed CIDR or non-IP `via` in `unsafe_routes`;
++- `firewall_inbound` rules with a proto outside `any`/`tcp`/`udp`/`icmp`, a
++  port that is not `any`, a single port `1-65535` or an ascending range
++  `a-b`, an empty or overlong (>64 chars) group, or more than 64 rules.
++
++### Per-host inbound firewall rules
++
++`advanced.firewall_inbound` appends host-specific inbound rules **after** the
++network-wide firewall policy in the rendered `config.yml` — additive only,
++inbound only; the network policy and the outbound section are never modified.
++In the UI the rules are entered one per line as `PORT/PROTO from GROUP`
++(e.g. `443/tcp from web`, `8000-9000/udp from monitoring`). A rule with group
++`any` renders as `host: any` (matches every peer), same as the network
++policy. Changing these rules re-publishes only the affected host's config on
++its next poll. Mobile bundles include them too. Note that mesh import always
++captures firewall policy at network level — per-host rules are never derived
++from imported configs.
+ 
+ ### Multiple overlay addresses per host
+ 
+diff --git a/internal/api/enroll.go b/internal/api/enroll.go
+index 258ffdb..343f63b 100644
+--- a/internal/api/enroll.go
++++ b/internal/api/enroll.go
+@@ -342,6 +342,9 @@ func (s *Server) renderHostConfig(ctx context.Context, host *models.Host) ([]byt
+ 		for _, u := range adv.UnsafeRoutes {
+ 			input.UnsafeRoutes = append(input.UnsafeRoutes, configgen.AdvancedUnsafeRoute{Route: u.Route, Via: u.Via})
+ 		}
++		for _, fr := range adv.FirewallInbound {
++			input.HostFirewallInbound = append(input.HostFirewallInbound, configgen.FirewallRule{Port: fr.Port, Proto: fr.Proto, Group: fr.Group})
++		}
+ 	}
+ 
+ 	// Emit the per-CA blocklist into pki.blocklist so the Nebula daemon
+diff --git a/internal/api/firewall_render_test.go b/internal/api/firewall_render_test.go
+index 2ede46f..24ce8c4 100644
+--- a/internal/api/firewall_render_test.go
++++ b/internal/api/firewall_render_test.go
+@@ -107,3 +107,43 @@ func TestRenderHostConfig_UnusableFirewallFallsBackToDefault(t *testing.T) {
+ 		t.Errorf("unusable rule was rendered instead of falling back\n%s", out)
+ 	}
+ }
++
++// TestRenderHostConfig_AppendsHostFirewallInbound: per-host inbound rules
++// (advanced.firewall_inbound) must be rendered after the network-wide
++// policy, additively — the network baseline must remain present.
++func TestRenderHostConfig_AppendsHostFirewallInbound(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++	ctx := context.Background()
++
++	const policy = `{"inbound":[{"port":"443","proto":"tcp","group":"auditors-only"}],` +
++		`"outbound":[{"port":"any","proto":"any","group":"any"}]}`
++	if err := srv.store.SetNetworkConfig(ctx, netID, "firewall", policy); err != nil {
++		t.Fatal(err)
++	}
++
++	host := renderTestHost(t, srv, netID)
++	host.Advanced = &models.HostAdvanced{
++		FirewallInbound: []models.HostFirewallRule{
++			{Port: "22", Proto: "tcp", Group: "bastion-admins"},
++		},
++	}
++
++	cfg, err := srv.renderHostConfig(ctx, host)
++	if err != nil {
++		t.Fatal(err)
++	}
++	out := string(cfg)
++	if !strings.Contains(out, "auditors-only") {
++		t.Errorf("network policy rule missing from rendered config\n%s", out)
++	}
++	if !strings.Contains(out, "bastion-admins") {
++		t.Errorf("per-host firewall rule missing from rendered config\n%s", out)
++	}
++	if !strings.Contains(out, `port: "22"`) {
++		t.Errorf("per-host firewall port missing from rendered config\n%s", out)
++	}
++	if netIdx, hostIdx := strings.Index(out, "auditors-only"), strings.Index(out, "bastion-admins"); netIdx > hostIdx {
++		t.Errorf("network rule should render before the per-host rule\n%s", out)
++	}
++}
+diff --git a/internal/api/hosts_firewall_advanced_test.go b/internal/api/hosts_firewall_advanced_test.go
+new file mode 100644
+index 0000000..12decd8
+--- /dev/null
++++ b/internal/api/hosts_firewall_advanced_test.go
+@@ -0,0 +1,89 @@
++package api
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++
++	"github.com/stretchr/testify/require"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++	"github.com/forgekeep/nebula-mesh/internal/store"
++)
++
++// TestCreateHost_RejectsInvalidFirewallInbound: advanced.firewall_inbound is
++// validated at create time with the same friendly errors as the web form.
++func TestCreateHost_RejectsInvalidFirewallInbound(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++
++	body, _ := json.Marshal(createHostRequest{
++		NetworkID: netID,
++		Name:      "bad-fw",
++		NebulaIPs: []string{"192.168.100.30"},
++		Role:      "host",
++		Advanced: &models.HostAdvanced{
++			FirewallInbound: []models.HostFirewallRule{
++				{Port: "443", Proto: "sctp", Group: "web"},
++			},
++		},
++	})
++	req := httptest.NewRequest(http.MethodPost, "/api/v1/hosts", bytes.NewBuffer(body))
++	authRequest(req)
++	w := httptest.NewRecorder()
++	srv.ServeHTTP(w, req)
++
++	require.Equal(t, http.StatusBadRequest, w.Code, "body: %s", w.Body.String())
++	require.True(t, strings.Contains(w.Body.String(), "advanced.firewall_inbound[0]"),
++		"error should reference the offending rule: %s", w.Body.String())
++}
++
++// TestUpdateHost_FirewallInbound_AuditAndRepublish: a PATCH that only
++// changes advanced.firewall_inbound must produce an audit diff entry and
++// reset the host's config version so the agent re-renders on next poll.
++func TestUpdateHost_FirewallInbound_AuditAndRepublish(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++	ctx := context.Background()
++
++	host := createHostHelper(t, srv, netID, "fw-edit", "192.168.100.31", nil)
++
++	// Simulate an agent that already consumed config version 5.
++	require.NoError(t, srv.store.UpdateHostConfigVersion(ctx, host.ID, 5))
++
++	reqBody, _ := json.Marshal(updateHostRequest{
++		Advanced: &models.HostAdvanced{
++			FirewallInbound: []models.HostFirewallRule{
++				{Port: "22", Proto: "tcp", Group: "admin"},
++			},
++		},
++	})
++	req := httptest.NewRequest(http.MethodPatch, "/api/v1/hosts/"+host.ID, bytes.NewBuffer(reqBody))
++	authRequest(req)
++	rec := httptest.NewRecorder()
++	srv.ServeHTTP(rec, req)
++	require.Equal(t, http.StatusOK, rec.Code, "body: %s", rec.Body.String())
++
++	var updated models.Host
++	require.NoError(t, json.NewDecoder(rec.Body).Decode(&updated))
++	require.NotNil(t, updated.Advanced)
++	require.Equal(t, []models.HostFirewallRule{{Port: "22", Proto: "tcp", Group: "admin"}},
++		updated.Advanced.FirewallInbound)
++
++	// Audit entry carries the advanced.firewall_inbound diff.
++	entries, err := srv.store.ListAuditEntries(ctx, store.AuditFilter{Action: "host.update", Limit: 10})
++	require.NoError(t, err)
++	require.Equal(t, 1, len(entries))
++	var details map[string]map[string]any
++	require.NoError(t, json.Unmarshal([]byte(entries[0].Details), &details))
++	require.Contains(t, details, "advanced.firewall_inbound")
++
++	// Config version reset → re-render on next poll.
++	version, err := srv.store.GetHostConfigVersion(ctx, host.ID)
++	require.NoError(t, err)
++	require.Equal(t, 0, version, "config version should reset so the agent re-renders")
++}
+diff --git a/internal/configgen/firewall_test.go b/internal/configgen/firewall_test.go
+index 59f1331..a3e8ff8 100644
+--- a/internal/configgen/firewall_test.go
++++ b/internal/configgen/firewall_test.go
+@@ -1,6 +1,10 @@
+ package configgen
+ 
+-import "testing"
++import (
++	"testing"
++
++	"gopkg.in/yaml.v3"
++)
+ 
+ func TestFirewallRulesFromJSON(t *testing.T) {
+ 	tests := []struct {
+@@ -102,3 +106,82 @@ func TestFirewallRulesFromJSON_DefaultsRenderValidRules(t *testing.T) {
+ 		}
+ 	}
+ }
++
++func TestGenerate_HostFirewallInboundAppended(t *testing.T) {
++	input := GeneratorInput{
++		HostName:   "bastion",
++		NebulaIPs:  []string{"192.168.100.5"},
++		CACertPath: "/etc/nebula/ca.crt",
++		CertPath:   "/etc/nebula/host.crt",
++		KeyPath:    "/etc/nebula/host.key",
++		FirewallInbound: []FirewallRule{
++			{Port: "any", Proto: "icmp", Group: "any"},
++		},
++		FirewallOutbound: []FirewallRule{
++			{Port: "any", Proto: "any", Group: "any"},
++		},
++		HostFirewallInbound: []FirewallRule{
++			{Port: "22", Proto: "tcp", Group: "admin"},
++			{Port: "8000-9000", Proto: "udp", Group: "any"},
++		},
++	}
++
++	data, err := Generate(input)
++	if err != nil {
++		t.Fatalf("Generate: %v", err)
++	}
++
++	var parsed struct {
++		Firewall struct {
++			Inbound  []map[string]any `yaml:"inbound"`
++			Outbound []map[string]any `yaml:"outbound"`
++		} `yaml:"firewall"`
++	}
++	if err := yaml.Unmarshal(data, &parsed); err != nil {
++		t.Fatalf("invalid YAML: %v\n%s", err, string(data))
++	}
++
++	in := parsed.Firewall.Inbound
++	if len(in) != 3 {
++		t.Fatalf("inbound rules = %d, want 3 (network first, then host): %s", len(in), string(data))
++	}
++	// Network rule first.
++	if in[0]["proto"] != "icmp" || in[0]["host"] != "any" {
++		t.Errorf("inbound[0] should be the network icmp/any rule, got %v", in[0])
++	}
++	// Host rules appended in order.
++	if in[1]["port"] != 22 && in[1]["port"] != "22" {
++		t.Errorf("inbound[1].port = %v, want 22", in[1]["port"])
++	}
++	if in[1]["group"] != "admin" {
++		t.Errorf("inbound[1].group = %v, want admin", in[1]["group"])
++	}
++	// Host rule with group "any" renders as host: any (mapFirewallRules).
++	if in[2]["host"] != "any" {
++		t.Errorf("inbound[2] group any should render host: any, got %v", in[2])
++	}
++	if len(parsed.Firewall.Outbound) != 1 {
++		t.Errorf("outbound rules = %d, want 1 (untouched)", len(parsed.Firewall.Outbound))
++	}
++}
++
++func TestGenerate_HostFirewallInbound_DoesNotMutateDefaults(t *testing.T) {
++	input := GeneratorInput{
++		HostName:         "h",
++		NebulaIPs:        []string{"192.168.100.6"},
++		CACertPath:       "/etc/nebula/ca.crt",
++		CertPath:         "/etc/nebula/host.crt",
++		KeyPath:          "/etc/nebula/host.key",
++		FirewallInbound:  DefaultFirewallInbound,
++		FirewallOutbound: DefaultFirewallOutbound,
++		HostFirewallInbound: []FirewallRule{
++			{Port: "22", Proto: "tcp", Group: "admin"},
++		},
++	}
++	if _, err := Generate(input); err != nil {
++		t.Fatalf("Generate: %v", err)
++	}
++	if len(DefaultFirewallInbound) != 1 {
++		t.Fatalf("DefaultFirewallInbound mutated: %#v", DefaultFirewallInbound)
++	}
++}
+diff --git a/internal/configgen/generator.go b/internal/configgen/generator.go
+index 94b0746..2c34ee0 100644
+--- a/internal/configgen/generator.go
++++ b/internal/configgen/generator.go
+@@ -41,7 +41,10 @@ type GeneratorInput struct {
+ 	Relays           []string
+ 	FirewallInbound  []FirewallRule
+ 	FirewallOutbound []FirewallRule
+-	Mobile           *MobileProfile
++	// HostFirewallInbound holds per-host inbound rules appended after the
++	// network-wide FirewallInbound policy in the rendered config.
++	HostFirewallInbound []FirewallRule
++	Mobile              *MobileProfile
+ 
+ 	// Optional per-host overrides. Zero values mean "use the default".
+ 	PunchyOverride *bool
+diff --git a/internal/configgen/marshal.go b/internal/configgen/marshal.go
+index a028a02..aa9705e 100644
+--- a/internal/configgen/marshal.go
++++ b/internal/configgen/marshal.go
+@@ -339,7 +339,13 @@ func buildConfig(input GeneratorInput) nebulaConfig {
+ 	}
+ 
+ 	cfg.Firewall.Outbound = mapFirewallRules(input.FirewallOutbound)
+-	cfg.Firewall.Inbound = mapFirewallRules(input.FirewallInbound)
++	// Network-wide policy first, then per-host additions. Composed into a
++	// fresh slice: appending to input.FirewallInbound could mutate the
++	// shared DefaultFirewallInbound backing array.
++	inbound := make([]FirewallRule, 0, len(input.FirewallInbound)+len(input.HostFirewallInbound))
++	inbound = append(inbound, input.FirewallInbound...)
++	inbound = append(inbound, input.HostFirewallInbound...)
++	cfg.Firewall.Inbound = mapFirewallRules(inbound)
+ 	if input.Mobile != nil {
+ 		applyMobileProfile(&cfg, *input.Mobile)
+ 	}
+diff --git a/internal/mobilebundle/builder.go b/internal/mobilebundle/builder.go
+index 2c441f8..918fa90 100644
+--- a/internal/mobilebundle/builder.go
++++ b/internal/mobilebundle/builder.go
+@@ -166,6 +166,9 @@ func Build(ctx context.Context, s store.Store, resolver interface {
+ 		for _, u := range adv.UnsafeRoutes {
+ 			input.UnsafeRoutes = append(input.UnsafeRoutes, configgen.AdvancedUnsafeRoute{Route: u.Route, Via: u.Via})
+ 		}
++		for _, fr := range adv.FirewallInbound {
++			input.HostFirewallInbound = append(input.HostFirewallInbound, configgen.FirewallRule{Port: fr.Port, Proto: fr.Proto, Group: fr.Group})
++		}
+ 	}
+ 
+ 	configYAML, err := configgen.Generate(input)
+diff --git a/internal/mobilebundle/builder_test.go b/internal/mobilebundle/builder_test.go
+index c67d37a..f9e314b 100644
+--- a/internal/mobilebundle/builder_test.go
++++ b/internal/mobilebundle/builder_test.go
+@@ -322,3 +322,51 @@ func TestBuild_AppliesStoredFirewallRules(t *testing.T) {
+ 		t.Errorf("mobile bundle does not contain the stored firewall group; rules not applied\n%s", bundle)
+ 	}
+ }
++
++// TestBuild_AppendsHostFirewallInbound: per-host inbound rules must reach
++// the mobile bundle too, appended after the network policy.
++func TestBuild_AppendsHostFirewallInbound(t *testing.T) {
++	ctx := context.Background()
++
++	s, err := store.NewSQLiteStore(":memory:")
++	require.NoError(t, err)
++	require.NoError(t, s.Migrate(ctx))
++
++	ca, err := pki.NewCA("test-ca", 365*24*time.Hour)
++	require.NoError(t, err)
++	resolver := &StubCAResolver{ca: ca}
++
++	network := &models.Network{ID: "net-hfw", Name: "hfw-network", CIDRs: []string{"10.0.0.0/8"}}
++	require.NoError(t, s.CreateNetwork(ctx, network))
++
++	const policy = `{"inbound":[{"port":"8443","proto":"tcp","group":"mobile-only"}],` +
++		`"outbound":[{"port":"any","proto":"any","group":"any"}]}`
++	require.NoError(t, s.SetNetworkConfig(ctx, network.ID, "firewall", policy))
++
++	host := &models.Host{
++		ID: "mobile-hfw", Name: "phone-hfw", NetworkID: network.ID,
++		NebulaIPs: []string{"10.0.0.10"}, Kind: models.HostKindMobile,
++		Variant: models.HostVariantIOS, Role: models.HostRoleHost,
++		Status: models.HostStatusPending, CAID: "test-ca-id", Groups: []string{"mobile"},
++		Advanced: &models.HostAdvanced{
++			FirewallInbound: []models.HostFirewallRule{
++				{Port: "5000", Proto: "udp", Group: "sync-peers"},
++			},
++		},
++	}
++	require.NoError(t, s.CreateHost(ctx, host))
++	seedActiveCAOwner(t, s, host.CAID)
++
++	bundle, err := Build(ctx, s, resolver, host)
++	require.NoError(t, err)
++	out := string(bundle)
++	if !strings.Contains(out, "mobile-only") {
++		t.Errorf("network firewall rule missing from bundle\n%s", out)
++	}
++	if !strings.Contains(out, "sync-peers") {
++		t.Errorf("per-host firewall rule missing from bundle\n%s", out)
++	}
++	if netIdx, hostIdx := strings.Index(out, "mobile-only"), strings.Index(out, "sync-peers"); netIdx > hostIdx {
++		t.Errorf("network rule should render before the per-host rule\n%s", out)
++	}
++}
+diff --git a/internal/models/host.go b/internal/models/host.go
+index 527e5e5..9382d0c 100644
+--- a/internal/models/host.go
++++ b/internal/models/host.go
+@@ -167,6 +167,20 @@ type UnsafeRoute struct {
+ 	Via   string `json:"via" yaml:"via"`     // Nebula IP of the gateway host
+ }
+ 
++// HostFirewallRule is a single per-host inbound firewall rule, appended
++// after the network-wide policy in the rendered Nebula config. Group "any"
++// renders as `host: any` (match every peer), mirroring the network policy.
++type HostFirewallRule struct {
++	Port  string `json:"port" yaml:"port"`   // "any", a port, or a range "a-b"
++	Proto string `json:"proto" yaml:"proto"` // any | tcp | udp | icmp
++	Group string `json:"group" yaml:"group"`
++}
++
++// MaxHostFirewallRules caps advanced.firewall_inbound per host. Generous
++// relative to real use, but bounded so a single host cannot bloat its
++// rendered config without limit.
++const MaxHostFirewallRules = 64
++
+ // HostAdvanced groups optional per-host overrides for the rendered Nebula
+ // config. All fields are optional. A field set to its zero value means
+ // "inherit network default"; a field set to a non-zero value overrides.
+@@ -175,9 +189,10 @@ type UnsafeRoute struct {
+ // hole-punching for a host (false) without it being indistinguishable from
+ // "not set".
+ type HostAdvanced struct {
+-	Punchy       *bool         `json:"punchy,omitempty" yaml:"punchy,omitempty"`
+-	ListenHost   string        `json:"listen_host,omitempty" yaml:"listen_host,omitempty"`
+-	MTU          int           `json:"mtu,omitempty" yaml:"mtu,omitempty"`
+-	TunDevice    string        `json:"tun_device,omitempty" yaml:"tun_device,omitempty"`
+-	UnsafeRoutes []UnsafeRoute `json:"unsafe_routes,omitempty" yaml:"unsafe_routes,omitempty"`
++	Punchy          *bool              `json:"punchy,omitempty" yaml:"punchy,omitempty"`
++	ListenHost      string             `json:"listen_host,omitempty" yaml:"listen_host,omitempty"`
++	MTU             int                `json:"mtu,omitempty" yaml:"mtu,omitempty"`
++	TunDevice       string             `json:"tun_device,omitempty" yaml:"tun_device,omitempty"`
++	UnsafeRoutes    []UnsafeRoute      `json:"unsafe_routes,omitempty" yaml:"unsafe_routes,omitempty"`
++	FirewallInbound []HostFirewallRule `json:"firewall_inbound,omitempty" yaml:"firewall_inbound,omitempty"`
+ }
+diff --git a/internal/models/hostdiff.go b/internal/models/hostdiff.go
+index 40c7f4c..ee09c8d 100644
+--- a/internal/models/hostdiff.go
++++ b/internal/models/hostdiff.go
+@@ -123,6 +123,14 @@ func HostDiff(before, after *Host) ([]byte, bool, error) {
+ 		}
+ 	}
+ 
++	// FirewallInbound
++	if !hostFirewallRulesEqual(beforeAdv.FirewallInbound, afterAdv.FirewallInbound) {
++		changes["advanced.firewall_inbound"] = map[string]any{
++			"before": beforeAdv.FirewallInbound,
++			"after":  afterAdv.FirewallInbound,
++		}
++	}
++
+ 	// If no changes, return nil
+ 	if len(changes) == 0 {
+ 		return nil, false, nil
+@@ -198,3 +206,17 @@ func unsafeRoutesEqual(a, b []UnsafeRoute) bool {
+ 	}
+ 	return true
+ }
++
++// hostFirewallRulesEqual compares two HostFirewallRule slices (order matters,
++// as it is preserved into the rendered config).
++func hostFirewallRulesEqual(a, b []HostFirewallRule) bool {
++	if len(a) != len(b) {
++		return false
++	}
++	for i := range a {
++		if a[i] != b[i] {
++			return false
++		}
++	}
++	return true
++}
+diff --git a/internal/models/hostdiff_test.go b/internal/models/hostdiff_test.go
+index 6cac255..dc99294 100644
+--- a/internal/models/hostdiff_test.go
++++ b/internal/models/hostdiff_test.go
+@@ -419,3 +419,45 @@ func TestHostDiff_RoleAndLighthouseFlags(t *testing.T) {
+ 		t.Fatalf("role change mismatch: %+v", roleChange)
+ 	}
+ }
++
++func TestHostDiff_AdvancedFirewallInbound(t *testing.T) {
++	ruleA := HostFirewallRule{Port: "443", Proto: "tcp", Group: "web"}
++	ruleB := HostFirewallRule{Port: "22", Proto: "tcp", Group: "admin"}
++
++	cases := []struct {
++		name       string
++		before     *HostAdvanced
++		after      *HostAdvanced
++		wantChange bool
++	}{
++		{"add rule to nil advanced", nil, &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA}}, true},
++		{"remove all rules", &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA}}, &HostAdvanced{}, true},
++		{"change rule", &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA}}, &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleB}}, true},
++		{"reorder rules", &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA, ruleB}}, &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleB, ruleA}}, true},
++		{"identical rules", &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA}}, &HostAdvanced{FirewallInbound: []HostFirewallRule{ruleA}}, false},
++		{"both empty", &HostAdvanced{}, &HostAdvanced{}, false},
++	}
++	for _, tc := range cases {
++		t.Run(tc.name, func(t *testing.T) {
++			before := &Host{Name: "h", Advanced: tc.before}
++			after := &Host{Name: "h", Advanced: tc.after}
++			diffJSON, hasChanges, err := HostDiff(before, after)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if hasChanges != tc.wantChange {
++				t.Fatalf("hasChanges = %v, want %v (diff: %s)", hasChanges, tc.wantChange, diffJSON)
++			}
++			if !tc.wantChange {
++				return
++			}
++			var parsed map[string]map[string]any
++			if err := json.Unmarshal(diffJSON, &parsed); err != nil {
++				t.Fatalf("unmarshal diff: %v", err)
++			}
++			if _, ok := parsed["advanced.firewall_inbound"]; !ok {
++				t.Errorf("diff missing key advanced.firewall_inbound: %s", diffJSON)
++			}
++		})
++	}
++}
+diff --git a/internal/models/validate_ip.go b/internal/models/validate_ip.go
+index e3592e4..fc02263 100644
+--- a/internal/models/validate_ip.go
++++ b/internal/models/validate_ip.go
+@@ -4,6 +4,7 @@ import (
+ 	"fmt"
+ 	"net/netip"
+ 	"regexp"
++	"strconv"
+ 	"strings"
+ )
+ 
+@@ -171,5 +172,68 @@ func ValidateHostAdvanced(adv *HostAdvanced) error {
+ 			return err
+ 		}
+ 	}
++	if len(adv.FirewallInbound) > MaxHostFirewallRules {
++		return fmt.Errorf("advanced.firewall_inbound: at most %d rules allowed", MaxHostFirewallRules)
++	}
++	for i, r := range adv.FirewallInbound {
++		if err := validateHostFirewallRule(r); err != nil {
++			return fmt.Errorf("advanced.firewall_inbound[%d]: %w", i, err)
++		}
++	}
++	return nil
++}
++
++// maxFirewallGroupLen mirrors the API-side cap on group names embedded in
++// certificates (maxGroupNameLen in internal/api).
++const maxFirewallGroupLen = 64
++
++func validateHostFirewallRule(r HostFirewallRule) error {
++	if r.Port == "" || r.Proto == "" || r.Group == "" {
++		return fmt.Errorf("port, proto and group are required")
++	}
++	switch r.Proto {
++	case "any", "tcp", "udp", "icmp":
++	default:
++		return fmt.Errorf("proto must be one of any, tcp, udp, icmp")
++	}
++	if len(r.Group) > maxFirewallGroupLen {
++		return fmt.Errorf("group must be at most %d characters", maxFirewallGroupLen)
++	}
++	if err := validateFirewallPort(r.Port); err != nil {
++		return err
++	}
++	return nil
++}
++
++// validateFirewallPort accepts "any", a single port 1-65535, or an
++// ascending range "a-b" within those bounds — the forms Nebula's firewall
++// accepts for the port field.
++func validateFirewallPort(port string) error {
++	if port == "any" {
++		return nil
++	}
++	parse := func(s string) (int, error) {
++		n, err := strconv.Atoi(s)
++		if err != nil || n < 1 || n > 65535 {
++			return 0, fmt.Errorf("port must be \"any\", a port between 1 and 65535, or a range \"a-b\"")
++		}
++		return n, nil
++	}
++	lo, hi, isRange := strings.Cut(port, "-")
++	if !isRange {
++		_, err := parse(port)
++		return err
++	}
++	loN, err := parse(lo)
++	if err != nil {
++		return err
++	}
++	hiN, err := parse(hi)
++	if err != nil {
++		return err
++	}
++	if loN > hiN {
++		return fmt.Errorf("port range start must not exceed its end")
++	}
+ 	return nil
+ }
+diff --git a/internal/models/validate_ip_test.go b/internal/models/validate_ip_test.go
+index e05374a..acd0d4d 100644
+--- a/internal/models/validate_ip_test.go
++++ b/internal/models/validate_ip_test.go
+@@ -174,3 +174,65 @@ func TestValidateHostAdvanced_TunDeviceAccepts(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestValidateHostAdvanced_FirewallInbound_AcceptsValid(t *testing.T) {
++	rules := []HostFirewallRule{
++		{Port: "443", Proto: "tcp", Group: "web"},
++		{Port: "8000-9000", Proto: "udp", Group: "monitoring"},
++		{Port: "any", Proto: "icmp", Group: "any"},
++		{Port: "22", Proto: "tcp", Group: "admin"},
++		{Port: "53", Proto: "any", Group: "ops"},
++	}
++	if err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: rules}); err != nil {
++		t.Errorf("valid firewall_inbound rejected: %v", err)
++	}
++	if err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: nil}); err != nil {
++		t.Errorf("nil firewall_inbound rejected: %v", err)
++	}
++	if err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: []HostFirewallRule{}}); err != nil {
++		t.Errorf("empty firewall_inbound rejected: %v", err)
++	}
++}
++
++func TestValidateHostAdvanced_FirewallInbound_Rejects(t *testing.T) {
++	longGroup := strings.Repeat("g", 65)
++	cases := []struct {
++		name string
++		rule HostFirewallRule
++	}{
++		{"empty port", HostFirewallRule{Port: "", Proto: "tcp", Group: "web"}},
++		{"empty proto", HostFirewallRule{Port: "443", Proto: "", Group: "web"}},
++		{"empty group", HostFirewallRule{Port: "443", Proto: "tcp", Group: ""}},
++		{"unknown proto", HostFirewallRule{Port: "443", Proto: "sctp", Group: "web"}},
++		{"port zero", HostFirewallRule{Port: "0", Proto: "tcp", Group: "web"}},
++		{"port too high", HostFirewallRule{Port: "70000", Proto: "tcp", Group: "web"}},
++		{"port not a number", HostFirewallRule{Port: "https", Proto: "tcp", Group: "web"}},
++		{"inverted range", HostFirewallRule{Port: "9000-8000", Proto: "tcp", Group: "web"}},
++		{"range with junk", HostFirewallRule{Port: "80-x", Proto: "tcp", Group: "web"}},
++		{"range out of bounds", HostFirewallRule{Port: "80-70000", Proto: "tcp", Group: "web"}},
++		{"overlong group", HostFirewallRule{Port: "443", Proto: "tcp", Group: longGroup}},
++	}
++	for _, tc := range cases {
++		t.Run(tc.name, func(t *testing.T) {
++			err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: []HostFirewallRule{tc.rule}})
++			if err == nil {
++				t.Errorf("rule %+v accepted, want error", tc.rule)
++			} else if !strings.Contains(err.Error(), "advanced.firewall_inbound[0]") {
++				t.Errorf("error %q should reference advanced.firewall_inbound[0]", err)
++			}
++		})
++	}
++}
++
++func TestValidateHostAdvanced_FirewallInbound_CapsRuleCount(t *testing.T) {
++	rules := make([]HostFirewallRule, MaxHostFirewallRules+1)
++	for i := range rules {
++		rules[i] = HostFirewallRule{Port: "443", Proto: "tcp", Group: "web"}
++	}
++	if err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: rules}); err == nil {
++		t.Error("expected error for too many firewall rules")
++	}
++	if err := ValidateHostAdvanced(&HostAdvanced{FirewallInbound: rules[:MaxHostFirewallRules]}); err != nil {
++		t.Errorf("exactly MaxHostFirewallRules rules rejected: %v", err)
++	}
++}
+diff --git a/internal/web/advanced.go b/internal/web/advanced.go
+index dd7ead1..10c4773 100644
+--- a/internal/web/advanced.go
++++ b/internal/web/advanced.go
+@@ -57,6 +57,24 @@ func parseAdvancedFromForm(r *http.Request) (*models.HostAdvanced, error) {
+ 			used = true
+ 		}
+ 	}
++	if raw := strings.TrimSpace(r.FormValue("adv_firewall_inbound")); raw != "" {
++		for _, line := range strings.Split(raw, "\n") {
++			line = strings.TrimSpace(line)
++			if line == "" {
++				continue
++			}
++			parts := strings.Fields(line)
++			var port, proto string
++			if len(parts) == 3 && parts[1] == "from" {
++				port, proto, _ = strings.Cut(parts[0], "/")
++			}
++			if port == "" || proto == "" || strings.Contains(proto, "/") {
++				return nil, fmt.Errorf("adv_firewall_inbound line %q: expected '<PORT>/<PROTO> from <GROUP>'", line)
++			}
++			adv.FirewallInbound = append(adv.FirewallInbound, models.HostFirewallRule{Port: port, Proto: proto, Group: parts[2]})
++			used = true
++		}
++	}
+ 
+ 	if !used {
+ 		return nil, nil
+diff --git a/internal/web/advanced_firewall_test.go b/internal/web/advanced_firewall_test.go
+new file mode 100644
+index 0000000..403ad09
+--- /dev/null
++++ b/internal/web/advanced_firewall_test.go
+@@ -0,0 +1,251 @@
++package web
++
++import (
++	"context"
++	"net/http"
++	"net/http/httptest"
++	"net/url"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++	"github.com/forgekeep/nebula-mesh/internal/store"
++)
++
++func findHostByName(t *testing.T, s *store.SQLiteStore, name string) *models.Host {
++	t.Helper()
++	hosts, err := s.ListHosts(context.Background(), store.HostFilter{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	for _, h := range hosts {
++		if h.Name == name {
++			return h
++		}
++	}
++	t.Fatalf("host %q not found", name)
++	return nil
++}
++
++func advForm(t *testing.T, values url.Values) *http.Request {
++	t.Helper()
++	req := httptest.NewRequest(http.MethodPost, "/ui/hosts", strings.NewReader(values.Encode()))
++	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
++	return req
++}
++
++func TestParseAdvancedFromForm_FirewallInbound(t *testing.T) {
++	req := advForm(t, url.Values{
++		"adv_firewall_inbound": {"443/tcp from web\n\n8000-9000/udp from monitoring\nany/icmp from any"},
++	})
++	adv, err := parseAdvancedFromForm(req)
++	if err != nil {
++		t.Fatalf("parseAdvancedFromForm: %v", err)
++	}
++	if adv == nil {
++		t.Fatal("adv = nil, want parsed rules")
++	}
++	want := []models.HostFirewallRule{
++		{Port: "443", Proto: "tcp", Group: "web"},
++		{Port: "8000-9000", Proto: "udp", Group: "monitoring"},
++		{Port: "any", Proto: "icmp", Group: "any"},
++	}
++	if len(adv.FirewallInbound) != len(want) {
++		t.Fatalf("rules = %+v, want %+v", adv.FirewallInbound, want)
++	}
++	for i := range want {
++		if adv.FirewallInbound[i] != want[i] {
++			t.Errorf("rule[%d] = %+v, want %+v", i, adv.FirewallInbound[i], want[i])
++		}
++	}
++}
++
++func TestParseAdvancedFromForm_FirewallInbound_Malformed(t *testing.T) {
++	cases := []string{
++		"443 tcp web",            // missing slash and "from"
++		"443/tcp web",            // missing "from"
++		"443/tcp/extra from web", // two slashes
++		"443 from web",           // no proto
++	}
++	for _, line := range cases {
++		t.Run(line, func(t *testing.T) {
++			req := advForm(t, url.Values{"adv_firewall_inbound": {line}})
++			_, err := parseAdvancedFromForm(req)
++			if err == nil {
++				t.Fatalf("line %q accepted, want error", line)
++			}
++			if !strings.Contains(err.Error(), "<PORT>/<PROTO> from <GROUP>") {
++				t.Errorf("error %q should explain the expected format", err)
++			}
++		})
++	}
++}
++
++func TestParseAdvancedFromForm_FirewallInbound_EmptyIsNil(t *testing.T) {
++	req := advForm(t, url.Values{"adv_firewall_inbound": {"   \n  "}})
++	adv, err := parseAdvancedFromForm(req)
++	if err != nil {
++		t.Fatalf("parseAdvancedFromForm: %v", err)
++	}
++	if adv != nil {
++		t.Errorf("adv = %+v, want nil for whitespace-only textarea", adv)
++	}
++}
++
++func TestHostFormState_FirewallInboundRoundTrip(t *testing.T) {
++	h := &models.Host{
++		Name: "h", NebulaIPs: []string{"10.0.0.1"},
++		Advanced: &models.HostAdvanced{
++			FirewallInbound: []models.HostFirewallRule{
++				{Port: "443", Proto: "tcp", Group: "web"},
++				{Port: "any", Proto: "icmp", Group: "any"},
++			},
++		},
++	}
++	state := hostFormStateFromHost(h)
++	want := "443/tcp from web\nany/icmp from any"
++	if state.AdvFirewallInbound != want {
++		t.Errorf("AdvFirewallInbound = %q, want %q", state.AdvFirewallInbound, want)
++	}
++}
++
++func TestHostForms_FirewallInboundTextarea(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++
++	ctx := context.Background()
++	if err := s.CreateNetwork(ctx, &models.Network{
++		ID: "n-fw1", Name: "test-net", CIDRs: []string{"10.0.0.0/24"}, CreatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++	host := &models.Host{
++		ID: "h-fw1", NetworkID: "n-fw1", Name: "fw-1", NebulaIPs: []string{"10.0.0.5"},
++		Groups: []string{}, Role: models.HostRoleHost, Status: models.HostStatusEnrolled,
++		Advanced: &models.HostAdvanced{
++			FirewallInbound: []models.HostFirewallRule{{Port: "443", Proto: "tcp", Group: "web"}},
++		},
++		CreatedAt: time.Now(), UpdatedAt: time.Now(),
++	}
++	if err := s.CreateHost(ctx, host); err != nil {
++		t.Fatal(err)
++	}
++
++	for _, path := range []string{"/ui/hosts/new", "/ui/hosts/h-fw1/edit"} {
++		t.Run(path, func(t *testing.T) {
++			req := httptest.NewRequest(http.MethodGet, path, nil)
++			for _, c := range cookies {
++				req.AddCookie(c)
++			}
++			rec := httptest.NewRecorder()
++			w.ServeHTTP(rec, req)
++			if rec.Code != http.StatusOK {
++				t.Fatalf("status = %d, want 200", rec.Code)
++			}
++			if !strings.Contains(rec.Body.String(), `name="adv_firewall_inbound"`) {
++				t.Error("form should include the adv_firewall_inbound textarea")
++			}
++		})
++	}
++
++	// Edit form shows the existing rules and opens the advanced section.
++	req := httptest.NewRequest(http.MethodGet, "/ui/hosts/h-fw1/edit", nil)
++	for _, c := range cookies {
++		req.AddCookie(c)
++	}
++	rec := httptest.NewRecorder()
++	w.ServeHTTP(rec, req)
++	body := rec.Body.String()
++	if !strings.Contains(body, "443/tcp from web") {
++		t.Error("edit form should show the existing firewall rules")
++	}
++	if !strings.Contains(body, "<details style=\"margin: 16px 0;\" open>") {
++		t.Error("advanced section should be open when firewall rules are set")
++	}
++}
++
++func TestCreateHostViaUI_FirewallInbound(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++
++	ctx := context.Background()
++	if err := s.CreateNetwork(ctx, &models.Network{
++		ID: "n-fw2", Name: "test-net", CIDRs: []string{"10.0.0.0/24"}, CreatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++
++	csrfToken, updatedCookies := getCSRFTokenFromCookies(t, w, "/ui/hosts", cookies)
++	form := url.Values{
++		"network_id":           {"n-fw2"},
++		"name":                 {"fw-created"},
++		"nebula_ips":           {"10.0.0.6"},
++		"role":                 {"host"},
++		"adv_firewall_inbound": {"22/tcp from admin\n443/tcp from web"},
++		"_csrf":                {csrfToken},
++	}
++	req := httptest.NewRequest(http.MethodPost, "/ui/hosts", strings.NewReader(form.Encode()))
++	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
++	for _, c := range updatedCookies {
++		req.AddCookie(c)
++	}
++	rec := httptest.NewRecorder()
++	w.ServeHTTP(rec, req)
++	if rec.Code != http.StatusOK {
++		t.Fatalf("status = %d, want 200, body: %s", rec.Code, rec.Body.String())
++	}
++
++	created := findHostByName(t, s, "fw-created")
++	want := []models.HostFirewallRule{
++		{Port: "22", Proto: "tcp", Group: "admin"},
++		{Port: "443", Proto: "tcp", Group: "web"},
++	}
++	if created.Advanced == nil || len(created.Advanced.FirewallInbound) != 2 {
++		t.Fatalf("Advanced.FirewallInbound = %+v, want %+v", created.Advanced, want)
++	}
++	for i := range want {
++		if created.Advanced.FirewallInbound[i] != want[i] {
++			t.Errorf("rule[%d] = %+v, want %+v", i, created.Advanced.FirewallInbound[i], want[i])
++		}
++	}
++}
++
++func TestCreateHostViaUI_FirewallInbound_InvalidRerenders(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++
++	ctx := context.Background()
++	if err := s.CreateNetwork(ctx, &models.Network{
++		ID: "n-fw3", Name: "test-net", CIDRs: []string{"10.0.0.0/24"}, CreatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++
++	csrfToken, updatedCookies := getCSRFTokenFromCookies(t, w, "/ui/hosts", cookies)
++	form := url.Values{
++		"network_id":           {"n-fw3"},
++		"name":                 {"fw-bad"},
++		"nebula_ips":           {"10.0.0.7"},
++		"role":                 {"host"},
++		"adv_firewall_inbound": {"443/sctp from web"},
++		"_csrf":                {csrfToken},
++	}
++	req := httptest.NewRequest(http.MethodPost, "/ui/hosts", strings.NewReader(form.Encode()))
++	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
++	for _, c := range updatedCookies {
++		req.AddCookie(c)
++	}
++	rec := httptest.NewRecorder()
++	w.ServeHTTP(rec, req)
++	if rec.Code != http.StatusBadRequest {
++		t.Fatalf("status = %d, want 400, body: %s", rec.Code, rec.Body.String())
++	}
++	body := rec.Body.String()
++	if !strings.Contains(body, "advanced.firewall_inbound[0]") {
++		t.Errorf("error banner should reference the offending rule\n%s", body)
++	}
++	if !strings.Contains(body, "443/sctp from web") {
++		t.Errorf("re-rendered form should preserve the submitted textarea input\n%s", body)
++	}
++}
+diff --git a/internal/web/form_state.go b/internal/web/form_state.go
+index 4178778..97e8163 100644
+--- a/internal/web/form_state.go
++++ b/internal/web/form_state.go
+@@ -34,40 +34,42 @@ func trimEmpty(src []string) []string {
+ // NebulaIPs is a slice to support multiple overlay addresses per host (issue #108).
+ // NebulaIPErrors maps row index to per-row error messages for inline rendering.
+ type hostFormState struct {
+-	NetworkID       string
+-	Name            string
+-	NebulaIPs       []string
+-	NebulaIPErrors  map[int]string
+-	Role            string
+-	Groups          string
+-	PublicIP        string
+-	ListenPort      string
+-	AdvListenHost   string
+-	AdvMTU          string
+-	AdvTunDevice    string
+-	AdvPunchy       string
+-	AdvUnsafeRoutes string
+-	Kind            string
+-	Variant         string
++	NetworkID          string
++	Name               string
++	NebulaIPs          []string
++	NebulaIPErrors     map[int]string
++	Role               string
++	Groups             string
++	PublicIP           string
++	ListenPort         string
++	AdvListenHost      string
++	AdvMTU             string
++	AdvTunDevice       string
++	AdvPunchy          string
++	AdvUnsafeRoutes    string
++	AdvFirewallInbound string
++	Kind               string
++	Variant            string
+ }
+ 
+ func newHostFormState(r *http.Request) hostFormState {
+ 	return hostFormState{
+-		NetworkID:       r.FormValue("network_id"),
+-		Name:            r.FormValue("name"),
+-		NebulaIPs:       trimEmpty(r.Form["nebula_ips"]),
+-		NebulaIPErrors:  make(map[int]string),
+-		Role:            r.FormValue("role"),
+-		Groups:          r.FormValue("groups"),
+-		PublicIP:        r.FormValue("public_ip"),
+-		ListenPort:      r.FormValue("listen_port"),
+-		AdvListenHost:   r.FormValue("adv_listen_host"),
+-		AdvMTU:          r.FormValue("adv_mtu"),
+-		AdvTunDevice:    r.FormValue("adv_tun_device"),
+-		AdvPunchy:       r.FormValue("adv_punchy"),
+-		AdvUnsafeRoutes: r.FormValue("adv_unsafe_routes"),
+-		Kind:            r.FormValue("kind"),
+-		Variant:         r.FormValue("variant"),
++		NetworkID:          r.FormValue("network_id"),
++		Name:               r.FormValue("name"),
++		NebulaIPs:          trimEmpty(r.Form["nebula_ips"]),
++		NebulaIPErrors:     make(map[int]string),
++		Role:               r.FormValue("role"),
++		Groups:             r.FormValue("groups"),
++		PublicIP:           r.FormValue("public_ip"),
++		ListenPort:         r.FormValue("listen_port"),
++		AdvListenHost:      r.FormValue("adv_listen_host"),
++		AdvMTU:             r.FormValue("adv_mtu"),
++		AdvTunDevice:       r.FormValue("adv_tun_device"),
++		AdvPunchy:          r.FormValue("adv_punchy"),
++		AdvUnsafeRoutes:    r.FormValue("adv_unsafe_routes"),
++		AdvFirewallInbound: r.FormValue("adv_firewall_inbound"),
++		Kind:               r.FormValue("kind"),
++		Variant:            r.FormValue("variant"),
+ 	}
+ }
+ 
+@@ -276,6 +278,14 @@ func hostFormStateFromHost(h *models.Host) hostFormState {
+ 			}
+ 			state.AdvUnsafeRoutes += ur.Route + " via " + ur.Via
+ 		}
++
++		// FirewallInbound: "PORT/PROTO from GROUP" per line
++		for _, fr := range h.Advanced.FirewallInbound {
++			if state.AdvFirewallInbound != "" {
++				state.AdvFirewallInbound += "\n"
++			}
++			state.AdvFirewallInbound += fr.Port + "/" + fr.Proto + " from " + fr.Group
++		}
+ 	}
+ 
+ 	return state
+diff --git a/internal/web/templates/host_edit.html b/internal/web/templates/host_edit.html
+index 22d14ce..85346ec 100644
+--- a/internal/web/templates/host_edit.html
++++ b/internal/web/templates/host_edit.html
+@@ -72,7 +72,7 @@
+             <input type="number" name="listen_port" class="form-control" placeholder="4242" value="{{.Form.ListenPort}}">
+         </div>
+ 
+-        <details style="margin: 16px 0;"{{if or .Form.AdvListenHost .Form.AdvMTU .Form.AdvTunDevice .Form.AdvPunchy .Form.AdvUnsafeRoutes}} open{{end}}>
++        <details style="margin: 16px 0;"{{if or .Form.AdvListenHost .Form.AdvMTU .Form.AdvTunDevice .Form.AdvPunchy .Form.AdvUnsafeRoutes .Form.AdvFirewallInbound}} open{{end}}>
+             <summary style="cursor: pointer; padding: 8px; color: var(--text-muted); font-size: 14px;">Advanced configuration (optional)</summary>
+             <p style="font-size: 12px; color: var(--text-muted); margin: 8px 0;">Empty fields inherit the network default. See <a href="https://nebula.defined.net/docs/config" target="_blank">Nebula config docs</a>.</p>
+             <div class="form-group"><label>Listen host (advanced.listen_host)</label><input type="text" name="adv_listen_host" class="form-control" placeholder="0.0.0.0" value="{{.Form.AdvListenHost}}"></div>
+@@ -87,6 +87,7 @@
+                 </select>
+             </div>
+             <div class="form-group"><label>Unsafe routes (one per line: <code>CIDR via NEBULA_IP</code>)</label><textarea name="adv_unsafe_routes" class="form-control" rows="3" placeholder="192.168.10.0/24 via 10.0.0.99">{{.Form.AdvUnsafeRoutes}}</textarea></div>
++            <div class="form-group"><label>Inbound firewall rules (one per line: <code>PORT/PROTO from GROUP</code>, added after the network policy)</label><textarea name="adv_firewall_inbound" class="form-control" rows="3" placeholder="443/tcp from web">{{.Form.AdvFirewallInbound}}</textarea></div>
+         </details>
+ 
+         <button type="submit" class="btn btn-primary">Save changes</button>
+diff --git a/internal/web/templates/host_new.html b/internal/web/templates/host_new.html
+index 054cee3..b98efc3 100644
+--- a/internal/web/templates/host_new.html
++++ b/internal/web/templates/host_new.html
+@@ -94,7 +94,7 @@
+             <input type="number" name="listen_port" class="form-control" placeholder="4242" value="{{.Form.ListenPort}}">
+         </div>
+ 
+-        <details style="margin: 16px 0;"{{if or .Form.AdvListenHost .Form.AdvMTU .Form.AdvTunDevice .Form.AdvPunchy .Form.AdvUnsafeRoutes}} open{{end}}>
++        <details style="margin: 16px 0;"{{if or .Form.AdvListenHost .Form.AdvMTU .Form.AdvTunDevice .Form.AdvPunchy .Form.AdvUnsafeRoutes .Form.AdvFirewallInbound}} open{{end}}>
+             <summary style="cursor: pointer; padding: 8px; color: var(--text-muted); font-size: 14px;">
+                 Advanced configuration (optional)
+             </summary>
+@@ -126,6 +126,10 @@
+                 <label>Unsafe routes (one per line: <code>CIDR via NEBULA_IP</code>)</label>
+                 <textarea name="adv_unsafe_routes" class="form-control" rows="3" placeholder="192.168.10.0/24 via 10.0.0.99">{{.Form.AdvUnsafeRoutes}}</textarea>
+             </div>
++            <div class="form-group">
++                <label>Inbound firewall rules (one per line: <code>PORT/PROTO from GROUP</code>, added after the network policy)</label>
++                <textarea name="adv_firewall_inbound" class="form-control" rows="3" placeholder="443/tcp from web">{{.Form.AdvFirewallInbound}}</textarea>
++            </div>
+         </details>
+ 
+         <button type="submit" class="btn btn-primary">Create Host</button>
+-- 
+2.54.0
+

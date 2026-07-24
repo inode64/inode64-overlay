@@ -34,6 +34,7 @@ RDEPEND="
 
 PATCHES=(
         "${FILESDIR}/0001-feat-host-introduce-combined-lighthouse-relay-role.patch"
+        "${FILESDIR}/0002-feat-firewall-add-per-host-inbound-firewall-rules-co.patch"
 )
 
 src_prepare() {
