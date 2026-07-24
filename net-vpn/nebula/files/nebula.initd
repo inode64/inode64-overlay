@@ -2,7 +2,7 @@
 #
 # nebula service for open-rc systems
 
-extra_commands="checkconfig"
+extra_commands="checkconfig reload"
 
 vpn=${SVCNAME#*.}
 [[ $SVCNAME == nebula ]] && vpn=config
@@ -35,4 +35,10 @@ stop_pre() {
 	if [ "${RC_CMD}" = "restart" ] ; then
 		checkconfig || return $?
 	fi
+}
+
+reload() {
+  ebegin "Reloading ${RC_SVCNAME}"
+  supervise-daemon "${RC_SVCNAME}" --signal SIGHUP
+  eend $?
 }
