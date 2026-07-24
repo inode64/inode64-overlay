@@ -33,8 +33,7 @@ RDEPEND="
 "
 
 PATCHES=(
-        "${FILESDIR}/0001-feat-host-introduce-combined-lighthouse-relay-role.patch"
-        "${FILESDIR}/0002-feat-firewall-add-per-host-inbound-firewall-rules-co.patch"
+        "${FILESDIR}/0001-feat-agent-add-nebula_reload_command-for-service-rel.patch"
 )
 
 src_prepare() {

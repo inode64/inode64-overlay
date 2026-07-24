@@ -1,0 +1,511 @@
+From 1c41ed28996e8ece595813bc20083f81c33d78ae Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Sat, 25 Jul 2026 01:02:01 +0200
+Subject: [PATCH] feat(agent): add nebula_reload_command for service reload
+ customization
+
+---
+ cmd/nebula-agent/main.go      |   2 +
+ configs/agent.example.yml     |   1 +
+ docs/agent.md                 |  19 +--
+ internal/agent/enroll.go      |  24 +++-
+ internal/agent/poller.go      |   9 +-
+ internal/agent/reload.go      |  45 ++++++++
+ internal/agent/reload_test.go | 212 ++++++++++++++++++++++++++++++++++
+ internal/config/agent.go      |   7 ++
+ internal/config/agent_test.go |  26 +++++
+ 9 files changed, 329 insertions(+), 16 deletions(-)
+ create mode 100644 internal/agent/reload.go
+ create mode 100644 internal/agent/reload_test.go
+
+diff --git a/cmd/nebula-agent/main.go b/cmd/nebula-agent/main.go
+index 5b17cf5..8fdd21b 100644
+--- a/cmd/nebula-agent/main.go
++++ b/cmd/nebula-agent/main.go
+@@ -351,6 +351,7 @@ func startPoller(ctx context.Context, cfg *config.AgentConfig, logger *slog.Logg
+ 			SigningKeyPath:   cfg.SigningKeyPath,
+ 			Interval:         cfg.PollInterval,
+ 			PIDFile:          cfg.NebulaPIDFile,
++			ReloadCommand:    cfg.NebulaReloadCommand,
+ 			NebulaConfigPath: cfg.NebulaConfigPath,
+ 			NebulaCAPath:     cfg.ResolvedNebulaCAPath(),
+ 			NebulaCertPath:   cfg.ResolvedNebulaCertPath(),
+@@ -379,6 +380,7 @@ func startPoller(ctx context.Context, cfg *config.AgentConfig, logger *slog.Logg
+ 			logger.Info("performing server-requested rekey")
+ 			if err := agent.Reenroll(ctx, cfg.ServerURL, re.Token, agent.ReenrollOptions{
+ 				DataDir: cfg.DataDir, SigningKeyPath: cfg.SigningKeyPath, PIDFile: cfg.NebulaPIDFile,
++				ReloadCommand: cfg.NebulaReloadCommand,
+ 				Profile: models.AgentProfile{
+ 					NebulaConfigPath: cfg.NebulaConfigPath, NebulaCAPath: cfg.ResolvedNebulaCAPath(),
+ 					NebulaCertPath: cfg.ResolvedNebulaCertPath(), NebulaKeyPath: cfg.ResolvedNebulaKeyPath(),
+diff --git a/configs/agent.example.yml b/configs/agent.example.yml
+index a4ced1d..45768e4 100644
+--- a/configs/agent.example.yml
++++ b/configs/agent.example.yml
+@@ -9,4 +9,5 @@ nebula_config_path: "/etc/nebula/config.yml"
+ # nebula_key_path: "/etc/nebula/host.key"
+ # import_session_id: ""  # managed by nebula-agent during mesh import
+ nebula_pid_file: "/run/nebula.pid"
++# nebula_reload_command: "systemctl reload nebula"  # optional — run via shell instead of the SIGHUP; takes precedence over nebula_pid_file
+ # signing_key_path: "/etc/nebula-agent/host.signing.key"  # default; override for non-root setups (parent dir must be writable by the agent user)
+diff --git a/docs/agent.md b/docs/agent.md
+index 161ead9..97e73f0 100644
+--- a/docs/agent.md
++++ b/docs/agent.md
+@@ -61,7 +61,7 @@ you need them.
+ | darwin | arm64 | `darwin_arm64.tar.gz` | Apple Silicon. |
+ | freebsd | amd64 | `freebsd_amd64.tar.gz` | Built. Use with the FreeBSD Nebula port. |
+ | freebsd | arm64 | `freebsd_arm64.tar.gz` | Built, not regularly tested. |
+-| windows | amd64 | `windows_amd64.zip` | Built. SIGHUP-based reload is unavailable on Windows — leave `nebula_pid_file` empty and restart Nebula manually. |
++| windows | amd64 | `windows_amd64.zip` | Built. SIGHUP-based reload is unavailable on Windows — leave `nebula_pid_file` empty and set `nebula_reload_command` (e.g. a service restart), or restart Nebula manually. |
+ 
+ Unsupported targets and reasoning:
+ 
+@@ -235,8 +235,9 @@ Control or remove the service with:
+ 
+ Uninstalling the service does not delete `agent.yml`, certificates, or private
+ keys. Windows cannot use the Unix `SIGHUP` mechanism, so leave
+-`nebula_pid_file` empty and restart the separate Nebula service after managed
+-config updates when required.
++`nebula_pid_file` empty and either set `nebula_reload_command` to restart the
++Nebula service (e.g. `sc stop nebula & sc start nebula`) or restart it
++manually after managed config updates when required.
+ 
+ ### 4. Docker / sidecar
+ 
+@@ -358,6 +359,7 @@ data_dir: "/etc/nebula"                       # where host.crt/host.key/ca.crt/c
+ poll_interval: "30s"                          # how often to ask for updates
+ nebula_config_path: "/etc/nebula/config.yml"  # full path to the rendered nebula config
+ nebula_pid_file: "/run/nebula.pid"            # optional — if set, SIGHUP'd on changes
++# nebula_reload_command: "systemctl reload nebula"  # optional — replaces the SIGHUP when set
+ signing_key_path: "/etc/nebula-agent/host.signing.key"  # Ed25519 PoP signing key — parent dir must be writable by the agent user
+ ```
+ 
+@@ -368,6 +370,7 @@ signing_key_path: "/etc/nebula-agent/host.signing.key"  # Ed25519 PoP signing ke
+ | `poll_interval` | `30s` | Lower values reduce convergence time but increase server load. 5s–5m is the practical range. |
+ | `nebula_config_path` | `/etc/nebula/config.yml` | The agent overwrites this file atomically. |
+ | `nebula_pid_file` | (empty) | When set and the file holds a numeric PID, the agent sends `SIGHUP` after every successful write. |
++| `nebula_reload_command` | (empty) | When set, run through the system shell (`sh -c`, `cmd /C` on Windows) after every successful write **instead of** the SIGHUP — takes precedence over `nebula_pid_file`. 30s timeout; a failing command blocks the config ack so the reload is retried on the next poll. Use it to hook a service manager, e.g. `systemctl reload nebula`. |
+ | `signing_key_path` | `/etc/nebula-agent/host.signing.key` | Ed25519 PoP signing key (ADR 0004). Override for non-root setups so the parent directory is writable by the agent user. |
+ | `allow_insecure_http` | `false` | Opts out of the `https`-required guard on `server_url` (or pass `--insecure-http`). Only for isolated lab networks; credentials transit in the clear. |
+ 
+@@ -754,12 +757,14 @@ Each `poll_interval` the agent:
+    sibling temp file with the same permissions, calls `fsync(2)`, then `rename(2)`s
+    into place. A crash mid-write leaves either the old or the new file — never a
+    half-written one.
+-4. If any file changed and `nebula_pid_file` is set, the agent reads the PID and
+-   sends `SIGHUP`, prompting Nebula to reload without dropping tunnels.
++4. If any file changed, the agent triggers a reload: with
++   `nebula_reload_command` set it runs that command through the system shell;
++   otherwise, with `nebula_pid_file` set, it reads the PID and sends `SIGHUP`,
++   prompting Nebula to reload without dropping tunnels.
+ 5. For agents advertising `config_ack_v1`, the server keeps the delivered
+    `config_version` pending. After validation, atomic write, and successful
+-   `SIGHUP` delivery, the agent sends a signed
+-   `POST /api/v1/agent/config-ack/<version>`. Without `nebula_pid_file`, the ack
++   reload delivery (command or `SIGHUP`), the agent sends a signed
++   `POST /api/v1/agent/config-ack/<version>`. Without a configured reload, the ack
+    means only that the config was validated and written. It does not prove that
+    Nebula accepted the reload or that the tunnel is healthy. Until the ack is
+    committed, later polls receive the newest config again; duplicate ack
+diff --git a/internal/agent/enroll.go b/internal/agent/enroll.go
+index b2c4b49..ad989f4 100644
+--- a/internal/agent/enroll.go
++++ b/internal/agent/enroll.go
+@@ -48,7 +48,10 @@ type ReenrollOptions struct {
+ 	DataDir        string
+ 	SigningKeyPath string
+ 	PIDFile        string
+-	Profile        models.AgentProfile
++	// ReloadCommand, when set, replaces the SIGHUP-to-PIDFile reload with a
++	// shell command (see nebulaReloader).
++	ReloadCommand string
++	Profile       models.AgentProfile
+ }
+ 
+ // Reenroll replaces an existing agent identity using its current profile.
+@@ -62,11 +65,22 @@ func reenrollWithSignal(
+ 	options ReenrollOptions,
+ 	signal func(string) error,
+ ) error {
+-	var reload func() error
+-	if options.PIDFile != "" {
+-		reload = func() error { return signal(options.PIDFile) }
++	return enrollWithProfile(ctx, serverURL, token, options.DataDir, options.SigningKeyPath, options.Profile,
++		reenrollReload(options, signal))
++}
++
++// reenrollReload picks the reload hook for a re-enrollment: the shell
++// command when configured (taking precedence over the PID file), the
++// SIGHUP seam when only a PID file is set, nil when neither is.
++func reenrollReload(options ReenrollOptions, signal func(string) error) func() error {
++	switch {
++	case options.ReloadCommand != "":
++		return nebulaReloader(options.ReloadCommand, "")
++	case options.PIDFile != "":
++		return func() error { return signal(options.PIDFile) }
++	default:
++		return nil
+ 	}
+-	return enrollWithProfile(ctx, serverURL, token, options.DataDir, options.SigningKeyPath, options.Profile, reload)
+ }
+ 
+ // enrollmentSecrets collects every heap copy of private key material made
+diff --git a/internal/agent/poller.go b/internal/agent/poller.go
+index e380613..3de17ef 100644
+--- a/internal/agent/poller.go
++++ b/internal/agent/poller.go
+@@ -141,6 +141,9 @@ type PollerConfig struct {
+ 	SigningKeyPath string
+ 	Interval       time.Duration
+ 	PIDFile        string
++	// ReloadCommand, when set, replaces the SIGHUP-to-PIDFile reload with a
++	// shell command (see nebulaReloader).
++	ReloadCommand string
+ 	// NebulaConfigPath is where the rendered Nebula config.yml is written.
+ 	// Empty falls back to DataDir/config.yml. Honors agent.yml's
+ 	// nebula_config_path so the daemon writes the config to the file Nebula
+@@ -186,9 +189,7 @@ func NewPoller(cfg PollerConfig, logger *slog.Logger) (*Poller, error) {
+ 		signingKey: priv,
+ 		httpClient: &http.Client{Timeout: timeout},
+ 	}
+-	p.signalFunc = func() error {
+-		return signalNebulaFromPID(cfg.PIDFile)
+-	}
++	p.signalFunc = nebulaReloader(cfg.ReloadCommand, cfg.PIDFile)
+ 	return p, nil
+ }
+ 
+@@ -384,7 +385,7 @@ func (p *Poller) poll(ctx context.Context) error {
+ 	if needsReload {
+ 		if err := p.signalFunc(); err != nil {
+ 			p.logger.Warn("failed to signal nebula", "error", err)
+-			if p.config.PIDFile != "" {
++			if p.config.ReloadCommand != "" || p.config.PIDFile != "" {
+ 				reloadDelivered = false
+ 			}
+ 		} else {
+diff --git a/internal/agent/reload.go b/internal/agent/reload.go
+new file mode 100644
+index 0000000..1285f59
+--- /dev/null
++++ b/internal/agent/reload.go
+@@ -0,0 +1,45 @@
++package agent
++
++import (
++	"context"
++	"fmt"
++	"os/exec"
++	"runtime"
++	"time"
++)
++
++// reloadCommandTimeout bounds a nebula_reload_command run. A hook that
++// hangs would otherwise stall the poll loop forever; var (not const) so
++// tests can shrink it.
++var reloadCommandTimeout = 30 * time.Second
++
++// nebulaReloader returns the reload hook for the given agent settings:
++// when reloadCommand is set it is run through the system shell (taking
++// precedence over the PID file), otherwise the classic SIGHUP to the PID
++// named in pidFile. A failing or timed-out command surfaces its combined
++// output in the error so the poller's no-ack retry loop logs something
++// actionable.
++func nebulaReloader(reloadCommand, pidFile string) func() error {
++	if reloadCommand == "" {
++		return func() error { return signalNebulaFromPID(pidFile) }
++	}
++	return func() error {
++		ctx, cancel := context.WithTimeout(context.Background(), reloadCommandTimeout)
++		defer cancel()
++
++		var cmd *exec.Cmd
++		if runtime.GOOS == "windows" {
++			cmd = exec.CommandContext(ctx, "cmd", "/C", reloadCommand) // #nosec G204 -- operator-controlled reload hook from agent config, documented API contract
++		} else {
++			cmd = exec.CommandContext(ctx, "sh", "-c", reloadCommand) // #nosec G204 -- operator-controlled reload hook from agent config, documented API contract
++		}
++		out, err := cmd.CombinedOutput()
++		if err != nil {
++			if ctx.Err() == context.DeadlineExceeded {
++				return fmt.Errorf("nebula_reload_command timed out after %s: %s", reloadCommandTimeout, out)
++			}
++			return fmt.Errorf("nebula_reload_command failed: %w: %s", err, out)
++		}
++		return nil
++	}
++}
+diff --git a/internal/agent/reload_test.go b/internal/agent/reload_test.go
+new file mode 100644
+index 0000000..f551d29
+--- /dev/null
++++ b/internal/agent/reload_test.go
+@@ -0,0 +1,212 @@
++package agent
++
++import (
++	"context"
++	"encoding/json"
++	"log/slog"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"runtime"
++	"strings"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++func TestNebulaReloader_CommandRuns(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	marker := filepath.Join(t.TempDir(), "ran")
++	reload := nebulaReloader("touch "+marker, "")
++	if err := reload(); err != nil {
++		t.Fatalf("reload: %v", err)
++	}
++	if _, err := os.Stat(marker); err != nil {
++		t.Errorf("command did not run: %v", err)
++	}
++}
++
++func TestNebulaReloader_CommandFailureIncludesOutput(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	reload := nebulaReloader("echo boom-detail >&2; exit 3", "")
++	err := reload()
++	if err == nil {
++		t.Fatal("expected error from failing command")
++	}
++	if !strings.Contains(err.Error(), "boom-detail") {
++		t.Errorf("error %q should include command output", err)
++	}
++}
++
++func TestNebulaReloader_CommandTimesOut(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	orig := reloadCommandTimeout
++	reloadCommandTimeout = 200 * time.Millisecond
++	defer func() { reloadCommandTimeout = orig }()
++
++	reload := nebulaReloader("sleep 5", "")
++	start := time.Now()
++	err := reload()
++	if err == nil {
++		t.Fatal("expected timeout error")
++	}
++	if elapsed := time.Since(start); elapsed > 2*time.Second {
++		t.Errorf("reload took %v, should have been killed by the %v timeout", elapsed, reloadCommandTimeout)
++	}
++}
++
++// TestNebulaReloader_CommandTakesPrecedenceOverPIDFile: with both settings
++// present the command wins — the PID file must not even be read (a bogus
++// path would otherwise error).
++func TestNebulaReloader_CommandTakesPrecedenceOverPIDFile(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	reload := nebulaReloader("true", "/nonexistent/nebula.pid")
++	if err := reload(); err != nil {
++		t.Errorf("command should take precedence over pid file: %v", err)
++	}
++}
++
++// TestNebulaReloader_FallsBackToPIDFile: without a command the existing
++// SIGHUP path is used, including its "not configured" error for an empty
++// pid file.
++func TestNebulaReloader_FallsBackToPIDFile(t *testing.T) {
++	reload := nebulaReloader("", "")
++	err := reload()
++	if err == nil {
++		t.Fatal("expected 'not configured' error with no command and no pid file")
++	}
++	if !strings.Contains(err.Error(), "not configured") {
++		t.Errorf("err = %v, want the signalNebulaFromPID 'not configured' error", err)
++	}
++}
++
++func reloadTestServer(t *testing.T, dir string, acked *atomic.Bool) *httptest.Server {
++	t.Helper()
++	configYAML := "pki:\n  ca: " + filepath.Join(dir, "ca.crt") + "\n  cert: " + filepath.Join(dir, "host.crt") + "\n  key: " + filepath.Join(dir, "host.key") + "\n"
++	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		if strings.HasPrefix(r.URL.Path, "/api/v1/agent/config-ack/") {
++			acked.Store(true)
++			w.WriteHeader(http.StatusNoContent)
++			return
++		}
++		_ = json.NewEncoder(w).Encode(UpdatesResponse{
++			HasUpdates:    true,
++			ConfigYAML:    &configYAML,
++			ConfigVersion: 7,
++			Blocklist:     []string{},
++		})
++	}))
++}
++
++func newReloadCommandPoller(t *testing.T, serverURL, dir, command string) *Poller {
++	t.Helper()
++	p, err := NewPoller(PollerConfig{
++		ServerURL:      serverURL,
++		Fingerprint:    "test-fp",
++		DataDir:        dir,
++		SigningKeyPath: filepath.Join(dir, "host.signing.key"),
++		Interval:       50 * time.Millisecond,
++		ReloadCommand:  command,
++	}, slog.Default())
++	if err != nil {
++		t.Fatal(err)
++	}
++	return p
++}
++
++// TestPoller_ReloadCommandFailure_BlocksAck: with nebula_reload_command
++// configured, a failing command must behave like a failed SIGHUP with a
++// configured pid file — the config version is NOT acknowledged so the
++// agent retries the reload on the next poll.
++func TestPoller_ReloadCommandFailure_BlocksAck(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	dir := t.TempDir()
++	seedSigningKeyAt(t, dir)
++	var acked atomic.Bool
++	server := reloadTestServer(t, dir, &acked)
++	defer server.Close()
++
++	// NewPoller directly: newTestPoller would replace signalFunc with a
++	// no-op, and this test needs the real command-backed reloader.
++	p := newReloadCommandPoller(t, server.URL, dir, "exit 1")
++
++	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
++	defer cancel()
++	_ = p.Run(ctx)
++
++	if acked.Load() {
++		t.Error("config must NOT be acked when nebula_reload_command fails")
++	}
++}
++
++// TestPoller_ReloadCommandSuccess_Acks: the happy path — the command runs,
++// the config is acknowledged.
++func TestPoller_ReloadCommandSuccess_Acks(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	dir := t.TempDir()
++	seedSigningKeyAt(t, dir)
++	var acked atomic.Bool
++	server := reloadTestServer(t, dir, &acked)
++	defer server.Close()
++
++	p := newReloadCommandPoller(t, server.URL, dir, "true")
++
++	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
++	defer cancel()
++	_ = p.Run(ctx)
++
++	if !acked.Load() {
++		t.Error("config should be acked when nebula_reload_command succeeds")
++	}
++}
++
++// TestReenrollReload_Selection: re-enroll uses the same precedence — the
++// command (when set) wins over the pid-file SIGHUP seam; with neither, no
++// reload hook is installed.
++func TestReenrollReload_Selection(t *testing.T) {
++	if runtime.GOOS == "windows" {
++		t.Skip("unix shell test")
++	}
++	marker := filepath.Join(t.TempDir(), "ran")
++	var signaledPID string
++	seam := func(pidFile string) error { signaledPID = pidFile; return nil }
++
++	reload := reenrollReload(ReenrollOptions{ReloadCommand: "touch " + marker, PIDFile: "/run/nebula.pid"}, seam)
++	if reload == nil {
++		t.Fatal("reload hook should be set when command is configured")
++	}
++	if err := reload(); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := os.Stat(marker); err != nil {
++		t.Error("command did not run")
++	}
++	if signaledPID != "" {
++		t.Error("SIGHUP seam must not be called when command is set")
++	}
++
++	reload = reenrollReload(ReenrollOptions{PIDFile: "/run/nebula.pid"}, seam)
++	if err := reload(); err != nil {
++		t.Fatal(err)
++	}
++	if signaledPID != "/run/nebula.pid" {
++		t.Errorf("signaled pid file = %q, want /run/nebula.pid", signaledPID)
++	}
++
++	if reload = reenrollReload(ReenrollOptions{}, seam); reload != nil {
++		t.Error("no command and no pid file should install no reload hook")
++	}
++}
+diff --git a/internal/config/agent.go b/internal/config/agent.go
+index f2b9556..3d69e0e 100644
+--- a/internal/config/agent.go
++++ b/internal/config/agent.go
+@@ -26,6 +26,13 @@ type AgentConfig struct {
+ 	ImportSessionID  string        `yaml:"import_session_id,omitempty"`
+ 	NebulaPIDFile    string        `yaml:"nebula_pid_file"`
+ 
++	// NebulaReloadCommand, when set, is run through the system shell after
++	// config/cert changes instead of sending SIGHUP to nebula_pid_file
++	// (which it takes precedence over). Lets operators hook their service
++	// manager (e.g. "systemctl reload nebula") and gives Windows — where
++	// SIGHUP does not exist — a working reload path.
++	NebulaReloadCommand string `yaml:"nebula_reload_command,omitempty"`
++
+ 	// AllowInsecureHTTP opts out of the https-required guard on server_url.
+ 	// Without it a plaintext http:// URL is only accepted for loopback
+ 	// hosts — over any other network the enrollment token, certificates,
+diff --git a/internal/config/agent_test.go b/internal/config/agent_test.go
+index e38145a..9da2f39 100644
+--- a/internal/config/agent_test.go
++++ b/internal/config/agent_test.go
+@@ -279,3 +279,29 @@ func TestLoadAgentConfig_PlaintextHTTPRefused(t *testing.T) {
+ 		t.Error("AllowInsecureHTTP not loaded from YAML")
+ 	}
+ }
++
++func TestLoadAgentConfig_NebulaReloadCommand(t *testing.T) {
++	dir := t.TempDir()
++	cfgPath := filepath.Join(dir, "agent.yml")
++
++	data := []byte(`server_url: "https://mgmt.example.com:8080"
++nebula_reload_command: "systemctl reload nebula"
++`)
++	if err := os.WriteFile(cfgPath, data, 0o644); err != nil {
++		t.Fatal(err)
++	}
++
++	cfg, err := LoadAgentConfig(cfgPath)
++	if err != nil {
++		t.Fatalf("unexpected error: %v", err)
++	}
++	if cfg.NebulaReloadCommand != "systemctl reload nebula" {
++		t.Errorf("NebulaReloadCommand = %q, want %q", cfg.NebulaReloadCommand, "systemctl reload nebula")
++	}
++}
++
++func TestLoadAgentConfig_NebulaReloadCommand_DefaultEmpty(t *testing.T) {
++	if got := DefaultAgentConfig().NebulaReloadCommand; got != "" {
++		t.Errorf("default NebulaReloadCommand = %q, want empty", got)
++	}
++}
+-- 
+2.54.0
+
