@@ -33,7 +33,7 @@ RDEPEND="
 "
 
 PATCHES=(
-        "${FILESDIR}/0001-feat-host-introduc~house-relay-role.patch"
+        "${FILESDIR}/0001-feat-host-introduce-combined-lighthouse-relay-role.patch"
 )
 
 src_prepare() {
