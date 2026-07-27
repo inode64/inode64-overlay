@@ -1,0 +1,1052 @@
+From b736ea309ff21e1fdd8b20f0db6c787f129d807a Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Mon, 27 Jul 2026 23:00:37 +0200
+Subject: [PATCH] fix(hosts): re-issue certificates when a host's groups change
+
+Groups are carried in the Nebula certificate, and firewall rules select
+their counterparties by group, so editing a host's groups had no effect
+on the mesh until the certificate was replaced. This bit hardest in the
+removing direction: a host dropped from a privileged group kept that
+access for as long as it held a certificate still claiming membership.
+
+The API PATCH handler and the web UI edit form each kept their own copy
+of the "which fields are cert-bound" rule, and both omitted groups. They
+now share models.CertIdentityChanged and store.ApplyHostEdit.
+
+ApplyHostEdit sets pending_rekey on the host struct so it commits inside
+UpdateHost's transaction alongside the config_version reset
+(SEC-PERSIST-001). That closes an atomicity gap in the API path, which
+previously issued a separate SetPendingRekey write and so could persist
+the new groups while failing to schedule the re-issuance that carries
+them.
+
+Also adds a Groups column to the web UI and CLI host listings.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+---
+ docs/server.md                            |  33 +++-
+ internal/api/hosts.go                     |  47 +----
+ internal/api/hosts_update_groups_test.go  | 152 +++++++++++++++
+ internal/api/hosts_update_test.go         |   6 +-
+ internal/cli/host.go                      |   9 +-
+ internal/models/hostcert_identity_test.go |  84 ++++++++
+ internal/models/hostdiff.go               |  29 +++
+ internal/store/host_edit.go               |  49 +++++
+ internal/store/host_edit_test.go          | 226 ++++++++++++++++++++++
+ internal/web/handlers.go                  |  31 +--
+ internal/web/host_edit_groups_test.go     | 128 ++++++++++++
+ internal/web/hosts_list_groups_test.go    |  55 ++++++
+ internal/web/templates/hosts.html         |   3 +-
+ 13 files changed, 780 insertions(+), 72 deletions(-)
+ create mode 100644 internal/api/hosts_update_groups_test.go
+ create mode 100644 internal/models/hostcert_identity_test.go
+ create mode 100644 internal/store/host_edit.go
+ create mode 100644 internal/store/host_edit_test.go
+ create mode 100644 internal/web/host_edit_groups_test.go
+ create mode 100644 internal/web/hosts_list_groups_test.go
+
+diff --git a/docs/server.md b/docs/server.md
+index 1d67011..88dee86 100644
+--- a/docs/server.md
++++ b/docs/server.md
+@@ -225,9 +225,25 @@ Response (201):
+ - `nebula_ips` (hosts): array of IP address strings. Each address must fall within one of the parent network's CIDRs. At least one is required. Order is preserved in the issued certificate.
+ - Legacy singular fields (`cidr` and `nebula_ip`) were removed in v0.3.0. Requests using the old field names receive a 400 Bad Request error.
+ 
+-### Updating host addresses
+-
+-To change a host's addresses (trigger a new certificate issuance), use PATCH:
++### Updating certificate-bound fields
++
++`name`, `nebula_ips` and `groups` are all carried inside the host's Nebula
++certificate, so editing any of them schedules a re-issuance: the host row is
++flagged `pending_rekey`, the next poll answers `rekey_required: true` with a
++single-use enrollment token, and the agent re-enrolls with a certificate that
++reflects the change. Other fields (`role`, `public_ip`, `listen_port`,
++`advanced`) only affect the rendered config and are picked up on the next poll
++without a new certificate.
++
++This matters most for `groups`. Peers authorize each other on the certificate,
++and firewall rules select their counterparties by group, so a group edit does
++nothing on the mesh until the new certificate lands. Note that the previous
++certificate stays valid until it expires — removing a host from a group closes
++its new sessions' access once the host re-enrolls, but it does not retroactively
++invalidate the old certificate. Block the host (which adds its fingerprint to
++the blocklist) when you need immediate, enforced revocation.
++
++To change a host's addresses, use PATCH:
+ 
+ ```bash
+ curl -X PATCH "https://mgmt.example.com:8080/api/v1/hosts/host_def456" \
+@@ -240,6 +256,17 @@ curl -X PATCH "https://mgmt.example.com:8080/api/v1/hosts/host_def456" \
+ 
+ The new certificate will reflect the reordered addresses on the agent's next poll.
+ 
++Changing group membership works the same way:
++
++```bash
++curl -X PATCH "https://mgmt.example.com:8080/api/v1/hosts/host_def456" \
++  -H "Authorization: Bearer $API_KEY" \
++  -H "Content-Type: application/json" \
++  -d '{
++    "groups": ["web", "prod"]
++  }'
++```
++
+ ## Hosts
+ 
+ ### Mobile hosts (iOS / Android)
+diff --git a/internal/api/hosts.go b/internal/api/hosts.go
+index 3157f11..a69643f 100644
+--- a/internal/api/hosts.go
++++ b/internal/api/hosts.go
+@@ -769,11 +769,15 @@ func (s *Server) handleUpdateHost(w http.ResponseWriter, r *http.Request) {
+ 		return
+ 	}
+ 
+-	if err := s.store.UpdateHost(r.Context(), host); err != nil {
+-		// Reachable only via a TOCTOU race between concurrent host writes: the
+-		// validateHostIPs fast-path above returns 400 for any collision visible
+-		// at request time, so reaching the store's UNIQUE(network_id, address)
+-		// guard means another writer claimed the IP in between.
++	// Persist, schedule a cert re-issuance if a cert-bound field moved, and
++	// bump the network config version on a role change. config_version reset
++	// and the pending-rekey flag commit inside UpdateHost (SEC-PERSIST-001).
++	if err := store.ApplyHostEdit(r.Context(), s.store, s.logger, &before, host); err != nil {
++		// ErrIPTaken is reachable only via a TOCTOU race between concurrent
++		// host writes: the validateHostIPs fast-path above returns 400 for any
++		// collision visible at request time, so reaching the store's
++		// UNIQUE(network_id, address) guard means another writer claimed the
++		// IP in between.
+ 		if errors.Is(err, store.ErrIPTaken) {
+ 			writeError(w, http.StatusConflict, "one or more nebula_ips are already assigned to another host in this network")
+ 			return
+@@ -783,39 +787,6 @@ func (s *Server) handleUpdateHost(w http.ResponseWriter, r *http.Request) {
+ 		return
+ 	}
+ 
+-	// config_version reset now happens atomically inside UpdateHost (SEC-PERSIST-001).
+-
+-	// If role changed, bump network config version for peer updates
+-	if before.Role != host.Role {
+-		if err := s.store.BumpNetworkConfigVersion(r.Context(), host.NetworkID); err != nil {
+-			s.logger.Error("bump network config version", "network", host.NetworkID, "error", err)
+-		}
+-	}
+-
+-	// If name or any IP changed, set pending rekey for cert re-enrollment
+-	ipsEqual := len(before.NebulaIPs) == len(host.NebulaIPs)
+-	if ipsEqual {
+-		for i := range before.NebulaIPs {
+-			if before.NebulaIPs[i] != host.NebulaIPs[i] {
+-				ipsEqual = false
+-				break
+-			}
+-		}
+-	}
+-	if before.Name != host.Name || !ipsEqual {
+-		if err := s.store.SetPendingRekey(r.Context(), host.ID); err != nil {
+-			if !errors.Is(err, store.ErrRekeyAlreadyPending) {
+-				s.logger.Error("set pending rekey", "host", host.ID, "error", err)
+-			}
+-			// Idempotent: ErrRekeyAlreadyPending is success (rekey already scheduled)
+-		}
+-		// Reload host to get PendingRekey flag in response
+-		freshHost, err := s.store.GetHost(r.Context(), host.ID)
+-		if err == nil {
+-			host = freshHost
+-		}
+-	}
+-
+ 	// Record audit entry with diff
+ 	s.recordAuditAction(r.Context(), auditHostUpdate, host.ID, string(diffJSON))
+ 
+diff --git a/internal/api/hosts_update_groups_test.go b/internal/api/hosts_update_groups_test.go
+new file mode 100644
+index 0000000..cc90bf4
+--- /dev/null
++++ b/internal/api/hosts_update_groups_test.go
+@@ -0,0 +1,152 @@
++package api
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"net/http"
++	"net/http/httptest"
++	"testing"
++
++	"github.com/slackhq/nebula/cert"
++	"github.com/stretchr/testify/require"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++)
++
++// patchHostGroups PATCHes a host's groups and returns the decoded response.
++func patchHostGroups(t *testing.T, srv *Server, hostID string, groups []string) *models.Host {
++	t.Helper()
++	body, err := json.Marshal(updateHostRequest{Groups: &groups})
++	require.NoError(t, err)
++
++	req := httptest.NewRequest(http.MethodPatch, "/api/v1/hosts/"+hostID, bytes.NewBuffer(body))
++	authRequest(req)
++	rec := httptest.NewRecorder()
++	srv.ServeHTTP(rec, req)
++	require.Equal(t, http.StatusOK, rec.Code, "PATCH groups: %s", rec.Body.String())
++
++	var updated models.Host
++	require.NoError(t, json.NewDecoder(rec.Body).Decode(&updated))
++	return &updated
++}
++
++// certGroups parses a stored certificate PEM and returns its embedded groups.
++func certGroups(t *testing.T, pemBytes []byte) []string {
++	t.Helper()
++	parsed, _, err := cert.UnmarshalCertificateFromPEM(pemBytes)
++	require.NoError(t, err)
++	return parsed.Groups()
++}
++
++// TestUpdateHost_GroupChangeSetsPendingRekey: a host's groups are baked into
++// its Nebula certificate, and firewall rules select peers by group. Changing
++// the groups on the host row therefore has no effect on the mesh until a new
++// certificate is issued — so the change has to schedule one, exactly as a
++// rename or an IP change does.
++func TestUpdateHost_GroupChangeSetsPendingRekey(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++	host := createHostHelper(t, srv, netID, "web-1", "192.168.100.1", nil)
++
++	fresh, err := srv.store.GetHost(context.Background(), host.ID)
++	require.NoError(t, err)
++	require.False(t, fresh.PendingRekey, "setup: PendingRekey should start false")
++
++	updated := patchHostGroups(t, srv, host.ID, []string{"web", "prod"})
++	require.Equal(t, []string{"web", "prod"}, updated.Groups)
++	require.True(t, updated.PendingRekey, "changing groups must schedule a new certificate")
++
++	fresh, err = srv.store.GetHost(context.Background(), host.ID)
++	require.NoError(t, err)
++	require.True(t, fresh.PendingRekey, "the scheduled rekey must be persisted")
++}
++
++// TestUpdateHost_GroupRemovalSetsPendingRekey is the security-relevant
++// direction: dropping a host from a privileged group must not leave it holding
++// a certificate that still claims membership. Peers authorize on the cert, not
++// on the server's host row.
++func TestUpdateHost_GroupRemovalSetsPendingRekey(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++	host := createHostHelper(t, srv, netID, "web-1", "192.168.100.1", nil)
++
++	_ = patchHostGroups(t, srv, host.ID, []string{"admin", "web"})
++	require.NoError(t, srv.store.ClearPendingRekey(context.Background(), host.ID))
++
++	updated := patchHostGroups(t, srv, host.ID, []string{"web"})
++	require.Equal(t, []string{"web"}, updated.Groups)
++	require.True(t, updated.PendingRekey, "removing a group must schedule a new certificate")
++}
++
++// TestUpdateHost_SameGroupsDoesNotRekey: a PATCH that does not actually change
++// the groups must stay a no-op. Re-issuing on every write would churn
++// certificates across the fleet for idempotent config pushes.
++func TestUpdateHost_SameGroupsDoesNotRekey(t *testing.T) {
++	srv, _ := newTestServer(t)
++	netID := createNetwork(t, srv)
++	host := createHostHelper(t, srv, netID, "web-1", "192.168.100.1", nil)
++
++	_ = patchHostGroups(t, srv, host.ID, []string{"web"})
++	require.NoError(t, srv.store.ClearPendingRekey(context.Background(), host.ID))
++
++	updated := patchHostGroups(t, srv, host.ID, []string{"web"})
++	require.False(t, updated.PendingRekey, "re-sending identical groups must not rekey")
++
++	fresh, err := srv.store.GetHost(context.Background(), host.ID)
++	require.NoError(t, err)
++	require.False(t, fresh.PendingRekey, "re-sending identical groups must not rekey")
++}
++
++// TestUpdateHost_GroupChangeReachesTheAgent walks the whole chain the bug
++// report was about: an operator edits the groups, and the host's very next
++// signed poll is told to re-key. Everything else here asserts one link;
++// without this one, all the links could pass while the chain stays broken.
++func TestUpdateHost_GroupChangeReachesTheAgent(t *testing.T) {
++	srv, st := newTestServer(t)
++	agent := enrolledFixture(t, srv)
++
++	host, err := st.GetHostByFingerprint(context.Background(), agent.fingerprint)
++	require.NoError(t, err)
++	require.False(t, host.PendingRekey, "setup: nothing pending before the edit")
++
++	_ = patchHostGroups(t, srv, host.ID, []string{"admin"})
++
++	req := httptest.NewRequest(http.MethodGet, "/api/v1/agent/updates", nil)
++	signPoll(t, req, agent)
++	rec := httptest.NewRecorder()
++	srv.ServeHTTP(rec, req)
++	require.Equal(t, http.StatusOK, rec.Code, "poll: %s", rec.Body.String())
++
++	var resp agentUpdatesResponse
++	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
++	require.True(t, resp.RekeyRequired, "the agent was never told to re-key after the group change")
++	require.NotEmpty(t, resp.EnrollmentToken, "a re-key needs a token for the agent to re-enroll with")
++}
++
++// TestUpdateHost_GroupChangeReissuedCertCarriesNewGroups closes the loop on
++// why the rekey matters: once the scheduled re-issuance happens, the new
++// certificate must carry the new groups and drop the old ones.
++func TestUpdateHost_GroupChangeReissuedCertCarriesNewGroups(t *testing.T) {
++	srv, st := newTestServer(t)
++	agent := enrolledFixture(t, srv)
++
++	host, err := st.GetHostByFingerprint(context.Background(), agent.fingerprint)
++	require.NoError(t, err)
++
++	_ = patchHostGroups(t, srv, host.ID, []string{"admin"})
++	certInfo, err := st.GetCertificateInfo(context.Background(), host.ID)
++	require.NoError(t, err)
++	require.NotContains(t, certGroups(t, []byte(certInfo.PEM)), "admin",
++		"setup: the cert on record predates the group change")
++
++	// Re-issue the way the rekey path eventually does: same key, current
++	// host attributes.
++	host, err = st.GetHost(context.Background(), host.ID)
++	require.NoError(t, err)
++	signed, err := srv.signHostCert(context.Background(), host, certInfo, srv.now())
++	require.NoError(t, err)
++
++	require.Equal(t, []string{"admin"}, certGroups(t, signed.certPEM),
++		"the re-issued certificate must carry the host's current groups")
++}
+diff --git a/internal/api/hosts_update_test.go b/internal/api/hosts_update_test.go
+index 7bc9138..0990685 100644
+--- a/internal/api/hosts_update_test.go
++++ b/internal/api/hosts_update_test.go
+@@ -921,5 +921,9 @@ func TestUpdateHost_OmittedNebulaIPs_Untouched(t *testing.T) {
+ 	require.NoError(t, json.NewDecoder(patchRec.Body).Decode(&updatedHost))
+ 
+ 	require.Equal(t, originalIPs, updatedHost.NebulaIPs, "addresses should be unchanged")
+-	require.False(t, updatedHost.PendingRekey, "groups-only change should not set PendingRekey")
++	// The groups themselves do schedule a re-issuance — they are carried in
++	// the certificate that peers authorize against. See
++	// TestUpdateHost_GroupChangeSetsPendingRekey; asserted here only to keep
++	// this test honest about what a groups-only PATCH does.
++	require.True(t, updatedHost.PendingRekey, "groups-only change still re-issues the cert")
+ }
+diff --git a/internal/cli/host.go b/internal/cli/host.go
+index beda324..6c1e321 100644
+--- a/internal/cli/host.go
++++ b/internal/cli/host.go
+@@ -167,6 +167,7 @@ func HostList(serverURL, apiKey, networkID string) error {
+ 		ID        string   `json:"id"`
+ 		Name      string   `json:"name"`
+ 		NebulaIPs []string `json:"nebula_ips"`
++		Groups    []string `json:"groups"`
+ 		Role      string   `json:"role"`
+ 		Status    string   `json:"status"`
+ 	}
+@@ -179,10 +180,14 @@ func HostList(serverURL, apiKey, networkID string) error {
+ 		return nil
+ 	}
+ 
+-	fmt.Printf("%-36s  %-20s  %-40s  %-12s  %s\n", "ID", "NAME", "NEBULA IPS", "ROLE", "STATUS")
++	fmt.Printf("%-36s  %-20s  %-40s  %-24s  %-12s  %s\n", "ID", "NAME", "NEBULA IPS", "GROUPS", "ROLE", "STATUS")
+ 	for _, h := range hosts {
+ 		ipsStr := strings.Join(h.NebulaIPs, ", ")
+-		fmt.Printf("%-36s  %-20s  %-40s  %-12s  %s\n", h.ID, h.Name, ipsStr, h.Role, h.Status)
++		groupsStr := strings.Join(h.Groups, ", ")
++		if groupsStr == "" {
++			groupsStr = "-"
++		}
++		fmt.Printf("%-36s  %-20s  %-40s  %-24s  %-12s  %s\n", h.ID, h.Name, ipsStr, groupsStr, h.Role, h.Status)
+ 	}
+ 	return nil
+ }
+diff --git a/internal/models/hostcert_identity_test.go b/internal/models/hostcert_identity_test.go
+new file mode 100644
+index 0000000..ff5ffe4
+--- /dev/null
++++ b/internal/models/hostcert_identity_test.go
+@@ -0,0 +1,84 @@
++package models
++
++import "testing"
++
++// TestCertIdentityChanged covers each certificate-bound field on its own, and
++// pins the fields that must NOT trigger a re-issuance — a false positive there
++// churns certificates across the fleet on every routine config edit.
++func TestCertIdentityChanged(t *testing.T) {
++	base := func() *Host {
++		return &Host{
++			Name:       "web-1",
++			NebulaIPs:  []string{"10.0.0.1", "fd00::1"},
++			Groups:     []string{"web", "prod"},
++			Role:       HostRoleHost,
++			PublicIP:   "203.0.113.1",
++			ListenPort: 4242,
++		}
++	}
++
++	tests := []struct {
++		name   string
++		mutate func(*Host)
++		want   bool
++	}{
++		{"no change", func(*Host) {}, false},
++
++		{"name changed", func(h *Host) { h.Name = "web-2" }, true},
++		{"ip changed", func(h *Host) { h.NebulaIPs = []string{"10.0.0.9", "fd00::1"} }, true},
++		{"ip added", func(h *Host) { h.NebulaIPs = append(h.NebulaIPs, "10.0.0.2") }, true},
++		{"ip removed", func(h *Host) { h.NebulaIPs = h.NebulaIPs[:1] }, true},
++		// Order is preserved into the certificate, so a reorder is a change.
++		{"ips reordered", func(h *Host) { h.NebulaIPs = []string{"fd00::1", "10.0.0.1"} }, true},
++
++		{"group added", func(h *Host) { h.Groups = append(h.Groups, "admin") }, true},
++		{"group removed", func(h *Host) { h.Groups = h.Groups[:1] }, true},
++		{"group renamed", func(h *Host) { h.Groups = []string{"web", "staging"} }, true},
++		{"groups reordered", func(h *Host) { h.Groups = []string{"prod", "web"} }, true},
++		{"all groups cleared", func(h *Host) { h.Groups = nil }, true},
++
++		// Config-only fields: delivered on the next poll, no new cert.
++		{"role changed", func(h *Host) { h.Role = HostRoleLighthouse }, false},
++		{"public ip changed", func(h *Host) { h.PublicIP = "203.0.113.9" }, false},
++		{"listen port changed", func(h *Host) { h.ListenPort = 4243 }, false},
++		{"advanced changed", func(h *Host) { h.Advanced = &HostAdvanced{MTU: 1300} }, false},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			before, after := base(), base()
++			tt.mutate(after)
++			if got := CertIdentityChanged(before, after); got != tt.want {
++				t.Errorf("CertIdentityChanged() = %v, want %v", got, tt.want)
++			}
++		})
++	}
++}
++
++// TestCertIdentityChanged_NilSides mirrors HostDiff's contract: a nil side
++// reads as the zero Host rather than panicking.
++func TestCertIdentityChanged_NilSides(t *testing.T) {
++	populated := &Host{Name: "web-1", Groups: []string{"web"}}
++
++	if !CertIdentityChanged(nil, populated) {
++		t.Error("nil before vs a populated host should count as changed")
++	}
++	if !CertIdentityChanged(populated, nil) {
++		t.Error("a populated host vs nil after should count as changed")
++	}
++	if CertIdentityChanged(nil, nil) {
++		t.Error("two zero hosts should not count as changed")
++	}
++}
++
++// TestCertIdentityChanged_EmptyVersusNilSlices: a host round-tripped through
++// JSON or the store can come back with []string{} where it went in as nil.
++// Treating that as a change would rekey hosts on every no-op write.
++func TestCertIdentityChanged_EmptyVersusNilSlices(t *testing.T) {
++	nilSlices := &Host{Name: "web-1"}
++	emptySlices := &Host{Name: "web-1", NebulaIPs: []string{}, Groups: []string{}}
++
++	if CertIdentityChanged(nilSlices, emptySlices) {
++		t.Error("nil and empty slices describe the same certificate; want no change")
++	}
++}
+diff --git a/internal/models/hostdiff.go b/internal/models/hostdiff.go
+index ee09c8d..d391e39 100644
+--- a/internal/models/hostdiff.go
++++ b/internal/models/hostdiff.go
+@@ -157,6 +157,35 @@ func HostDiff(before, after *Host) ([]byte, bool, error) {
+ 	return jsonBytes, true, nil
+ }
+ 
++// CertIdentityChanged reports whether an edit touched a field that is carried
++// inside the host's Nebula certificate: Name, NebulaIPs or Groups.
++//
++// Those three are the host's identity as far as the mesh is concerned. Peers
++// authorize each other on the certificate rather than on the management
++// server's host row, and firewall rules select their counterparties by group,
++// so editing any of them is inert until a new certificate is issued. Callers
++// use this to schedule that re-issuance. Every other field (Role, PublicIP,
++// ListenPort, Advanced) only shapes the rendered config, which the agent picks
++// up on its next poll without a new certificate.
++//
++// Both host-edit paths — the API's PATCH handler and the web UI's form — must
++// agree on this, hence one definition rather than a copy each. It deliberately
++// reuses the same comparators as HostDiff above, so what the audit trail
++// records as a change and what triggers a re-issuance cannot drift apart.
++//
++// A nil side is treated as the zero Host, matching HostDiff.
++func CertIdentityChanged(before, after *Host) bool {
++	if before == nil {
++		before = &Host{}
++	}
++	if after == nil {
++		after = &Host{}
++	}
++	return before.Name != after.Name ||
++		!nebulaIPsEqual(before.NebulaIPs, after.NebulaIPs) ||
++		!groupsEqual(before.Groups, after.Groups)
++}
++
+ // nebulaIPsEqual compares two IP slices for equality (order matters).
+ func nebulaIPsEqual(a, b []string) bool {
+ 	if len(a) != len(b) {
+diff --git a/internal/store/host_edit.go b/internal/store/host_edit.go
+new file mode 100644
+index 0000000..25f397c
+--- /dev/null
++++ b/internal/store/host_edit.go
+@@ -0,0 +1,49 @@
++package store
++
++import (
++	"context"
++	"log/slog"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++)
++
++// ApplyHostEdit persists an edited host together with the follow-up writes a
++// host edit implies. Both edit paths — the API's PATCH handler and the web
++// UI's edit form — go through here so they cannot drift apart on what an edit
++// means; they previously kept separate copies of these rules, and the copies
++// disagreed about whether a group change needs a new certificate.
++//
++// Callers are expected to have snapshotted `before`, merged their input into
++// `after`, validated it, and established that something actually changed.
++//
++// The pending-rekey flag is set on the host struct rather than through a
++// separate SetPendingRekey write. UpdateHost commits it in the same
++// transaction as the config_version reset (SEC-PERSIST-001), so a crash
++// between the two cannot leave a host whose certificate-bound fields moved but
++// whose re-issuance was never scheduled — which would strand an agent on a
++// stale, possibly more permissive, certificate. Setting the flag when it is
++// already set is a no-op, so retries stay idempotent.
++//
++// The returned error is the one from persisting the host; callers map it to
++// their own transport (ErrIPTaken → 409, ErrNotFound → 404). The network
++// config-version bump is best-effort and only logged: it is a propagation hint
++// for peers, and failing an otherwise-applied edit over it would be worse than
++// a late peer update.
++func ApplyHostEdit(ctx context.Context, s Store, logger *slog.Logger, before, after *models.Host) error {
++	if models.CertIdentityChanged(before, after) {
++		after.PendingRekey = true
++	}
++
++	if err := s.UpdateHost(ctx, after); err != nil {
++		return err
++	}
++
++	// A role change alters the topology every peer renders (lighthouse and
++	// relay entries), not just this host's own config.
++	if before.Role != after.Role {
++		if err := s.BumpNetworkConfigVersion(ctx, after.NetworkID); err != nil {
++			logger.Error("bump network config version", "network", after.NetworkID, "error", err)
++		}
++	}
++	return nil
++}
+diff --git a/internal/store/host_edit_test.go b/internal/store/host_edit_test.go
+new file mode 100644
+index 0000000..1581059
+--- /dev/null
++++ b/internal/store/host_edit_test.go
+@@ -0,0 +1,226 @@
++package store
++
++import (
++	"context"
++	"errors"
++	"io"
++	"log/slog"
++	"testing"
++	"time"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++)
++
++func quietLogger() *slog.Logger {
++	return slog.New(slog.NewTextHandler(io.Discard, nil))
++}
++
++// seedEditableHost creates a network and one host ready to be edited.
++func seedEditableHost(t *testing.T, s *SQLiteStore) *models.Host {
++	t.Helper()
++	ctx := context.Background()
++	if err := s.CreateNetwork(ctx, &models.Network{
++		ID: "n-1", Name: "net", CIDRs: []string{"10.0.0.0/24"}, CreatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++	host := &models.Host{
++		ID: "h-1", NetworkID: "n-1", Name: "web-1",
++		NebulaIPs: []string{"10.0.0.1"},
++		Groups:    []string{"web"},
++		Role:      models.HostRoleHost,
++		Status:    models.HostStatusEnrolled,
++		CreatedAt: time.Now(), UpdatedAt: time.Now(),
++	}
++	if err := s.CreateHost(ctx, host); err != nil {
++		t.Fatal(err)
++	}
++	return host
++}
++
++// TestApplyHostEdit_SchedulesRekeyForCertBoundFields: the whole point of the
++// shared applier — an edit to a certificate-bound field must come back out of
++// the store with the re-issuance scheduled.
++func TestApplyHostEdit_SchedulesRekeyForCertBoundFields(t *testing.T) {
++	tests := []struct {
++		name   string
++		mutate func(*models.Host)
++	}{
++		{"name", func(h *models.Host) { h.Name = "web-2" }},
++		{"ips", func(h *models.Host) { h.NebulaIPs = []string{"10.0.0.9"} }},
++		{"groups added", func(h *models.Host) { h.Groups = []string{"web", "admin"} }},
++		{"groups removed", func(h *models.Host) { h.Groups = nil }},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			s := newTestStore(t)
++			ctx := context.Background()
++			host := seedEditableHost(t, s)
++
++			before := *host
++			after := *host
++			tt.mutate(&after)
++
++			if err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after); err != nil {
++				t.Fatalf("ApplyHostEdit: %v", err)
++			}
++
++			// The flag has to be persisted, not just set on the struct — the
++			// agent learns about the rekey from the host row on its next poll.
++			stored, err := s.GetHost(ctx, host.ID)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if !stored.PendingRekey {
++				t.Error("PendingRekey was not persisted")
++			}
++			if !after.PendingRekey {
++				t.Error("PendingRekey was not reflected on the caller's host, which is what the API returns")
++			}
++		})
++	}
++}
++
++// TestApplyHostEdit_NoRekeyForConfigOnlyFields pins the other direction:
++// config-only edits must not churn certificates.
++func TestApplyHostEdit_NoRekeyForConfigOnlyFields(t *testing.T) {
++	s := newTestStore(t)
++	ctx := context.Background()
++	host := seedEditableHost(t, s)
++
++	before := *host
++	after := *host
++	after.PublicIP = "203.0.113.7"
++	after.ListenPort = 4242
++
++	if err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after); err != nil {
++		t.Fatalf("ApplyHostEdit: %v", err)
++	}
++
++	stored, err := s.GetHost(ctx, host.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if stored.PendingRekey {
++		t.Error("a config-only edit must not schedule a certificate re-issuance")
++	}
++	if stored.PublicIP != "203.0.113.7" {
++		t.Errorf("PublicIP = %q, want the edited value", stored.PublicIP)
++	}
++}
++
++// TestApplyHostEdit_RekeyCommitsWithTheHostRow is the reason the flag is set
++// on the struct instead of through a second SetPendingRekey write: both land
++// in UpdateHost's single transaction, so there is no window in which the new
++// groups are persisted while the re-issuance that carries them is not.
++func TestApplyHostEdit_RekeyCommitsWithTheHostRow(t *testing.T) {
++	s := newTestStore(t)
++	ctx := context.Background()
++	host := seedEditableHost(t, s)
++
++	before := *host
++	after := *host
++	after.Groups = []string{"admin"}
++
++	if err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after); err != nil {
++		t.Fatalf("ApplyHostEdit: %v", err)
++	}
++
++	stored, err := s.GetHost(ctx, host.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got := stored.Groups; len(got) != 1 || got[0] != "admin" {
++		t.Fatalf("Groups = %v, want [admin]", got)
++	}
++	if !stored.PendingRekey {
++		t.Error("the new groups are visible but the re-issuance was not scheduled with them")
++	}
++	// SEC-PERSIST-001: the same transaction re-publishes the config.
++	version, err := s.GetHostConfigVersion(ctx, host.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if version != 0 {
++		t.Errorf("config_version = %d, want 0 (reset in the same commit)", version)
++	}
++}
++
++// TestApplyHostEdit_Idempotent: re-applying an edit over an already-pending
++// host must not error. The old SetPendingRekey path answered
++// ErrRekeyAlreadyPending here and every caller had to special-case it.
++func TestApplyHostEdit_Idempotent(t *testing.T) {
++	s := newTestStore(t)
++	ctx := context.Background()
++	host := seedEditableHost(t, s)
++
++	before := *host
++	after := *host
++	after.Groups = []string{"admin"}
++
++	for i := range 2 {
++		if err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after); err != nil {
++			t.Fatalf("ApplyHostEdit call %d: %v", i+1, err)
++		}
++	}
++
++	stored, err := s.GetHost(ctx, host.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !stored.PendingRekey {
++		t.Error("PendingRekey should still be set after a repeated apply")
++	}
++}
++
++// TestApplyHostEdit_RoleChangeBumpsNetworkVersion: a role change alters the
++// topology every peer renders, so it has to re-publish network-wide.
++func TestApplyHostEdit_RoleChangeBumpsNetworkVersion(t *testing.T) {
++	s := newTestStore(t)
++	ctx := context.Background()
++	host := seedEditableHost(t, s)
++
++	initial, err := s.GetNetworkConfigVersion(ctx, "n-1")
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	before := *host
++	after := *host
++	after.Role = models.HostRoleLighthouse
++	after.IsLighthouse = true
++
++	if err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after); err != nil {
++		t.Fatalf("ApplyHostEdit: %v", err)
++	}
++
++	bumped, err := s.GetNetworkConfigVersion(ctx, "n-1")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if bumped <= initial {
++		t.Errorf("network config version = %d, want greater than %d", bumped, initial)
++	}
++}
++
++// TestApplyHostEdit_PropagatesStoreError: a failed persist must reach the
++// caller so it can map the status, and must not be masked by the follow-up
++// writes.
++func TestApplyHostEdit_PropagatesStoreError(t *testing.T) {
++	s := newTestStore(t)
++	ctx := context.Background()
++
++	missing := &models.Host{
++		ID: "nope", NetworkID: "n-1", Name: "ghost",
++		Role: models.HostRoleHost, Status: models.HostStatusEnrolled,
++	}
++	before := *missing
++	after := *missing
++	after.Name = "ghost-2"
++
++	err := ApplyHostEdit(ctx, s, quietLogger(), &before, &after)
++	if !errors.Is(err, ErrNotFound) {
++		t.Errorf("err = %v, want ErrNotFound", err)
++	}
++}
+diff --git a/internal/web/handlers.go b/internal/web/handlers.go
+index 141e270..0959714 100644
+--- a/internal/web/handlers.go
++++ b/internal/web/handlers.go
+@@ -1272,11 +1272,10 @@ func (w *Web) handleHostUpdate(rw http.ResponseWriter, r *http.Request) {
+ 		return
+ 	}
+ 
+-	// Update host; set PendingRekey if cert-bound fields (NebulaIPs, Name) changed
+-	if !slicesEqual(before.NebulaIPs, host.NebulaIPs) || before.Name != host.Name {
+-		host.PendingRekey = true
+-	}
+-	if err := w.store.UpdateHost(r.Context(), host); err != nil {
++	// Persist, schedule a cert re-issuance if a cert-bound field moved, and
++	// bump the network config version on a role change. config_version reset
++	// and the pending-rekey flag commit inside UpdateHost (SEC-PERSIST-001).
++	if err := store.ApplyHostEdit(r.Context(), w.store, w.logger, &before, host); err != nil {
+ 		w.logger.Error("update host", "error", err)
+ 		http.Error(rw, "Failed to update host", http.StatusInternalServerError)
+ 		return
+@@ -1287,15 +1286,6 @@ func (w *Web) handleHostUpdate(rw http.ResponseWriter, r *http.Request) {
+ 		w.logger.Error("add audit entry", "error", err)
+ 	}
+ 
+-	// config_version reset now happens atomically inside UpdateHost (SEC-PERSIST-001).
+-
+-	// Role change bumps network config version for topology propagation
+-	if before.Role != host.Role {
+-		if err := w.store.BumpNetworkConfigVersion(r.Context(), host.NetworkID); err != nil {
+-			w.logger.Error("bump network config version", "error", err)
+-		}
+-	}
+-
+ 	http.Redirect(rw, r, "/ui/hosts/"+host.ID, http.StatusSeeOther) // #nosec G710 -- same-origin redirect: host.ID is a server-generated UUID, hardcoded /ui/hosts/ prefix keeps Location on the current host
+ }
+ 
+@@ -1553,16 +1543,3 @@ func (w *Web) renderMobileBundle(rw http.ResponseWriter, r *http.Request, host *
+ 		"Active":       "hosts",
+ 	})
+ }
+-
+-// slicesEqual reports whether two string slices are equal (same length and same elements in same order).
+-func slicesEqual(a, b []string) bool {
+-	if len(a) != len(b) {
+-		return false
+-	}
+-	for i := range a {
+-		if a[i] != b[i] {
+-			return false
+-		}
+-	}
+-	return true
+-}
+diff --git a/internal/web/host_edit_groups_test.go b/internal/web/host_edit_groups_test.go
+new file mode 100644
+index 0000000..95e4f05
+--- /dev/null
++++ b/internal/web/host_edit_groups_test.go
+@@ -0,0 +1,128 @@
++package web
++
++import (
++	"context"
++	"net/http"
++	"net/http/httptest"
++	"net/url"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/forgekeep/nebula-mesh/internal/models"
++	"github.com/forgekeep/nebula-mesh/internal/store"
++)
++
++// seedHostWithGroups creates a network and one enrolled host carrying groups.
++func seedHostWithGroups(t *testing.T, s store.Store, groups []string) {
++	t.Helper()
++	ctx := context.Background()
++	if err := s.CreateNetwork(ctx, &models.Network{
++		ID: "n-1", Name: "test-net", CIDRs: []string{"192.168.100.0/24"}, CreatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.CreateHost(ctx, &models.Host{
++		ID: "h-1", NetworkID: "n-1", Name: "web-1",
++		NebulaIPs: []string{"192.168.100.10"},
++		Groups:    groups,
++		Role:      models.HostRoleHost,
++		Status:    models.HostStatusEnrolled,
++		CreatedAt: time.Now(), UpdatedAt: time.Now(),
++	}); err != nil {
++		t.Fatal(err)
++	}
++}
++
++// postHostEditGroups submits the host edit form with everything unchanged
++// except the groups field.
++func postHostEditGroups(t *testing.T, w *Web, cookies []*http.Cookie, groups string) *httptest.ResponseRecorder {
++	t.Helper()
++	csrfToken, updatedCookies := getCSRFTokenFromCookies(t, w, "/ui/hosts/h-1/edit", cookies)
++	form := url.Values{
++		"network_id": {"n-1"},
++		"name":       {"web-1"},
++		"nebula_ips": {"192.168.100.10"},
++		"groups":     {groups},
++		"role":       {"host"},
++		"_csrf":      {csrfToken},
++	}
++	req := httptest.NewRequest(http.MethodPost, "/ui/hosts/h-1/edit", strings.NewReader(form.Encode()))
++	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
++	for _, c := range updatedCookies {
++		req.AddCookie(c)
++	}
++	rec := httptest.NewRecorder()
++	w.ServeHTTP(rec, req)
++	return rec
++}
++
++// TestHostUpdate_POST_GroupChangeSetsPendingRekey: the UI edit form has its
++// own copy of the cert-bound-field check, so it needs its own guard — a group
++// edit made here must schedule a re-issuance exactly as the API PATCH does.
++// Groups ride in the certificate and firewall rules select by group, so until
++// the cert is replaced the edit changes nothing on the mesh.
++func TestHostUpdate_POST_GroupChangeSetsPendingRekey(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++	seedHostWithGroups(t, s, []string{"web"})
++
++	if rec := postHostEditGroups(t, w, cookies, "web, prod"); rec.Code != http.StatusSeeOther {
++		t.Fatalf("status = %d, want 303", rec.Code)
++	}
++
++	updated, err := s.GetHost(context.Background(), "h-1")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got := strings.Join(updated.Groups, ","); got != "web,prod" {
++		t.Errorf("Groups = %q, want %q", got, "web,prod")
++	}
++	if !updated.PendingRekey {
++		t.Error("PendingRekey should be true after a group change")
++	}
++}
++
++// TestHostUpdate_POST_GroupRemovalSetsPendingRekey covers the direction that
++// matters for access control: a host dropped from a group keeps that group's
++// access until its certificate stops claiming membership.
++func TestHostUpdate_POST_GroupRemovalSetsPendingRekey(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++	seedHostWithGroups(t, s, []string{"admin", "web"})
++
++	if rec := postHostEditGroups(t, w, cookies, "web"); rec.Code != http.StatusSeeOther {
++		t.Fatalf("status = %d, want 303", rec.Code)
++	}
++
++	updated, err := s.GetHost(context.Background(), "h-1")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got := strings.Join(updated.Groups, ","); got != "web" {
++		t.Errorf("Groups = %q, want %q", got, "web")
++	}
++	if !updated.PendingRekey {
++		t.Error("PendingRekey should be true after a group removal")
++	}
++}
++
++// TestHostUpdate_POST_UnchangedGroupsDoesNotRekey: resubmitting the form
++// untouched must stay idempotent rather than churning the fleet's certs.
++func TestHostUpdate_POST_UnchangedGroupsDoesNotRekey(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++	seedHostWithGroups(t, s, []string{"web"})
++
++	if rec := postHostEditGroups(t, w, cookies, "web"); rec.Code != http.StatusSeeOther {
++		t.Fatalf("status = %d, want 303", rec.Code)
++	}
++
++	updated, err := s.GetHost(context.Background(), "h-1")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if updated.PendingRekey {
++		t.Error("resubmitting identical groups must not schedule a rekey")
++	}
++}
+diff --git a/internal/web/hosts_list_groups_test.go b/internal/web/hosts_list_groups_test.go
+new file mode 100644
+index 0000000..cc871af
+--- /dev/null
++++ b/internal/web/hosts_list_groups_test.go
+@@ -0,0 +1,55 @@
++package web
++
++import (
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++)
++
++// getHostsList performs an authenticated GET of the host list page.
++func getHostsList(t *testing.T, w *Web, cookies []*http.Cookie) string {
++	t.Helper()
++	req := httptest.NewRequest(http.MethodGet, "/ui/hosts", nil)
++	for _, c := range cookies {
++		req.AddCookie(c)
++	}
++	rec := httptest.NewRecorder()
++	w.ServeHTTP(rec, req)
++	if rec.Code != http.StatusOK {
++		t.Fatalf("hosts list: status = %d, want 200", rec.Code)
++	}
++	return rec.Body.String()
++}
++
++// TestHostsList_ShowsGroups: group membership drives firewall policy, so the
++// host list is where an operator needs to see it — otherwise checking which
++// hosts hold which groups means opening every host in turn.
++func TestHostsList_ShowsGroups(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++	seedHostWithGroups(t, s, []string{"admin", "web"})
++
++	body := getHostsList(t, w, cookies)
++
++	if !strings.Contains(body, "<th>Groups</th>") {
++		t.Error("host list is missing the Groups column header")
++	}
++	if !strings.Contains(body, "admin, web") {
++		t.Error("host list does not render the host's groups")
++	}
++}
++
++// TestHostsList_GroupsEmptyPlaceholder keeps a host with no groups from
++// rendering a blank cell that reads as a broken column.
++func TestHostsList_GroupsEmptyPlaceholder(t *testing.T) {
++	w, s := newTestWeb(t)
++	cookies := loginSession(t, w)
++	seedHostWithGroups(t, s, []string{})
++
++	body := getHostsList(t, w, cookies)
++
++	if !strings.Contains(body, `<td class="host-groups">—</td>`) {
++		t.Error("a host with no groups should render the em-dash placeholder")
++	}
++}
+diff --git a/internal/web/templates/hosts.html b/internal/web/templates/hosts.html
+index 7daafa3..4b7df57 100644
+--- a/internal/web/templates/hosts.html
++++ b/internal/web/templates/hosts.html
+@@ -9,12 +9,13 @@
+ {{if .Hosts}}
+ <div class="card">
+     <table id="hosts-table">
+-        <thead><tr><th>Name</th><th>Overlay Addresses</th><th>Network</th><th>Role</th><th>Status</th><th>Online</th><th>Last Seen</th><th></th></tr></thead>
++        <thead><tr><th>Name</th><th>Overlay Addresses</th><th>Groups</th><th>Network</th><th>Role</th><th>Status</th><th>Online</th><th>Last Seen</th><th></th></tr></thead>
+         <tbody>
+         {{range .Hosts}}
+         <tr id="host-{{.ID}}" data-host-id="{{.ID}}">
+             <td><a href="/ui/hosts/{{.ID}}">{{.Name}}</a></td>
+             <td>{{range $i, $ip := .NebulaIPs}}{{if $i}}, {{end}}{{$ip}}{{end}}</td>
++            <td class="host-groups">{{if .Groups}}{{range $i, $g := .Groups}}{{if $i}}, {{end}}{{$g}}{{end}}{{else}}—{{end}}</td>
+             <td><span title="{{.NetworkID}}">{{if .NetworkName}}{{.NetworkName}}{{else}}{{.NetworkID}}{{end}}</span></td>
+             <td>{{.Role}}</td>
+             <td><span class="badge badge-{{.Status}}">{{.Status}}</span></td>
+-- 
+2.54.0
+
