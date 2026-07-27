@@ -10,14 +10,14 @@ HOMEPAGE="https://guacamole.apache.org/"
 if [[ "${PV}" == *9999 ]]; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
-	#EGIT_BRANCH="staging/${PV}"
+	EGIT_BRANCH="staging/${PV}"
 else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS=""
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
 RESTRICT="!test? ( test )"
 
@@ -69,12 +69,17 @@ DEPEND="${RDEPEND}
 src_prepare() {
 	default
 
-	append-cflags -Wno-error=deprecated-declarations
+	append-cflags -Wno-error
 	append-cflags -std=gnu17
 
 	if [[ "${PV}" == *9999 ]]; then
 		eautoreconf -fi
 	fi
+
+	# Fix issue _XOPEN_SOURCE for glibc 2.42 and later
+	{ printf '#ifndef GUAC_GENERATED_CONFIG_H\n#define GUAC_GENERATED_CONFIG_H\n' &&
+		cat config.h.in && printf '#endif\n'; } > "${T}"/config.h.in || die
+	mv "${T}"/config.h.in config.h.in || die
 }
 
 src_configure() {
