@@ -32,11 +32,6 @@ RDEPEND="
 	agent? ( net-vpn/nebula )
 "
 
-PATCHES=(
-        "${FILESDIR}/0001-feat-agent-add-nebula_reload_command-for-service-rel.patch"
-        "${FILESDIR}/0002-fix-hosts-re-issue-certificates-when-a-host-s-groups.patch"
-)
-
 src_prepare() {
 	default
 
