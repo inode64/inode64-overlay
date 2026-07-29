@@ -35,6 +35,7 @@ RDEPEND="
 	!apache? ( !nginx? ( www-servers/uwsgi ) )
 	$(python_gen_cond_dep '
 		dev-python/aiosmtpd[${PYTHON_USEDEP}]
+		dev-python/argon2-cffi[${PYTHON_USEDEP}]
 		dev-python/cronsim[${PYTHON_USEDEP}]
 		>=dev-python/django-5.1[${PYTHON_USEDEP}]
 		dev-python/django-compressor[${PYTHON_USEDEP}]
