@@ -13,7 +13,7 @@ if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/performancecopilot/pcp.git"
 else
-	KEYWORDS=""
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/performancecopilot/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
@@ -81,9 +81,6 @@ DEPEND="
 RDEPEND="${DEPEND}
 	acct-group/pcp
 	acct-user/pcp
-	!sys-process/atop
-	!sys-process/htop
-	!sys-apps/dstat
 "
 
 pkg_setup() {
