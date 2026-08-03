@@ -1,0 +1,33 @@
+[Unit]
+Description=VirtioFS daemon for %i
+Requires=virtiofsd@%i.socket
+After=virtiofsd@%i.socket
+After=local-fs.target
+Before=libvirtd.service virtqemud.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/virtiofsd/%i.conf
+
+# systemd pasa el file descriptor del socket como LISTEN_FDS
+ExecStart=/usr/libexec/virtiofsd \
+  --fd=3 \
+  --shared-dir=${SHARED_DIR} \
+  --inode-file-handles=${INODE_HANDLES:-prefer} \
+  --announce-submounts \
+  --cache=${CACHE:-auto} \
+  --sandbox=${SANDBOX:-namespace} \
+  --xattr
+
+LimitNOFILE=1048576
+
+# Seguridad y reinicio
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=false
+
+# El socket lo gestiona la unidad .socket
+StandardInput=socket
+
+[Install]
+WantedBy=multi-user.target

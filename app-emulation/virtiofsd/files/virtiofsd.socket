@@ -1,0 +1,14 @@
+[Unit]
+Description=VirtioFS socket for %i
+Documentation=man:virtiofsd(1)
+Before=libvirtd.service virtqemud.service
+
+[Socket]
+ListenStream=/run/virtiofsd/%i.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=qemu
+RemoveOnStop=true
+
+[Install]
+WantedBy=sockets.target

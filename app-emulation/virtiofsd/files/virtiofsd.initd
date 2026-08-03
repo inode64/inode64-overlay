@@ -1,0 +1,40 @@
+#!/sbin/openrc-run
+
+depend() {
+    need localmount
+    before libvirtd
+}
+
+start() {
+    local name="$1"
+    local conf="/etc/virtiofsd/${name}.conf"
+
+    if [ ! -f "$conf" ]; then
+        eerror "No configuration found for $name"
+        return 1
+    fi
+
+    . "$conf"
+
+    checkpath -d -m 0755 /run/virtiofsd
+
+    ebegin "Starting virtiofsd for $name"
+    start-stop-daemon --start --background \
+        --make-pidfile --pidfile "/run/virtiofsd-${name}.pid" \
+        --exec /usr/libexec/virtiofsd -- \
+            --socket-path="/run/virtiofsd/${name}.sock" \
+            --shared-dir="${SHARED_DIR}" \
+            --inode-file-handles="${INODE_HANDLES:-prefer}" \
+            --announce-submounts \
+            --cache="${CACHE:-auto}" \
+            --sandbox="${SANDBOX:-namespace}" \
+            --xattr
+    eend $?
+}
+
+stop() {
+    local name="$1"
+    ebegin "Stopping virtiofsd for $name"
+    start-stop-daemon --stop --pidfile "/run/virtiofsd-${name}.pid"
+    eend $?
+}
