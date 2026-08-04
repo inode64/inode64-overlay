@@ -148,6 +148,7 @@ DEPEND="
 	sys-libs/libseccomp
 "
 RDEPEND="
+	acct-group/qemu
 	sys-apps/shadow
 	${DEPEND}
 "
@@ -178,6 +179,9 @@ src_install() {
 	# TODO: remove once old QEMUs are removed from the portage.
 	insinto "/usr/share/qemu/vhost-user"
 	newins "50-virtiofsd.json" "40-virtiofsd.json"
+
+	insinto "/etc/${PN}"
+	doins "${FILESDIR}/example.conf"
 
         newinitd "${FILESDIR}/${PN}.initd" ${PN}
         systemd_newunit "${FILESDIR}/${PN}.service" "${PN}@.service"

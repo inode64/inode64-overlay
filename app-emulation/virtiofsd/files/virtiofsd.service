@@ -4,30 +4,29 @@ Requires=virtiofsd@%i.socket
 After=virtiofsd@%i.socket
 After=local-fs.target
 Before=libvirtd.service virtqemud.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/virtiofsd/%i.conf
+# Los valores por defecto se pueden sobrescribir en el fichero de instancia.
+# EXTRA_ARGS acepta opciones adicionales, por ejemplo: --xattr --posix-acl.
+Environment=INODE_HANDLES=prefer CACHE=auto SANDBOX=namespace EXTRA_ARGS=--xattr
+EnvironmentFile=/etc/virtiofsd/%i.conf
 
-# systemd pasa el file descriptor del socket como LISTEN_FDS
+# systemd pasa el socket de escucha como descriptor 3.
 ExecStart=/usr/libexec/virtiofsd \
   --fd=3 \
   --shared-dir=${SHARED_DIR} \
-  --inode-file-handles=${INODE_HANDLES:-prefer} \
+  --inode-file-handles=${INODE_HANDLES} \
   --announce-submounts \
-  --cache=${CACHE:-auto} \
-  --sandbox=${SANDBOX:-namespace} \
-  --xattr
+  --cache=${CACHE} \
+  --sandbox=${SANDBOX} \
+  $EXTRA_ARGS
 
-LimitNOFILE=1048576
-
-# Seguridad y reinicio
+# Reinicio tras errores
 Restart=on-failure
 RestartSec=2
-NoNewPrivileges=false
-
-# El socket lo gestiona la unidad .socket
-StandardInput=socket
 
 [Install]
 WantedBy=multi-user.target
