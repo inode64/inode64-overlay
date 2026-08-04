@@ -1,13 +1,27 @@
 #!/sbin/openrc-run
 
+# Crear una instancia mediante un enlace, por ejemplo:
+# ln -s virtiofsd /etc/init.d/virtiofsd.fr3_web
+instance_name() {
+    case ${RC_SVCNAME} in
+        virtiofsd.?*) printf '%s\n' "${RC_SVCNAME#virtiofsd.}" ;;
+        *) return 1 ;;
+    esac
+}
+
 depend() {
     need localmount
     before libvirtd
 }
 
 start() {
-    local name="$1"
-    local conf="/etc/virtiofsd/${name}.conf"
+    local name conf
+
+    name=$(instance_name) || {
+        eerror "Service name must include an instance (e.g. virtiofsd.fr3_web)"
+        return 1
+    }
+    conf="/etc/virtiofsd/${name}.conf"
 
     if [ ! -f "$conf" ]; then
         eerror "No configuration found for $name"
@@ -15,6 +29,10 @@ start() {
     fi
 
     . "$conf"
+
+    if [ -z "${EXTRA_ARGS+x}" ]; then
+        EXTRA_ARGS=--xattr
+    fi
 
     checkpath -d -m 0755 /run/virtiofsd
 
@@ -28,12 +46,17 @@ start() {
             --announce-submounts \
             --cache="${CACHE:-auto}" \
             --sandbox="${SANDBOX:-namespace}" \
-            --xattr
+            ${EXTRA_ARGS}
     eend $?
 }
 
 stop() {
-    local name="$1"
+    local name
+
+    name=$(instance_name) || {
+        eerror "Service name must include an instance (e.g. virtiofsd.fr3_web)"
+        return 1
+    }
     ebegin "Stopping virtiofsd for $name"
     start-stop-daemon --stop --pidfile "/run/virtiofsd-${name}.pid"
     eend $?

@@ -148,6 +148,7 @@ DEPEND="
 	sys-libs/libseccomp
 "
 RDEPEND="
+	acct-group/qemu
 	sys-apps/shadow
 	${DEPEND}
 "
@@ -179,7 +180,10 @@ src_install() {
 	insinto "/usr/share/qemu/vhost-user"
 	newins "50-virtiofsd.json" "40-virtiofsd.json"
 
-        newinitd "${FILESDIR}/${PN}.initd" ${PN}
-        systemd_newunit "${FILESDIR}/${PN}.service" "${PN}@.service"
-        systemd_newunit "${FILESDIR}/${PN}.socket" "${PN}@.socket"
+	insinto "/etc/${PN}"
+	doins "${FILESDIR}/example.conf"
+
+	newinitd "${FILESDIR}/${PN}.initd" ${PN}
+	systemd_newunit "${FILESDIR}/${PN}.service" "${PN}@.service"
+	systemd_newunit "${FILESDIR}/${PN}.socket" "${PN}@.socket"
 }
