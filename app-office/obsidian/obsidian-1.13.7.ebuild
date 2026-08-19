@@ -109,8 +109,8 @@ src_prepare() {
 	# support and one for launching without. We will do the same here.
 
 	# Create a copy of upstream's .desktop
-	cp usr/share/applications/obsidian.desktop \
-		usr/share/applications/obsidian-wayland.desktop \
+	cp usr/share/applications/md.obsidian.Obsidian.desktop \
+		usr/share/applications/md.obsidian.Obsidian-wayland.desktop \
 		|| die "failed to create obsidian-wayland.desktop file"
 
 	# Edit the Exec & Name
@@ -125,7 +125,7 @@ src_prepare() {
 			# comment field
 			/^Comment/s/$/ with Wayland support enabled/
 		' \
-		'usr/share/applications/obsidian-wayland.desktop' ||
+		'usr/share/applications/md.obsidian.Obsidian-wayland.desktop' ||
 		die "sed failed for obsidian-wayland.desktop file"
 }
 
@@ -157,9 +157,9 @@ src_install() {
 		dosym ../../usr/lib64/libayatana-appindicator3.so "${DIR}/libappindicator3.so"
 	fi
 
-	domenu usr/share/applications/obsidian.desktop
+	domenu usr/share/applications/md.obsidian.Obsidian.desktop
 	if use wayland; then
-		domenu usr/share/applications/obsidian-wayland.desktop
+		domenu usr/share/applications/md.obsidian.Obsidian-wayland.desktop
 	fi
 
 	for size in 16 32 48 64 128 256 512; do
