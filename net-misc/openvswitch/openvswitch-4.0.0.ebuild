@@ -114,12 +114,7 @@ src_install() {
 
 	local SCRIPT
 	if use monitor; then
-		# ovs-bugtool is installed to sbin by the build system, but we
-		# install it to bin below, and these clash in merged-usr
-		# https://bugs.gentoo.org/889846
-		rm "${ED}"/usr/sbin/ovs-bugtool || die
-
-		for SCRIPT in ovs-{pcap,parse-backtrace,dpctl-top,l3ping,tcpdump,tcpundump,test,vlan-test} bugtool/ovs-bugtool; do
+		for SCRIPT in ovs-{pcap,dpctl-top,l3ping,tcpdump,tcpundump}; do
 			python_doscript utilities/"${SCRIPT}"
 		done
 		rm -r "${ED}"/usr/share/openvswitch/python || die
