@@ -114,7 +114,7 @@ src_install() {
 
 	local SCRIPT
 	if use monitor; then
-		for SCRIPT in ovs-{pcap,dpctl-top,l3ping,tcpdump,tcpundump}; do
+		for SCRIPT in ovs-{pcap,dpctl-top,tcpdump,tcpundump}; do
 			python_doscript utilities/"${SCRIPT}"
 		done
 		rm -r "${ED}"/usr/share/openvswitch/python || die
