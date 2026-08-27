@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sysadmin@takeachef.com</email>
+		<name>Fco Javier Felix</name>
+	</maintainer>
+	<longdescription lang="en">
+		PyCryptodome is a self-contained Python package of low-level
+		cryptographic primitives. This is the pycryptodomex distribution,
+		which installs under the independent "Cryptodome" namespace and can
+		therefore coexist with dev-python/pycryptodome ("Crypto").
+	</longdescription>
+	<upstream>
+		<remote-id type="pypi">pycryptodomex</remote-id>
+		<remote-id type="github">Legrandin/pycryptodome</remote-id>
+	</upstream>
+</pkgmetadata>

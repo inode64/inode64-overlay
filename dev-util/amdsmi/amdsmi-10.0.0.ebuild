@@ -57,8 +57,6 @@ src_prepare() {
 	# Reset custom installation path
 	sed -e "/generic_add_rocm/d" -i CMakeLists.txt || die
 
-	# Remove /usr/lib to fix multilib
-	sed -e '/target_link_libraries.*\/lib/d' -i goamdsmi_shim/CMakeLists.txt || die
 
 	# Install docs to correct place
 	sed -e "s:doc/\${CPACK_PACKAGE_NAME}:doc/${P}:" -i CMakeLists.txt || die

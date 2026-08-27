@@ -42,9 +42,8 @@ src_unpack() {
 }
 
 src_prepare() {
-	sed -e "s:amdgcn/bitcode:lib/amdgcn/bitcode:" \
-		-i cmake/OCL.cmake \
-		-i cmake/Packages.cmake || die
+	sed -e "s:\"amdgcn/bitcode\":\"lib/amdgcn/bitcode\":" \
+		-i cmake/OCL.cmake || die
 	# shellcheck disable=SC2016
 	sed -e 's:${CMAKE_INSTALL_DATADIR}/doc/${CPACK_PACKAGE_NAME}:${CMAKE_INSTALL_DOCDIR}:' \
 		-i CMakeLists.txt || die

@@ -50,10 +50,10 @@ test_wrapper() {
 }
 
 src_prepare() {
-	sed -e "s/get_version ( \"1.0.0\" )/get_version ( \"${PV}\" )/" -i CMakeLists.txt || die
+	sed -e "s/get_version ( \"1.0.0\" )/get_version ( \"${PV}\" )/" -i libhsakmt/CMakeLists.txt || die
 
 	# https://github.com/ROCm/ROCR-Runtime/issues/263
-	sed -e "s/\${HSAKMT_TARGET} STATIC/\${HSAKMT_TARGET}/" -i CMakeLists.txt || die
+	sed -e "s/\${HSAKMT_TARGET} STATIC/\${HSAKMT_TARGET}/" -i libhsakmt/CMakeLists.txt || die
 
 	cmake_src_prepare
 }

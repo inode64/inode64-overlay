@@ -117,7 +117,6 @@ src_prepare() {
 		-i "hipamd/CMakeLists.txt" || die
 
 	sed -e "/cmake_minimum_required/ s/3\.[35]/3.10/" \
-		-i "hipamd/src/hiprtc/cmake/hiprtc-config.cmake.in" \
 		-i opencl/khronos/icd/CMakeLists.txt \
 		-i opencl/khronos/headers/opencl2.2/tests/CMakeLists.txt || die
 

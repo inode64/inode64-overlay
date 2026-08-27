@@ -33,7 +33,7 @@ src_prepare() {
 
 	# Disable code that relies on missing .git directory.
 	# Just silences potential "git: command not found" QA warnings.
-	sed -e "/find_program (GIT NAMES git)/d" -i CMakeLists.txt || die
+	sed -e "/find_program *(GIT NAMES git)/d" -i CMakeLists.txt || die
 	sed -e "/num_change_since_prev_pkg(\${VERSION_PREFIX})/d" -i cmake_modules/utils.cmake || die
 
 	local rocm_lib="${EPREFIX}/usr/$(get_libdir)/librocm_smi64.so.@VERSION_MAJOR@"

@@ -38,8 +38,7 @@ src_prepare() {
 
 	sed -e "s:lib/llvm/bin:lib/llvm/${LLVM_SLOT}/bin:" \
 		-e "s:/opt/rocm:/usr:g" \
-		-i src/hipBin_base.h \
-		-i src/hipBin_amd.h || die
+		-i src/hipBin_base.h || die
 
 	# The C++ driver now constructs this path component-by-component.
 	sed -e "/hipClangPath \/= \"llvm\";/a\\    hipClangPath /= \"${LLVM_SLOT}\";" \
