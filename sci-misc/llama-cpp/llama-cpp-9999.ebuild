@@ -33,17 +33,17 @@ LICENSE="MIT"
 SLOT="0"
 CPU_FLAGS_X86=( avx avx2 f16c )
 
-# wwma USE explained here: https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md#hip
-IUSE="curl openblas +openmp blis rocm cuda opencl openssl vulkan flexiblas wmma examples"
+# hip-graphs / vmm only take effect with USE=rocm, see
+# https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md#hip
+# hip-graphs is off by default: with ROCm 10 the HIP graph path cuts token
+# generation by ~30% on RDNA4 (gfx1201).
+IUSE="curl openblas +openmp blis rocm cuda opencl openssl vulkan flexiblas hip-graphs +vmm examples"
 
 REQUIRED_USE="
 	?? (
 		openblas
 		blis
 		flexiblas
-	)
-	wmma? (
-		rocm
 	)
 "
 
@@ -58,9 +58,6 @@ CDEPEND="
 	rocm? (
 		>=dev-util/hip-${ROCM_VERSION}:=
 		>=sci-libs/hipBLAS-${ROCM_VERSION}:=
-		wmma? (
-			>=sci-libs/rocWMMA-${ROCM_VERSION}:=
-		)
 	)
 	cuda? ( dev-util/nvidia-cuda-toolkit:= )
 	openssl? ( dev-libs/openssl:= )
@@ -156,7 +153,8 @@ src_configure() {
 		rocm_use_hipcc
 		mycmakeargs+=(
 			-DGGML_HIP=ON -DAMDGPU_TARGETS=$(get_amdgpu_flags)
-			-DGGML_HIP_ROCWMMA_FATTN=$(usex wmma)
+			-DGGML_HIP_GRAPHS=$(usex hip-graphs)
+			-DGGML_HIP_NO_VMM=$(usex vmm OFF ON)
 		)
 		if use openmp; then
 			# FindOpenMP detects hipcc's -fopenmp flag, but hipcc does not
