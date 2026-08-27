@@ -29,16 +29,16 @@ else
 			https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/hip-tests.tar.gz -> hip-tests-${PV}.tar.gz
 		)
 	"
-	S="${WORKDIR}/clr"
+	S="${WORKDIR}/clr/"
 	TEST_S="${WORKDIR}/hip-tests/catch"
-	HIP_S="${WORKDIR}/${PN}"
+	HIP_S="${WORKDIR}/hip"
 	KEYWORDS="~amd64"
 	SLOT="0/$(ver_cut 1-2)"
 fi
 
 LICENSE="MIT"
 
-IUSE="debug +hip opencl test video_cards_amdgpu video_cards_nvidia"
+IUSE="debug +hip numa opencl test video_cards_amdgpu video_cards_nvidia"
 
 # many tests are broken; also tests run against installed version, not built one
 RESTRICT="test"
@@ -57,6 +57,7 @@ DEPEND="
 	video_cards_nvidia? ( dev-libs/hipother:${SLOT} )
 	x11-base/xorg-proto
 	virtual/opengl[X]
+	numa? ( sys-process/numactl )
 "
 BDEPEND="
 	video_cards_amdgpu? (
@@ -93,6 +94,16 @@ PATCHES=(
 )
 
 QA_FLAGS_IGNORED="usr/lib.*/libhiprtc-builtins.*"
+
+src_unpack() {
+	# rocm 7.2.4 release-asset tarballs carry their own clr/, hip/ and
+	# hip-tests/ top-level directories (7.2.3's unpacked flat, hence the
+	# manual wrapper dirs previously). Unpack directly into ${WORKDIR} so
+	# the tarball roots land where S=/HIP_S=/TEST_S= already expect them.
+	unpack "rocm-clr-${PV}.tar.gz"
+	unpack "${P}.tar.gz"
+	use test && unpack "hip-tests-${PV}.tar.gz"
+}
 
 hip_test_wrapper() {
 	local CMAKE_USE_DIR="${TEST_S}"
@@ -180,6 +191,11 @@ src_configure() {
 			-DHIP_PLATFORM="amd"
 			-DOpenGL_GL_PREFERENCE="GLVND"
 			-DUSE_PROF_API=OFF
+			# clr 7.2.3 dropped its find_package(NUMA), so cmake silently
+			# ignores these; kept aligned with ::gentoo in case upstream
+			# restores NUMA detection — verified inert 2026-05-08.
+			-DCMAKE_DISABLE_FIND_PACKAGE_NUMA="$(usex !numa)"
+			-DCMAKE_REQUIRE_FIND_PACKAGE_NUMA="$(usex numa)"
 		)
 	elif use video_cards_nvidia; then
 		mycmakeargs+=(

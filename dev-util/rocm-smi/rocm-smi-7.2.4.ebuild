@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 
 inherit cmake linux-info optfeature python-r1
 
@@ -14,7 +14,7 @@ if [[ ${PV} == *9999 ]] ; then
 	inherit git-r3
 	EGIT_SUBMODULES=()
 	EGIT_REPO_URI="https://github.com/ROCm/rocm-systems.git"
-	S="${WORKDIR}"
+	S="${WORKDIR}/${P}/projects/rocm-smi-lib"
 else
 	SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/rocm-smi-lib.tar.gz -> rocm-smi-${PV}.tar.gz"
 	KEYWORDS="~amd64"

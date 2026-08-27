@@ -1,9 +1,9 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 inherit cmake python-any-r1 linux-info
 
 DESCRIPTION="Runtime for AIE and FPGA based platforms"
@@ -53,7 +53,7 @@ SLOT="0"
 RESTRICT="bindist mirror strip"
 
 RDEPEND="
-	dev-util/xrt
+	~dev-util/xrt-${PV}
 	sys-apps/util-linux
 "
 
@@ -77,6 +77,7 @@ BDEPEND+="
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-0_p20251025-fix-clang.patch
+	"${FILESDIR}"/${PN}-2.21.75-gcc-16.patch
 )
 
 CONFIG_CHECK="~AMD_IOMMU ~DRM_ACCEL"

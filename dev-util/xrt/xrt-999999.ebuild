@@ -1,23 +1,16 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
-inherit bash-completion-r1 cmake python-any-r1
+PYTHON_COMPAT=( python3_{12..15} )
+inherit shell-completion cmake python-any-r1
 
 DESCRIPTION="Runtime for AIE and FPGA based platforms"
 HOMEPAGE="https://github.com/Xilinx/XRT"
 
 if [[ ${PV} == 999999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Xilinx/XRT.git"
-	EGIT_SUBMODULES=(
-		src/runtime_src/aie-rt
-		src/runtime_src/core/common/aiebu
-		src/runtime_src/core/common/elf
-		src/runtime_src/xdp
-		src/runtime_src/core/common/aiebu/src/cpp/ELFIO
-	)
 	inherit git-r3
 else
 	declare -Ag submodules
@@ -55,8 +48,6 @@ RDEPEND="
 	dev-libs/boost:=
 	dev-libs/openssl:=
 	sys-apps/util-linux
-	dev-cpp/abseil-cpp:=
-	dev-libs/protobuf:=
 "
 
 DEPEND="
@@ -70,6 +61,7 @@ DEPEND="
 
 BDEPEND="
 	${PYTHON_DEPS}
+	dev-libs/protobuf[protoc(+)]
 	$(python_gen_any_dep "
 		dev-python/jinja2[\${PYTHON_USEDEP}]
 		dev-python/markdown[\${PYTHON_USEDEP}]

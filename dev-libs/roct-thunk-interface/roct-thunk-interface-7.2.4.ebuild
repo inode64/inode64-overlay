@@ -11,7 +11,7 @@ if [[ ${PV} == *9999 ]] ; then
 	EGIT_SUBMODULES=()
 	EGIT_REPO_URI="https://github.com/ROCm/rocm-systems.git"
 	inherit git-r3
-	S="${WORKDIR}/${P}/projects/rocr-runtime/libhsakmt"
+	S="${WORKDIR}/${P}/projects/rocr-runtime"
 else
 	SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/rocr-runtime.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/rocr-runtime"

@@ -1,23 +1,11 @@
-# Copyright 1999-2026 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit linux-mod-r1 toolchain-funcs
+PYTHON_COMPAT=( python3_{11..15} )
 
-# To regenerate, run:
-# ebuild xdna-driver-999999.ebuild info
-FW_COMMIT=5c040900cb08fe65c4f76c0c63ce5d7f318eae93
-
-declare -A FIRMWARES=(
-	[1502_00/npu.sbin.1.5.5.391]=npu.dev.sbin
-	[17f1_10/npu.sbin.0.0.20.173]=npu.dev.sbin
-	[17f1_10/cert.sbin.20260217]=cert.dev.sbin
-	[17f2_10/npu.sbin.0.0.20.173]=npu.dev.sbin
-	[17f2_10/cert.sbin.20260217]=cert.dev.sbin
-	[17f0_10/npu.sbin.255.0.11.69]=npu.dev.sbin
-	[17f0_11/npu.sbin.255.0.11.71]=npu.dev.sbin
-)
+inherit linux-mod-r1 multiprocessing optfeature python-any-r1 toolchain-funcs
 
 DESCRIPTION="AMD XDNA Driver"
 HOMEPAGE="https://github.com/amd/xdna-driver"
@@ -26,54 +14,118 @@ if [[ ${PV} == 999999 ]] ; then
 	EGIT_REPO_URI="https://github.com/amd/xdna-driver.git"
 	EGIT_SUBMODULES=()
 	inherit git-r3
+
+	BDEPEND="${PYTHON_DEPS}"
 else
 	SRC_URI="https://github.com/amd/xdna-driver/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64"
+
+	# For live ebuild firmware is fetched from amd-ipu-staging branch of https://gitlab.com/kernel-firmware/drm-firmware.
+	# For release commit, see https://github.com/amd/xdna-driver/issues/1236
+	# (requires manual date-based commit selection)
+	FW_COMMIT=9c532be0fe8d6ac30e8a5e1c0b54a88ae94f50b6
+
+	# To regenerate, run:
+	# ebuild xdna-driver-<version>.ebuild info
+	declare -Ag FIRMWARES=(
+		[1502_00/npu.sbin.1.5.5.391]=npu.dev.sbin
+		[17f1_10/npu.sbin.1.1.0.206]=npu.dev.sbin
+		[17f1_10/cert.sbin.1.0.0.28]=cert.dev.sbin
+		[17f2_10/npu.sbin.1.1.0.206]=npu.dev.sbin
+		[17f2_10/cert.sbin.1.0.0.28]=cert.dev.sbin
+		[17f0_10/1.7_npu.sbin.1.1.2.64]=npu.dev.sbin
+		[17f0_11/1.7_npu.sbin.1.1.2.65]=npu.dev.sbin
+	)
+
+	FW_URI_PREFIX=https://gitlab.com/kernel-firmware/drm-firmware/-/raw/${FW_COMMIT}/amdnpu
+
+	SRC_URI+=" "
+	for fw in "${!FIRMWARES[@]}"; do
+		SRC_URI+="${FW_URI_PREFIX}/${fw} -> ${FW_COMMIT:0:6}-${fw%%/*}__${FIRMWARES[${fw}]} "
+	done
 fi
 
-FW_URI_PREFIX=https://gitlab.com/kernel-firmware/drm-firmware/-/raw/${FW_COMMIT}/amdnpu
-
-SRC_URI+=" firmware? ( "
-for fw in "${!FIRMWARES[@]}"; do
-	SRC_URI+="${FW_URI_PREFIX}/${fw} -> ${FW_COMMIT:0:6}-${fw%%/*}__${FIRMWARES[${fw}]} "
-done
-SRC_URI+=")"
-
 S="${WORKDIR}/${P}/src/driver/amdxdna"
-LICENSE="GPL-2 firmware? ( linux-fw-redistributable )"
+LICENSE="GPL-2 linux-fw-redistributable"
 SLOT="0"
-IUSE="+firmware"
+# Re-use compress-* USE flags from sys-kernel/linux-firmware.
+IUSE="compress-xz compress-zstd"
+REQUIRED_USE="?? ( compress-xz compress-zstd )"
+
+BDEPEND+="
+	compress-xz? ( app-arch/xz-utils )
+	compress-zstd? ( app-arch/zstd )
+"
+DEPEND="${PYTHON_DEPS}"
+
+pkg_setup() {
+	if use compress-xz || use compress-zstd ; then
+		local CONFIG_CHECK
+
+		if kernel_is -ge 5 19; then
+			use compress-xz && CONFIG_CHECK="~FW_LOADER_COMPRESS_XZ"
+			use compress-zstd && CONFIG_CHECK="~FW_LOADER_COMPRESS_ZSTD"
+		else
+			use compress-xz && CONFIG_CHECK="~FW_LOADER_COMPRESS"
+			if use compress-zstd; then
+				eerror "Kernels <5.19 do not support ZSTD-compressed firmware files"
+			fi
+		fi
+		linux-info_pkg_setup
+	fi
+	linux-mod-r1_pkg_setup
+
+	if [[ ${PV} == 999999 ]] ; then
+		python-any-r1_pkg_setup
+	fi
+}
 
 pkg_info() {
-	local FWAPI=https://gitlab.com/api/v4/projects/kernel-firmware%2Fdrm-firmware/repository/branches/amd-ipu-staging
-	local FW_COMMIT=$(curl -s "$FWAPI" | jq -r '.commit.id')
-	local INFO_FILE=https://raw.githubusercontent.com/amd/xdna-driver/main/tools/info.json
-	local COMMON_PREFIX=https://gitlab.com/kernel-firmware/drm-firmware/-/raw/amd-ipu-staging/amdnpu/
-	# shellcheck disable=SC2016
-	local JQ_EXPR='.firmwares[] | (.url | sub($prefix; "")) as $p | "    [" + $p + "]=" + .fw_name'
+	if [[ ${PV} != 999999 ]] ; then
+		local INFO_FILE="https://raw.githubusercontent.com/amd/xdna-driver/${PV}/tools/info.json"
+		local COMMON_PREFIX=https://gitlab.com/kernel-firmware/drm-firmware/-/raw/amd-ipu-staging/amdnpu/
+		# shellcheck disable=SC2016
+		local JQ_EXPR='.firmwares[] | (.url | sub($prefix; "")) as $p | "    [" + $p + "]=" + .fw_name'
 
-	printf "FW_COMMIT=%s\n\n" "$FW_COMMIT"
-	echo 'declare -A FIRMWARES=('
-	curl -s "$INFO_FILE" | jq -r --arg prefix "$COMMON_PREFIX" "$JQ_EXPR"
-	echo ')'
+		echo 'declare -Ag FIRMWARES=('
+		curl -s "$INFO_FILE" | jq -r --arg prefix "$COMMON_PREFIX" "$JQ_EXPR"
+		echo ')'
+	fi
+}
+
+src_unpack() {
+	local firmware_dir="${WORKDIR}/${P}/amdxdna_bins/firmware"
+
+	if [[ ${PV} == 999999 ]] ; then
+		git-r3_src_unpack
+
+		# This downloads files specified in https://github.com/amd/xdna-driver/blob/main/tools/WHENCE
+		# Firmware files signatures are not present in the Manifest, but effectively pinned via "whence-commit"
+		"${EPYTHON}" "${P}/tools/sync_from_whence.py" firmware --out "${firmware_dir}" || die
+	else
+		default
+
+		mkdir -p "${firmware_dir}" || die
+		for fw in "${!FIRMWARES[@]}"; do
+			local dir="${fw%%/*}"
+			local src_filename="${FW_COMMIT:0:6}-${dir}__${FIRMWARES[${fw}]}"
+			mkdir -p "${firmware_dir}/${dir}" || die
+			cp "${DISTDIR}/${src_filename}" "${firmware_dir}/${dir}/${FIRMWARES[${fw}]}" || die
+		done
+	fi
 }
 
 src_prepare() {
 	sed -e "s/-Werror//" -i Kbuild || die
-
-	# Forward clang compiler, otherwise fails when kernel is compiled with clang cflags
-	# shellcheck disable=SC2016
-	sed -e 's/make -s /make -s CC="${CC}" /' \
-		-e 's:>/dev/null 2>&1::' \
-		-i "${WORKDIR}/${P}"/src/driver/tools/configure_kernel.sh || die
-
 	default
 }
 
 src_configure() {
 	cd "${WORKDIR}/${P}/src" || die
-	KERNEL_SRC="${KERNEL_DIR}" ARCH=$(tc-arch-kernel) \
-	./driver/tools/configure_kernel.sh || die
+	KERNEL_SRC="${KERNEL_DIR}" \
+	KERNEL_VER="${KV_FULL}" \
+	ARCH="$(tc-arch-kernel)" \
+	CC="${KERNEL_CC}" ./driver/tools/configure_kernel.sh || die
 }
 
 src_compile() {
@@ -84,22 +136,53 @@ src_compile() {
 }
 
 src_install() {
-	for fw in "${!FIRMWARES[@]}"; do
-		local dir="${fw%%/*}"
-		local src_filename="${FW_COMMIT:0:6}-${dir}__${FIRMWARES[${fw}]}"
-		insinto "/lib/firmware/amdnpu/${dir}"
-		newins "${DISTDIR}/${src_filename}" "${FIRMWARES[${fw}]}"
-	done
+	insinto /lib/firmware/amdnpu
+	doins -r "${WORKDIR}/${P}/amdxdna_bins/firmware"/*
 
-	insinto /usr/lib/modules-load.d
-	newins - amdxdna.conf <<-EOF
-		amdxdna
-	EOF
+	if use compress-xz || use compress-zstd; then
+		pushd "${ED}/lib/firmware/amdnpu" &>/dev/null || die
+		einfo "Compressing firmware ..."
+		local compressor suffix
 
-	insinto /etc/modprobe.d
+		if use compress-xz; then
+			compressor="xz -T1 -C crc32"
+			suffix=".xz"
+		elif use compress-zstd; then
+			compressor="zstd -15 -T1 -C -q --rm"
+			suffix=".zst"
+		fi
+		# shellcheck disable=SC2086
+		find . -type f -print0 | \
+			xargs -0 -P $(makeopts_jobs) -I'{}' ${compressor} '{}'
+		assert
+
+		# Symlinks were copied verbatim by doins -r and now point at
+		# filenames that no longer exist because their targets were
+		# just compressed. Relink them at the new, compressed names.
+		local link target
+		while IFS= read -r -d ''  link; do
+			target=$(readlink "${link}") || die
+			ln -sf "${target}${suffix}" "${link}${suffix}" || die
+			rm -f "${link}" || die
+		done < <(find . -type l -print0)
+
+		popd &>/dev/null || die
+	fi
+
+	# Prefer out-of-tree driver over kernel/drivers/accel/amdxdna/amdxdna.ko
+	insinto /etc/depmod.d
 	newins - amdxdna.conf <<-EOF
-		install amdxdna /sbin/insmod /lib/modules/\$(uname -r)/extra/amdxdna.ko \$CMDLINE_OPTS
+		override amdxdna * extra
 	EOF
 
 	linux-mod-r1_src_install
+}
+
+pkg_postinst() {
+	linux-mod-r1_pkg_postinst
+
+	einfo "To reload kernel module between out-of-tree builds run:"
+	einfo "modprobe -r amdxdna && modprobe amdxdna"
+	einfo "However, switching between in-tree and out-of-tree builds requires a reboot."
+	optfeature "for runtime and xrt-smi tool" dev-libs/xrt-xdna
 }

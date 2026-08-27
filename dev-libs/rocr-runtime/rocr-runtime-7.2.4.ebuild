@@ -10,7 +10,7 @@ inherit cmake flag-o-matic llvm-r2
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/ROCm/ROCR-Runtime/"
 	inherit git-r3
-	S="${WORKDIR}/${PN}"
+	S="${WORKDIR}/${P}"
 else
 	SRC_URI="https://github.com/ROCm/rocm-systems/releases/download/rocm-${PV}/${PN}.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/${PN}"
@@ -29,10 +29,11 @@ COMMON_DEPEND="dev-libs/elfutils
 DEPEND="${COMMON_DEPEND}
 	dev-libs/roct-thunk-interface:${SLOT}
 	dev-libs/rocm-device-libs:${SLOT}
-	$(llvm_gen_dep "
-		llvm-core/clang:\${LLVM_SLOT}=
-		llvm-core/lld:\${LLVM_SLOT}=
-	")
+		$(llvm_gen_dep "
+			llvm-core/clang:\${LLVM_SLOT}=
+			llvm-core/lld:\${LLVM_SLOT}=
+			llvm-core/llvm:\${LLVM_SLOT}=
+		")
 "
 RDEPEND="${DEPEND}"
 BDEPEND="app-editors/vim-core"

@@ -15,7 +15,7 @@ S="${WORKDIR}/clr"
 LICENSE="Apache-2.0 MIT"
 SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
-IUSE="debug test"
+IUSE="debug numa test"
 RESTRICT="!test? ( test )"
 
 RDEPEND="
@@ -24,6 +24,7 @@ RDEPEND="
 	dev-libs/rocm-device-libs:${SLOT}
 	>=virtual/opencl-3
 	media-libs/mesa[-opencl]
+	numa? ( sys-process/numactl )
 "
 DEPEND="${RDEPEND}"
 BDEPEND="
@@ -35,6 +36,13 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-6.2.4-fix-lib-version.patch"
 )
+
+src_unpack() {
+	# rocm 7.2.4's clr release-asset tarball carries its own clr/ top-level
+	# directory (7.2.3's unpacked flat, hence the manual wrapper previously).
+	# Unpack directly into ${WORKDIR} so the root lands where S= expects it.
+	unpack "rocm-clr-${PV}.tar.gz"
+}
 
 src_prepare() {
 	# Compatibility with CMake < 3.10 will be removed
@@ -66,6 +74,11 @@ src_configure() {
 		-DBUILD_ICD=ON
 		-DCLR_BUILD_OCL=ON
 		-DCMAKE_DISABLE_FIND_PACKAGE_Git=ON
+		# clr 7.2.3 dropped its find_package(NUMA), so cmake silently
+		# ignores these; kept aligned with ::gentoo in case upstream
+		# restores NUMA detection — verified inert 2026-05-08.
+		-DCMAKE_DISABLE_FIND_PACKAGE_NUMA="$(usex !numa)"
+		-DCMAKE_REQUIRE_FIND_PACKAGE_NUMA="$(usex numa)"
 	)
 	cmake_src_configure
 }
