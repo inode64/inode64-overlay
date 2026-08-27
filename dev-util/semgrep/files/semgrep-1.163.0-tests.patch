@@ -1,0 +1,29 @@
+--- ../tests/default/unit/test_metric_manager.py	2026-05-18 15:47:44.964622424 +0300
++++ ../tests/default/unit/test_metric_manager.py	2026-05-18 15:48:46.866504461 +0300
+@@ -16,6 +16,8 @@
+ 
+ import pytest
+ 
++from freezegun import freeze_time
++
+ from semgrep.config_resolver import Config
+ from semgrep.metrics import Metrics
+ from semgrep.metrics import MetricsState
+@@ -42,7 +44,7 @@
+         (["a", "b"], ["b", "a"], False),
+     ],
+ )
+-@pytest.mark.freeze_time("2023-09-01 09:01:00")
++@freeze_time("2023-09-01 09:01:00")
+ def test_configs_hash(first, second, is_equal) -> None:
+     first_metrics = Metrics()
+     first_metrics.add_configs(first)
+@@ -67,7 +69,7 @@
+         ([0, 1, 2], [1], False),
+     ],
+ )
+-@pytest.mark.freeze_time("2023-09-01 09:01:00")
++@freeze_time("2023-09-01 09:01:00")
+ def test_rules_hash(first, second, is_equal) -> None:
+     config1 = dedent(
+         """

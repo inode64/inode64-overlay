@@ -1,0 +1,20 @@
+From: AMD ROCm LLVM
+Subject: [PATCH] AMDGPU: accept fake true16 encodings on true16 targets
+
+ROCm's assembly generators still use the traditional 32-bit VGPR spelling for
+some 16-bit instructions on gfx11.  Keep the fake-true16 matcher enabled beside
+the real-true16 matcher, matching the LLVM revision shipped by ROCm 10.0.0.
+
+--- a/llvm/lib/Target/AMDGPU/AMDGPU.td
++++ b/llvm/lib/Target/AMDGPU/AMDGPU.td
+@@ -2782,7 +2782,9 @@ def UseRealTrue16Insts : True16PredicateClass<"Subtarget->useRealTrue16Insts()">
+   AssemblerPredicate<(not (all_of FeatureTrue16BitInsts, FeatureRealTrue16Insts))>;
+ def UseFakeTrue16Insts : True16PredicateClass<"Subtarget->hasTrue16BitInsts() && "
+                                               "!Subtarget->useRealTrue16Insts()">,
+-  AssemblerPredicate<(all_of FeatureTrue16BitInsts, (not FeatureRealTrue16Insts))>;
++  AssemblerPredicate<(all_of FeatureTrue16BitInsts)>;
++  // FIXME When we default to RealTrue16 instead of Fake, change the line as follows.
++  // AssemblerPredicate<(all_of FeatureTrue16BitInsts, (not FeatureRealTrue16Insts))>;
+ 
+ def UseTrue16WithSramECC : True16PredicateClass<"Subtarget->useRealTrue16Insts() && "
+                                                 "!Subtarget->d16PreservesUnusedBits()">;

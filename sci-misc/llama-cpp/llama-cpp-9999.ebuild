@@ -79,6 +79,10 @@ RDEPEND="${CDEPEND}
 "
 BDEPEND="media-libs/shaderc"
 
+PATCHES=(
+	"${FILESDIR}/llama-cpp-9999-rocm-wmma-bf16-types.patch"
+)
+
 pkg_setup() {
 	if use rocm; then
 		linux-info_pkg_setup
@@ -154,6 +158,15 @@ src_configure() {
 			-DGGML_HIP=ON -DAMDGPU_TARGETS=$(get_amdgpu_flags)
 			-DGGML_HIP_ROCWMMA_FATTN=$(usex wmma)
 		)
+		if use openmp; then
+			# FindOpenMP detects hipcc's -fopenmp flag, but hipcc does not
+			# propagate libomp to the final HIP link on LLVM 23.
+			mycmakeargs+=(
+				-DOpenMP_C_LIB_NAMES=omp
+				-DOpenMP_CXX_LIB_NAMES=omp
+				-DOpenMP_omp_LIBRARY="${ESYSROOT}/usr/$(get_libdir)/libomp.so"
+			)
+		fi
 	fi
 
 	cmake_src_configure

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>spiderx@spiderx.dp.ua</email>
+		<name>Vladimir Pavljuchenkov</name>
+	</maintainer>
+	<maintainer type="project">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+	glom is a new and powerful way to handle real-world data with
+	path-based access for nested data structures, declarative data
+	transformation, using lightweight, Pythonic specifications, etc.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">mahmoud/glom</remote-id>
+		<remote-id type="pypi">glom</remote-id>
+	</upstream>
+</pkgmetadata>

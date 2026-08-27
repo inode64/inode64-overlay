@@ -1,0 +1,43 @@
+From 5fba111604add7eb04b00d64d923fd47611ca140 Mon Sep 17 00:00:00 2001
+From: inode64 overlay <noreply@localhost>
+Date: Thu, 27 Aug 2026 12:00:00 +0200
+Subject: [PATCH] rocclr: support over-aligned reference-counted objects
+
+ReferenceCountedObject provides class-specific allocation functions.  C++
+allocation-function lookup therefore does not reach the alignment-aware
+global overload for an over-aligned derived class when the class-specific
+set lacks an std::align_val_t overload.
+
+VirtualGPU is such a class: its barrier packets are alignas(64).  An
+allocation returned with only the default alignment violates the class
+invariant and permits the compiler to issue aligned vector stores to an
+unaligned address.  GCC 15 does exactly that when building with
+-march=native on AVX-512 hosts, causing a general-protection fault in the
+VirtualGPU constructor.
+
+Forward alignment-aware allocation and deallocation to the matching global
+operators so all over-aligned ReferenceCountedObject subclasses are
+allocated correctly.
+---
+ rocclr/include/top.hpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/rocclr/include/top.hpp b/rocclr/include/top.hpp
+index 8a1a5d2..8994051 100644
+--- a/rocclr/include/top.hpp
++++ b/rocclr/include/top.hpp
+@@ -164,6 +164,12 @@ class ReferenceCountedObject {
+ 
+   void* operator new(size_t size) { return ::operator new(size); }
+   void operator delete(void* p) { return ::operator delete(p); }
++  void* operator new(size_t size, std::align_val_t alignment) {
++    return ::operator new(size, alignment);
++  }
++  void operator delete(void* p, std::align_val_t alignment) {
++    return ::operator delete(p, alignment);
++  }
+   void* operator new(size_t size, size_t extSize) {
+     return ReferenceCountedObject::operator new(size + extSize);
+   };
+-- 
+2.51.0

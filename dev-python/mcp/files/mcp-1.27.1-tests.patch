@@ -1,0 +1,24 @@
+--- ../tests/test_examples.py	2026-05-18 13:37:00.430833050 +0300
++++ ../tests/test_examples.py	2026-05-18 13:39:07.274907970 +0300
+@@ -13,6 +13,7 @@
+ from mcp.shared.memory import create_connected_server_and_client_session as client_session
+ from mcp.types import TextContent, TextResourceContents
+ 
++import shutil
+ 
+ @pytest.mark.anyio
+ async def test_simple_echo():
+@@ -101,9 +102,12 @@
+ 
+ 
+ @pytest.mark.parametrize("example", find_examples("README.md"), ids=str)
+-def test_docs_examples(example: CodeExample, eval_example: EvalExample):
++def test_docs_examples(example: CodeExample, eval_example: EvalExample, monkeypatch: pytest.MonkeyPatch):
+     ruff_ignore: list[str] = ["F841", "I001", "F821"]  # F821: undefined names (snippets lack imports)
+ 
++    ruff = shutil.which("ruff")
++    monkeypatch.setattr("pytest_examples.lint.find_ruff_bin", lambda: ruff)
++
+     # Use project's actual line length of 120
+     eval_example.set_config(ruff_ignore=ruff_ignore, target_version="py310", line_length=120)
+ 

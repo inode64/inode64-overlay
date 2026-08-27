@@ -1,0 +1,20 @@
+--- ../libs/telemetry/Telemetry.ml	2026-05-15 20:59:21.852423672 +0300
++++ ../libs/telemetry/Telemetry.ml	2026-05-15 21:00:07.365641309 +0300
+@@ -218,14 +218,13 @@
+     attrs;
+   Log.info (fun m -> m "Setting up tracing with service name %s" service_name);
+   Otel.GC_metrics.basic_setup ();
+-  let ambient_storage_provider =
++  let _ambient_storage_provider =
+     match eio_sw_base with
+     (* If we are provided an eio switch + base we know we are going to use eio,
+        so let's use that as our ambient context storage provider *)
+-    | None -> Ambient_context_lwt.storage ()
+-    | Some _ -> Opentelemetry_ambient_context_eio.storage ()
++    | None -> Ambient_context_lwt.storage
++    | Some _ -> Ambient_context_lwt.storage
+   in
+-  Ambient_context.set_storage_provider ambient_storage_provider;
+   setup_otel ?eio_sw_base trace_endpoint
+ 
+ let restart_otel () =
