@@ -35,6 +35,9 @@ BDEPEND="
 		app-text/xmlto
 		dev-util/gtk-doc
 	)
+	test? (
+		dev-util/gdbus-codegen
+	)
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
 		dev-python/pip[${PYTHON_USEDEP}]
@@ -42,7 +45,6 @@ BDEPEND="
 			dev-python/pytest-asyncio[${PYTHON_USEDEP}]
 			dev-python/pytest-cov[${PYTHON_USEDEP}]
 			dev-python/pytest-timeout[${PYTHON_USEDEP}]
-			dev-util/gdbus_codegen[${PYTHON_USEDEP}]
 		)
 	')
 "

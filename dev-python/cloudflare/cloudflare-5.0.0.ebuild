@@ -25,7 +25,7 @@ BDEPEND="
 		dev-python/mypy[${PYTHON_USEDEP}]
 		dev-python/respx[${PYTHON_USEDEP}]
 		dev-python/pytest-asyncio[${PYTHON_USEDEP}]
-		dev-util/ruff[${PYTHON_USEDEP}]
+		dev-util/ruff
 		dev-python/time-machine[${PYTHON_USEDEP}]
 		dev-python/dirty-equals[${PYTHON_USEDEP}]
 		dev-python/importlib-metadata[${PYTHON_USEDEP}]
