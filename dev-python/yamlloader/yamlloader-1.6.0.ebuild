@@ -8,7 +8,7 @@ DISTUTILS_USE_PEP517="hatchling"
 
 inherit distutils-r1 pypi
 
-DESCRIPTION="Ordered YAML loader and dumper for PyYAML."
+DESCRIPTION="Ordered YAML loader and dumper for PyYAML"
 HOMEPAGE="https://github.com/Phynix/yamlloader https://pypi.org/project/yamlloader/"
 
 LICENSE="MIT"
@@ -21,12 +21,12 @@ DOCS="README.rst"
 
 RDEPEND="dev-python/pyyaml[${PYTHON_USEDEP}]"
 BDEPEND="
-    dev-python/setuptools[${PYTHON_USEDEP}]
-    test? (
+	dev-python/setuptools[${PYTHON_USEDEP}]
+	test? (
 	dev-python/pytest[${PYTHON_USEDEP}]
-    )"
+	)"
 
 python_test() {
-    nosetests --verbose || die
-    py.test -v -v || die
+	nosetests --verbose || die
+	py.test -v -v || die
 }

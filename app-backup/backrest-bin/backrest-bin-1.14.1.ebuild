@@ -15,8 +15,8 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RDEPEND="
-  app-backup/restic
-  !app-backup/backrest
+	app-backup/restic
+	!app-backup/backrest
 "
 
 src_install() {

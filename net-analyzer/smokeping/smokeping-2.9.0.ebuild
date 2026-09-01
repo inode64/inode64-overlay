@@ -13,7 +13,7 @@ SRC_URI="https://github.com/oetiker/SmokePing/releases/download/v${PV}/${P}.tar.
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="apache2 curl dig echoping ipv6 radius"
+IUSE="apache2 curl dig ipv6 radius"
 
 DEPEND="
 	acct-group/smokeping
@@ -44,7 +44,6 @@ DEPEND="
 	)
 	curl? ( >=net-misc/curl-7.21.4 )
 	dig? ( net-dns/bind-tools )
-	echoping? ( >=net-analyzer/echoping-6.0.2 )
 	ipv6? ( >=dev-perl/Socket6-0.20 )
 	radius? ( dev-perl/Authen-Radius )
 "

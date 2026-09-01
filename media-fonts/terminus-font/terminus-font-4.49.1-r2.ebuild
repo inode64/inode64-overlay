@@ -22,7 +22,6 @@ BDEPEND="app-alternatives/gzip
 	app-alternatives/awk
 	pcf-8bit? ( x11-apps/bdftopcf )
 	pcf-unicode? ( x11-apps/bdftopcf )"
-RDEPEND=""
 
 FONTDIR=/usr/share/fonts/terminus
 FONT_CONF=( 75-yes-terminus.conf )

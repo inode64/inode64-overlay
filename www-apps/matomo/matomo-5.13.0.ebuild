@@ -5,7 +5,7 @@ EAPI="8"
 
 inherit webapp
 
-DESCRIPTION="Matomo is the leading Free/Libre open analytics platform."
+DESCRIPTION="Leading Free/Libre open analytics platform"
 HOMEPAGE="https://matomo.org"
 SRC_URI="https://github.com/matomo-org/matomo/releases/download/${PV}/${P}.tar.gz"
 

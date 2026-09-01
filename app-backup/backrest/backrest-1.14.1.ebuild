@@ -23,8 +23,8 @@ RESTRICT="
 "
 BDEPEND="test? ( app-backup/restic )"
 RDEPEND="
-  app-backup/restic
-  !app-backup/backrest-bin
+	app-backup/restic
+	!app-backup/backrest-bin
 "
 DEPEND=">=dev-lang/go-1.26"
 
@@ -37,7 +37,9 @@ src_compile() {
 	pushd webui >/dev/null || die
 	enpm run build || die "build failed"
 	popd >/dev/null || die
-	ego build -trimpath -ldflags="-s -w" -ldflags "-X 'main.version=${PV}' -X 'main.commit=${PR}'" -o backrest ./cmd/backrest || die
+	ego build -trimpath -ldflags="-s -w" \
+		-ldflags "-X 'main.version=${PV}' -X 'main.commit=${PR}'" \
+		-o backrest ./cmd/backrest || die
 }
 
 src_test() {

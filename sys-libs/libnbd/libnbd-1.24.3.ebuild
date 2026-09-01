@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
 
-inherit autotools bash-completion-r1 dot-a python-single-r1
+inherit autotools dot-a python-single-r1 shell-completion
 
 MY_PV_1="$(ver_cut 1-2)"
 MY_PV_2="$(ver_cut 2)"

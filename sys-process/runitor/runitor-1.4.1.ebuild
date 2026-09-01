@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit flag-o-matic go-module
+inherit go-module
 
 DESCRIPTION="A command runner with healthchecks.io integration"
 HOMEPAGE="https://github.com/bdd/runitor/"

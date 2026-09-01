@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit bash-completion-r1 git-r3
+inherit git-r3 shell-completion
 
 DESCRIPTION="Dependency Manager for PHP"
 HOMEPAGE="https://github.com/composer/composer"

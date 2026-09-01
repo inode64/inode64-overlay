@@ -7,7 +7,7 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
 inherit python-single-r1
 
-DESCRIPTION="Script to communicate with Texas Instruments CC13xx/CC2538/CC26xx Serial Boot Loader"
+DESCRIPTION="Script to talk to TI CC13xx/CC2538/CC26xx Serial Boot Loader"
 HOMEPAGE="https://github.com/JelmerT/cc2538-bsl"
 
 if [[ ${PV} == *9999* ]]; then

@@ -7,7 +7,7 @@ inherit unpacker systemd tmpfiles
 
 MY_P="ONLYOFFICE-DocumentServer-"${PV}""
 
-DESCRIPTION="Online office suite comprising viewers and editors for texts, spreadsheets and presentations (binary version)"
+DESCRIPTION="Online office suite with editors for documents, sheets and slides (binary)"
 HOMEPAGE="https://www.onlyoffice.com/"
 SRC_URI="
 	https://github.com/ONLYOFFICE/DocumentServer/releases/download/v"${PV}"/onlyoffice-documentserver_amd64.deb

@@ -54,7 +54,6 @@ src_prepare() {
 	sed -e "s:\${CLANG_CMAKE_DIR}/../../../\*:${EPREFIX}/usr/lib/clang/${LLVM_SLOT}/include:" \
 		-i cmake/opencl_header.cmake || die
 
-
 	# comgr-compiler.cpp uses std::unordered_set without including its header.
 	sed -e '/#include <sstream>/i#include <unordered_set>' \
 		-i src/comgr-compiler.cpp || die

@@ -15,7 +15,8 @@ HOMEPAGE="https://guacamole.apache.org/"
 # Compression process:
 # cd ..
 # tar --create --auto-compress --file guacamole-client-1.6.0-mvn.tar.xz guacamole-client-1.6.0/.m2
-# tar --create --auto-compress --file guacamole-client-1.6.0-node_modules.tar.xz guacamole-client-1.6.0/guacamole/src/main/frontend/node_modules guacamole-client-1.6.0/guacamole-common-js/node
+# tar --create --auto-compress --file guacamole-client-1.6.0-node_modules.tar.xz \
+#	guacamole-client-1.6.0/guacamole/src/main/frontend/node_modules guacamole-client-1.6.0/guacamole-common-js/node
 
 if [[ "${PV}" == *9999 ]] ; then
 	inherit git-r3
@@ -138,7 +139,8 @@ src_install() {
 		doins "${WORKDIR}"/postgresql-42.7.3.jar
 
 		insinto "/usr/share/${PN}/schema/postgres"
-		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-postgresql/schema/" -name '*.sql' -exec doins '{}' +
+		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-postgresql/schema/" \
+			-name '*.sql' -exec doins '{}' +
 
 		elog "Please add a postgresql database and a user and load the sql files in /usr/share/${PN}/schema/ into it."
 		elog "If this is an update, then you will need to apply the appropriate update script in the location above."
@@ -152,7 +154,8 @@ src_install() {
 		doins extensions/guacamole-auth-ldap/target/guacamole-auth-ldap-${MY_PV}.jar
 
 		insinto "/usr/share/${PN}/schema"
-		doins "${S}/extensions/${MY_PN}-auth-ldap/schema/guacConfigGroup.ldif" "${S}/extensions/${MY_PN}-auth-ldap/schema/guacConfigGroup.schema"
+		doins "${S}/extensions/${MY_PN}-auth-ldap/schema/guacConfigGroup.ldif" \
+			"${S}/extensions/${MY_PN}-auth-ldap/schema/guacConfigGroup.schema"
 
 		elog "You will need to add and load the .schema file in /usr/share/${PN}/schema/ to your ldap server."
 		elog "You will also need to adjust the DB properties in ${GUACAMOLE_HOME}/guacamole.properties!"

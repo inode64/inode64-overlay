@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit bash-completion-r1 pam systemd
+inherit pam shell-completion systemd
 
 DESCRIPTION="Monitoring and managing daemons or similar programs running on a Unix system"
 HOMEPAGE="https://mmonit.com/monit/"

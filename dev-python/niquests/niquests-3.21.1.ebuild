@@ -8,7 +8,7 @@ PYTHON_COMPAT=( python3_{11..14} )
 
 inherit distutils-r1 pypi
 
-DESCRIPTION="Simple, yet elegant, HTTP library. Drop-in replacement for Requests."
+DESCRIPTION="Simple, yet elegant, HTTP library. Drop-in replacement for Requests"
 HOMEPAGE="
 	https://github.com/jawah/niquests
 	https://pypi.org/project/niquests/

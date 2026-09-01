@@ -150,7 +150,7 @@ declare -A GIT_CRATES=(
 
 LLVM_COMPAT=( {17..19} )
 
-inherit cargo llvm-r1
+inherit cargo llvm-r2
 
 DESCRIPTION="A suite of tools for thin provisioning on Linux"
 HOMEPAGE="https://github.com/jthornber/thin-provisioning-tools"
@@ -202,7 +202,7 @@ PATCHES=(
 )
 
 pkg_setup() {
-	llvm-r1_pkg_setup
+	llvm-r2_pkg_setup
 	rust_pkg_setup
 }
 

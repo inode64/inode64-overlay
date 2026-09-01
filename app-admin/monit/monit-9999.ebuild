@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit autotools bash-completion-r1 git-r3 pam systemd
+inherit git-r3 pam shell-completion systemd
 
 DESCRIPTION="Monitoring and managing daemons or similar programs running on a Unix system"
 HOMEPAGE="https://mmonit.com/monit/"

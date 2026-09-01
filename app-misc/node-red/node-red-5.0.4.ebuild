@@ -5,7 +5,7 @@ EAPI=8
 
 inherit nodejs-mod systemd tmpfiles
 
-DESCRIPTION="A visual tool for wiring the Internet of Things."
+DESCRIPTION="A visual tool for wiring the Internet of Things"
 HOMEPAGE="https://nodered.org"
 SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/${PV}.tar.gz  -> ${P}.tar.gz
 		https://www.inode64.com/dist/${P}-node_modules.tar.xz"

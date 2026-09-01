@@ -4,8 +4,8 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
-inherit bash-completion-r1 desktop linux-info optfeature
-inherit python-single-r1 systemd tmpfiles toolchain-funcs udev wrapper xdg
+inherit desktop linux-info optfeature
+inherit python-single-r1 shell-completion systemd tmpfiles toolchain-funcs udev wrapper xdg
 
 MY_P=${P/_/-}
 

@@ -9,7 +9,7 @@ PYPI_PN="portage-${PN}"
 
 inherit distutils-r1 git-r3
 
-DESCRIPTION="Tool to update ebuilds."
+DESCRIPTION="Tool to update ebuilds"
 HOMEPAGE="https://pypi.org/project/livecheck/"
 
 LICENSE="MIT"

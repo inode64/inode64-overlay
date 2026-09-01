@@ -5,7 +5,7 @@ EAPI=8
 
 MY_PN="CodeSniffer"
 
-DESCRIPTION="Tokenizes PHP files and detects violations of a defined set of coding standards."
+DESCRIPTION="Tokenizes PHP files and detects violations of a defined set of coding standards"
 HOMEPAGE="https://github.com/PHPCSStandards/PHP_CodeSniffer"
 SRC_URI="https://github.com/PHPCSStandards/PHP_CodeSniffer/archive/refs/tags/${PV}.tar.gz -> ${PN}-${PV}.tar.gz"
 

@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd tmpfiles
 
-DESCRIPTION="Like Prometheus, but for logs."
+DESCRIPTION="Like Prometheus, but for logs"
 HOMEPAGE="https://grafana.com/loki"
 SRC_URI="https://github.com/grafana/loki/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
@@ -41,15 +41,18 @@ src_compile() {
 		einfo "Building cmd/${PN}/${PN}-tool..."
 		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor -o cmd/${PN}/${PN}-tool ./cmd/${PN} || die
 		einfo "Building cmd/${PN}-canary/${PN}-canary..."
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor -o cmd/${PN}-canary/${PN}-canary ./cmd/${PN}-canary || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor \
+			-o cmd/${PN}-canary/${PN}-canary ./cmd/${PN}-canary || die
 	fi
 
 	if use promtail; then
 		einfo "Building cmd/${PN}/promtail..."
 		if use systemd; then
-			ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags promtail_journal_enabled -mod vendor -o cmd/promtail/promtail ./clients/cmd/promtail || die
+			ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags promtail_journal_enabled -mod vendor \
+				-o cmd/promtail/promtail ./clients/cmd/promtail || die
 		else
-			ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor -o cmd/promtail/promtail ./clients/cmd/promtail || die
+			ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor \
+				-o cmd/promtail/promtail ./clients/cmd/promtail || die
 		fi
 	fi
 }

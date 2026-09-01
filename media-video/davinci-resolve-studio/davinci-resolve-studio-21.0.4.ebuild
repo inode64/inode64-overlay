@@ -380,7 +380,8 @@ src_install() {
 		newicon -s ${res} graphics/blackmagicraw-speedtest_${res}x${res}_apps.png blackmagicraw-speedtest.png
 		newicon -s ${res} graphics/blackmagicraw-player_${res}x${res}_apps.png blackmagicraw-player.png
 		newicon -s ${res} -c mimetypes graphics/application-x-braw-clip_${res}x${res}_mimetypes.png application-x-braw-clip
-		newicon -s ${res} -c mimetypes graphics/application-x-braw-sidecar_${res}x${res}_mimetypes.png application-x-braw-sidecar
+		newicon -s ${res} -c mimetypes \
+			graphics/application-x-braw-sidecar_${res}x${res}_mimetypes.png application-x-braw-sidecar
 	done
 
 	for res in 64 128; do

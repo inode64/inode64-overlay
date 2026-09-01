@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit autotools bash-completion-r1 flag-o-matic linux-info tmpfiles udev
+inherit autotools flag-o-matic linux-info shell-completion tmpfiles udev
 
 DESCRIPTION="mirror/replicate block-devices across a network-connection"
 HOMEPAGE="https://linbit.com/drbd/"

@@ -11,5 +11,6 @@
 	</maintainer>
 	<upstream>
 		<remote-id type="gitlab">leogx9r/ryzen_smu</remote-id>
+		<remote-id type="github">amkillam/ryzen_smu</remote-id>
 	</upstream>
 </pkgmetadata>

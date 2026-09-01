@@ -5,7 +5,7 @@ EAPI=8
 
 inherit git-r3 go-module tmpfiles
 
-DESCRIPTION="Sermo is a safe service monitoring and control system for Linux."
+DESCRIPTION="Sermo is a safe service monitoring and control system for Linux"
 HOMEPAGE="https://github.com/inode64/sermo"
 EGIT_REPO_URI="https://github.com/inode64/Sermo.git"
 
@@ -17,16 +17,16 @@ BDEPEND=">=dev-lang/go-1.26"
 RESTRICT="network-sandbox"
 
 src_unpack() {
-    git-r3_src_unpack
+	git-r3_src_unpack
 }
 
 src_compile() {
-    ego build -trimpath -ldflags "-s -w" -o sermoctlr ./cmd/sermoctl || die
-    ego build -trimpath -ldflags "-s -w" -o sermod ./cmd/sermod || die
+	ego build -trimpath -ldflags "-s -w" -o sermoctlr ./cmd/sermoctl || die
+	ego build -trimpath -ldflags "-s -w" -o sermod ./cmd/sermod || die
 }
 
 src_test() {
-    ego test || die "test failed"
+	ego test || die "test failed"
 }
 
 pkg_postinst() {

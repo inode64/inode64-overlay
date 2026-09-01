@@ -8,7 +8,6 @@
 		<flag name="blis">Build a BLIS backend</flag>
 		<flag name="flexiblas">Build a FlexiBLAS backend</flag>
 		<flag name="rocm">Build a HIP (ROCm) backend</flag>
-		<flag name="hip">Build a HIP (ROCm) backend</flag>
 		<flag name="hip-graphs">Use HIP graphs to batch kernel launches (HIP backend only). Off by default: with ROCm 10 it slows token generation by ~30% on RDNA4</flag>
 		<flag name="vmm">Use HIP virtual memory management for the device memory pool (HIP backend only)</flag>
 		<flag name="openblas">Build an OpenBLAS backend</flag>

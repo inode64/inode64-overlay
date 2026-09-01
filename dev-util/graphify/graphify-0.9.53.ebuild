@@ -12,7 +12,6 @@ DESCRIPTION="AI coding assistant skill"
 HOMEPAGE="https://github.com/safishamsi/graphify"
 SRC_URI="https://github.com/safishamsi/${PN}/archive/v${PV}.tar.gz -> ${P}.gh.tar.gz"
 
-
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"

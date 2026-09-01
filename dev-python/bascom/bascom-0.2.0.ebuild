@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python3_{11..14} )
 DISTUTILS_USE_PEP517=hatchling
 inherit distutils-r1 pypi
 
-DESCRIPTION="Core library used in Tatsh projects."
+DESCRIPTION="Core library used in Tatsh projects"
 HOMEPAGE="https://pypi.org/project/bascom/"
 
 LICENSE="MIT"

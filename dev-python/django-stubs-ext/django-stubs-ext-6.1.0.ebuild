@@ -7,7 +7,7 @@ DISTUTILS_USE_PEP517=uv-build
 PYTHON_COMPAT=( python3_{11..14} )
 inherit distutils-r1 pypi
 
-DESCRIPTION="Monkey-patching and extensions for django-stubs."
+DESCRIPTION="Monkey-patching and extensions for django-stubs"
 HOMEPAGE="https://pypi.org/project/django-stubs-ext/"
 
 LICENSE="MIT"

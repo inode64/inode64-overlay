@@ -8,7 +8,7 @@ DISTUTILS_USE_PEP517=setuptools
 
 inherit distutils-r1 git-r3
 
-DESCRIPTION="Analyses your database queries and schema and suggests indices and schema improvements"
+DESCRIPTION="Analyses database queries and schema and suggests improvements"
 HOMEPAGE="https://github.com/macbre/index-digest"
 EGIT_REPO_URI="https://github.com/macbre/index-digest"
 

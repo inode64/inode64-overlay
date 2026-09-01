@@ -21,7 +21,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="30bits server"
 RESTRICT="mirror"
 
-BDEPEND="dev-util/patchelf" 
+BDEPEND="dev-util/patchelf"
 RDEPEND="
 	app-arch/brotli
 	app-arch/zstd[lz4]
@@ -56,7 +56,6 @@ src_prepare() {
 	patchelf --set-rpath '$ORIGIN' \
 		plugins/jcef-plugin/jcef/jcef_helper \
 		plugins/jcef-plugin/jcef/libjcef.so
-
 
 	local remove_me=(
 		help/ReferenceCardForMac.pdf

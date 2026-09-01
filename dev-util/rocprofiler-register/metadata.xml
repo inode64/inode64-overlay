@@ -22,9 +22,4 @@
 	<upstream>
 		<remote-id type="github">ROCm/rocm-systems</remote-id>
 	</upstream>
-	<use>
-		<flag name="hip">Build HIP runtime</flag>
-		<flag name="numa">Enable NUMA support using <pkg>sys-process/numactl</pkg> (NUMA kernel support is also required)</flag>
-		<flag name="opencl">Build vendored OpenCL runtime</flag>
-	</use>
 </pkgmetadata>
