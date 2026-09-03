@@ -114,24 +114,45 @@ nodejs_has_bin() {
 # @DESCRIPTION:
 # Install binary files
 nodejs_install_bin() {
+    debug-print-function "${FUNCNAME}" "${@}"
+
     # Create a proper destination
     local module_path
     module_path="$(nodejs_modules)"
     [[ -z "${module_path}" ]] && die "Failed to determine module path"
 
-    # Use node to safely parse the bin entries
+    # Use node to safely parse the bin entries. The field is either a string,
+    # and then the unscoped package name is the command, or an object mapping
+    # command names to paths.
     local bins
-    bins=$(node -e "console.log(JSON.stringify(require('./package.json').bin))")
+    bins=$(node -e '
+        const pkg = require("./package.json");
+        const bin = typeof pkg.bin === "string"
+            ? { [pkg.name.replace(/^@[^/]+\//, "")]: pkg.bin }
+            : pkg.bin;
+        for (const [name, file] of Object.entries(bin)) {
+            console.log(name + "\t" + file.replace(/^\.\//, ""));
+        }
+    ') || die "Failed to parse the bin entries of package.json"
 
-    insinto "${module_path}"
-    echo "$bins" | tr '{},' '\n' | grep ':' | sed -e 's/\"//g' -e 's/,$//'| while IFS=: read -r key value; do
-      key="$(echo "$key" | xargs)"
-      value="$(echo "$value" | xargs)"
+    local key value dir
+    while IFS=$'\t' read -r key value; do
+        [[ -n "${key}" && -n "${value}" ]] || continue
 
-      doins "${value}"
-      fperms +x "${module_path}/${value}"
-      dosym -r "${module_path}/${value}" "/usr/bin/${key}"
-    done
+        # enpm_install() already copied whatever NODEJS_FILES covers, so only
+        # install the entries that live outside of it. Copying unconditionally
+        # would flatten the path and leave a stray duplicate behind.
+        if [[ ! -e "${ED}/${module_path}/${value}" ]]; then
+            dir="${value%/*}"
+            [[ "${dir}" == "${value}" ]] && dir=""
+
+            insinto "${module_path}${dir:+/${dir}}"
+            doins "${value}"
+        fi
+
+        fperms +x "${module_path}/${value}"
+        dosym -r "${module_path}/${value}" "/usr/bin/${key}"
+    done <<<"${bins}"
 }
 
 # @FUNCTION: nodejs_modules
@@ -229,7 +250,8 @@ nodejs_remove_dev() {
     find -type f -iregex '.*/\(benchmark.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
 
 	# TODO: Exclude/include binary and glibc/musl to remove
-    # Remove development directories
+    # Remove tooling, build and foreign platform directories. None of these
+    # names is ever part of a package's own code, so they can go at any depth.
     # shellcheck disable=SC2185
     find -type d \
     \( \
@@ -237,37 +259,56 @@ nodejs_remove_dev() {
         -iwholename '*/.github' -o \
         -iwholename '*/.idea' -o \
         -iwholename '*/.nyc_output' -o \
+        -iwholename '*/.storybook' -o \
         -iwholename '*/.tscache' -o \
         -iwholename '*/.vscode' -o \
-        -iwholename '*/.storybook' -o \
         -iwholename '*/android-arm' -o \
         -iwholename '*/android-arm64' -o \
-        -iwholename '*/benchmarks' -o \
         -iwholename '*/coverage' -o \
         -iwholename '*/darwin-x64' -o \
         -iwholename '*/darwin-x64+arm64' -o \
-        -iwholename '*/demo' -o \
-        -iwholename '*/doc' -o \
-        -iwholename '*/docs' -o \
-        -iwholename '*/fixtures' -o \
         -iwholename '*/git-hooks' -o \
         -iwholename '*/linux-arm' -o \
         -iwholename '*/linux-arm64' -o \
         -iwholename '*/linux-armv6' -o \
         -iwholename '*/linux-armv7' -o \
         -iwholename '*/linux-armv8' -o \
-        -iwholename '*/man' -o \
         -iwholename '*/prebuilds' -o \
-        -iwholename '*/scripts' -o \
         -iwholename '*/storybook-static' -o \
-        -iwholename '*/test' -o \
-        -iwholename '*/tests' -o \
         -iwholename '*/win32-arm64' -o \
         -iwholename '*/win32-ia32' -o \
         -iwholename '*/win32-x64' -o \
         -iwholename '*/*-musl' \
     \) \
     -exec rm -rvf {} + || ewarn "Failed to remove some directories"
+
+    # Remove development directories.
+    #
+    # Unlike the names above, these are ordinary words that only mean
+    # "development files" at the top level of a package. Deeper down they
+    # belong to the code, for example yaml ships its document model in
+    # dist/doc, and a dependency can simply be called test or docs. So only
+    # prune a directory whose parent is a package root.
+    local dev_dirs=() dev_dir
+    while IFS= read -r -d '' dev_dir; do
+        [[ -f "${dev_dir%/*}/package.json" ]] && dev_dirs+=( "${dev_dir}" )
+    done < <(find . -type d \
+    \( \
+        -iwholename '*/benchmarks' -o \
+        -iwholename '*/demo' -o \
+        -iwholename '*/doc' -o \
+        -iwholename '*/docs' -o \
+        -iwholename '*/fixtures' -o \
+        -iwholename '*/man' -o \
+        -iwholename '*/scripts' -o \
+        -iwholename '*/test' -o \
+        -iwholename '*/tests' \
+    \) -print0)
+
+    # find has walked the whole tree already, so removing entries is safe now.
+    for dev_dir in "${dev_dirs[@]}"; do
+        rm -rvf "${dev_dir}" || ewarn "Failed to remove ${dev_dir}"
+    done
 }
 
 # @FUNCTION: enpm

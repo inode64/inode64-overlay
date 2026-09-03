@@ -1,0 +1,11 @@
+# Bind address of the web UI. Keep it on the loopback interface unless you
+# also set a UI password in OPENCHAMBER_OPTS: OpenChamber runs an agent with
+# full access to the files and the shell of the openchamber user.
+OPENCHAMBER_HOST="127.0.0.1"
+
+# Port the web UI listens on.
+OPENCHAMBER_PORT="3000"
+
+# Extra arguments for "openchamber serve", for example:
+#   OPENCHAMBER_OPTS="--ui-password some-long-secret"
+OPENCHAMBER_OPTS=""

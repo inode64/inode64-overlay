@@ -1,0 +1,54 @@
+[Unit]
+Description=Agentic development environment based on the OpenCode AI agent
+Documentation=https://openchamber.dev/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=openchamber
+Group=openchamber
+WorkingDirectory=/var/lib/openchamber
+# Override the bind address, the port or the extra "openchamber serve"
+# arguments (for example --ui-password) with "systemctl edit openchamber".
+Environment=HOME=/var/lib/openchamber
+Environment=OPENCHAMBER_HOST=127.0.0.1
+Environment=OPENCHAMBER_PORT=3000
+Environment=OPENCHAMBER_OPTS=
+ExecStart=/usr/bin/openchamber serve --foreground --host ${OPENCHAMBER_HOST} --port ${OPENCHAMBER_PORT} $OPENCHAMBER_OPTS
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+CapabilityBoundingSet=
+NoNewPrivileges=true
+RemoveIPC=true
+LockPersonality=true
+
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectProc=noaccess
+ProtectClock=yes
+# node-pty needs /dev/ptmx and /dev/pts to run terminals and the agent.
+DeviceAllow=char-* rw
+
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+# AF_NETLINK is needed to enumerate interfaces for the LAN/connect URLs.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/openchamber /var/log/openchamber
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @pkey
+
+[Install]
+WantedBy=multi-user.target

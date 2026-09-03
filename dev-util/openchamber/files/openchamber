@@ -1,0 +1,30 @@
+#!/sbin/openrc-run
+
+: "${OPENCHAMBER_HOST:=127.0.0.1}"
+: "${OPENCHAMBER_PORT:=3000}"
+: "${OPENCHAMBER_HOME:=/var/lib/openchamber}"
+: "${OPENCHAMBER_LOGDIR:=/var/log/openchamber}"
+
+description="Agentic development environment based on the OpenCode AI agent"
+
+command="/usr/bin/openchamber"
+command_args="serve --foreground --host ${OPENCHAMBER_HOST} --port ${OPENCHAMBER_PORT} ${OPENCHAMBER_OPTS}"
+command_background="yes"
+command_user="openchamber:openchamber"
+directory="${OPENCHAMBER_HOME}"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${OPENCHAMBER_LOGDIR}/${RC_SVCNAME}.log"
+error_log="${OPENCHAMBER_LOGDIR}/${RC_SVCNAME}.log"
+
+depend() {
+	need net
+	after logger
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o openchamber:openchamber "${OPENCHAMBER_HOME}" || return 1
+	checkpath -d -m 0750 -o openchamber:openchamber "${OPENCHAMBER_LOGDIR}" || return 1
+
+	# OpenChamber and the OpenCode CLI it drives keep their state under $HOME.
+	export HOME="${OPENCHAMBER_HOME}"
+}

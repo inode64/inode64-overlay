@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		OpenChamber is an open source workspace for running, supervising and
+		reviewing AI coding work. It drives the OpenCode agent and exposes it
+		through a web UI, so sessions can be started, watched and reviewed from
+		a browser, a PWA, an editor or a phone. It needs the standalone OpenCode
+		CLI, which is not packaged in Gentoo.
+	</longdescription>
+	<use>
+		<flag name="dictation">Install the sherpa-onnx speech to text engine used by the dictation feature</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/openchamber/openchamber/issues</bugs-to>
+		<doc>https://openchamber.dev/</doc>
+		<remote-id type="github">openchamber/openchamber</remote-id>
+	</upstream>
+</pkgmetadata>
