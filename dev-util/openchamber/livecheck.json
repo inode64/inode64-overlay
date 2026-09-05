@@ -1,3 +1,4 @@
 {
-  "nodejs": true
+  "nodejs": true,
+  "nodejs_omit_dev": true
 }

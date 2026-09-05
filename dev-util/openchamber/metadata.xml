@@ -16,9 +16,6 @@
 		a browser, a PWA, an editor or a phone. It needs the standalone OpenCode
 		CLI, which is not packaged in Gentoo.
 	</longdescription>
-	<use>
-		<flag name="dictation">Install the sherpa-onnx speech to text engine used by the dictation feature</flag>
-	</use>
 	<upstream>
 		<bugs-to>https://github.com/openchamber/openchamber/issues</bugs-to>
 		<doc>https://openchamber.dev/</doc>
