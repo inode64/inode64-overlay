@@ -10,10 +10,10 @@ KEYWORDS="~amd64"
 RDEPEND="
 		|| ( dev-util/phpstorm app-editors/vscode )
 		dev-lang/php
+		dev-lang/sassc
 		dev-php/composer
 		dev-php/PHP_CodeSniffer
 		dev-php/xdebug
-		dev-ruby/sass
 		dev-util/uglifyjs
 		net-libs/nodejs
 		sys-apps/yarn

@@ -21,7 +21,6 @@ RDEPEND="
 "
 BDEPEND="
 	test? (
-		dev-python/nox[${PYTHON_USEDEP}]
 		dev-python/mypy[${PYTHON_USEDEP}]
 		dev-python/respx[${PYTHON_USEDEP}]
 		dev-python/pytest-asyncio[${PYTHON_USEDEP}]
