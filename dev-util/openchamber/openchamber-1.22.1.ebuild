@@ -35,18 +35,18 @@ NODEJS_EXTRA_FILES="public server"
 # bun-pty ships an already stripped prebuilt library.
 QA_PREBUILT="usr/lib*/node_modules/@openchamber/web/node_modules/bun-pty/rust-pty/target/release/*.so"
 
-src_unpack() {
-	unpack ${P}.tgz
-
-	# The npm archive always unpacks into package/; give it the usual name so
-	# that the node_modules archive, which uses ${P}/, lands on top of it.
-	mv "${WORKDIR}"/package "${S}" || die
-
-	# livecheck drops this one from SRC_URI while it regenerates the archive.
-	if has ${P}-node_modules.tar.xz ${A}; then
-		unpack ${P}-node_modules.tar.xz
-	fi
-}
+#src_unpack() {
+#	unpack ${P}.tgz
+#
+#	# The npm archive always unpacks into package/; give it the usual name so
+#	# that the node_modules archive, which uses ${P}/, lands on top of it.
+#	mv "${WORKDIR}"/package "${S}" || die
+#
+#	# livecheck drops this one from SRC_URI while it regenerates the archive.
+#	if has ${P}-node_modules.tar.xz ${A}; then
+#		unpack ${P}-node_modules.tar.xz
+#	fi
+#}
 
 src_prepare() {
 	# Speech to text pulls in ~25MiB of prebuilt onnxruntime libraries and is
