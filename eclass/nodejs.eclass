@@ -50,6 +50,15 @@ esac
 # Files and directories that usually come in a standard NodeJS/npm module.
 NODEJS_FILES="babel.config.js babel.config.json bin cli.js dist index.js lib node_modules package.json"
 
+# @ECLASS_VARIABLE: NODEJS_REMOVE_TYPES
+# @DEFAULT_UNSET
+# @DESCRIPTION:
+# Set to a non-empty value to also drop the TypeScript declarations (*.d.ts
+# and its .cts/.mts variants). They are read by the compiler when building
+# against a package, never at run time, so an application can do without
+# them. Leave it unset for a package meant to be compiled against, such as
+# dev-lang/typescript, whose declarations are part of what it ships.
+
 # @ECLASS_VARIABLE: NODEJS_EXTRA_FILES
 # @DESCRIPTION:
 # If additional dist files are present in the NodeJS/npm module that are not
@@ -221,8 +230,6 @@ nodejs_remove_dev() {
 
     # Remove misc files
     # shellcheck disable=SC2185
-    find -type f -iname '*.musl.node' -delete || die
-    # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(editorconfig\|bak\|npmignore\|exe\|gitattributes\|ps1\|ds_store\|log\|pyc\)$' -delete || die
     # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(travis.yml\|makefile\|jshintrc\|flake8\|mk\|env\|nycrc\|eslint.*\|coveralls.*\)$' -delete || die
@@ -234,6 +241,19 @@ nodejs_remove_dev() {
     find -type f -iname makefile -delete || die
     # shellcheck disable=SC2185
     find -type f -name '*\~' -delete || die
+    # shellcheck disable=SC2185
+    find -type f -iregex '.*\.\(orig\|rej\|keep\|gitkeep\|auto-changelog\)$' -delete || die
+    # Lock files describe how a tree was resolved, which is already settled
+    # once it is installed, and the rest is repository bookkeeping.
+    # shellcheck disable=SC2185
+    find -type f \( -name 'yarn.lock' -o -name 'package-lock.json' -o \
+        -name 'pnpm-lock.yaml' -o -name 'CODEOWNERS' -o -iname 'codecov.yml' -o \
+        -iname 'opslevel.yml' \) -delete || die
+
+    if [[ -n ${NODEJS_REMOVE_TYPES} ]]; then
+        # shellcheck disable=SC2185
+        find -type f -iregex '.*\.d\.\(ts\|cts\|mts\)$' -delete || die
+    fi
 
     # Additional files to remove
     # shellcheck disable=SC2185
@@ -245,11 +265,88 @@ nodejs_remove_dev() {
     # shellcheck disable=SC2185
     find -type f -iregex '.*\.\(appveyor.yml\|circle.yml\|circleci.*\|dependabot.*\|renovate.*\)$' -delete || die
     # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(jest.config.*\|karma.conf.*\|ava.config.*\|jasmine.*\)$' -delete || die
-    # shellcheck disable=SC2185
-    find -type f -iregex '.*/\(benchmark.*\|demo.*\|fixture.*\|sample.*\)$' -delete || die
+    find -type f -iregex '.*/\(jest\.config\..*\|karma\.conf\..*\|ava\.config\..*\|jasmine\.json\)$' -delete || die
+    # No rule on file names here. "sample", "demo", "fixture" and "benchmark"
+    # are ordinary function names, and matching them by prefix takes real API
+    # with them: lodash publishes sample.js and sampleSize.js, es-toolkit and
+    # underscore do the same, and vitest ships a dist chunk called benchmark.
+    # The directory rules below cover the development trees anyway.
 
-	# TODO: Exclude/include binary and glibc/musl to remove
+    # Remove the prebuilt libraries meant for another system. A package that
+    # vendors one library per target keeps them all side by side, named after
+    # it, so the ones that can never be loaded here can go. Windows and macOS
+    # never can; of the Linux ones drop the foreign libc and architectures.
+    local foreign_libs=( -iname '*.dll' -o -iname '*.dylib' )
+
+    if [[ ${CHOST} == *-musl* ]]; then
+        foreign_libs+=( -o -iname '*[-_.]gnu.so' -o -iname '*[-_.]glibc.so' \
+            -o -iname '*[-_.]gnu.node' -o -iname '*[-_.]glibc.node' )
+    else
+        foreign_libs+=( -o -iname '*[-_.]musl.so' -o -iname '*[-_.]musl.node' )
+    fi
+
+    # Only the tokens that cannot be mistaken for the native one, hence no
+    # bare "x86" on amd64: it is a prefix of "x86_64". Missing a foreign
+    # library only wastes space, deleting a native one breaks the package.
+    local foreign_arches=() arch_token
+    case ${ARCH} in
+        amd64) foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 s390x ) ;;
+        arm)   foreign_arches=( aarch64 amd64 arm64 i386 i686 ia32 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
+        arm64) foreign_arches=( amd64 arm armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
+        ppc64) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 riscv64 s390x x64 x86_64 ) ;;
+        riscv) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le s390x x64 x86_64 ) ;;
+        s390)  foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 x64 x86_64 ) ;;
+        x86)   foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
+    esac
+
+    for arch_token in "${foreign_arches[@]}"; do
+        foreign_libs+=( -o -iname "*[-_]${arch_token}.so" -o -iname "*[-_]${arch_token}[-_]*.so" )
+        foreign_libs+=( -o -iname "*[-_]${arch_token}.node" -o -iname "*[-_]${arch_token}[-_]*.node" )
+    done
+
+    # shellcheck disable=SC2185
+    find -type f \( "${foreign_libs[@]}" \) -delete || die
+
+    # Remove what node-gyp leaves behind in a native addon: only the compiled
+    # .node under build/Release is needed at run time, the object files, the
+    # generated makefiles and the C++ sources it was built from are not.
+    #
+    # Restrict the sweep to the packages that actually carry a binding.gyp.
+    # Names such as "src" or "*.h" are ordinary elsewhere in the tree, and a
+    # package that ships no addon may well need them.
+    local addon_dir
+    while IFS= read -r -d '' addon_dir; do
+        addon_dir=${addon_dir%/binding.gyp}
+
+        rm -rf "${addon_dir}"/build/Release/obj \
+            "${addon_dir}"/build/Release/obj.target \
+            "${addon_dir}"/build/Release/node-addon-api \
+            "${addon_dir}"/build/deps \
+            "${addon_dir}"/build/node_gyp_bins ||
+            ewarn "Failed to remove the node-gyp intermediates of ${addon_dir}"
+    done < <(find . -type f -name binding.gyp -print0)
+
+    # The sources it was built from, on the other hand, can go tree wide.
+    # Node loads none of these, and a package such as node-addon-api or nan
+    # exists only to be compiled against, so it carries nothing else.
+    # shellcheck disable=SC2185
+    find -type f \
+    \( \
+        -name '*.a' -o \
+        -name '*.c' -o \
+        -name '*.cc' -o \
+        -name '*.cpp' -o \
+        -name '*.cxx' -o \
+        -name '*.gyp' -o \
+        -name '*.gypi' -o \
+        -name '*.h' -o \
+        -name '*.hpp' -o \
+        -name '*.o' -o \
+        -name '*.target.mk' -o \
+        -name 'binding.Makefile' -o \
+        -name 'gyp-mac-tool' \
+    \) -delete || die
+
     # Remove tooling, build and foreign platform directories. None of these
     # names is ever part of a package's own code, so they can go at any depth.
     # shellcheck disable=SC2185
@@ -294,10 +391,12 @@ nodejs_remove_dev() {
         [[ -f "${dev_dir%/*}/package.json" ]] && dev_dirs+=( "${dev_dir}" )
     done < <(find . -type d \
     \( \
+        -iwholename '*/benchmark' -o \
         -iwholename '*/benchmarks' -o \
         -iwholename '*/demo' -o \
         -iwholename '*/doc' -o \
         -iwholename '*/docs' -o \
+        -iwholename '*/fixture' -o \
         -iwholename '*/fixtures' -o \
         -iwholename '*/man' -o \
         -iwholename '*/scripts' -o \
@@ -309,6 +408,13 @@ nodejs_remove_dev() {
     for dev_dir in "${dev_dirs[@]}"; do
         rm -rvf "${dev_dir}" || ewarn "Failed to remove ${dev_dir}"
     done
+
+    # Everything above deletes files, which tends to leave whole directory
+    # trees behind with nothing in them, for example the Windows only
+    # third_party of node-pty. -delete implies -depth, so a parent left empty
+    # by its children goes in the same pass.
+    # shellcheck disable=SC2185
+    find -mindepth 1 -type d -empty -delete || ewarn "Failed to remove some empty directories"
 }
 
 # @FUNCTION: enpm
