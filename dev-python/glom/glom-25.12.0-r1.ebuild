@@ -18,8 +18,7 @@ KEYWORDS="~amd64 ~x86"
 RDEPEND="dev-python/attrs[${PYTHON_USEDEP}]
 	dev-python/boltons[${PYTHON_USEDEP}]
 	dev-python/face[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}]
-	dev-python/tomli[${PYTHON_USEDEP}]"
+	dev-python/pyyaml[${PYTHON_USEDEP}]"
 
 EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
