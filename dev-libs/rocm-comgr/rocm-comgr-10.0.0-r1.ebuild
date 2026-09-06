@@ -39,6 +39,19 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
+# Mesa's radeonsi driver loads libLLVM into the same process as comgr whenever
+# OpenGL and ROCm are used together (Blender, DaVinci Resolve...). Two LLVM
+# versions in one process abort with "LLVM ERROR: Option 'basic' already
+# exists!", so Mesa must be built against the same LLVM slot (or without llvm).
+RDEPEND+="
+	$(llvm_gen_dep "
+		|| (
+			media-libs/mesa[llvm_slot_\${LLVM_SLOT}(-)]
+			media-libs/mesa[-llvm]
+		)
+	")
+"
+
 # Circular dependency: to build tests, hip compiler must be functional
 BDEPEND="test? ( dev-util/hip:${SLOT} )"
 
