@@ -1,0 +1,23 @@
+--- a/scripts/script.getlogs.v4
++++ b/scripts/script.getlogs.v4
+@@ -28,7 +28,7 @@
+ fi
+ 
+ 
+-cd ${LOGS_DIR}
++cd "${LOGS_DIR}" || exit 1
+ 
+ # Clean up any old log archives
+ rm -rf log_archive
+@@ -140,7 +140,10 @@
+ 
+ cat /proc/cpuinfo >> log_archive/output.txt
+ cat /proc/meminfo >> log_archive/output.txt
+-/sbin/chkconfig --list crond >> log_archive/output.txt
++if [ -x /sbin/chkconfig ]
++then
++	/sbin/chkconfig --list crond >> log_archive/output.txt
++fi
+ top bn 1 >> log_archive/output.txt
+ df -h >> log_archive/output.txt
+ 

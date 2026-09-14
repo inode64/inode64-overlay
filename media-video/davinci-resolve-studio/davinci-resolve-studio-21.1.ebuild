@@ -18,74 +18,14 @@ LIBS_SYM="
 	libs/libaprutil-1.so
 	libs/libaprutil-1.so.0
 	libs/libaprutil-1.so.0.6.1
-	libs/libcrypto.so.1.1
+	libs/libcrypto.so.3
 	libs/libcurl.so
-	libs/libdns_sd.so.1
-	libs/libgstapp-1.0.so
-	libs/libgstapp-1.0.so.0
-	libs/libgstapp-1.0.so.0.2003.0
-	libs/libgstaudio-1.0.so
-	libs/libgstaudio-1.0.so.0
-	libs/libgstaudio-1.0.so.0.2003.0
-	libs/libgstbase-1.0.so
-	libs/libgstbase-1.0.so.0
-	libs/libgstbase-1.0.so.0.2003.0
-	libs/libgstcodecparsers-1.0.so
-	libs/libgstcodecparsers-1.0.so.0
-	libs/libgstcodecparsers-1.0.so.0.2003.0
-	libs/libgstcodecs-1.0.so
-	libs/libgstcodecs-1.0.so.0
-	libs/libgstcodecs-1.0.so.0.2003.0
-	libs/libgstnet-1.0.so
-	libs/libgstnet-1.0.so.0
-	libs/libgstnet-1.0.so.0.2003.0
-	libs/libgstpbutils-1.0.so
-	libs/libgstpbutils-1.0.so.0
-	libs/libgstpbutils-1.0.so.0.2003.0
-	libs/libgstreamer-1.0.so
-	libs/libgstreamer-1.0.so.0
-	libs/libgstreamer-1.0.so.0.2003.0
-	libs/libgstrtp-1.0.so
-	libs/libgstrtp-1.0.so.0
-	libs/libgstrtp-1.0.so.0.2003.0
-	libs/libgstsctp-1.0.so
-	libs/libgstsctp-1.0.so.0
-	libs/libgstsctp-1.0.so.0.2003.0
-	libs/libgstsdp-1.0.so
-	libs/libgstsdp-1.0.so.0
-	libs/libgstsdp-1.0.so.0.2003.0
-	libs/libgsttag-1.0.so
-	libs/libgsttag-1.0.so.0
-	libs/libgsttag-1.0.so.0.2003.0
-	libs/libgstvideo-1.0.so
-	libs/libgstvideo-1.0.so.0
-	libs/libgstvideo-1.0.so.0.2003.0
-	libs/libgstwebrtc-1.0.so
-	libs/libgstwebrtc-1.0.so.0
-	libs/libgstwebrtc-1.0.so.0.2003.0
-	libs/libjxl.so
-	libs/libjxl.so.0.11
-	libs/libjxl.so.0.11.1
-	libs/libjxl_cms.so
-	libs/libjxl_cms.so.0.11
-	libs/libjxl_cms.so.0.11.1
-	libs/libjxl_threads.so
-	libs/libjxl_threads.so.0.11
-	libs/libjxl_threads.so.0.11.1
 	libs/libluajit-5.1.so.2
-	libs/liborc-0.4.so
-	libs/liborc-0.4.so.0
-	libs/liborc-0.4.so.0.32.0
 	libs/libpq.so.5
 	libs/libsoxr.so
 	libs/libsoxr.so.0
 	libs/libsoxr.so.0.1.3
-	libs/libsrtp2.so
-	libs/libsrtp2.so.2.4.0
-	libs/libssl.so.1.1
-	libs/libtbb.so.2
-	libs/libtbbmalloc.so.2
-	libs/libtbbmalloc_proxy.so.2
+	libs/libssl.so.3
 	libs/libsharpyuv.so
 	libs/libsharpyuv.so.0
 	libs/libsharpyuv.so.0.1.1
@@ -101,8 +41,6 @@ LIBS_SYM="
 	libs/libwebpmux.so
 	libs/libwebpmux.so.3
 	libs/libwebpmux.so.3.1.1
-	libs/libxmlsec1-openssl.so
-	libs/libxmlsec1.so
 	Fairlight Studio Utility/libavahi-common.so.3
 	Fairlight Studio Utility/libavahi-client.so.3
 	Fairlight Studio Utility/libdns_sd.so.1
@@ -119,54 +57,55 @@ KEYWORDS="~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 RESTRICT="fetch mirror strip test"
 
-# x11-libs/libXtst required for libs/libFairlightPage.so
-
-DEPEND="
+# Runtime dependencies of the prebuilt executables and Qt plugins.
+RDEPEND="
 	app-arch/brotli
+	app-arch/bzip2
 	app-arch/lz4
+	app-arch/xz-utils
 	app-crypt/mit-krb5
-	dev-libs/glib
+	>=dev-libs/glib-2.82
 	dev-libs/icu
 	dev-libs/libltdl
-	dev-libs/nspr
+	dev-libs/libusb:1
 	dev-libs/nss
 	gnome-base/librsvg
 	media-gfx/graphite2
-	media-libs/harfbuzz
+	media-libs/alsa-lib
+	media-libs/glu
 	sys-apps/dbus
+	sys-apps/pciutils
 	sys-devel/gcc
-	virtual/libcrypt
+	sys-libs/glibc
+	sys-libs/libxcrypt[compat]
+	sys-libs/mtdev
 	virtual/opencl
-	virtual/opengl
-	x11-libs/libX11
-	x11-libs/libXext
+	virtual/udev
 	x11-libs/libXrandr
+	x11-libs/libXt
 	x11-libs/libXtst
-	x11-libs/libxcb
+	x11-libs/libXxf86vm
+	x11-libs/libdrm
+	x11-libs/libxkbcommon[X]
+	x11-libs/libxkbfile
+	x11-libs/xcb-util-cursor
+	x11-libs/xcb-util-keysyms
+	x11-libs/xcb-util-wm
+	x11-misc/xclip
+	x11-misc/xdg-utils
 	!bundled-libs? (
-		dev-libs/openssl-compat:1.1.1
-		dev-cpp/tbb
+		dev-db/postgresql:*
 		dev-lang/luajit
-		dev-lang/orc
-		dev-libs/apr
-		dev-libs/xmlsec
-		media-libs/freeglut
-		media-libs/gst-plugins-bad
-		media-libs/gst-plugins-base
-		media-libs/gstreamer
-		media-libs/libjxl
+		dev-libs/apr-util:1
+		dev-libs/openssl:0/3
 		media-libs/libwebp
 		media-libs/soxr
 		net-dns/avahi[mdnsresponder-compat]
-		net-libs/libsrtp
 		net-misc/curl
-	    dev-db/postgresql
-	    gnome-base/gnome-shell
 	)
 	video_cards_amdgpu? ( >=dev-libs/rocm-opencl-runtime-5.5.1 media-libs/mesa[-video_cards_radeon] )
-	video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-550.40.07 )
+	video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-580.119.02 )
 "
-RDEPEND="${DEPEND}"
 BDEPEND="
 	app-arch/unzip
 	dev-util/patchelf
@@ -210,21 +149,28 @@ src_unpack() {
 	default
 
 	# Extract the archive from squashfs
-	./${PKG_NAME}.run --appimage-extract
+	./"${PKG_NAME}".run --appimage-extract || die "failed to extract AppImage"
+	# The extracted installer is over 10 GiB and is no longer needed.
+	rm "${PKG_NAME}.run" || die
 }
 
 src_prepare() {
 	default
-	cd ${PKG_MOUNT}
+	cd "${PKG_MOUNT}" || die
+	eapply "${FILESDIR}/${PN}-21.1-capture-logs.patch"
+
+	# run_bmdpaneld uses bash's $(<file) extension to read its lock file.
+	sed -i '1s|^#!/bin/sh$|#!/bin/bash|' bin/run_bmdpaneld || die
+
+	# Use the default PDF viewer. Both strings are exactly 15 bytes: the
+	# executable passes a fixed length for the surrounding QString literal.
+	LC_ALL=C sed -i 's|/usr/bin/evince|xdg-open       |g' bin/resolve || die
 
 	# Set installation directory
 	sed -i -e "s|RESOLVE_INSTALL_LOCATION|${PKG_HOME}|g" share/*.desktop share/*.directory || die
 
 	# Fix categories
 	sed -i -e "s|=Video|=AudioVideo|g" share/*.desktop || die
-
-	# Remove 32bits apps
-	rm LUT/GenOutputLut LUT/GenLut || die
 
 	# Remove glib-2.0 compiled with old pango
 	# And fix Davinci Resolve: libpango undefined symbol: g_string_free_and_steal
@@ -240,20 +186,32 @@ src_prepare() {
 	# remove dev files
 	rm -rf libs/pkgconfig || die
 
+	# The welcome program imports QtQuick, Controls and Window only. These
+	# unused QML modules were shipped without their matching private Qt libs.
+	rm -r Onboarding/qml/Qt/labs/lottieqt Onboarding/qml/QtQml/RemoteObjects \
+		Onboarding/qml/QtQuick/{Particles.2,Shapes,VirtualKeyboard} || die
+
 	# Remove bundled libraries
 	if use !bundled-libs; then
 		local remove
-		echo "${LIBS_SYM}" | while read remove; do
-			if [ "${remove}" ]; then
-				rm "${remove}" || die
-			fi
-		done
+		while read -r remove; do
+			[[ -n ${remove} ]] || continue
+			rm "${remove}" || die
+		done <<< "${LIBS_SYM}"
 
 		# NOTE: graphviz is kept bundled even with -bundled-libs. DaVinci ships an
 		# old graphviz (libcdt.so.5 / libcgraph.so.6 / libgvc.so.6 / libgvcodec.so)
 		# whose sonames are ABI-incompatible with current media-gfx/graphviz
 		# (libcdt.so.6 / libcgraph.so.8 / libgvc.so.7). The bundled libs/graphviz/
 		# plugins (config6) are self-contained, so they must not be removed.
+
+		# Keep the bundled TBB 2020 (libtbb.so.2): oneTBB provides libtbb.so.12
+		# and cannot satisfy the ABI used by OpenVDB, OpenImageIO and USD.
+		# libgstreamer.so is now a private combined library, not the system
+		# libgstreamer-1.0.so.0; it must also remain bundled.
+		# Likewise keep JPEG XL 0.11 (newer releases change the SONAME), and
+		# xmlsec 1.2: libfraunhoferdcp needs xmlSecOpenSSLAppKeyLoad, removed
+		# in the system xmlsec 1.3 API.
 
 		# remove some libraries
 		find -name "libgcc_s.so.1" -delete || die
@@ -266,62 +224,71 @@ src_prepare() {
 }
 
 src_install() {
-	cd ${PKG_MOUNT}
+	cd "${PKG_MOUNT}" || die
 
+	# Preserve vendor-relative lookup paths: replacing these with one global
+	# path breaks USD plugins and mixes the private Qt builds of the utilities.
+	# Large libraries and executables need fixing too (there is no size cutoff).
+	local i entry rpath app_dir
+	local -a old_rpath
 	while IFS= read -r -d '' i; do
-	[[ -f "${i}" && $(od -t x1 -N 4 "${i}") == *"7f 45 4c 46"* ]] || continue
-		einfo "Fixing RPATH of ${i}"
-		patchelf --set-rpath \
-"${PKG_HOME}"'/libs:'\
-"${PKG_HOME}"'/libs/plugins/sqldrivers:'\
-"${PKG_HOME}"'/libs/plugins/xcbglintegrations:'\
-"${PKG_HOME}"'/libs/plugins/imageformats:'\
-"${PKG_HOME}"'/libs/plugins/platforms:'\
-"${PKG_HOME}"'/libs/Fusion:'\
-"${PKG_HOME}"'/plugins:'\
-"${PKG_HOME}"'/bin:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/BlackmagicRawAPI:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/platforms:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/imageformats:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/mediaservice:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/audio:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/xcbglintegrations:'\
-"${PKG_HOME}"'/BlackmagicRAWSpeedTest/plugins/bearer:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/BlackmagicRawAPI:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/mediaservice:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/imageformats:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/audio:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/platforms:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/xcbglintegrations:'\
-"${PKG_HOME}"'/BlackmagicRAWPlayer/plugins/bearer:'\
-"${PKG_HOME}"'/Onboarding/plugins/xcbglintegrations:'\
-"${PKG_HOME}"'/Onboarding/plugins/qtwebengine:'\
-"${PKG_HOME}"'/Onboarding/plugins/platforms:'\
-"${PKG_HOME}"'/Onboarding/plugins/imageformats:'\
-"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/platforms:'\
-"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/imageformats:'\
-"${PKG_HOME}"'/DaVinci Control Panels Setup/plugins/bearer:'\
-"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciKeyboards:'\
-"${PKG_HOME}"'/DaVinci Control Panels Setup/AdminUtility/PlugIns/DaVinciPanels:'\
-'$ORIGIN' "${i}" || die "patchelf failed on ${i}"
-	done < <(find "${S}/${PKG_MOUNT}" -type f -size -32M -print0)
+		[[ $(od -An -tx1 -N4 "${i}") == *"7f 45 4c 46"* ]] || continue
+		rpath='$ORIGIN'
+		IFS=: read -r -a old_rpath <<< "$(patchelf --print-rpath "${i}")"
+		for entry in "${old_rpath[@]}"; do
+			case ${entry} in
+				'$ORIGIN/'*) rpath+=":${entry}" ;;
+			esac
+		done
+		case ${i#./} in
+			libs/Fusion/Plugins/USD/*)
+				rpath+=":${PKG_HOME}/libs/Fusion/Plugins/USD"
+				;;
+			"DaVinci Control Panels Setup/"*|"Fairlight Studio Utility/"*)
+				app_dir=${i#./}
+				rpath+=":${PKG_HOME}/${app_dir%%/*}"
+				;;
+			BlackmagicRAWPlayer/*|BlackmagicRAWSpeedTest/*)
+				app_dir=${i#./}
+				rpath+=":${PKG_HOME}/${app_dir%%/*}/lib"
+				;;
+		esac
+		rpath+=":${PKG_HOME}/libs:${PKG_HOME}/libs/Fusion:${PKG_HOME}/bin"
+		patchelf --set-rpath "${rpath}" "${i}" || die "patchelf failed on ${i}"
+	done < <(find . -type f -print0)
 
 	# Fix QA Notice: Unresolved soname dependencies:
 	einfo "Fixing libsonyxavcenc.so"
 	patchelf --replace-needed "${PKG_HOME}"/libs/libsonyxavcenc.so libsonyxavcenc.so "${S}/${PKG_MOUNT}"/bin/resolve \
 		|| die "patchelf failed on resolve"
+	patchelf --set-soname libsonyxavcenc.so libs/libsonyxavcenc.so \
+		|| die "failed to set the Sony encoder SONAME"
 
 	insinto "${PKG_HOME}"
+	doins DaVinciResolve.mcpb
 	local _dir
 	for _dir in "Apple Immersive" bin BlackmagicRAWPlayer BlackmagicRAWSpeedTest \
 		    Certificates Control "DaVinci Control Panels Setup" \
-		    "Fairlight Studio Utility" Fusion graphics libs LUT plugins UI_Resource; do
+		    "Fairlight Studio Utility" Onboarding ResolvePython Fusion graphics libs LUT plugins UI_Resource; do
 		include_dir "${_dir}"
 	done
 
 	if use developer; then
 		include_dir Developer
 	fi
+
+	# Required by the Capture Logs desktop entry and Resolve's diagnostics UI.
+	exeinto "${PKG_HOME}/scripts"
+	doexe scripts/script.getlogs.v4
+
+	# The graphical installer unpacks the offline Extras bundles separately
+	# from filelist.txt. Ship their contents so a fresh installation has them.
+	dodir "${PKG_HOME}/Extras"
+	LD_LIBRARY_PATH="${PWD}/libs" .ddm/ddmx \
+		--src="${S}/${PKG_MOUNT}/.ddm" --dst="${ED}${PKG_HOME}/Extras" \
+		|| die "failed to extract the offline Extras"
+	# Resolve's download manager updates these files as the invoking user.
+	fperms -R a+rwX "${PKG_HOME}/Extras"
 
 	insinto "${PKG_HOME}"/share
 	doins share/{default-config.dat,default_cm_config.bin,log-conf.xml}
@@ -331,6 +298,10 @@ src_install() {
 	dodir "/usr/$(get_libdir)"
 	tar -xf share/panels/dvpanel-framework-linux-x86_64.tgz \
 		-C "${ED}/usr/$(get_libdir)" || die "failed to unpack dvpanel framework"
+	# The archive contains clang-12 runtimes; the new panel API needs clang 20.
+	# Copy the targets, not the relative symlinks into /opt/resolve/libs.
+	cp -L libs/libc++{,abi}.so.1 "${ED}/usr/$(get_libdir)/lib/" \
+		|| die "failed to update the panel C++ runtimes"
 
 	# OFX render plugin, so other OFX hosts can use the Resolve renderer.
 	# post_install.sh: install_resolve_plugin() -> /usr/OFX/Plugins
@@ -340,9 +311,18 @@ src_install() {
 
 	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
 	dodoc "Technical Documentation"/{"DaVinci Remote Panel.txt","User Configuration folders and customization.txt"}
+	# Resolve's Help menu looks for this path beneath its installation root.
+	docompress -x "/usr/share/doc/${PF}/DaVinci_Resolve_Manual.pdf"
+	dosym -r "/usr/share/doc/${PF}/DaVinci_Resolve_Manual.pdf" \
+		"${PKG_HOME}/docs/DaVinci_Resolve_Manual.pdf"
 
 	insinto "$(get_udevdir)"/rules.d
 	doins share/etc/udev/rules.d/*.rules
+
+	# The SDX licensing dongle rule is generated by the upstream installer.
+	printf '%s\n' 'SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="096e", MODE="0666"' \
+		> "${T}/99-SDX.rules" || die
+	doins "${T}/99-SDX.rules"
 
 	insinto /usr/share/desktop-directories
 	doins share/*.directory
@@ -353,8 +333,10 @@ src_install() {
 	insinto /usr/share/mime/packages/
 	doins share/{blackmagicraw.xml,resolve.xml}
 
+	fperms a+w "${PKG_HOME}/Apple Immersive"
 	diropts -m 0777
-	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Extras,Fairlight,GPUCache,logs,Media,"Resolve Disk Database",.crashreport,.license,.LUT,"Apple Immersive/Calibration"}
+	keepdir "${PKG_HOME}/"{configs,DolbyVision,easyDCP,Extras,Fairlight,GPUCache,Immersive,logs,Media}
+	keepdir "${PKG_HOME}/"{"Resolve Disk Database",.crashreport,.license,.LUT,"Apple Immersive/Calibration"}
 
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
 
@@ -394,7 +376,7 @@ src_install() {
 
 	# create configuration for revdep-rebuild
 	echo "SEARCH_DIRS=\"${PKG_HOME}\"" > "${T}/80${PN}" || die
-	echo "LD_LIBRARY_MASK=\"libsonyxavcenc.so libcuda.so.1\"" >> "${T}/80${PN}" || die
+	echo "LD_LIBRARY_MASK=\"libcuda.so.1\"" >> "${T}/80${PN}" || die
 	insinto "/etc/revdep-rebuild"
 	doins "${T}/80${PN}"
 }
