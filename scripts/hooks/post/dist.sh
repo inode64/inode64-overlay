@@ -40,4 +40,9 @@ if [ "$cp" == "app-backup/autorestic" ] || \
 	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
 fi
 
+if [ "$cp" == "dev-python/jiter" ]; then
+	file="${ebuild}-${new_version}-crates.tar.xz"
+	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO" || exit "$?"
+fi
+
 exit 0
