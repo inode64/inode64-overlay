@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<longdescription lang="en">
+		CodeGraph builds a local, pre-indexed knowledge graph of a codebase
+		(symbols, call paths, dependents) with tree-sitter and keeps it in
+		sync as the code changes. It exposes the graph through a CLI and an
+		MCP server so AI coding agents such as Claude Code, Codex, Gemini,
+		Cursor or OpenCode can answer structural questions with fewer tokens
+		and tool calls. This package installs the self-contained upstream
+		release bundle, which ships its own Node.js runtime.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">colbymchenry/codegraph</remote-id>
+		<bugs-to>https://github.com/colbymchenry/codegraph/issues</bugs-to>
+		<changelog>https://github.com/colbymchenry/codegraph/blob/main/CHANGELOG.md</changelog>
+	</upstream>
+</pkgmetadata>
