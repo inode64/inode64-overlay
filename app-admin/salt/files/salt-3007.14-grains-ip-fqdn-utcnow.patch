@@ -1,0 +1,22 @@
+Avoid DeprecationWarning "datetime.datetime.utcnow() is deprecated" on
+Python >= 3.12, logged once per minute by the master (grains/core.py:2956)
+and forwarded to syslog through the OpenRC stderr logger. Both values are
+only subtracted from each other, so timezone-aware datetimes are safe.
+
+--- a/salt/grains/core.py
++++ b/salt/grains/core.py
+@@ -2953,12 +2953,12 @@ def ip_fqdn():
+         if not ret["ipv" + ipv_num]:
+             ret[key] = []
+         else:
+-            start_time = datetime.datetime.utcnow()
++            start_time = datetime.datetime.now(datetime.timezone.utc)
+             try:
+                 info = socket.getaddrinfo(_fqdn, None, socket_type)
+                 ret[key] = list({item[4][0] for item in info})
+             except (OSError, UnicodeError):
+-                timediff = datetime.datetime.utcnow() - start_time
++                timediff = datetime.datetime.now(datetime.timezone.utc) - start_time
+                 if timediff.seconds > 5 and __opts__["__role"] == "master":
+                     log.warning(
+                         'Unable to find IPv%s record for "%s" causing a %s '

@@ -138,6 +138,10 @@ RESTRICT="
 PATCHES=(
 	"${FILESDIR}/salt-3003-gentoolkit-revdep.patch"
 	"${FILESDIR}/salt-3006.9-pam-module.patch"
+	# MWorker deadlock: asyncio.wait_for(recv()) loses the request on py>=3.12 (backport of 3008.x)
+	"${FILESDIR}/salt-3007.14-zmq-reqserver-poll-before-recv.patch"
+	# DeprecationWarning datetime.utcnow() logged every minute by the master
+	"${FILESDIR}/salt-3007.14-grains-ip-fqdn-utcnow.patch"
 )
 
 pkg_pretend() {
