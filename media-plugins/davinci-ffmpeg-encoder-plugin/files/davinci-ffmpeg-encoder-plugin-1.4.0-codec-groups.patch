@@ -1,0 +1,16 @@
+--- a/ffmpeg_encoder.cpp
++++ b/ffmpeg_encoder.cpp
+@@ -36,8 +36,11 @@
+         uuid[15] += i;
+         codecInfo.SetProperty(pIOPropUUID, propTypeUInt8, uuid, 16);
+ 
+-        const char* codecGroup = encoderInfo.codecGroup;
+-        codecInfo.SetProperty(pIOPropGroup, propTypeString, codecGroup, static_cast<int>(strlen(codecGroup)));
++        // Keep plugin codecs in their own groups, as in the Resolve SDK example.
++        // Native H.264/H.265/AV1 groups have host-specific availability and UI handling.
++        const std::string codecGroup = std::string(encoderInfo.codecGroup) + " (FFmpeg)";
++        codecInfo.SetProperty(pIOPropGroup, propTypeString, codecGroup.c_str(),
++                              static_cast<int>(codecGroup.size()));
+ 
+         const char* codecName = format.codecName;
+         codecInfo.SetProperty(pIOPropName, propTypeString, codecName, static_cast<int>(strlen(codecName)));
