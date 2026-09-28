@@ -15,6 +15,8 @@ LICENSE="0BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
+BDEPEND=">=dev-lang/go-1.27"
+
 PATCHES=( "${FILESDIR}/0001-Initial-pidfile-version.patch" )
 
 src_unpack() {

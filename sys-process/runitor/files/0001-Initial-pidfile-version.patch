@@ -1,16 +1,16 @@
-From c8e53a11ed0612db2245ee2fab9ad5f05b63c815 Mon Sep 17 00:00:00 2001
+From 99b9863e82bb17eb7f6162e648d2ea22fa219961 Mon Sep 17 00:00:00 2001
 From: INODE64 <ffelix@inode64.com>
 Date: Wed, 22 Apr 2026 14:42:46 +0200
 Subject: [PATCH] Initial pidfile version
 
 ---
  README.md                      |  28 ++++++-
- cmd/runitor/main.go            |  20 +++++
+ cmd/runitor/main.go            |  23 +++++-
  cmd/runitor/pidfile.go         |  94 +++++++++++++++++++++++
  cmd/runitor/pidfile_test.go    | 135 +++++++++++++++++++++++++++++++++
  cmd/runitor/pidfile_unix.go    |  42 ++++++++++
  cmd/runitor/pidfile_windows.go |  55 ++++++++++++++
- 6 files changed, 373 insertions(+), 1 deletion(-)
+ 6 files changed, 375 insertions(+), 2 deletions(-)
  create mode 100644 cmd/runitor/pidfile.go
  create mode 100644 cmd/runitor/pidfile_test.go
  create mode 100644 cmd/runitor/pidfile_unix.go
@@ -21,9 +21,9 @@ index 41a34d0..e2bdcd7 100644
 --- a/README.md
 +++ b/README.md
 @@ -109,10 +109,34 @@ command right away and reset the interval.
-
-	pkill -ALRM runitor
-
+ 
+ 	pkill -ALRM runitor
+ 
 +### Preventing Overlapping Runs
 +
 +Pass `-pidfile PATH` to prevent concurrent execution. At startup runitor
@@ -48,68 +48,71 @@ index 41a34d0..e2bdcd7 100644
 +of the runitor process, which lets external schedulers detect that runitor
 +itself is already active.
 +
-
+ 
  ## Usage
-
+ 
 -	runitor [-uuid uuid] -- command
 +	runitor [-uuid uuid] [-pidfile path] -- command
-
+ 
  ### Flags
-	-api-retries uint
+ 	-api-retries uint
 @@ -141,6 +165,8 @@ command right away and reset the interval.
-	      Ping type to send when command exits successfully (exit-code|success|fail|log (default success))
-	-ping-body-limit uint
-	      If non-zero, truncate the ping body to its last N bytes, including a truncation notice. (default 10000)
+ 	      Ping type to send when command exits successfully (exit-code|success|fail|log (default success))
+ 	-ping-body-limit uint
+ 	      If non-zero, truncate the ping body to its last N bytes, including a truncation notice. (default 10000)
 +	-pidfile string
 +	      Path to a PID file that prevents concurrent runitor instances from running simultaneously
-	-ping-key string
-	      Ping Key (env: $PING_KEY). Use 'file:' prefix for indirection
-	-quiet
+ 	-ping-key string
+ 	      Ping Key (env: $PING_KEY). Use 'file:' prefix for indirection
+ 	-quiet
 diff --git a/cmd/runitor/main.go b/cmd/runitor/main.go
-index 697fea8..62f47ac 100644
+index 4b09948..6b4b6ff 100644
 --- a/cmd/runitor/main.go
 +++ b/cmd/runitor/main.go
-@@ -163,6 +163,7 @@ func main() {
-	noStartPing := flag.Bool("no-start-ping", false, "Don't send start ping")
-	noOutputInPing := flag.Bool("no-output-in-ping", false, "Don't send command's output in pings")
-	noRunId := flag.Bool("no-run-id", false, "Don't generate and send a run id per run in pings")
+@@ -164,6 +164,7 @@ func main() {
+ 	noStartPing := flag.Bool("no-start-ping", false, "Don't send start ping")
+ 	noOutputInPing := flag.Bool("no-output-in-ping", false, "Don't send command's output in pings")
+ 	noRunId := flag.Bool("no-run-id", false, "Don't generate and send a run id per run in pings")
 +	pidfile := flag.String("pidfile", "", "Path to a PID file that prevents concurrent runitor instances from running simultaneously")
-	pingBodyLimit := flag.Uint("ping-body-limit", 10_000, "If non-zero, truncate the ping body to its last N bytes, including a truncation notice.")
-	version := flag.Bool("version", false, "Show version")
-
-@@ -237,6 +238,24 @@ func main() {
-	retries := max(0, *apiRetries) // has to be >= 0
-
-	cmd := flag.Args()
+ 	pingBodyLimit := flag.Uint("ping-body-limit", 10_000, "If non-zero, truncate the ping body to its last N bytes, including a truncation notice.")
+ 	version := flag.Bool("version", false, "Show version")
+ 
+@@ -238,6 +239,24 @@ func main() {
+ 	retries := max(0, *apiRetries) // has to be >= 0
+ 
+ 	cmd := flag.Args()
 +	// Acquire user-provided pidfile so concurrent invocations skip execution.
-+  var pf *Pidfile
-+  if *pidfile != "" {
-+  	pf, err = acquirePidfile(*pidfile)
-+  	if err != nil {
-+  		if errors.Is(err, errPidfileBusy) {
-+  			if pid := readPidfile(*pidfile); pid != 0 {
-+  				log.Printf("pidfile %s held by pid %d; exiting", *pidfile, pid)
-+  			} else {
-+  				log.Printf("pidfile %s held by another instance; exiting", *pidfile)
-+  			}
-+  			os.Exit(0)
-+  		}
-+   			log.Fatal(err)
-+   		}
-+  	setupSignalHandler(pf)
-+  }
++	var pf *Pidfile
++	if *pidfile != "" {
++		pf, err = acquirePidfile(*pidfile)
++		if err != nil {
++			if errors.Is(err, errPidfileBusy) {
++				if pid := readPidfile(*pidfile); pid != 0 {
++					log.Printf("pidfile %s held by pid %d; exiting", *pidfile, pid)
++				} else {
++					log.Printf("pidfile %s held by another instance; exiting", *pidfile)
++				}
++				os.Exit(0)
++			}
++			log.Fatal(err)
++		}
++		setupSignalHandler(pf)
++	}
 +
-	client := &APIClient{
-		BaseURL: *apiURL,
-		Retries: retries,
-@@ -271,6 +290,7 @@ func main() {
-
-	// One-shot mode. Exit with command's exit code.
-	if *every == 0 && *at == "" {
+ 	client := &APIClient{
+ 		BaseURL: *apiURL,
+ 		Retries: retries,
+@@ -270,7 +289,9 @@ func main() {
+ 
+ 	// One-shot mode. Exit with command's exit code.
+ 	if *every == 0 && *at == "" {
+-		os.Exit(task())
++		exitCode := task()
 +		pf.Release()
-		os.Exit(exitCode)
-	}
-
++		os.Exit(exitCode)
+ 	}
+ 
+ 	runNow := make(chan os.Signal, 1)
 diff --git a/cmd/runitor/pidfile.go b/cmd/runitor/pidfile.go
 new file mode 100644
 index 0000000..905fb72
@@ -460,5 +463,6 @@ index 0000000..4957a21
 +	f.Close()
 +	os.Remove(path)
 +}
---
-2.53.0
+-- 
+2.55.0
+
