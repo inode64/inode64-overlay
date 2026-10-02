@@ -1,0 +1,3 @@
+# Configuration file and additional command-line arguments.
+crowdsec_config="/etc/crowdsec/config.yaml"
+crowdsec_args=""

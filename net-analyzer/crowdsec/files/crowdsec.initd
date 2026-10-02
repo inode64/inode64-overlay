@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="CrowdSec security engine"
+command="/usr/bin/crowdsec"
+command_args="-c ${crowdsec_config:-/etc/crowdsec/config.yaml} ${crowdsec_args}"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+retry="TERM/30/KILL/5"
+extra_started_commands="reload"
+
+depend() {
+	need net
+	use logger
+}
+
+checkconfig() {
+	"${command}" -c "${crowdsec_config:-/etc/crowdsec/config.yaml}" -t -error
+}
+
+start_pre() {
+	checkpath --directory --mode 0750 /var/log/crowdsec
+	checkconfig
+}
+
+reload() {
+	checkconfig || return 1
+	ebegin "Reloading ${RC_SVCNAME}"
+	start-stop-daemon --signal HUP --pidfile "${pidfile}"
+	eend $?
+}

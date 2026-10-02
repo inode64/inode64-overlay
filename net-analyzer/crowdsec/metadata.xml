@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<description>The INODE64 Gentoo Project</description>
+	</maintainer>
+	<use>
+		<flag name="server">Build the CrowdSec daemon, OpenRC/systemd services and notification plugins; cscli is always installed</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">crowdsecurity/crowdsec</remote-id>
+	</upstream>
+</pkgmetadata>
