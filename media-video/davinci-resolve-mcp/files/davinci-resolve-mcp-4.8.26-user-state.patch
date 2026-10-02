@@ -1,0 +1,233 @@
+Use writable per-user state for a system installation.
+Preserve upstream per-file overrides and read-only documentation paths.
+
+--- a/src/analysis_dashboard.py
++++ b/src/analysis_dashboard.py
+@@ -45,6 +45,7 @@
+     resume_batch_job,
+     run_batch_job_slice,
+ )
++from src.utils.private_state import private_state_dir
+ from src.utils.platform import setup_environment
+ from src.utils.resolve_connection import connect_resolve
+ from src.utils.resolve_probe import has_method
+@@ -15146,7 +15147,7 @@
+     can't restart it ourselves. The marker is a hint the host can poll via
+     `/api/restart_needed` or by reading the file directly.
+     """
+-    log_dir = os.path.join(repo_root, "logs")
++    log_dir = private_state_dir()
+     try:
+         os.makedirs(log_dir, exist_ok=True)
+         marker = {
+@@ -15169,7 +15170,7 @@
+ 
+ 
+ def _read_restart_marker(repo_root: str) -> Dict[str, Any]:
+-    path = os.path.join(repo_root, "logs", ".mcp_restart_needed")
++    path = os.path.join(private_state_dir(), ".mcp_restart_needed")
+     if not os.path.isfile(path):
+         return {"needed": False}
+     try:
+@@ -15184,7 +15185,7 @@
+ 
+ 
+ def _clear_restart_marker(repo_root: str) -> Dict[str, Any]:
+-    path = os.path.join(repo_root, "logs", ".mcp_restart_needed")
++    path = os.path.join(private_state_dir(), ".mcp_restart_needed")
+     try:
+         os.remove(path)
+     except OSError:
+--- a/src/granular/common.py
++++ b/src/granular/common.py
+@@ -16,6 +16,8 @@
+ for path in (SRC_DIR, PROJECT_DIR):
+     if path not in sys.path:
+         sys.path.insert(0, path)
++
++from src.utils.private_state import private_state_dir
+ 
+ from mcp.server.fastmcp import FastMCP
+ from mcp.types import ToolAnnotations
+@@ -899,7 +901,7 @@
+     if override:
+         path = os.path.realpath(os.path.abspath(os.path.expanduser(override)))
+     else:
+-        path = os.path.join(PROJECT_DIR, "logs", "media-analysis-preferences.json")
++        path = os.path.join(private_state_dir(), "media-analysis-preferences.json")
+     try:
+         with open(path, "r", encoding="utf-8") as handle:
+             payload = json.load(handle)
+--- a/src/server.py
++++ b/src/server.py
+@@ -41,6 +41,8 @@
+ for p in [current_dir, project_dir]:
+     if p not in sys.path:
+         sys.path.insert(0, p)
++
++from src.utils.private_state import private_state_dir
+ 
+ from src.utils.resolve211_encryption import encrypt_dctl
+ from src.utils.resolve211_multicam import create_multicam, resolve_constant, GRADES
+@@ -203,7 +205,7 @@
+ 
+ # ─── Logging ──────────────────────────────────────────────────────────────────
+ 
+-log_dir = os.path.join(project_dir, "logs")
++log_dir = private_state_dir()
+ os.makedirs(log_dir, exist_ok=True)
+ 
+ #: Where this process logs. Unset: `logs/server.log` under the repository, as
+@@ -10551,7 +10553,7 @@
+     override = os.environ.get(_MEDIA_ANALYSIS_PREFS_ENV)
+     if override:
+         return os.path.realpath(os.path.abspath(os.path.expanduser(override)))
+-    return os.path.join(project_dir, "logs", "media-analysis-preferences.json")
++    return os.path.join(private_state_dir(), "media-analysis-preferences.json")
+ 
+ 
+ class ConfigParseError(Exception):
+@@ -10600,7 +10602,7 @@
+     override = os.environ.get(_SERVER_PREFS_ENV)
+     if override:
+         return os.path.realpath(os.path.abspath(os.path.expanduser(override)))
+-    return os.path.join(project_dir, "logs", "server-preferences.json")
++    return os.path.join(private_state_dir(), "server-preferences.json")
+ 
+ 
+ def _read_server_preferences() -> Dict[str, Any]:
+@@ -15859,9 +15861,9 @@
+         "require_confirm_token": _setup_bool(destructive.get("require_confirm_token"), True),
+         "safe_mode": _setup_bool(destructive.get("safe_mode"), False),
+         "audit_log": _setup_bool(destructive.get("audit_log"), True),
+-        "audit_log_path": destructive.get("audit_log_path") or os.path.join(project_dir, "logs", "security-audit.jsonl"),
++        "audit_log_path": destructive.get("audit_log_path") or os.path.join(private_state_dir(), "security-audit.jsonl"),
+         "operation_log": _setup_bool(destructive.get("operation_log"), True),
+-        "operation_log_path": destructive.get("operation_log_path") or os.path.join(project_dir, "logs", "operation-log.jsonl"),
++        "operation_log_path": destructive.get("operation_log_path") or os.path.join(private_state_dir(), "operation-log.jsonl"),
+         "preferences_path": _media_analysis_preferences_path(),
+     }
+ 
+--- a/src/utils/delivery_targets.py
++++ b/src/utils/delivery_targets.py
+@@ -142,6 +142,8 @@
+ """
+ 
+ from __future__ import annotations
++
++from src.utils.private_state import private_state_dir
+ 
+ import json
+ import logging
+@@ -1088,7 +1090,7 @@
+     override = values.get(ENV_USER_TARGETS)
+     if override:
+         return Path(override).expanduser()
+-    return Path(project_dir) / "logs" / "delivery-targets.json"
++    return Path(private_state_dir()) / "delivery-targets.json"
+ 
+ 
+ def _as_candidates(raw: Any) -> Tuple[str, ...]:
+--- a/src/utils/destructive_hook.py
++++ b/src/utils/destructive_hook.py
+@@ -23,6 +23,8 @@
+ """
+ 
+ from __future__ import annotations
++
++from src.utils.private_state import private_state_dir
+ 
+ import ast
+ import functools
+@@ -596,7 +598,7 @@
+     if configured:
+         return os.path.expanduser(str(configured))
+     project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+-    return os.path.join(project_dir, "logs", "security-audit.jsonl")
++    return os.path.join(private_state_dir(), "security-audit.jsonl")
+ 
+ 
+ def _safe_params_for_audit(params: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+--- a/src/utils/execution_trace.py
++++ b/src/utils/execution_trace.py
+@@ -21,6 +21,8 @@
+ """
+ 
+ from __future__ import annotations
++
++from src.utils.private_state import private_state_dir
+ 
+ import collections
+ import json
+@@ -501,7 +503,7 @@
+     override = os.environ.get("RESOLVE_MCP_TRACE_REPORT_DIR")
+     if override:
+         return os.path.realpath(os.path.abspath(os.path.expanduser(override)))
+-    return str(_REPO_ROOT / "logs" / "execution-reports")
++    return str(Path(private_state_dir()) / "execution-reports")
+ 
+ 
+ def _default_report_path(trace: Dict[str, Any], report_format: str) -> str:
+@@ -726,7 +728,7 @@
+     override = os.environ.get("RESOLVE_MCP_TRACE_FILE")
+     if override:
+         return os.path.realpath(os.path.abspath(os.path.expanduser(override)))
+-    return str(_REPO_ROOT / "logs" / "execution-traces.jsonl")
++    return str(Path(private_state_dir()) / "execution-traces.jsonl")
+ 
+ 
+ def persistence_status() -> Dict[str, Any]:
+--- a/src/utils/operation_log.py
++++ b/src/utils/operation_log.py
+@@ -7,6 +7,8 @@
+ """
+ 
+ from __future__ import annotations
++
++from src.utils.private_state import private_state_dir
+ 
+ import json
+ import logging
+@@ -56,7 +58,7 @@
+     )
+     if configured:
+         return os.path.realpath(os.path.abspath(os.path.expanduser(str(configured))))
+-    return str(_REPO_ROOT / "logs" / "operation-log.jsonl")
++    return str(Path(private_state_dir()) / "operation-log.jsonl")
+ 
+ 
+ def _now_iso() -> str:
+--- a/src/utils/private_state.py
++++ b/src/utils/private_state.py
+@@ -18,7 +18,10 @@
+ 
+ def private_state_dir() -> str:
+     override = os.environ.get("DAVINCI_RESOLVE_MCP_STATE_DIR")
+-    path = override or os.path.join(os.path.expanduser("~"), ".davinci-resolve-mcp")
++    path = override or os.path.join(
++        os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
++        "davinci-resolve-mcp",
++    )
+     try:
+         os.makedirs(path, mode=0o700, exist_ok=True)
+         if sys.platform != "win32":
+--- a/src/utils/update_check.py
++++ b/src/utils/update_check.py
+@@ -1,6 +1,8 @@
+ """Best-effort update checks for the DaVinci Resolve MCP server."""
+ 
+ from __future__ import annotations
++
++from src.utils.private_state import private_state_dir
+ 
+ import json
+ import os
+@@ -123,7 +125,7 @@
+     override = values.get(ENV_STATE_PATH)
+     if override:
+         return Path(override).expanduser()
+-    return Path(project_dir) / "logs" / "update-check.json"
++    return Path(private_state_dir()) / "update-check.json"
+ 
+ 
+ def get_cached_update_status(

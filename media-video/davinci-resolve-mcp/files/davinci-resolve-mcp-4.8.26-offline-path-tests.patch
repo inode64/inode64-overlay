@@ -1,0 +1,17 @@
+Keep platform-default tests independent of a running host installation.
+These tests simulate macOS, but discovery otherwise finds the real Linux process.
+
+--- a/tests/test_platform_paths.py
++++ b/tests/test_platform_paths.py
+@@ -27,6 +27,11 @@
+ 
+ 
+ class ResolvePathEnvOverrideTest(unittest.TestCase):
++    def setUp(self):
++        discovery = patch.object(platform_utils, "discover_scripting_lib", return_value=None)
++        discovery.start()
++        self.addCleanup(discovery.stop)
++
+     def test_defaults_used_when_env_unset(self):
+         with patch.object(platform_utils, "get_platform", return_value="darwin"), \
+                 patch.dict(os.environ, _env_without_overrides(), clear=True):

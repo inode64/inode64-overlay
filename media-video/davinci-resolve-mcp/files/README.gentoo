@@ -1,0 +1,36 @@
+Run davinci-resolve-mcp as the desktop user running DaVinci Resolve, with
+Preferences > General > External scripting using set to Local.
+Resolve 21.1's scripting module under /opt/resolve/ResolvePython/lib/modules
+is detected automatically. For older releases, enable USE=developer on
+media-video/davinci-resolve-studio to install the scripting SDK.
+RESOLVE_SCRIPT_API and RESOLVE_SCRIPT_LIB can override the default
+/opt/resolve installation paths; PYTHONPATH can provide a custom module path.
+
+MCP client configuration:
+{
+  "mcpServers": {
+    "davinci-resolve": {
+      "command": "/usr/bin/davinci-resolve-mcp"
+    }
+  }
+}
+
+The default transport is stdio. Add --full for the granular tools.
+davinci-resolve-mcp-control-panel launches the local browser interface;
+use --help to see its options.
+
+Logs, preferences and runtime state default to
+${XDG_STATE_HOME:-$HOME/.local/state}/davinci-resolve-mcp.
+DAVINCI_RESOLVE_MCP_STATE_DIR overrides this directory. Upstream's individual
+log/preference path overrides continue to work. Automatic upstream update
+checks are disabled by the launcher; update the package through Portage.
+
+This package installs the Python server, local control panel and knowledge
+documents. The separate Node.js resolve-advanced server and npm bootstrapper
+are not installed. Optional analysis programs such as ffmpeg, transcription
+engines and vision models are detected at runtime.
+
+MCP 2.2.0 cannot import the FastMCP API used by this release. The ebuild
+therefore uses MCP 1.30.0; recent Pydantic 2.13.5 and Starlette 1.7.0 were
+tested successfully. Gentoo currently marks the required HTTPX 0.x package
+deprecated, so pkgcheck reports that dependency warning.
