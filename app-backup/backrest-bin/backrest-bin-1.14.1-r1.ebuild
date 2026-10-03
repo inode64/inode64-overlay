@@ -23,11 +23,11 @@ src_install() {
 	dobin backrest
 	dodoc *.md
 
-	dotmpfiles "${FILESDIR}/backrest.tmpfiles.conf"
+	newtmpfiles "${FILESDIR}/backrest.tmpfiles.conf" ${PN}.conf
 	newinitd "${FILESDIR}/backrest.initd" backrest
 	systemd_dounit "${FILESDIR}/backrest.service"
 }
 
 pkg_postinst() {
-	tmpfiles_process backrest.tmpfiles.conf
+	tmpfiles_process ${PN}.conf
 }
