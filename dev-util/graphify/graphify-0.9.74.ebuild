@@ -31,8 +31,6 @@ RDEPEND="
 	dev-python/networkx[${PYTHON_USEDEP}]
 	dev-python/numpy[${PYTHON_USEDEP}]
 	dev-python/rapidfuzz[${PYTHON_USEDEP}]
-	dev-libs/tree-sitter-markdown
-	dev-libs/tree-sitter-markdown-inline
 	dev-libs/tree-sitter-php
 	dev-libs/tree-sitter-lua
 	dev-libs/tree-sitter-query
