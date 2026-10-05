@@ -24,5 +24,12 @@ src_install() {
 	nodejs-mod_src_install
 
 	doinitd "${FILESDIR}"/${PN}
-	systemd_dounit "${FILESDIR}/${PN}.service"
+	systemd_douserunit "${FILESDIR}/${PN}.service"
+}
+
+pkg_postinst() {
+	elog "Save your application list as its owner with: pm2 save"
+	elog "Then enable the user service: systemctl --user enable --now pm2.service"
+	elog "For startup at boot without logging in: loginctl enable-linger USER"
+	elog "When upgrading, disable the old system pm2.service before starting the user service."
 }

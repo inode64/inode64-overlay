@@ -1,12 +1,12 @@
 [Unit]
 Description=PM2 next gen process manager for Node.js
 Documentation=https://pm2.keymetrics.io/
-After=network.target remote-fs.target
+After=network.target
 
 [Service]
 Type=forking
-User=%USER%
-Environment=PM2_HOME=%HOME_PATH%
+Environment=PM2_HOME=%h/.pm2
+PIDFile=%h/.pm2/pm2.pid
 
 ExecStart=/usr/bin/pm2 resurrect
 ExecReload=/usr/bin/pm2 reload all
@@ -16,4 +16,4 @@ ExecStop=/usr/bin/pm2 delete all
 ExecStop=/usr/bin/pm2 kill
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

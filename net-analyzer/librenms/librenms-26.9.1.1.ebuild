@@ -24,7 +24,7 @@ DEPEND="
 	acct-user/librenms
 "
 
-RDEPEND="${BDEPEND}
+RDEPEND="${DEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
 	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
@@ -60,9 +60,9 @@ src_compile() {
 
 src_install() {
 	diropts -m 0770
-	insinto ${LIBRENMS_HOME}
+	dodir "${LIBRENMS_HOME}"
 
-	dosym ${LIBRENMS_HOME}/lnms /usr/bin/lnms
+	dosym "${LIBRENMS_HOME}/lnms" /usr/bin/lnms
 
 	insinto /etc/logrotate.d/
 	newins misc/librenms.logrotate librenms
@@ -72,15 +72,15 @@ src_install() {
 
 	dodoc AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md
 
-	// Remove developer files
+	# Remove developer files
 	rm *.md LICENSE.txt || die
 	find -type d -iwholename '*.github' -exec rm -rvf {} + || die
 	rm {.editorconfig,.git-blame-ignore-revs,.styleci.yml,mkdocs.yml} || die
 	rm {phpstan-baseline-deprecated.neon,phpstan-legacy.neon,phpstan-deprecated.neon,phpstan.neon,phpunit.xml} || die
 	rm -rf {.github,doc,licenses,tests} || die
-	cp -r . "${D}"${LIBRENMS_HOME}
+	cp -r . "${ED}${LIBRENMS_HOME}" || die "Failed to install LibreNMS"
 
-	fowners librenms:librenms -R ${LIBRENMS_HOME}
+	fowners -R librenms:librenms "${LIBRENMS_HOME}"
 }
 
 pkg_postinst() {

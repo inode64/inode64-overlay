@@ -1,3 +1,3 @@
-# NodeJS without support x32
+# Node.js does not support x32. Applied by the overlay's x32 profiles.
 
 sys-process/pm2

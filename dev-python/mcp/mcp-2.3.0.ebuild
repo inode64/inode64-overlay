@@ -6,7 +6,7 @@ EAPI=8
 DISTUTILS_USE_PEP517=hatchling
 PYTHON_COMPAT=( python3_{12..14} )
 
-inherit distutils-r1 edo optfeature pypi
+inherit distutils-r1 optfeature pypi
 
 DESCRIPTION="Python SDK for Model Context Protocol"
 HOMEPAGE="https://github.com/modelcontextprotocol/python-sdk"
@@ -15,37 +15,27 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-RDEPEND="dev-python/annotated-types[${PYTHON_USEDEP}]
-	dev-python/anyio[${PYTHON_USEDEP}]
-	dev-python/httpx[${PYTHON_USEDEP}]
-	dev-python/httpx-sse[${PYTHON_USEDEP}]
-	dev-python/jsonschema[${PYTHON_USEDEP}]
-	dev-python/multipart[${PYTHON_USEDEP}]
-	dev-python/pydantic[${PYTHON_USEDEP}]
-	dev-python/pydantic-settings[${PYTHON_USEDEP}]
-	dev-python/pyjwt[${PYTHON_USEDEP}]
-	dev-python/python-dotenv[${PYTHON_USEDEP}]
-	dev-python/starlette[${PYTHON_USEDEP}]
-	dev-python/sse-starlette[${PYTHON_USEDEP}]
-	dev-python/typer[${PYTHON_USEDEP}]
-	dev-python/typing-extensions[${PYTHON_USEDEP}]
-	dev-python/typing-inspection[${PYTHON_USEDEP}]
-	dev-python/uvicorn[${PYTHON_USEDEP}]"
-BDEPEND="test? ( dev-python/dirty-equals[${PYTHON_USEDEP}]
-		dev-python/websockets[${PYTHON_USEDEP}]
-		dev-util/ruff )"
+# httpx2 supplies anyio; mcp-types supplies pydantic and its typing dependencies.
+# sse-starlette supplies starlette, which also requires python-multipart.
+# PyJWT only suggests cryptography, so its crypto extra needs an explicit dep.
+RDEPEND="
+	dev-python/cryptography[${PYTHON_USEDEP}]
+	>=dev-python/httpx2-2.10.0[${PYTHON_USEDEP}]
+	>=dev-python/jsonschema-4.20.0[${PYTHON_USEDEP}]
+	~dev-python/mcp-types-${PV}[${PYTHON_USEDEP}]
+	>=dev-python/opentelemetry-api-1.28.0[${PYTHON_USEDEP}]
+	>=dev-python/pyjwt-2.10.1[${PYTHON_USEDEP}]
+	>=dev-python/python-dotenv-1.0.0[${PYTHON_USEDEP}]
+	>=dev-python/sse-starlette-3.0.0[${PYTHON_USEDEP}]
+	>=dev-python/typer-0.16.0[${PYTHON_USEDEP}]
+	>=dev-python/uvicorn-0.31.1[${PYTHON_USEDEP}]
+"
+BDEPEND="
+	dev-python/uv-dynamic-versioning[${PYTHON_USEDEP}]
+"
 
-EPYTEST_XDIST=1
-EPYTEST_PLUGINS=( anyio inline-snapshot pytest-examples )
-distutils_enable_tests pytest
-
-EPYTEST_DESELECT=( tests/client/test_config.py::test_command_execution )
-
-python_test() {
-	edo ln -s /usr/bin/ruff "${BUILD_DIR}"/install/usr/bin/ruff
-	distutils-r1_python_test
-	edo rm "${BUILD_DIR}"/install/usr/bin/ruff
-}
+# Tests require unpackaged logfire and pytest-examples.
+RESTRICT="test"
 
 pkg_postinst() {
 	optfeature "support rich" dev-python/rich

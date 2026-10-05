@@ -176,22 +176,25 @@ src_install() {
 	insinto "/usr/share/${PN}"
 	newins "${S}/${MY_PN}/target/${MY_PN}-${MY_PV}.war" "${MY_PN}.war"
 
-	elog "Guacamole split in two components, please install net-mis/guacamole-server in a computer when you need a Guacamole proxy"
+}
+
+pkg_postinst() {
+	local tomcat_instance="tomcat-9-${MY_PN}"
+
+	elog "Install net-misc/guacamole-server on the host providing the Guacamole proxy."
+	elog "Adjust ${EPREFIX}${GUACAMOLE_HOME}/guacamole.properties and load the database schema."
 	elog
-	elog "If it is an update, please make sure to delete the old webapp in /var/lib/tomcat-8.5/webapps/ first!"
-	elog "To deploy guacamole with tomcat, you will need to link the war file and create the configuration!"
-	elog "ln -sf /var/lib/${MY_PN}/${MY_PN}.war /var/lib/tomcat-8.5/webapps/"
-	elog "You will also need to adjust the configuration in ${GUACAMOLE_HOME}/${MY_PN}.properties"
-	elog "With systemd make sure that the var GUACAMOLE_HOME is set to ${GUACAMOLE_HOME}. for example via /etc/conf/tomcat."
-	elog "See https://guacamole.apache.org/doc/gug/configuring-guacamole.html for a basic setup"
-	elog "or https://guacamole.apache.org/doc/gug/jdbc-auth.html for a database for authentication and host definitions."
+	elog "Create a Tomcat 9 instance using its existing tomcat user and group:"
+	elog "  ${EPREFIX}/usr/share/tomcat-9/gentoo/tomcat-instance-manager.bash --create --suffix ${MY_PN}"
+	elog "For an existing instance, stop it and remove the old exploded webapp before deploying the update."
+	elog "Deploy the WAR installed by this package:"
+	elog "  ln -sfn ${EPREFIX}/usr/share/${PN}/${MY_PN}.war ${EPREFIX}/var/lib/${tomcat_instance}/webapps/${MY_PN}.war"
 	elog
-	elog "Create new tomcat instance for guacamole (https://wiki.gentoo.org/wiki/Apache_Tomcat):"
-	elog "  /usr/share/tomcat-8.5/gentoo/tomcat-instance-manager.bash --create --suffix guacamole --user guacamole --group guacamole"
-	elog
-	elog "Link the war file:"
-	elog "  ln -sf /usr/share/guacamole-client/guacamole.war /var/lib/tomcat-8.5-guacamole/webapps/"
-	elog
-	elog "Please install www-server/apache or www-server/nginx for a proxying Guacamole and update /etc/tomcat-8.5-guacamole/server.xml see:"
-	elog "  https://guacamole.apache.org/doc/gug/reverse-proxy.html"
+	elog "With OpenRC, add export GUACAMOLE_HOME=${EPREFIX}${GUACAMOLE_HOME} to ${EPREFIX}/etc/conf.d/${tomcat_instance}."
+	elog "With systemd, set Environment=GUACAMOLE_HOME=${EPREFIX}${GUACAMOLE_HOME}"
+	elog "in the Tomcat service's [Service] section."
+	elog "Configure www-servers/apache or www-servers/nginx as the reverse proxy and adjust ${EPREFIX}/etc/${tomcat_instance}/server.xml."
+	elog "See https://guacamole.apache.org/doc/gug/configuring-guacamole.html"
+	elog "    https://guacamole.apache.org/doc/gug/jdbc-auth.html"
+	elog "    https://guacamole.apache.org/doc/gug/reverse-proxy.html"
 }

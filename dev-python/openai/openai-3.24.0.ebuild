@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=hatchling
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 
 inherit distutils-r1 pypi
 
@@ -19,18 +19,18 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	>=dev-python/anyio-3.5.0[${PYTHON_USEDEP}]
-	>=dev-python/distro-1.7.0[${PYTHON_USEDEP}]
-	>=dev-python/httpx-0.23.0[${PYTHON_USEDEP}]
-	>=dev-python/jiter-0.10.0[${PYTHON_USEDEP}]
-	>=dev-python/pydantic-1.9.0[${PYTHON_USEDEP}]
+	<dev-python/anyio-5[${PYTHON_USEDEP}]
+	>=dev-python/httpx2-2.12.0[${PYTHON_USEDEP}]
+	<dev-python/httpx2-3[${PYTHON_USEDEP}]
+	>=dev-python/jiter-0.16.0[${PYTHON_USEDEP}]
+	<dev-python/jiter-1[${PYTHON_USEDEP}]
+	>=dev-python/pydantic-2.4[${PYTHON_USEDEP}]
+	<dev-python/pydantic-3[${PYTHON_USEDEP}]
 	dev-python/sniffio[${PYTHON_USEDEP}]
-	>=dev-python/tqdm-4.0[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.14[${PYTHON_USEDEP}]
+	<dev-python/typing-extensions-5[${PYTHON_USEDEP}]
 "
-BDEPEND="
-	dev-python/hatch-fancy-pypi-readme[${PYTHON_USEDEP}]
-"
+# httpx2 already requires anyio >= 4.10.0; retain OpenAI's upper bound.
 
 # Tests need the same Stainless mock-server stack as anthropic.
 RESTRICT="test"

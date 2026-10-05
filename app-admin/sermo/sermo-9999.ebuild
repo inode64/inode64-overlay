@@ -12,12 +12,15 @@ EGIT_REPO_URI="https://github.com/inode64/Sermo.git"
 LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-BDEPEND=">=dev-lang/go-1.26"
+IUSE="test"
+BDEPEND+=" >=dev-lang/go-1.27.1"
 
-RESTRICT="network-sandbox"
+RESTRICT="!test? ( test )"
 
 src_unpack() {
 	git-r3_src_unpack
+	# Fetch modules during unpack, where live ebuilds may access the network.
+	go-module_live_vendor
 }
 
 src_compile() {
@@ -26,7 +29,7 @@ src_compile() {
 }
 
 src_test() {
-	ego test || die "test failed"
+	ego test ./... || die "test failed"
 }
 
 pkg_postinst() {

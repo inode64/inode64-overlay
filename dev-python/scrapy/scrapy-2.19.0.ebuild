@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 DISTUTILS_USE_PEP517=hatchling
 inherit distutils-r1 pypi
 
@@ -13,41 +13,40 @@ HOMEPAGE="https://scrapy.org/"
 LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64"
-IUSE="test"
-RESTRICT="!test? ( test )"
 
-# The 'PyDispatcher>=2.0.5' distribution was not found and is required by Scrapy
-# https://bugs.gentoo.org/684734
-RDEPEND="dev-python/cssselect[${PYTHON_USEDEP}]
-	dev-python/cryptography[${PYTHON_USEDEP}]
-	dev-python/h2[${PYTHON_USEDEP}]
-	dev-python/itemadapter[${PYTHON_USEDEP}]
-	dev-python/itemloaders[${PYTHON_USEDEP}]
-	dev-python/lxml[${PYTHON_USEDEP}]
-	dev-python/parsel[${PYTHON_USEDEP}]
-	dev-python/protego[${PYTHON_USEDEP}]
+# itemloaders supplies itemadapter and parsel (including cssselect and packaging).
+# pyopenssl supplies cryptography; twisted[http2] supplies h2 and priority.
+RDEPEND="
+	>=app-arch/brotli-1.2.0[python,${PYTHON_USEDEP}]
+	>=dev-python/aiohttp-3.13.3[${PYTHON_USEDEP}]
+	>=dev-python/charset-normalizer-3.4.0[${PYTHON_USEDEP}]
+	>=dev-python/defusedxml-0.7.1[${PYTHON_USEDEP}]
+	>=dev-python/itemloaders-1.0.1[${PYTHON_USEDEP}]
+	>=dev-python/lxml-4.6.4[${PYTHON_USEDEP}]
+	>=dev-python/platformdirs-2.0.0[${PYTHON_USEDEP}]
+	>=dev-python/protego-0.1.15[${PYTHON_USEDEP}]
 	>=dev-python/pydispatcher-2.0.5[${PYTHON_USEDEP}]
-	dev-python/pyopenssl[${PYTHON_USEDEP}]
-	dev-python/queuelib[${PYTHON_USEDEP}]
-	dev-python/service-identity[${PYTHON_USEDEP}]
-	dev-python/six[${PYTHON_USEDEP}]
+	>=dev-python/pyopenssl-24.3.0[${PYTHON_USEDEP}]
+	>=dev-python/queuelib-1.6.1[${PYTHON_USEDEP}]
+	>=dev-python/service-identity-24.2.0[${PYTHON_USEDEP}]
 	dev-python/tldextract[${PYTHON_USEDEP}]
-	>=dev-python/twisted-18.9.0[${PYTHON_USEDEP}]
-	dev-python/w3lib[${PYTHON_USEDEP}]
-	dev-python/zope-interface[${PYTHON_USEDEP}]
-	dev-python/defusedxml[${PYTHON_USEDEP}]
+	>=dev-python/twisted-21.7.0[http2,${PYTHON_USEDEP}]
+	>=dev-python/w3lib-2.1.1[${PYTHON_USEDEP}]
+	>=dev-python/zope-interface-5.1.0[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		>=dev-python/backports-zstd-1.3.0[${PYTHON_USEDEP}]
+	' python3_{12,13})
 "
 BDEPEND="
 	test? (
-		${RDEPEND}
 		dev-python/botocore[${PYTHON_USEDEP}]
-		dev-python/defusedxml[${PYTHON_USEDEP}]
 		dev-python/pexpect[${PYTHON_USEDEP}]
-		dev-python/testfixtures[${PYTHON_USEDEP}]
+		>=dev-python/pyftpdlib-2.0.1[${PYTHON_USEDEP}]
 		dev-python/uvloop[${PYTHON_USEDEP}]
 	)
 "
 
+EPYTEST_PLUGINS=( pytest-rerunfailures pytest-twisted )
 distutils_enable_tests pytest
 
 EPYTEST_DESELECT=(
