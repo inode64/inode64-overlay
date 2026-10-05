@@ -11,7 +11,7 @@ HOMEPAGE="https://openchamber.dev/
 # The GitHub tarball is a bun workspace that needs the full frontend toolchain,
 # so use the npm release instead: it ships the prebuilt dist/.
 SRC_URI="https://registry.npmjs.org/@openchamber/web/-/web-${PV}.tgz -> ${P}.tgz
-"
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz"
 S="${WORKDIR}/package"
 
 LICENSE="0BSD Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0"
