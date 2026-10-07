@@ -134,6 +134,16 @@ include_dir() {
 	done
 }
 
+pkg_nofetch() {
+	einfo "Blackmagic does not allow direct downloads of DaVinci Resolve Studio."
+	einfo "Please download ${PKG_NAME}.zip (version ${PV}) from"
+	einfo "  ${HOMEPAGE}"
+	einfo "and place it in your DISTDIR (see 'portageq distdir', usually /var/cache/distfiles)."
+	einfo
+	einfo "Alternatively, the overlay ships a livecheck/portage hook that fetches it"
+	einfo "automatically: scripts/hooks/pre/davinci.sh in the overlay tree."
+}
+
 pkg_pretend() {
 	CHECKREQS_DISK_BUILD="30G"
 
