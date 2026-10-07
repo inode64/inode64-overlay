@@ -93,6 +93,13 @@ pkg_setup() {
 src_prepare() {
 	default
 	eapply_user
+
+	# pmview.ui wires its actions to custom slots of the top-level window.
+	# Qt6 uic generates pointer-to-member connections by default, which
+	# resolve against QMainWindow and fail ('optionsMenubar' is not a member
+	# of 'QMainWindow'). Fall back to the string based SIGNAL/SLOT syntax.
+	# https://github.com/inode64/inode64-overlay/issues/34
+	echo 'QMAKE_UIC_FLAGS += -connections string' >> src/pmview/pmview.pro || die
 }
 
 src_configure() {
