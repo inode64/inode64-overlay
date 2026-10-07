@@ -19,7 +19,7 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp +threads X xls"
+IUSE="activemq bind discovery doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt6 selinux snmp ssp +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 REQUIRED_USE="
@@ -34,7 +34,6 @@ BDEPEND="
 	dev-libs/libuv
 	discovery? ( net-dns/avahi[dbus] )
 	doc? ( app-text/xmlto )
-	qt5? ( dev-qt/qtsvg:6 )
 	sys-apps/systemd
 "
 
@@ -42,6 +41,10 @@ DEPEND="
 	${PYTHON_DEPS}
 	dev-libs/openssl:=
 	dev-lang/perl:=
+	qt6? (
+		dev-qt/qtbase:6[network,widgets]
+		dev-qt/qtsvg:6
+	)
 	activemq? ( dev-perl/libwww-perl )
 	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? (
@@ -98,6 +101,7 @@ src_prepare() {
 	# Qt6 uic generates pointer-to-member connections by default, which
 	# resolve against QMainWindow and fail ('optionsMenubar' is not a member
 	# of 'QMainWindow'). Fall back to the string based SIGNAL/SLOT syntax.
+	# pmview is disabled below (--without-qt3d); kept so it builds if enabled.
 	# https://github.com/inode64/inode64-overlay/issues/34
 	echo 'QMAKE_UIC_FLAGS += -connections string' >> src/pmview/pmview.pro || die
 }
@@ -116,7 +120,10 @@ src_configure() {
 		$(use_with json pmdajson)
 		$(use_with nutcracker pmdanutcracker)
 		$(use_with perfevent)
-		$(use_with qt5 qt)
+		$(use_with qt6 qt)
+		# pmview (developer preview) needs Coin3/SoQt, which is not packaged;
+		# do not let configure pick it up automagically
+		--without-qt3d
 		$(use_with selinux)
 		$(use_with snmp pmdasnmp)
 		$(use_with threads)

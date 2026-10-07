@@ -36,6 +36,7 @@
         </flag>
         <flag name="pie">Build programs as Position Independent Executables (a security hardening technique)</flag>
         <flag name="podman">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from podman</flag>
+        <flag name="qt6">Build the Qt6 GUI tools (pmchart, pmtime) using <pkg>dev-qt/qtbase</pkg></flag>
         <flag name="postgres">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics about the
             PostgreSQL database
         </flag>
