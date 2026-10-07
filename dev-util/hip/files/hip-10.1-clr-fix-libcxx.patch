@@ -1,0 +1,25 @@
+Fix compilation with libc++ (ROCM/clr part)
+Rebased on 10.1: upstream now includes <include/cuda_wrappers/algorithm> before
+__clang_cuda_complex_builtins.h, so only the __local workaround is still needed.
+--- a/hipamd/include/hip/amd_detail/amd_hip_runtime.h	2026-10-07 11:02:05.700120030 +0200
++++ b/hipamd/include/hip/amd_detail/amd_hip_runtime.h	2026-10-07 11:02:05.712966770 +0200
+@@ -417,10 +417,19 @@
+ // However libc++ include path requires to be before clang include path.
+ // To workaround this, we pass -isystem with the parent directory of clang include
+ // path instead of the clang include path itself.
++
++// libc++: <include/cuda_wrappers/complex> transitively includes <queue>, which uses __local
++#define ORIGINAL__LOCAL __local
++#undef __local
++
+ #include <include/cuda_wrappers/algorithm>
+ #include <__clang_cuda_complex_builtins.h>
+ #include <include/cuda_wrappers/complex>
+ #include <include/cuda_wrappers/new>
++
++#define __local ORIGINAL__LOCAL
++#undef ORIGINAL__LOCAL
++
+ #undef __CUDA__
+ #pragma pop_macro("__CUDA__")
+ #endif  // !_OPENMP || __HIP_ENABLE_CUDA_WRAPPER_FOR_OPENMP__

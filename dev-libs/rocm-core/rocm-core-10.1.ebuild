@@ -17,7 +17,10 @@ SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
 
 src_configure() {
-	local mycmakeargs=( -DROCM_VERSION=${PV} )
+	# upstream requires a MAJOR.MINOR.PATCH version string
+	local rocm_version=${PV}
+	[[ -n $(ver_cut 3) ]] || rocm_version+=".0"
+	local mycmakeargs=( -DROCM_VERSION=${rocm_version} )
 	cmake_src_configure
 }
 

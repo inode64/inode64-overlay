@@ -61,7 +61,6 @@ EPYTEST_PLUGINS=( pytest-{forked,xdist} )
 distutils_enable_tests pytest
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-5.4.2-fix-arch-parse.patch
 	"${FILESDIR}"/${PN}-6.0.2-expand-isa-compatibility.patch
 	"${FILESDIR}"/${PN}-7.0.1-fix-install.patch
 	"${FILESDIR}"/${PN}-7.1.0-cmake.patch
@@ -83,8 +82,11 @@ src_prepare() {
 
 	pushd "${PN}" || die
 
-	sed -e "/ROCM_SMI_ROOT/s,lib,$(get_libdir)," \
-		-i Source/cmake/FindROCmSMI.cmake || die
+	# FindROCmSMI.cmake is gone in 10.1 (no rocm_smi usage left)
+	if [[ -f Source/cmake/FindROCmSMI.cmake ]]; then
+		sed -e "/ROCM_SMI_ROOT/s,lib,$(get_libdir)," \
+			-i Source/cmake/FindROCmSMI.cmake || die
+	fi
 	sed -r -e "/TENSILE_USE_LLVM/s/ON/OFF/" \
 		-i Source/CMakeLists.txt || die
 

@@ -50,7 +50,10 @@ test_wrapper() {
 }
 
 src_prepare() {
-	sed -e "s/get_version ( \"1.0.0\" )/get_version ( \"${PV}\" )/" -i libhsakmt/CMakeLists.txt || die
+	# upstream expects a MAJOR.MINOR.PATCH version string
+	local rocm_version=${PV}
+	[[ -n $(ver_cut 3) ]] || rocm_version+=".0"
+	sed -e "s/get_version ( \"1.0.0\" )/get_version ( \"${rocm_version}\" )/" -i libhsakmt/CMakeLists.txt || die
 
 	# https://github.com/ROCm/ROCR-Runtime/issues/263
 	sed -e "s/\${HSAKMT_TARGET} STATIC/\${HSAKMT_TARGET}/" -i libhsakmt/CMakeLists.txt || die

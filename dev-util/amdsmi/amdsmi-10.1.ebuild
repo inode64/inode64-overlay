@@ -89,8 +89,11 @@ src_test() {
 src_install() {
 	cmake_src_install
 
-	# Wrong places
-	rm "${ED}"/usr/share/amd_smi/amdsmi/{libamd_smi.so,LICENSE,README.md} || die
+	# Wrong places (10.1 no longer ships libamd_smi.so/LICENSE/README.md here)
+	rm -f "${ED}"/usr/share/amd_smi/amdsmi/{libamd_smi.so,LICENSE,README.md} || die
+	# upstream copies the module into the default python's site-packages;
+	# python_domodule below installs it for every selected implementation
+	rm -rf "${ED}"/usr/lib/python*/site-packages || die
 
 	python_fix_shebang "${ED}"/usr/libexec/amdsmi_cli
 	python_domodule "${ED}"/usr/libexec/amdsmi_cli

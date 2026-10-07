@@ -11,9 +11,13 @@ HOMEPAGE="https://github.com/amd/xdna-driver"
 
 if [[ ${PV} == 999999 ]] ; then
 	EGIT_REPO_URI="https://github.com/amd/xdna-driver.git"
+	# VTD archives (xrt-smi validation binaries) now come from the vtd/ submodule
 	EGIT_SUBMODULES=(
+		vtd
 		xrt
 		xrt/src/runtime_src/core/common/aiebu
+		# aiebu bundles zstd as a submodule and globs its sources directly
+		xrt/src/runtime_src/core/common/aiebu/src/cpp/zstd
 		xrt/src/runtime_src/core/common/elf
 		xrt/src/runtime_src/xdp
 	)
@@ -98,10 +102,6 @@ src_unpack() {
 		git-r3_src_unpack
 
 		pushd "${S}" || die
-		# This downloads files specified in https://github.com/amd/xdna-driver/blob/main/tools/WHENCE
-		# VTD files signatures are not present in the Manifest, but effectively pinned via "whence-commit"
-		"${EPYTHON}" tools/sync_from_whence.py vtd --out amdxdna_bins/vtd_archives --whence tools/WHENCE || die
-
 		local msgs_url="https://raw.githubusercontent.com/Tanami/markdown-graphviz-svg/${MGS_COMMIT}/src/${MGS}/${MGS}.py"
 		if ! wget -nc "${msgs_url}" -O "${MGS_PY}"; then
 			die "Fetching from ${msgs_url} failed"
@@ -173,8 +173,17 @@ src_configure() {
 src_install() {
 	cmake_src_install
 
+	# XRT is rooted at /usr, so it looks for the VTD archives in
+	# /usr/share/xrt/amdxdna/bins (see detail/linux/xilinx_xrt.h)
 	insinto /usr/share/xrt/amdxdna/bins
-	doins amdxdna_bins/vtd_archives/*
+	if [[ ${PV} == 999999 ]] ; then
+		# VTD archives come from the vtd/ submodule; CMake/pkg.cmake installs
+		# them under share/amdxdna/bins, which XRT never searches
+		doins vtd/archive/*/xrt_smi_*.a
+		rm -r "${ED}"/usr/share/amdxdna || die
+	else
+		doins amdxdna_bins/vtd_archives/*
+	fi
 
 	# belongs to dev-util/xrt
 	rm -rf "${ED}/bins" || die

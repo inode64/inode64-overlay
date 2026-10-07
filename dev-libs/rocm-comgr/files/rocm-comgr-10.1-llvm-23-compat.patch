@@ -1,0 +1,73 @@
+Build against upstream LLVM 23 (no ROCm llvm-project fork):
+- replicate the GPUKind-based SGPR helpers that only exist in the fork
+- drop the gfx1250-strict ISA entry (EF_AMDGPU_MACH_AMDGCN_GFX1250_STRICT is fork-only)
+
+--- a/src/comgr-metadata.cpp	2026-09-08 01:34:04.000000000 +0200
++++ b/src/comgr-metadata.cpp	2026-10-07 11:00:32.991697110 +0200
+@@ -36,6 +36,40 @@
+ using namespace llvm;
+ using namespace llvm::object;
+ 
++namespace {
++// Upstream LLVM does not provide the GPUKind-based SGPR helpers that the
++// ROCm llvm-project fork adds to AMDGPUTargetParser.h.  Replicate them here
++// (same logic as llvm/lib/TargetParser/AMDGPUTargetParser.cpp in the fork).
++unsigned compatGetTotalNumSGPRs(AMDGPU::GPUKind AK) {
++  AMDGPU::IsaVersion Version = AMDGPU::getIsaVersion(AMDGPU::getSubArch(AK));
++  if (Version.Major >= 8)
++    return 800;
++  return 512;
++}
++
++unsigned compatGetAddressableNumSGPRs(AMDGPU::GPUKind AK) {
++  // FeatureSGPRInitBug (gfx802 / tonga / iceland) fixes the SGPR count.
++  if (AK == AMDGPU::GK_GFX802)
++    return 96;
++
++  AMDGPU::IsaVersion Version = AMDGPU::getIsaVersion(AMDGPU::getSubArch(AK));
++  if (Version.Major >= 10)
++    return 106;
++  if (Version.Major >= 8)
++    return 102;
++  return 104;
++}
++
++unsigned compatGetSGPRAllocGranule(AMDGPU::GPUKind AK) {
++  AMDGPU::IsaVersion Version = AMDGPU::getIsaVersion(AMDGPU::getSubArch(AK));
++  if (Version.Major >= 10)
++    return compatGetAddressableNumSGPRs(AK);
++  if (Version.Major >= 8)
++    return 16;
++  return 8;
++}
++} // namespace
++
+ namespace COMGR {
+ namespace metadata {
+ 
+@@ -554,12 +588,12 @@
+   Root["MaxFlatWorkGroupSize"] =
+       Doc.getNode(std::to_string(Info.MaxFlatWorkGroupSize), /*Copy=*/true);
+   Root["SGPRAllocGranule"] =
+-      Doc.getNode(std::to_string(AMDGPU::getSGPRAllocGranule(Kind)),
++      Doc.getNode(std::to_string(compatGetSGPRAllocGranule(Kind)),
+                   /*Copy=*/true);
+   Root["TotalNumSGPRs"] = Doc.getNode(
+-      std::to_string(AMDGPU::getTotalNumSGPRs(Kind)), /*Copy=*/true);
++      std::to_string(compatGetTotalNumSGPRs(Kind)), /*Copy=*/true);
+   Root["AddressableNumSGPRs"] = Doc.getNode(
+-      std::to_string(AMDGPU::getAddressableNumSGPRs(Kind)), /*Copy=*/true);
++      std::to_string(compatGetAddressableNumSGPRs(Kind)), /*Copy=*/true);
+   Root["VGPRAllocGranule"] =
+       Doc.getNode(std::to_string(Info.VGPRAllocGranule), /*Copy=*/true);
+   Root["TotalNumVGPRs"] =
+--- a/src/comgr-isa-metadata.def	2026-09-08 01:34:04.000000000 +0200
++++ b/src/comgr-isa-metadata.def	2026-10-07 11:00:32.991739519 +0200
+@@ -75,7 +75,6 @@
+ HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1200",         EF_AMDGPU_MACH_AMDGCN_GFX1200,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
+ HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1201",         EF_AMDGPU_MACH_AMDGCN_GFX1201,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
+ HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1250",         EF_AMDGPU_MACH_AMDGCN_GFX1250,         true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
+-HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1250-strict",  EF_AMDGPU_MACH_AMDGCN_GFX1250_STRICT,  true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
+ HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1251",         EF_AMDGPU_MACH_AMDGCN_GFX1251,         true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
+ HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1310",         EF_AMDGPU_MACH_AMDGCN_GFX1310,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
+ 
