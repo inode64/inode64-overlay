@@ -64,7 +64,7 @@ src_install() {
 	dotmpfiles "${FILESDIR}/zigbee2mqtt.conf"
 
 	doinitd "${FILESDIR}/${PN}"
-	systemd_dounit "${FILESDIR}/${PN}.service"
+	systemd_newunit "${FILESDIR}/${PN}-r1.service" "${PN}.service"
 
 	dodir /etc/env.d
 	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}/etc/env.d/90${PN}" || die
