@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit check-reqs desktop udev xdg
+inherit check-reqs desktop toolchain-funcs udev xdg
 
 PKG_NAME="DaVinci_Resolve_Studio_${PV}_Linux"
 PKG_HOME="/opt/resolve"
@@ -108,7 +108,7 @@ RDEPEND="
 "
 BDEPEND="
 	app-arch/unzip
-	dev-util/patchelf
+	>=dev-util/patchelf-0.17
 "
 
 QA_PREBUILT="*"
@@ -217,6 +217,20 @@ src_prepare() {
 		find -name "libgcc_s.so.1" -delete || die
 		find -name "libusb*" -delete || die
 	fi
+
+	# libProResRAW.so bundles an old libstdc++ std::filesystem and exports it.
+	# Being NEEDED by bin/resolve its copy shadows the system libstdc++ for
+	# every library loaded later (ROCm, OpenCL ICD, Mesa...) and they crash on
+	# the path::_Cmpt ABI mismatch. Preloading the system libstdc++ breaks
+	# libProResRAW instead, so rename its exports: the library keeps using
+	# its own copy while everybody else gets the system one.
+	# https://github.com/inode64/inode64-overlay/issues/22
+	local prr_lib="libs/libProResRAW.so"
+	$(tc-getNM) -D --defined-only "${prr_lib}" | awk '{print $3}' | grep 10filesystem \
+		| sed 's/.*/& &_prr/' > "${T}/prr.map"
+	[[ -s ${T}/prr.map ]] || die "no std::filesystem symbols found in ${prr_lib}"
+	patchelf --rename-dynamic-symbols "${T}/prr.map" "${prr_lib}" \
+		|| die "patchelf failed on ${prr_lib}"
 
 	# Remove license files
 	rm "BlackmagicRAWSpeedTest/Third Party Licenses.rtf" || die
