@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="pypi">litellm</remote-id>
+		<remote-id type="github">BerriAI/litellm</remote-id>
+	</upstream>
+	<use>
+		<flag name="caching">Disk cache for responses via <pkg>dev-python/diskcache</pkg></flag>
+		<flag name="cli">Interactive CLI helpers (model picker, credential store) via <pkg>dev-python/inquirerpy</pkg> and <pkg>dev-python/keyring</pkg></flag>
+		<flag name="mcp">Model Context Protocol client support via <pkg>dev-python/mcp</pkg></flag>
+	</use>
+</pkgmetadata>

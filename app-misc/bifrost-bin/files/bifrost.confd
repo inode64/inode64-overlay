@@ -1,0 +1,15 @@
+# /etc/conf.d/bifrost
+# Listener; keep loopback unless the gateway sits behind TLS/auth.
+#BIFROST_HOST="127.0.0.1"
+#BIFROST_PORT="8080"
+# Application data directory (config.json, SQLite stores, logs).
+#BIFROST_APP_DIR="/var/lib/bifrost"
+# debug, info, warn, error
+#BIFROST_LOG_LEVEL="info"
+# Extra command line options for bifrost-http
+#BIFROST_EXTRA_OPTS=""
+# One-time token required to create the first dashboard admin account
+# (Workspace -> Config -> Security, or POST /api/session/setup). Only
+# checked until the account exists; generate with: openssl rand -hex 32
+# This file is world-readable: chmod 600 it or clear the token afterwards.
+#BIFROST_SETUP_TOKEN=""

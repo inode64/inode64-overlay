@@ -1,0 +1,54 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="FastFlowLM NPU runtime — OpenAI-compatible LLM server on XDNA2."
+
+: ${FLM_USER:=fastflowlm}
+: ${FLM_MODEL_PATH:=/var/lib/fastflowlm}
+: ${FLM_MODEL:=qwen3:0.6b}
+: ${FLM_HOST:=127.0.0.1}
+: ${FLM_PORT:=}
+: ${FLM_ASR:=1}
+: ${FLM_EMBED:=1}
+: ${FLM_PMODE:=performance}
+: ${FLM_LOG:=/var/log/flm.log}
+: ${FLM_EXTRA_OPTS:=}
+
+supervisor="supervise-daemon"
+command="/usr/bin/flm"
+output_log="${FLM_LOG}"
+error_log="${FLM_LOG}"
+respawn_delay=5
+respawn_max=0
+
+# FLM mlocks NPU buffers — memlock must be unlimited.
+rc_ulimit="-l unlimited"
+
+depend() {
+	need net
+	after net
+}
+
+start_pre() {
+	if ! getent passwd "${FLM_USER}" > /dev/null; then
+		eerror "User '${FLM_USER}' not found on this system."
+		return 1
+	fi
+	# supervise-daemon opens the log redirect as the dropped user, so the
+	# file must exist and be owned by it.
+	if [ -n "${FLM_LOG}" ]; then
+		checkpath -f -m 0640 -o "${FLM_USER}:${FLM_USER}" "${FLM_LOG}" || return 1
+	fi
+	# Shared model store; the directory itself is owned by acct-user/fastflowlm.
+	if [ -n "${FLM_MODEL_PATH}" ]; then
+		checkpath -d -m 2770 -o fastflowlm:fastflowlm "${FLM_MODEL_PATH}/models" || return 1
+		export FLM_MODEL_PATH
+	fi
+	local args="serve --host ${FLM_HOST} --pmode ${FLM_PMODE} -a ${FLM_ASR} -e ${FLM_EMBED}"
+	[ -n "${FLM_PORT}" ] && args="${args} --port ${FLM_PORT}"
+	[ -n "${FLM_EXTRA_OPTS}" ] && args="${args} ${FLM_EXTRA_OPTS}"
+	args="${args} ${FLM_MODEL}"
+	command_args="${args}"
+	command_user="${FLM_USER}:${FLM_USER}"
+}

@@ -1,0 +1,30 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Bifrost AI gateway (virtual keys, budgets, usage logging)"
+
+: ${BIFROST_HOST:=127.0.0.1}
+: ${BIFROST_PORT:=8080}
+: ${BIFROST_APP_DIR:=/var/lib/bifrost}
+: ${BIFROST_LOG_LEVEL:=info}
+: ${BIFROST_EXTRA_OPTS:=}
+
+supervisor="supervise-daemon"
+command="/usr/bin/bifrost-http"
+command_args="-app-dir ${BIFROST_APP_DIR} -host ${BIFROST_HOST} -port ${BIFROST_PORT} -log-level ${BIFROST_LOG_LEVEL} ${BIFROST_EXTRA_OPTS}"
+command_user="bifrost:bifrost"
+output_log="/var/log/bifrost.log"
+error_log="/var/log/bifrost.log"
+respawn_delay=5
+
+depend() {
+	need net
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o bifrost:bifrost "${BIFROST_APP_DIR}" || return 1
+	checkpath -f -m 0640 -o bifrost:bifrost "${output_log}" || return 1
+	[ -n "${BIFROST_SETUP_TOKEN}" ] && export BIFROST_SETUP_TOKEN
+	return 0
+}

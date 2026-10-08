@@ -1,0 +1,31 @@
+[Unit]
+Description=Bifrost AI gateway (virtual keys, budgets, usage logging)
+Documentation=https://docs.getbifrost.ai/
+After=network.target
+
+[Service]
+Type=simple
+User=bifrost
+Group=bifrost
+# Application data: config.json, SQLite stores and logs.
+StateDirectory=bifrost
+StateDirectoryMode=0750
+EnvironmentFile=-/etc/default/bifrost
+Environment="BIFROST_HOST=127.0.0.1"
+Environment="BIFROST_PORT=8080"
+Environment="BIFROST_LOG_LEVEL=info"
+ExecStart=/bin/sh -c 'exec /usr/bin/bifrost-http -app-dir /var/lib/bifrost -host "$$BIFROST_HOST" -port "$$BIFROST_PORT" -log-level "$$BIFROST_LOG_LEVEL" $$BIFROST_EXTRA_OPTS'
+Restart=on-failure
+RestartSec=5s
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/bifrost
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

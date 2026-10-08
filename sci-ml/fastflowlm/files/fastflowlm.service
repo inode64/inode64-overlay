@@ -1,0 +1,41 @@
+[Unit]
+Description=FastFlowLM NPU runtime (OpenAI-compatible server)
+Documentation=https://github.com/ROCm/FastFlowLM
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=fastflowlm
+Group=fastflowlm
+# Shared model store (FLM_MODEL_PATH), group writable for other flm users.
+StateDirectory=fastflowlm
+StateDirectoryMode=2770
+Environment="FLM_MODEL_PATH=/var/lib/fastflowlm"
+EnvironmentFile=-/etc/default/fastflowlm
+Environment="FLM_MODEL=qwen3:0.6b"
+Environment="FLM_HOST=127.0.0.1"
+Environment="FLM_PORT="
+Environment="FLM_PMODE=performance"
+Environment="FLM_ASR=1"
+Environment="FLM_EMBED=1"
+Environment="FLM_EXTRA_OPTS="
+# FLM mlocks NPU buffers: memlock must be unlimited.
+LimitMEMLOCK=infinity
+# The conditional --port flag and positional model argument need shell
+# parameter expansion; $$ escapes the dollar so systemd passes the
+# literal $ through to /bin/sh, which then expands.
+ExecStart=/bin/sh -c 'exec /usr/bin/flm serve --host "$$FLM_HOST" $${FLM_PORT:+--port "$$FLM_PORT"} --pmode "$$FLM_PMODE" -a "$$FLM_ASR" -e "$$FLM_EMBED" $$FLM_EXTRA_OPTS "$$FLM_MODEL"'
+Restart=always
+RestartSec=5s
+
+NoNewPrivileges=true
+PrivateTmp=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

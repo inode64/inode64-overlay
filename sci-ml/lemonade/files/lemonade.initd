@@ -1,0 +1,107 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Lemonade local AI server (lemond) — OpenAI-compatible LLM inference."
+
+# Design note: the systemd unit runs lemond as the dedicated acct-user
+# 'lemonade'. OpenRC intentionally does NOT assume that account -- it runs
+# as an admin-chosen LEMONADE_USER that already owns ~/.cache/lemonade.
+# This asymmetry is deliberate; don't "unify" the two onto the lemonade
+# system user without rechecking cache ownership.
+
+# Set LEMONADE_USER in /etc/conf.d/lemonade. No default — the service
+# refuses to start until it's configured.
+: ${LEMONADE_USER:=lemonade}
+: ${LEMONADE_HOST:=127.0.0.1}
+: ${LEMONADE_PORT:=}
+: ${LEMONADE_CACHE:=}
+# Config dir exported as STATE_DIRECTORY (mirrors the systemd unit); the
+# shared model store is seeded via models_dir in config.json.
+: ${LEMONADE_STATE_DIR:=/var/lib/lemonade}
+# Shared FastFlowLM model store handed to the flm NPU backend lemond spawns.
+: ${LEMONADE_FLM_MODEL_PATH:=/var/lib/fastflowlm}
+: ${LEMONADE_LOG:=/var/log/lemonade.log}
+: ${LEMONADE_EXTRA_OPTS:=}
+# Writable runtime dir exported as XDG_RUNTIME_DIR; lemond refuses to start
+# without one. Mirrors the upstream systemd unit's RuntimeDirectory=lemonade.
+# See conf.d for the full rationale. Empty disables the creation/export.
+: ${LEMONADE_RUNTIME_DIR:=/run/lemonade}
+# Reuse the system ROCm runtime for lemond's bundled ROCm backends instead of
+# fetching AMD's multi-GB TheRock runtime; /usr is Gentoo's ROCm prefix. See
+# conf.d for the full rationale. Empty disables the export.
+: ${LEMONADE_ROCM_PATH:=/usr}
+
+supervisor="supervise-daemon"
+command="/usr/bin/lemond"
+output_log="${LEMONADE_LOG}"
+error_log="${LEMONADE_LOG}"
+respawn_delay=5
+# never give up restarting; the inference daemon is long-lived
+respawn_max=0
+
+# Mirror the upstream systemd unit's CAP_SYS_RESOURCE grant: give the
+# dropped user rlimit headroom for mmap/mlock of large model weights.
+rc_ulimit="-l unlimited"
+
+depend() {
+	need net
+	after net
+}
+
+start_pre() {
+	if ! getent passwd "${LEMONADE_USER}" > /dev/null; then
+		eerror "User '${LEMONADE_USER}' not found on this system."
+		return 1
+	fi
+	if [ -z "${LEMONADE_CACHE}" ]; then
+		if [ "${LEMONADE_USER}" = lemonade ]; then
+			LEMONADE_CACHE="/var/cache/lemonade"
+		else
+			local home
+			home="$(getent passwd "${LEMONADE_USER}" | cut -d: -f6)"
+			LEMONADE_CACHE="${home}/.cache/lemonade"
+		fi
+	fi
+	checkpath -d -m 0755 -o "${LEMONADE_USER}:${LEMONADE_USER}" "${LEMONADE_CACHE}" || return 1
+	if [ -n "${LEMONADE_STATE_DIR}" ]; then
+		checkpath -d -m 0750 -o "${LEMONADE_USER}:${LEMONADE_USER}" "${LEMONADE_STATE_DIR}" || return 1
+		export STATE_DIRECTORY="${LEMONADE_STATE_DIR}"
+	fi
+	[ -n "${LEMONADE_FLM_MODEL_PATH}" ] && export FLM_MODEL_PATH="${LEMONADE_FLM_MODEL_PATH}"
+	# supervise-daemon opens the stdout/stderr redirect (LEMONADE_LOG) itself,
+	# as the dropped user (not as root), and dup2s it onto the child's fds.
+	# /var/log is root-owned, so that open fails and lemond never gets a valid
+	# stdout -- it dies before writing a line. Pre-create the log user-owned so
+	# the redirect opens; 0640 keeps it off other local users.
+	if [ -n "${LEMONADE_LOG}" ]; then
+		checkpath -f -m 0640 -o "${LEMONADE_USER}:${LEMONADE_USER}" \
+			"${LEMONADE_LOG}" || return 1
+	fi
+	# lemond needs a writable XDG_RUNTIME_DIR for its control socket and
+	# runtime state, and refuses to start without one. supervise-daemon's
+	# clean environment has none -- elogind's /run/user/<uid> only exists
+	# after an interactive login, which a boot-time service can't rely on.
+	# Create a dedicated dir owned by the dropped user (mirroring the upstream
+	# systemd unit's RuntimeDirectory=lemonade) and export it.
+	if [ -n "${LEMONADE_RUNTIME_DIR}" ]; then
+		checkpath -d -m 0700 -o "${LEMONADE_USER}:${LEMONADE_USER}" \
+			"${LEMONADE_RUNTIME_DIR}" || return 1
+		export XDG_RUNTIME_DIR="${LEMONADE_RUNTIME_DIR}"
+	fi
+	# Reuse the system ROCm runtime (skips the multi-GB TheRock download) for
+	# lemond's bundled ROCm backends. No-op unless a ROCm backend is selected
+	# and a ROCm runtime is actually present at this path.
+	[ -n "${LEMONADE_ROCM_PATH}" ] && export ROCM_PATH="${LEMONADE_ROCM_PATH}"
+	# --host overrides config.json, so 127.0.0.1 here forces a loopback
+	# bind regardless of what config.json carries. Set LEMONADE_HOST to
+	# 0.0.0.0 in /etc/conf.d/lemonade ONLY behind API-key auth
+	# (LEMONADE_API_KEY) or a trusted transport (SSH tunnel / WireGuard);
+	# lemond has no built-in TLS.
+	local args="--host ${LEMONADE_HOST}"
+	[ -n "${LEMONADE_PORT}" ] && args="${args} --port ${LEMONADE_PORT}"
+	[ -n "${LEMONADE_EXTRA_OPTS}" ] && args="${args} ${LEMONADE_EXTRA_OPTS}"
+	args="${args} ${LEMONADE_CACHE}"
+	command_args="${args}"
+	command_user="${LEMONADE_USER}:${LEMONADE_USER}"
+}

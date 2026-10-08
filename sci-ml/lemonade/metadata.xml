@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+    <maintainer type="person" proxied="yes">
+        <email>web@inode64.com</email>
+        <name>Fco. Javier Félix</name>
+    </maintainer>
+    <longdescription lang="en">
+        Lemonade is a local AI server that exposes optimized LLMs through OpenAI, Anthropic and Ollama
+        compatible APIs, running inference on AMD NPU and GPU. The C++ server core (lemond, lemonade)
+        is packaged; the bundled web frontend is available behind USE=webui and the Tauri desktop
+        wrapper behind USE=tauri. Pairs with sci-ml/fastflowlm to drive the AMD Ryzen AI XDNA2 NPU.
+    </longdescription>
+    <use>
+        <flag name="system-fastflowlm">Reuse the system <pkg>sci-ml/fastflowlm</pkg> (/usr/bin/flm) for the NPU backend instead of letting lemond download the flm runtime at first NPU use</flag>
+        <flag name="system-llamacpp">Reuse the system <pkg>sci-misc/llama-cpp</pkg> (/usr/bin/llama-server) for the llama.cpp backend instead of fetching an upstream prebuilt binary at runtime</flag>
+        <flag name="system-rocm">Point lemond's ROCm runtime at the system ROCm in /usr (ROCM_PATH) so its ROCm backends reuse it instead of downloading AMD's TheRock runtime; pulls <pkg>dev-util/hip</pkg></flag>
+        <flag name="tauri">Build the Tauri desktop app (lemonade-app), a native webkit2gtk window for the same UI as USE=webui. Fetches Rust crates over the network at build time</flag>
+        <flag name="webui">Build the bundled React web frontend served by lemond at the server root; runs npm over the network at build time</flag>
+    </use>
+    <upstream>
+        <remote-id type="github">lemonade-sdk/lemonade</remote-id>
+        <bugs-to>https://github.com/lemonade-sdk/lemonade/issues</bugs-to>
+        <doc>https://lemonade-server.ai/docs/</doc>
+    </upstream>
+</pkgmetadata>

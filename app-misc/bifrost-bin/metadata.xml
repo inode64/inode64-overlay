@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+    <maintainer type="person" proxied="yes">
+        <email>web@inode64.com</email>
+        <name>Fco. Javier Félix</name>
+    </maintainer>
+    <longdescription lang="en">
+        Bifrost is an AI gateway: a single OpenAI/Anthropic compatible endpoint in front of local
+        (lemonade, ollama, vLLM) and cloud LLM providers, with virtual keys per user or team,
+        budgets, rate limits, usage and cost logging, and a web admin UI. This package installs the
+        prebuilt bifrost-http binary published by Maxim.
+    </longdescription>
+    <upstream>
+        <remote-id type="github">maximhq/bifrost</remote-id>
+        <doc>https://docs.getbifrost.ai/</doc>
+    </upstream>
+</pkgmetadata>
