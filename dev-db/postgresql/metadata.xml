@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sysadmin@takeachef.com</email>
+		<name>Administracion agricer</name>
+	</maintainer>
+	<longdescription lang="es">
+		PostgreSQL 8.2 revivido para toolchain moderno. Slot historico que
+		sirve la base de datos heredada de agricer; no es un paquete
+		mantenido por Gentoo.
+	</longdescription>
+	<use>
+		<flag name="pg_legacytimestamp">Usa marcas de tiempo en coma flotante
+		(--disable-integer-datetimes). OBLIGATORIO para leer un cluster 8.2
+		existente creado con esta opcion.</flag>
+		<flag name="server">Instala el servidor, initdb y los scripts de arranque</flag>
+	</use>
+</pkgmetadata>
