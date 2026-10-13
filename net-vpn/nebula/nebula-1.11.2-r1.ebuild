@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module systemd
+inherit go-module linux-info systemd
 
 DESCRIPTION="Nebula connects devices worldwide with a secure, simple, scalable network"
 HOMEPAGE="https://github.com/slackhq/nebula"
@@ -16,6 +16,18 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="+client gencert"
 REQUIRED_USE="|| ( client gencert )"
+
+# Kernel features the nebula daemon relies on at runtime (overlay/tun_linux.go):
+# a TUN device opened through /dev/net/tun with IFF_MULTI_QUEUE, addresses and
+# routes managed over rtnetlink in the main table (no policy routing, no
+# netfilter), and SO_MARK on its UDP socket. An IPv6 overlay additionally
+# needs CONFIG_IPV6.
+CONFIG_CHECK="~TUN"
+ERROR_TUN="CONFIG_TUN is required: nebula creates its overlay interface through /dev/net/tun"
+
+pkg_setup() {
+	linux-info_pkg_setup
+}
 
 src_configure() {
 	export EGO_LDFLAGS="-s -w -X main.Build=${PV}"
