@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit unpacker systemd xdg desktop
+inherit desktop linux-info systemd unpacker xdg
 
 DESCRIPTION="Cloudflare Warp Client"
 HOMEPAGE="https://1.1.1.1"
@@ -53,6 +53,36 @@ QA_PREBUILT="
 	usr/bin/warp-.*
 	usr/libexec/warp/.*
 "
+
+# Kernel features warp-svc relies on at runtime: TUN for the userspace
+# WireGuard/MASQUE tunnel, nftables for the "inet cloudflare-warp" table and
+# policy routing (fwmark rules) for IPv4 and IPv6. Since 2026.8 the IPv6 fwmark
+# rule is installed unconditionally, so IPV6_MULTIPLE_TABLES is mandatory.
+CONFIG_CHECK="
+	~TUN
+	~IP_ADVANCED_ROUTER
+	~IP_MULTIPLE_TABLES
+	~IPV6
+	~IPV6_MULTIPLE_TABLES
+	~NETFILTER
+	~NF_TABLES
+	~NF_TABLES_INET
+	~NF_TABLES_IPV4
+	~NF_TABLES_IPV6
+	~NFT_REJECT
+	~NFT_REJECT_INET
+"
+ERROR_TUN="CONFIG_TUN is required: warp-svc creates the tunnel interface in userspace"
+ERROR_IP_MULTIPLE_TABLES="CONFIG_IP_MULTIPLE_TABLES is required: warp-svc installs IPv4 fwmark rules"
+ERROR_IPV6_MULTIPLE_TABLES="CONFIG_IPV6_MULTIPLE_TABLES is required: since 2026.8 warp-svc installs an IPv6 fwmark rule"
+ERROR_IPV6_MULTIPLE_TABLES+=" and fails with 'IPv6 fwmark rule install: Address family not supported by protocol'"
+ERROR_NF_TABLES="CONFIG_NF_TABLES is required: warp-svc keeps its firewall in the nftables table 'inet cloudflare-warp'"
+ERROR_NF_TABLES_INET="CONFIG_NF_TABLES_INET is required: the warp-svc nftables table is of family inet"
+ERROR_NFT_REJECT_INET="CONFIG_NFT_REJECT_INET is required: warp-svc loads nft_reject_inet for its firewall rules"
+
+pkg_setup() {
+	linux-info_pkg_setup
+}
 
 src_prepare() {
 	default
