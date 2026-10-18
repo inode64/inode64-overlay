@@ -1,9 +1,20 @@
 /var/log/redmine/*.log {
-	daily
+	su redmine redmine
+	create 0640 redmine redmine
 	missingok
+	notifempty
+	sharedscripts
+	delaycompress
 	rotate 7
 	compress
-	delaycompress
-	notifempty
-	copytruncate
+	weekly
+	postrotate
+		if test -d /run/systemd/system ; then
+			systemctl try-reload-or-restart apache2.service > /dev/null 2>&1 || true
+			systemctl try-restart redmine.service > /dev/null 2>&1 || true
+		else
+			/etc/init.d/apache2 --ifstarted reload > /dev/null 2>&1 || true
+			/etc/init.d/redmine --ifstarted restart > /dev/null 2>&1 || true
+		fi
+	endscript
 }

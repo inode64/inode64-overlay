@@ -158,7 +158,42 @@ all_ruby_install() {
 	doenvd "${T}/50${PN}"
 }
 
+# Redmine has to run as redmine (PassengerUser in Apache, init script in
+# standalone mode). Give back to redmine the paths the application writes:
+# an admin may have handed them to another user (chown -R apache), files
+# merged from ._cfg keep the owner of the new copy, and the rake tasks of
+# pkg_config run as root. A mix makes Redmine fail to start after an
+# upgrade or after logrotate creates a new log.
+redmine_fix_perms() {
+	local d="${EROOT}${REDMINE_DIR}" p
+
+	for p in "${d}" "${d}/config.ru" "${d}/Gemfile.lock"; do
+		[[ -e ${p} ]] && { chown redmine:redmine "${p}" || die; }
+	done
+	for p in config files public/plugin_assets tmp; do
+		[[ -e ${d}/${p} ]] && { chown -R redmine:redmine "${d}/${p}" || die; }
+	done
+	chown -R redmine:redmine "${EROOT}/var/log/${PN}" || die
+
+	# protect sensitive data, see bug #406605; a world writable log dir
+	# also makes logrotate skip it
+	chmod -R go-rwx "${d}/config" "${EROOT}/var/log/${PN}" || die
+}
+
 pkg_postinst() {
+	redmine_fix_perms
+
+	if use passenger && ! grep -qsE '^[[:space:]]*PassengerUser[[:space:]]+redmine' \
+		"${EROOT}"/etc/apache2/{modules,vhosts}.d/*.conf
+	then
+		ewarn "No Apache configuration sets 'PassengerUser redmine'."
+		ewarn "PassengerDefaultUser is only used when config.ru is owned by root,"
+		ewarn "so Passenger runs Redmine as the owner of config.ru. Add to the"
+		ewarn "Redmine vhost (see /etc/apache2/vhosts.d/10_redmine_vhost.conf):"
+		ewarn "    PassengerUser redmine"
+		ewarn "    PassengerGroup redmine"
+	fi
+
 	if [[ -e "${EROOT}${REDMINE_DIR}/config/initializers/session_store.rb" \
 	|| -e "${EROOT}${REDMINE_DIR}/config/initializers/secret_token.rb" ]]
 	then
@@ -246,7 +281,6 @@ pkg_config() {
 		RAILS_ENV="${RAILS_ENV}" ${RUBY} -S rake db:migrate || die
 		einfo "Populating database with default configuration data."
 		RAILS_ENV="${RAILS_ENV}" ${RUBY} -S rake redmine:load_default_data || die
-		chown redmine:redmine -R "${EROOT}/var/log/redmine/" || die
 		einfo
 		einfo "If you use sqlite3, please do not forget to change the ownership"
 		einfo "of the sqlite files."
@@ -255,4 +289,7 @@ pkg_config() {
 		einfo "# chown redmine:redmine db/ db/*.sqlite3"
 		einfo
 	fi
+
+	# the rake tasks above run as root
+	redmine_fix_perms
 }
