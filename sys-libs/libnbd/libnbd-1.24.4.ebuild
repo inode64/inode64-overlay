@@ -47,7 +47,6 @@ BDEPEND="dev-lang/perl"
 PATCHES=(
 	"${FILESDIR}/${PN}-1.24.0-build-Remove-automagic-compiling-of-examples.patch"
 	"${FILESDIR}/${PN}-1.24.0-Makefile.am-Conditionally-compile-some-SUBDIRS.patch"
-	"${FILESDIR}/${PN}-1.24.0-build-define-TLS_PRIORITY-unconditionally.patch"
 )
 
 pkg_setup() {
