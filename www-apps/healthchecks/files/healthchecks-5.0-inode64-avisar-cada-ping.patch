@@ -1,0 +1,202 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Wed, 21 Oct 2026 18:59:32 +0200
+Subject: [PATCH 2/2] INODE64: opción por check «Avisar de cada ping»
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../0125_check_notify_every_ping.py           | 15 +++++++
+ hc/api/models.py                              | 40 +++++++++++++++++++
+ hc/api/views.py                               |  2 +
+ hc/front/forms.py                             |  2 +
+ hc/front/views.py                             |  2 +
+ templates/front/filtering_rules_modal.html    | 16 ++++++++
+ 6 files changed, 77 insertions(+)
+ create mode 100644 hc/api/migrations/0125_check_notify_every_ping.py
+
+diff --git a/hc/api/migrations/0125_check_notify_every_ping.py b/hc/api/migrations/0125_check_notify_every_ping.py
+new file mode 100644
+index 0000000..4563320
+--- /dev/null
++++ b/hc/api/migrations/0125_check_notify_every_ping.py
+@@ -0,0 +1,15 @@
++# INODE64: opción por check «Avisar de cada ping»
++
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++    dependencies = [("api", "0123_alter_channel_kind")]
++
++    operations = [
++        migrations.AddField(
++            model_name="check",
++            name="notify_every_ping",
++            field=models.BooleanField(default=False),
++        ),
++    ]
+diff --git a/hc/api/models.py b/hc/api/models.py
+index a9aac47..1b47517 100644
+--- a/hc/api/models.py
++++ b/hc/api/models.py
+@@ -127,6 +127,7 @@ class CheckDict(TypedDict):
+     last_ping: str | None
+     next_ping: str | None
+     manual_resume: bool
++    notify_every_ping: bool
+     methods: str
+     subject: str
+     subject_fail: str
+@@ -211,6 +212,8 @@ class Check(models.Model):
+     failure_kw = models.CharField(max_length=200, blank=True)
+     methods = models.CharField(max_length=30, blank=True)
+     manual_resume = models.BooleanField(default=False)
++    # INODE64: avisar por todos los canales de cada resultado, aunque no cambie el estado
++    notify_every_ping = models.BooleanField(default=False)
+     badge_key = models.UUIDField(default=uuid.uuid4, unique=True)
+ 
+     n_pings = models.IntegerField(default=0)
+@@ -450,6 +453,7 @@ class Check(models.Model):
+             "last_ping": isostring(self.last_ping),
+             "next_ping": isostring(self.get_grace_start()),
+             "manual_resume": self.manual_resume,
++            "notify_every_ping": self.notify_every_ping,
+             "methods": self.methods,
+             "subject": self.success_kw if self.filter_subject else "",
+             "subject_fail": self.failure_kw if self.filter_subject else "",
+@@ -514,6 +518,14 @@ class Check(models.Model):
+             if self.status == "paused" and self.manual_resume:
+                 action = "ign"
+ 
++            # INODE64: con «avisar de cada ping», los resultados que no cambian
++            # el estado (no crean Flip) se avisan aparte, ver notify_every_ping_now()
++            # (sendalerts calla en new->up y paused->up: esos los avisa esto)
++            notify_again = self.notify_every_ping and (
++                (action == "success" and self.status != "down")
++                or (action == "fail" and self.status == "down")
++            )
++
+             if action == "start":
+                 self.last_start = frozen_now
+                 self.last_start_rid = rid
+@@ -568,10 +580,38 @@ class Check(models.Model):
+         if ping.object_size:
+             put_object(self.code, ping.n, body)
+ 
++        if notify_again:
++            self.notify_every_ping_now(frozen_now, action)
++
+         # Every 100 received pings, prune old pings and notifications:
+         if self.n_pings % 100 == 0:
+             self.prune()
+ 
++    def notify_every_ping_now(self, when: datetime, action: str) -> None:
++        """INODE64: avisar de un resultado que no cambia el estado del check.
++
++        Solo con notify_every_ping. Las caídas y recuperaciones crean un Flip
++        y las envía sendalerts; esto cubre «success» con el check en «up»,
++        «new» o «paused» (sendalerts no avisa de new->up ni paused->up) y
++        «fail» con el check ya en «down». Un fallo al enviar nunca debe hacer
++        fallar el ping.
++        """
++
++        try:
++            for ch in self.channel_set.filter(disabled=False):
++                # Flip sin guardar, como en las notificaciones de prueba
++                flip = Flip(owner=self)
++                flip.created = when
++                flip.old_status = self.status
++                flip.new_status = self.status
++                if action == "fail":
++                    flip.reason = "fail"
++                ch.notify(flip)
++        except Exception:
++            import logging
++
++            logging.getLogger("hc").exception("Exception in notify_every_ping_now")
++
+     def prune(self, wait: bool = False) -> None:
+         """Remove old pings and notifications."""
+ 
+diff --git a/hc/api/views.py b/hc/api/views.py
+index 6d33187..5d9d549 100644
+--- a/hc/api/views.py
++++ b/hc/api/views.py
+@@ -68,6 +68,7 @@ class Spec(BaseModel):
+     filter_default_fail: bool | None = None
+     grace: td | None = Field(None, ge=60, le=31536000)
+     manual_resume: bool | None = None
++    notify_every_ping: bool | None = None  # INODE64
+     methods: Literal["", "POST"] | None = None
+     name: str | None = Field(None, max_length=100)
+     schedule: str | None = Field(None, max_length=100)
+@@ -379,6 +380,7 @@ def _update(check: Check, spec: Spec, v: int) -> None:
+         "tags",
+         "desc",
+         "manual_resume",
++        "notify_every_ping",  # INODE64
+         "methods",
+         "tz",
+         "start_kw",
+diff --git a/hc/front/forms.py b/hc/front/forms.py
+index 9df5632..2c38f41 100644
+--- a/hc/front/forms.py
++++ b/hc/front/forms.py
+@@ -86,6 +86,8 @@ class FilteringRulesForm(forms.Form):
+     failure_kw = forms.CharField(required=False, max_length=200)
+     methods = forms.ChoiceField(required=False, choices=(("", "Any"), ("POST", "POST")))
+     manual_resume = forms.BooleanField(required=False)
++    # INODE64: avisar de cada ping
++    notify_every_ping = forms.BooleanField(required=False)
+ 
+ 
+ class TimeoutForm(forms.Form):
+diff --git a/hc/front/views.py b/hc/front/views.py
+index f777ba0..347a073 100644
+--- a/hc/front/views.py
++++ b/hc/front/views.py
+@@ -595,6 +595,7 @@ def filtering_rules(request: AuthenticatedHttpRequest, code: UUID) -> HttpRespon
+             "failure_kw",
+             "methods",
+             "manual_resume",
++            "notify_every_ping",  # INODE64
+         )
+         for field in update_fields:
+             setattr(check, field, form.cleaned_data[field])
+@@ -1107,6 +1108,7 @@ def copy(request: AuthenticatedHttpRequest, code: UUID) -> HttpResponse:
+ 
+     copied.methods = check.methods
+     copied.manual_resume = check.manual_resume
++    copied.notify_every_ping = check.notify_every_ping  # INODE64
+ 
+     copied.kind = check.kind
+     copied.timeout, copied.grace = check.timeout, check.grace
+diff --git a/templates/front/filtering_rules_modal.html b/templates/front/filtering_rules_modal.html
+index bafd651..4b87e15 100644
+--- a/templates/front/filtering_rules_modal.html
++++ b/templates/front/filtering_rules_modal.html
+@@ -154,6 +154,22 @@
+                 </div>
+                 <hr>
+ 
++                <div class="modal-body">
++                    <h2>Avisar de cada ping</h2>
++                    {# INODE64: aviso por cada resultado recibido #}
++                    <label class="checkbox-container">
++                        <input
++                            type="checkbox"
++                            name="notify_every_ping"
++                            value="1"
++                            {% if check.notify_every_ping %}checked{% endif %}>
++                        <span class="checkmark"></span>
++                        Avisar por todos los canales del check en cada resultado
++                        recibido (correcto o fallo), aunque no cambie de estado
++                    </label>
++                </div>
++                <hr>
++
+                 <div class="modal-body">
+                     <h2>Pinging a Paused Check</h2>
+                     <p>When a paused check receives a ping:</p>

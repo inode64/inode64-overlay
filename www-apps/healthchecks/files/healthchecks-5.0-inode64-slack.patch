@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Wed, 21 Oct 2026 18:59:32 +0200
+Subject: [PATCH] INODE64: avisos de Slack en español (mismos textos que el correo)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ hc/integrations/slack/transport.py | 61 ++++++++++++------------------
+ 1 file changed, 25 insertions(+), 36 deletions(-)
+
+diff --git a/hc/integrations/slack/transport.py b/hc/integrations/slack/transport.py
+index ffa7082..ba0683d 100644
+--- a/hc/integrations/slack/transport.py
++++ b/hc/integrations/slack/transport.py
+@@ -30,58 +30,47 @@ class Slackalike(HttpTransport):
+ 
+     def payload(self, flip: Flip) -> JSONDict:
+         """Prepare JSON-serializable payload for Slack-compatible incoming webhook."""
++        # INODE64: textos en español, los mismos que el correo.
++        # Ver hc/front/templatetags/inode64_es.py
++        from hc.front.templatetags.inode64_es import datos_aviso
++
+         check = flip.owner
+-        name = check.name_then_code()
++        ping = self.last_ping(flip)
++        a = datos_aviso(flip, ping, get_ping_body(ping), lineas=15)
+         fields = SlackFields()
+-        text = None
+-        if flip.reason:
+-            text = f"Reason: {flip.reason_long()}." if flip.reason else None
+-        elif flip.new_status == "up" and flip.down_duration:
+-            formatted_duration = format_duration_for_sentence(flip.down_duration)
+-            text = f"The downtime lasted {formatted_duration}."
++        texto = a["frase"]
++        if a["nota"]:
++            texto += " " + a["nota"]
+ 
+         result: JSONDict = {
+             "username": settings.SITE_NAME,
+             "icon_url": absolute_site_logo_url(),
+             "attachments": [
+                 {
+-                    "color": "good" if flip.new_status == "up" else "danger",
+-                    "fallback": f'The check "{name}" is {flip.new_status.upper()}.',
++                    "color": "good" if a["correcto"] else "danger",
++                    "fallback": a["asunto"],
+                     "mrkdwn_in": ["fields"],
+-                    "title": f"“{name}” is {flip.new_status.upper()}.",
++                    "title": a["asunto"],
+                     "title_link": check.cloaked_url(),
+-                    "text": text,
++                    "text": texto,
+                     "fields": fields,
+                 }
+             ],
+         }
+ 
+         if check.desc:
+-            fields.add("Description", check.desc, short=False)
+-
+-        if check.project.name:
+-            fields.add("Project", check.project.name)
+-
+-        if tags := check.tags_list():
+-            fields.add("Tags", " ".join(f"`{tag}`" for tag in tags))
+-
+-        if check.kind == "simple":
+-            fields.add("Period", format_duration(check.timeout))
+-
+-        if check.kind in ("cron", "oncalendar"):
+-            fields.add("Schedule", self.fix_asterisks(check.schedule))
+-            fields.add("Time Zone", check.tz)
+-
+-        if ping := self.last_ping(flip):
+-            fields.add("Total Pings", str(ping.n))
+-            fields.add("Last Ping", ping.formatted_kind_created())
+-        else:
+-            fields.add("Total Pings", "0")
+-            fields.add("Last Ping", "Never")
+-
+-        body = get_ping_body(ping, maxlen=1000)
+-        if body and "```" not in body:
+-            fields.add("Last Ping Body", f"```\n{body}\n```", short=False)
++            fields.add("Descripción", check.desc, short=False)
++
++        for etiqueta, valor in a["campos"]:
++            if etiqueta == "Etiquetas":
++                valor = " ".join(f"`{tag}`" for tag in check.tags_list())
++            elif etiqueta == "Programación":
++                valor = self.fix_asterisks(valor)
++            fields.add(etiqueta, valor, short=len(valor) <= 40)
++
++        registro = a["registro"][-1500:]
++        if registro and "```" not in registro:
++            fields.add("Final del registro", f"```\n{registro}\n```", short=False)
+ 
+         return result
+ 

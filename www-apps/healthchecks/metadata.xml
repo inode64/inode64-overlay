@@ -13,6 +13,10 @@
 		<flag name="apprise">Allow backup monitoring to send notification to a wide variety
 			of services, using <pkg>dev-python/apprise</pkg></flag>
 		<flag name="apache">Install Apache required applications</flag>
+		<flag name="inode64">Apply INODE64 local changes: email and Slack alerts in Spanish
+			(status, exit code, origin, duration, schedule and end of the log) and a
+			per-check «notify every ping» option (adds the api migration
+			0125_check_notify_every_ping)</flag>
 		<flag name="nginx">Install Nginx required applications</flag>
 	</use>
 	<upstream>

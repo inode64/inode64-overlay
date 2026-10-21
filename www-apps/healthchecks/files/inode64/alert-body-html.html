@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load inode64_es hc_extras %}{% aviso flip ping body as a %}
+<div style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333;">
+
+<p style="margin: 0 0 12px 0; padding: 10px 14px; border-radius: 4px; color: #ffffff; font-size: 16px; background-color: {% if a.correcto %}#22bc66{% else %}#d9534f{% endif %};">
+    <b>{{ a.estado }}</b> &middot; {{ a.frase }}
+</p>
+
+<table style="border-collapse: collapse;">
+    {% for etiqueta, valor in a.campos %}
+    <tr>
+        <td style="padding: 3px 16px 3px 0; vertical-align: top; white-space: nowrap; color: #777777;">{{ etiqueta }}</td>
+        <td style="padding: 3px 0; vertical-align: top;">{{ valor }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% if a.nota %}
+<p><b>{{ a.nota }}</b></p>
+{% endif %}
+
+{% if a.descripcion %}
+<p>
+    <b>Descripción</b><br>
+    {{ a.descripcion|linebreaksbr }}
+</p>
+{% endif %}
+
+{% if a.registro %}
+<p style="margin-bottom: 4px;"><b>Final del registro</b></p>
+<pre style="margin-top: 0; padding: 8px; background-color: #f4f4f4; border: 1px solid #dddddd; border-radius: 3px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;">{{ a.registro }}</pre>
+{% endif %}
+
+<p>
+    <a href="{{ a.enlace }}">Ver el check en {% site_name %}</a>
+</p>
+
+<p style="color: #999999; font-size: 12px;">
+    <a href="{{ unsub_link }}" style="color: #999999;">Dejar de recibir estos avisos</a>
+</p>
+
+</div>

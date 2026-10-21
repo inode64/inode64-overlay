@@ -16,7 +16,7 @@ SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.
 LICENSE="BSD"
 KEYWORDS="~amd64 ~arm64"
 
-IUSE="apache apprise mysql nginx postgres +sqlite"
+IUSE="apache apprise inode64 mysql nginx postgres +sqlite"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	|| ( mysql postgres sqlite )
@@ -61,6 +61,24 @@ pkg_setup() {
 	webapp_pkg_setup
 }
 
+src_prepare() {
+	if use inode64; then
+		PATCHES+=(
+			"${FILESDIR}"/${PN}-5.0-inode64-slack.patch
+			"${FILESDIR}"/${PN}-5.0-inode64-avisar-cada-ping.patch
+		)
+	fi
+
+	default
+
+	if use inode64; then
+		# Email alerts in Spanish; Slack reuses the same texts
+		cp "${FILESDIR}"/inode64/inode64_es.py hc/front/templatetags/ || die
+		cp "${FILESDIR}"/inode64/alert-{subject,body-text,body-html}.html \
+			templates/emails/ || die
+	fi
+}
+
 src_test() {
 	./manage.py test
 }
@@ -99,6 +117,13 @@ src_install() {
 
 pkg_postinst() {
 	webapp_pkg_postinst
+
+	if use inode64; then
+		elog "INODE64: alerts by email and Slack are in Spanish and each check has"
+		elog "the option «Avisar de cada ping» (notify_every_ping). webapp-config runs"
+		elog "'manage.py migrate', which adds api 0125_check_notify_every_ping."
+		elog "Restart Apache and ht-sendalerts to load the new code."
+	fi
 
 	optfeature "send Signal notifications\
 	    https://blog.healthchecks.io/2023/01/how-healthchecks-sends-signal-notifications" \
