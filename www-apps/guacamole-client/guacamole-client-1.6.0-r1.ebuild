@@ -9,7 +9,7 @@ HOMEPAGE="https://guacamole.apache.org/"
 # Download mvn and node_modules:
 # tar -xf guacamole-client-1.6.0.tar.gz (don't use mc!!)
 # cd guacamole-client-1.6.0
-# Require Java 11
+# Any JDK >= 11 can be used
 # LC_ALL=C LANG=en-US.UTF-8 mvn dependency:go-offline -Dmaven.repo.local=.m2 -Drat.ignoreErrors=true package
 
 # Compression process:
@@ -26,8 +26,8 @@ else
 	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/${P}.tar.gz"
 fi
 SRC_URI+="
-	https://www.inode64.com/dist/${PF}-node_modules.tar.xz
-	https://www.inode64.com/dist/${PF}-mvn.tar.xz
+	https://www.inode64.com/dist/${P}-node_modules.tar.xz
+	https://www.inode64.com/dist/${P}-mvn.tar.xz
 	mysql? ( https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.3.0.tar.gz )
 	postgres? ( https://jdbc.postgresql.org/download/postgresql-42.7.3.jar )
 	"
@@ -39,7 +39,7 @@ IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
 BDEPEND="
 	>=dev-java/maven-bin-3.9.6
-	virtual/jre:11
+	>=virtual/jdk-11:*
 	"
 RDEPEND="
 	ldap? ( net-nds/openldap )
@@ -68,21 +68,39 @@ src_unpack() {
 		unpack ${P}.tar.gz
 	fi
 
-	unpack ${PF}-node_modules.tar.xz
-	unpack ${PF}-mvn.tar.xz
+	unpack ${P}-node_modules.tar.xz
+	unpack ${P}-mvn.tar.xz
 
 	if use mysql; then
 		unpack mysql-connector-j-8.3.0.tar.gz
 	fi
 }
 
+src_prepare() {
+	default
+
+	# Upstream turns every javac warning into an error, which breaks the
+	# build with newer JDKs (new lint categories, obsolete -source/-target)
+	sed -i 's|<failOnWarning>true</failOnWarning>|<failOnWarning>false</failOnWarning>|' \
+		pom.xml || die
+	sed -i '/<arg>-Werror<\/arg>/d' doc/guacamole-example/pom.xml || die
+}
+
 src_compile() {
+	local java_major
+	java_major=$(java -version 2>&1 | head -n 1 | cut -d '"' -f 2 | cut -d '.' -f 1)
+	if [[ ${java_major} -lt 11 ]]; then
+		die "Java >= 11 is required, select it with 'eselect java-vm'"
+	fi
+
 	export LC_ALL=C
 	export LANG=en-US.UTF-8
 
 	local myconf=(
 		-Dmaven.repo.local="${S}/.m2"
 		-Drat.ignoreErrors=true
+		-Dmaven.compiler.release=11
+		-Dmaven.javadoc.skip=true
 		-P lgpl-extensions
 	)
 
