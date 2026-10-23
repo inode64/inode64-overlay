@@ -84,6 +84,7 @@ src_install() {
 
 	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
 	newinitd "${FILESDIR}/${PN}.initd" ${PN}
+	newconfd "${FILESDIR}/${PN}.confd" ${PN}
 	systemd_dounit "${FILESDIR}/${PN}.service"
 }
 

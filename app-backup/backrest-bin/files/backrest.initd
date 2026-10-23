@@ -1,9 +1,19 @@
 #!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
 
 name="backrest"
 description="backrest Daemon"
+
+# See /etc/conf.d/backrest.
+: "${BACKREST_BIND_HOST:=127.0.0.1}"
+: "${BACKREST_BIND_PORT:=9898}"
+: "${BACKREST_BIND_INTERFACE:=}"
+: "${BACKREST_BIND_FAMILY:=4}"
+: "${BACKREST_BIND_TIMEOUT:=30}"
+: "${BACKREST_RESTIC_CACHE_DIR:=}"
+
 command="/usr/bin/backrest"
-command_args="-restic-cmd /usr/sbin/restic -data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json"
 command_background=true
 pidfile="/run/backrest.pid"
 supervisor=supervise-daemon
@@ -12,5 +22,60 @@ output_log="/var/log/backrest/backrest.log"
 error_log="/var/log/backrest/backrest.log"
 
 depend() {
-    need net
+	need net
+	# Only orders the start when netifrc manages the interface; the address
+	# itself is waited for in start_pre().
+	if [ -n "${BACKREST_BIND_INTERFACE}" ]; then
+		after "net.${BACKREST_BIND_INTERFACE}"
+	fi
+}
+
+# First usable global address of family BACKREST_BIND_FAMILY on interface $1.
+_interface_address() {
+	ip -o "-${BACKREST_BIND_FAMILY}" addr show dev "$1" scope global 2>/dev/null |
+		awk '!/ (tentative|deprecated|dadfailed|temporary) / { sub("/.*", "", $4); print $4; exit }'
+}
+
+start_pre() {
+	local host="${BACKREST_BIND_HOST}"
+
+	if [ -n "${BACKREST_BIND_INTERFACE}" ]; then
+		case "${BACKREST_BIND_FAMILY}" in
+			4|6) ;;
+			*)
+				eerror "BACKREST_BIND_FAMILY must be 4 or 6, not '${BACKREST_BIND_FAMILY}'"
+				return 1
+				;;
+		esac
+		if ! command -v ip >/dev/null 2>&1; then
+			eerror "ip(8) is needed to find the address of ${BACKREST_BIND_INTERFACE}"
+			return 1
+		fi
+
+		local timeout="${BACKREST_BIND_TIMEOUT}"
+		host="$(_interface_address "${BACKREST_BIND_INTERFACE}")"
+		while [ -z "${host}" ] && [ "${timeout}" -gt 0 ]; do
+			sleep 1
+			timeout=$((timeout - 1))
+			host="$(_interface_address "${BACKREST_BIND_INTERFACE}")"
+		done
+		if [ -z "${host}" ]; then
+			eerror "No IPv${BACKREST_BIND_FAMILY} address on ${BACKREST_BIND_INTERFACE}"
+			return 1
+		fi
+		einfo "Listening on ${BACKREST_BIND_INTERFACE} (${host})"
+	fi
+
+	# An IPv6 literal needs brackets in front of the port.
+	case "${host}" in
+		\[*\]) ;;
+		*:*) host="[${host}]" ;;
+	esac
+
+	if [ -n "${BACKREST_RESTIC_CACHE_DIR}" ]; then
+		checkpath -d -m 0700 "${BACKREST_RESTIC_CACHE_DIR}" || return 1
+		export RESTIC_CACHE_DIR="${BACKREST_RESTIC_CACHE_DIR}"
+	fi
+
+	command_args="-restic-cmd /usr/bin/restic -data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json -bind-address ${host}:${BACKREST_BIND_PORT}"
 }

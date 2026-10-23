@@ -1,0 +1,29 @@
+# /etc/conf.d/backrest
+
+# Address the web UI listens on. 127.0.0.1 (the default) only accepts local
+# connections; 0.0.0.0 or :: listens on every interface. Backrest has no TLS
+# of its own, so expose it only behind a trusted network or a reverse proxy.
+# Ignored when BACKREST_BIND_INTERFACE is set.
+#BACKREST_BIND_HOST="127.0.0.1"
+
+# Listen only on the address of this network interface, e.g. "eth0" or
+# "wg0", instead of BACKREST_BIND_HOST. The address is looked up with ip(8)
+# each time the service starts, so restart backrest if it changes.
+#BACKREST_BIND_INTERFACE=""
+
+# Address family taken from BACKREST_BIND_INTERFACE: 4 (IPv4) or 6 (IPv6).
+# Only global addresses are used; temporary IPv6 privacy addresses are skipped.
+#BACKREST_BIND_FAMILY="4"
+
+# Seconds to wait for BACKREST_BIND_INTERFACE to get an address (DHCP, VPN)
+# before giving up.
+#BACKREST_BIND_TIMEOUT="30"
+
+# Port the web UI listens on.
+#BACKREST_BIND_PORT="9898"
+
+# Directory for the restic cache, exported to restic as RESTIC_CACHE_DIR.
+# Leave empty to keep restic's default (~/.cache/restic of the user running
+# the service). The systemd unit uses /var/lib/backrest/restic. A --cache-dir
+# flag set on a repository in backrest still takes precedence.
+#BACKREST_RESTIC_CACHE_DIR=""

@@ -25,6 +25,7 @@ src_install() {
 
 	newtmpfiles "${FILESDIR}/backrest.tmpfiles.conf" ${PN}.conf
 	newinitd "${FILESDIR}/backrest.initd" backrest
+	newconfd "${FILESDIR}/backrest.confd" backrest
 	systemd_dounit "${FILESDIR}/backrest.service"
 }
 
