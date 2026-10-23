@@ -22,4 +22,7 @@
 	<upstream>
 		<remote-id type="github">ROCm/rocm-systems</remote-id>
 	</upstream>
+	<use>
+		<flag name="profile">Register with <pkg>dev-util/rocprofiler-register</pkg> so ROCm profiling and tracing tools can attach</flag>
+	</use>
 </pkgmetadata>
