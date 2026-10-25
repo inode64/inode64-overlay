@@ -19,6 +19,7 @@ if [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
     [ "$cp" == "dev-util/locust" ] || \
     [ "$cp" == "dev-util/openchamber" ] || \
+    [ "$cp" == "dev-util/rulesync" ] || \
     [ "$cp" == "sys-process/pm2" ] || \
     [ "$cp" == "www-apps/guacamole-client" ] ; then
 	file="${ebuild}-${new_version}-node_modules.tar.xz"
