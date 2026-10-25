@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		Rulesync manages shared rules, commands, skills, subagents and MCP
+		configuration for AI coding tools. It imports existing configuration
+		and generates tool-specific files from a common source tree.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/dyoshikawa/rulesync/issues</bugs-to>
+		<doc>https://rulesync.dyoshikawa.com/</doc>
+		<remote-id type="github">dyoshikawa/rulesync</remote-id>
+	</upstream>
+</pkgmetadata>
