@@ -349,6 +349,8 @@ nodejs_remove_dev() {
 
     # Remove tooling, build and foreign platform directories. None of these
     # names is ever part of a package's own code, so they can go at any depth.
+    # Vitest keeps transformed modules in node_modules/.vitest-cache and
+    # reports and attachments in .vitest; neither belongs in the installed tree.
     # shellcheck disable=SC2185
     find -type d \
     \( \
@@ -358,6 +360,8 @@ nodejs_remove_dev() {
         -iwholename '*/.nyc_output' -o \
         -iwholename '*/.storybook' -o \
         -iwholename '*/.tscache' -o \
+        -iwholename '*/.vitest' -o \
+        -iwholename '*/.vitest-cache' -o \
         -iwholename '*/.vscode' -o \
         -iwholename '*/android-arm' -o \
         -iwholename '*/android-arm64' -o \
