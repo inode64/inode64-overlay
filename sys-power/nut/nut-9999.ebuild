@@ -40,10 +40,10 @@ DEPEND="
 	dev-libs/libltdl
 	virtual/udev
 	cgi? ( >=media-libs/gd-2[png] )
-	gpio? ( dev-libs/libgpiod )
+	gpio? ( dev-libs/libgpiod:= )
 	i2c? ( sys-apps/i2c-tools )
 	ipmi? ( sys-libs/freeipmi )
-	modbus? ( dev-libs/libmodbus )
+	modbus? ( dev-libs/libmodbus:= )
 	python? ( ${PYTHON_DEPS} )
 	snmp? ( net-analyzer/net-snmp:= )
 	ssl? ( >=dev-libs/openssl-1:= )
