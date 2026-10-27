@@ -243,6 +243,11 @@ src_install() {
 	local -a old_rpath
 	while IFS= read -r -d '' i; do
 		[[ $(od -An -tx1 -N4 "${i}") == *"7f 45 4c 46"* ]] || continue
+		# CEF's chrome-sandbox only links libc. An older patchelf run by the
+		# vendor moved its .note.ABI-tag but left PT_NOTE at the old offset, so
+		# patchelf aborts: "cannot normalize PT_NOTE segment: non-contiguous
+		# SHT_NOTE sections".
+		[[ ${i##*/} != chrome-sandbox ]] || continue
 		rpath='$ORIGIN'
 		IFS=: read -r -a old_rpath <<< "$(patchelf --print-rpath "${i}")"
 		for entry in "${old_rpath[@]}"; do
