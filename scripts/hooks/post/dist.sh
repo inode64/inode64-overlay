@@ -31,6 +31,7 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/wal-g" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
+    [ "$cp" == "app-metrics/mcp-grafana" ] || \
     [ "$cp" == "dev-php/composer" ] || \
     [ "$cp" == "media-video/go2rtc" ] || \
     [ "$cp" == "sys-process/runitor" ] || \
@@ -38,6 +39,11 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "net-vpn/nebula-mesh" ] || \
     [ "$cp" == "net-vpn/nebula" ] ; then
 	file="${ebuild}-${new_version}-vendor.tar.xz"
+	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
+fi
+
+if [ "$cp" == "www-apps/guacamole-client" ]; then
+	file="${ebuild}-${new_version}-mvn.tar.xz"
 	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
 fi
 
