@@ -1,0 +1,18 @@
+[Unit]
+Description=Grafana MCP server
+Documentation=https://github.com/grafana/mcp-grafana
+Wants=network-online.target
+After=network-online.target grafana.service
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=/etc/conf.d/mcp-grafana
+# The token stays root-only on disk; systemd hands a copy to the dynamic user.
+LoadCredential=grafana-token:/etc/mcp-grafana/token
+Environment=GRAFANA_SERVICE_ACCOUNT_TOKEN_FILE=%d/grafana-token
+ExecStart=/usr/bin/mcp-grafana $MCP_GRAFANA_OPTS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

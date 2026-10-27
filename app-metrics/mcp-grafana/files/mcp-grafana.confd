@@ -1,0 +1,21 @@
+# Environment for the mcp-grafana systemd service.
+
+# Grafana instance to talk to.
+GRAFANA_URL="http://localhost:3000"
+
+# The Grafana service account token is read from /etc/mcp-grafana/token
+# through LoadCredential. Do not set GRAFANA_SERVICE_ACCOUNT_TOKEN here:
+# it would take precedence over the file.
+
+# Bearer token that MCP clients must send. Needed as soon as --address is not
+# a loopback address.
+#MCP_GRAFANA_SERVER_TOKEN=""
+
+# Do not report anonymous usage statistics to Grafana Labs.
+GRAFANA_USAGE_STATS="disabled"
+
+# Reject broad Loki log queries instead of letting them scan everything.
+#GRAFANA_LOKI_GUARDRAIL_MODE="enforce"
+
+# --disable-write also drops the raw SQL tools (query_sql, query_influxdb).
+MCP_GRAFANA_OPTS="--transport streamable-http --address 127.0.0.1:8000 --disable-write"
