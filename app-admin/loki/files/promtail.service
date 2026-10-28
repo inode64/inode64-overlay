@@ -11,7 +11,6 @@ Restart=on-failure
 EnvironmentFile=/etc/conf.d/promtail
 Environment=PROMTAIL_CONF=/etc/loki/promtail-local-config.yaml
 ExecStart=/usr/bin/promtail -config.file=${PROMTAIL_CONF} ${PROMTAIL_OPTS}
-PIDFile=/var/run/promtail.pid
 
 [Install]
 WantedBy=multi-user.target

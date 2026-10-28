@@ -11,7 +11,6 @@ Restart=on-failure
 EnvironmentFile=/etc/conf.d/loki
 Environment=LOKI_CONF=/etc/loki/loki-local-config.yaml
 ExecStart=/usr/bin/loki -config.file=${LOKI_CONF} ${LOKI_OPTS}
-PIDFile=/run/loki.pid
 
 [Install]
 WantedBy=multi-user.target
