@@ -104,8 +104,16 @@ pkg_postinst() {
 }
 
 pkg_config() {
-	einfo "Installing cronjobs ..."
-	crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/dist/librenms.cron || die
+	# Only on the first setup: on every update it would wipe local changes to
+	# the crontab, such as a healthchecks wrapper around daily.sh. Test the
+	# output, not the exit code: fcrontab -l returns 0 for a user without one.
+	if [[ -n $(crontab -u librenms -l 2>/dev/null) ]]; then
+		ewarn "librenms already has a crontab, leaving it untouched."
+		ewarn "Compare it with ${EROOT}${LIBRENMS_HOME}/dist/librenms.cron"
+	else
+		einfo "Installing cronjobs ..."
+		crontab -u librenms "${EROOT}"/${LIBRENMS_HOME}/dist/librenms.cron || die
+	fi
 
 	einfo "Installing composer deps ..."
 	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev --ansi
