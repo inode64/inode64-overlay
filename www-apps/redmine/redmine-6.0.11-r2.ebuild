@@ -15,7 +15,11 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="fastcgi imagemagick ldap +minimagick mysql passenger pdf postgres +standalone sqlite"
 
-ruby_add_bdepend "
+# Bundler resolves the Gemfile each time Redmine starts and in pkg_config,
+# so the gems must stay installed: as build-only dependencies a
+# depclean --with-bdeps=n removes them.
+# commonmarker 2.x shares the slot but renamed the module Redmine 6.0 uses.
+ruby_add_rdepend "
 	fastcgi? ( dev-ruby/fcgi )
 	ldap? ( >=dev-ruby/ruby-net-ldap-0.17.0 )
 	minimagick? ( >=dev-ruby/mini_magick-5.0.1 )
@@ -26,9 +30,11 @@ ruby_add_bdepend "
 	passenger? ( www-apache/passenger )
 	postgres? ( >=dev-ruby/pg-1.5.3:1 )
 	sqlite? ( >=dev-ruby/sqlite3-1.7.0 )
+	standalone? ( www-servers/puma )
 	dev-ruby/actionpack-xml_parser:2
 	dev-ruby/addressable
 	>=dev-ruby/commonmarker-0.23.8
+	<dev-ruby/commonmarker-1
 	>=dev-ruby/csv-3.2.8:3
 	>=dev-ruby/deckar01-task_list-2.3.2
 	>=dev-ruby/html-pipeline-2.13.2
@@ -36,28 +42,23 @@ ruby_add_bdepend "
 	>=dev-ruby/mail-2.8.1
 	dev-ruby/marcel
 	>=dev-ruby/mini_mime-1.1.0
-	>=dev-ruby/net-imap-0.4.8
+	>=dev-ruby/net-imap-0.4.20
 	>=dev-ruby/net-pop-0.1.2
 	>=dev-ruby/net-smtp-0.4.0
-	>=dev-ruby/nokogiri-1.18.3
+	>=dev-ruby/nokogiri-1.19.1
 	>=dev-ruby/propshaft-1.1.0:1
 	>=dev-ruby/rack-3.1.3:3.1
 	>=dev-ruby/rails-7.2.2.1:7.2
 	>=dev-ruby/rbpdf-1.21.4
-	>=dev-ruby/redcarpet-3.6.0
-	>=dev-ruby/request_store-1.5.0:0
-	dev-ruby/rexml
 	>=dev-ruby/roadie-rails-3.2.0:3
 	>=dev-ruby/rotp-5.0.0
 	>=dev-ruby/rouge-4.5.0
 	dev-ruby/rqrcode
 	>=dev-ruby/rubyzip-2.3.0:2
 	>=dev-ruby/sanitize-6.0:6
-	dev-ruby/with_advisory_lock
-	~dev-ruby/rb_sys-0.9.117
 "
 
-RDEPEND="
+RDEPEND+="
 	dev-ruby/rack:3.1
 	acct-group/redmine
 	acct-user/redmine
@@ -66,7 +67,6 @@ RDEPEND="
 		app-text/ghostscript-gpl
 		media-gfx/imagemagick
 	)
-	standalone? ( www-servers/puma )
 "
 
 REDMINE_DIR="/var/lib/${PN}"
@@ -93,10 +93,11 @@ all_ruby_prepare() {
 
 	sed -i -e "s/'deckar01-task_list',.*/'deckar01-task_list', '~>2.3.2'/" Gemfile || die
 
+	sed -i -e "/group :development, :test do/,/^end$/d" Gemfile || die
 	sed -i -e "/group :development do/,/^end$/d" Gemfile || die
 	sed -i -e "/group :test do/,/^end$/d" Gemfile || die
 
-	if ! use imagemagick ; then
+	if ! use minimagick ; then
 		sed -i -e "/group :minimagick do/,/^end$/d" Gemfile || die
 	fi
 	if ! use ldap ; then

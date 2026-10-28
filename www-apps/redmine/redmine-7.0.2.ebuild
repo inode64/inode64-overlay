@@ -15,7 +15,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="fastcgi imagemagick ldap +minimagick mysql passenger pdf postgres +standalone sqlite"
 
-ruby_add_bdepend "
+# Bundler resolves the Gemfile each time Redmine starts and in pkg_config,
+# so the gems must stay installed: as build-only dependencies a
+# depclean --with-bdeps=n removes them.
+# rb_sys is a runtime dependency in the commonmarker 2.x gemspec, but only
+# a build dependency of its ebuild.
+ruby_add_rdepend "
 	fastcgi? ( dev-ruby/fcgi )
 	ldap? ( >=dev-ruby/ruby-net-ldap-0.20.0 )
 	minimagick? ( >=dev-ruby/mini_magick-5.2.0:5 )
@@ -26,6 +31,7 @@ ruby_add_bdepend "
 	passenger? ( www-apache/passenger )
 	postgres? ( >=dev-ruby/pg-1.6.2:1 )
 	sqlite? ( >=dev-ruby/sqlite3-2.9.4:2 )
+	standalone? ( www-servers/puma )
 	>=dev-ruby/actionpack-xml_parser-2.0.1-r5:2
 	dev-ruby/addressable
 	dev-ruby/bcrypt-ruby
@@ -58,7 +64,7 @@ ruby_add_bdepend "
 	~dev-ruby/rb_sys-0.9.117
 "
 
-RDEPEND="
+RDEPEND+="
 	acct-group/redmine
 	acct-user/redmine
 	imagemagick? ( media-gfx/imagemagick )
@@ -66,7 +72,6 @@ RDEPEND="
 		app-text/ghostscript-gpl
 		media-gfx/imagemagick
 	)
-	standalone? ( www-servers/puma )
 "
 
 REDMINE_DIR="/var/lib/${PN}"
