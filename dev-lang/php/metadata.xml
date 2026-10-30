@@ -6,8 +6,15 @@
     <name>PHP</name>
   </maintainer>
   <use>
+    <flag name="apparmor">
+      Support FPM application confinement through
+      <pkg>sys-libs/libapparmor</pkg>
+    </flag>
     <flag name="argon2">Enable password hashing algorithm from <pkg>app-crypt/argon2</pkg></flag>
     <flag name="bcmath">Add support for libbcmath</flag>
+    <flag name="capstone">
+      Support opcache JIT disassembly through <pkg>dev-libs/capstone</pkg>
+    </flag>
     <flag name="cli">Enable CLI SAPI</flag>
     <flag name="ctype">Enable ctype functions</flag>
     <flag name="embed">Enable embed SAPI </flag>
@@ -20,17 +27,34 @@
     <flag name="gd">Adds support for gd (bundled with PHP)</flag>
     <flag name="hash">Enable the hash extension</flag>
     <flag name="inifile">Add dbm support for .ini files</flag>
+    <flag name="ipv6">
+      Support IPv6 connectivity in fopen and friends, and v6 address
+      conversions in functions like inet_pton and inet_ntop.
+    </flag>
+    <flag name="jit">Enable PCRE JIT support</flag>
     <flag name="json">Enable JSON support</flag>
     <flag name="ldap-sasl">Add SASL support for the PHP LDAP extension</flag>
     <flag name="lmdb">Enable support for <pkg>dev-db/lmdb</pkg> db backend</flag>
     <flag name="intl">
       Enables the intl extension for extended internalization support
     </flag>
+    <flag name="lto">
+      Build with link-time optimization; with GCC the VM files that use
+      global register variables are kept out of LTO
+    </flag>
     <flag name="opcache">
       Enables built-in opcode cache, replacing pecl-apc et al.
     </flag>
+    <flag name="opcache-jit">
+      Enable Just In Time (JIT) compilation within the opcache extension
+    </flag>
     <flag name="pcntl">Add support for process creation functions</flag>
     <flag name="pdo">Enable the bundled PDO extensions</flag>
+    <flag name="pgo">
+      Optimize with profile-guided optimization trained on the test suite
+      (GCC only, ignored with Clang); the VM executor (zend_execute.c) is
+      left out of the profile and built at -O2, which is faster for it
+    </flag>
     <flag name="phar">
       Enables the phar extension to provide phar archive support
     </flag>
@@ -49,6 +73,7 @@
     <flag name="sysvipc">
       Support for System V-compatible inter-process communication
     </flag>
+    <flag name="test-full">Run slower tests</flag>
     <flag name="tokenizer">Add support for the PHP file parser</flag>
     <flag name="tokyocabinet">
       Enable support for <pkg>dev-db/tokyocabinet</pkg> db backend</flag>
@@ -59,4 +84,7 @@
     <flag name="wddx">Add support for Web Distributed Data eXchange</flag>
     <flag name="webp">Enable webp support for GD in php-7.x</flag>
   </use>
+  <upstream>
+    <remote-id type="github">php/php-src</remote-id>
+  </upstream>
 </pkgmetadata>
