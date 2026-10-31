@@ -51,6 +51,7 @@ DEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
+	"${FILESDIR}/${PN}-use-atomic.patch"
 )
 
 src_compile() {
