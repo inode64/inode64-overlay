@@ -32,12 +32,14 @@ IUSE="test"
 RESTRICT="
 	!test? ( test )
 "
-BDEPEND="test? ( app-backup/restic )"
+BDEPEND="
+	>=dev-lang/go-1.26
+	test? ( app-backup/restic )
+"
 RDEPEND="
 	app-backup/restic
 	!app-backup/backrest-bin
 "
-DEPEND=">=dev-lang/go-1.26"
 
 src_prepare() {
 	# The webui build is the only part that still wanted the network:

@@ -36,8 +36,8 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	sys-libs/libseccomp
-	test? ( dev-tcltk/expect )
 "
+BDEPEND="test? ( dev-tcltk/expect )"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-0.9.70-envlimits.patch"

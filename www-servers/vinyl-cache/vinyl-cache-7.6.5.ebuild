@@ -38,8 +38,8 @@ RDEPEND="
 	sys-devel/gcc
 	selinux? ( sec-policy/selinux-varnishd )
 "
-DEPEND="
-	${CDEPEND}
+DEPEND="${CDEPEND}"
+BDEPEND="
 	dev-python/docutils
 	dev-python/sphinx
 	virtual/pkgconfig

@@ -24,8 +24,8 @@ RDEPEND="
 	acct-user/rabbitmq
 	>=dev-lang/erlang-26.0[ssl] <dev-lang/erlang-26.3
 "
-DEPEND="
-	${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
 	app-arch/zip
 	app-arch/unzip
 	app-text/docbook-xml-dtd:4.5

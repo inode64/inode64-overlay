@@ -57,18 +57,20 @@ DEPEND="
 	virtual/acl
 	test? (
 		>=dev-util/cmocka-1.0.1
-		app-benchmarks/dbench
 		dev-libs/xxhash
-		dev-vcs/git
-		dev-libs/yajl
-		sys-fs/xfsprogs
-		sys-apps/attr
 	)
 "
 BDEPEND="
 	sys-devel/bison
 	sys-devel/flex
 	virtual/pkgconfig
+	test? (
+		app-benchmarks/dbench
+		dev-libs/yajl
+		dev-vcs/git
+		sys-apps/attr
+		sys-fs/xfsprogs
+	)
 "
 
 DOCS=( AUTHORS ChangeLog NEWS README.md THANKS )

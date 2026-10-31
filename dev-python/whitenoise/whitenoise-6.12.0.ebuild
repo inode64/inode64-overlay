@@ -16,12 +16,10 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND="
-	dev-python/django[${PYTHON_USEDEP}]
-"
 BDEPEND="
 	test? (
 		app-arch/brotli[python,${PYTHON_USEDEP}]
+		dev-python/django[${PYTHON_USEDEP}]
 	)
 "
 

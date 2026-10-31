@@ -46,11 +46,11 @@ RDEPEND="acct-group/mongodb
 		>=dev-libs/openssl-1.0.1g:0=
 	)"
 DEPEND="${RDEPEND}
-	${PYTHON_DEPS}
 	sys-libs/ncurses:0=
 	sys-libs/readline:0=
 	debug? ( dev-debug/valgrind )"
 BDEPEND="
+	${PYTHON_DEPS}
 	$(python_gen_any_dep '
 		>=dev-build/scons-3.1.1[${PYTHON_USEDEP}]
 		dev-python/cheetah3[${PYTHON_USEDEP}]

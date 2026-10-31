@@ -29,9 +29,7 @@ RESTRICT="network-sandbox"
 # links mbedtls; only slot 0 matches the probe, otherwise a static copy is fetched.
 RDEPEND="
 	>=app-arch/zstd-1.5.5:=
-	>=dev-cpp/cli11-2.4.2
 	>=dev-cpp/cpp-httplib-0.26.0
-	>=dev-cpp/nlohmann_json-3.11.3
 	>=net-libs/libwebsockets-4.3.3
 	>=net-misc/curl-8.5.0
 	net-libs/mbedtls:0=
@@ -52,7 +50,11 @@ RDEPEND="
 		x11-libs/gtk+:3
 	)
 "
-DEPEND="${RDEPEND}"
+DEPEND="
+	${RDEPEND}
+	>=dev-cpp/cli11-2.4.2
+	>=dev-cpp/nlohmann_json-3.11.3
+"
 BDEPEND="
 	${PYTHON_DEPS}
 	>=dev-build/cmake-3.12

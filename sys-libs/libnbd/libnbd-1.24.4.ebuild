@@ -30,19 +30,20 @@ RDEPEND="
 			dev-libs/libev )
 	fuse? ( sys-fs/fuse:3 )
 	gnutls? ( net-libs/gnutls:= )
-	go? ( dev-lang/go )
 	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
 	python? ( ${PYTHON_DEPS} )
 "
-DEPEND="
-	${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
+	dev-lang/perl
+	go? ( dev-lang/go )
 	ocaml? ( dev-ml/findlib )
-	test? (	sys-block/nbdkit[gnutls?]
-		net-libs/gnutls:=[tools]
+	test? (
+		net-libs/gnutls[tools]
+		sys-block/nbdkit[gnutls?]
 		ocaml? ( dev-ml/findlib[ocamlopt] )
-)
+	)
 "
-BDEPEND="dev-lang/perl"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-1.24.0-build-Remove-automagic-compiling-of-examples.patch"

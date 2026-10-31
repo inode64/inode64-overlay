@@ -87,19 +87,19 @@ COMMON_DEPEND="
 		cxx? ( dev-libs/cyrus-sasl:= )
 	)
 "
-DEPEND="${COMMON_DEPEND}
-	sys-apps/groff
-"
+DEPEND="${COMMON_DEPEND}"
 RDEPEND="${COMMON_DEPEND}
 	selinux? ( sec-policy/selinux-ldap )
 "
 
 # The user/group are only used for running daemons which are
 # disabled in minimal builds, so elide the accounts too.
-BDEPEND="!minimal? (
+BDEPEND="
+	sys-apps/groff
+	!minimal? (
 		acct-group/ldap
 		acct-user/ldap
-)
+	)
 "
 
 # for tracking versions

@@ -140,15 +140,14 @@ RDEPEND="${COMMON_DEPEND}
 		systemd? ( sys-apps/systemd ) )
 "
 
+DEPEND="${COMMON_DEPEND}"
+
 # Bison isn't actually needed when building from a release tarball
 # However, the configure script will warn if it's absent or if you
 # have an incompatible version installed. See bug 593278.
-DEPEND="${COMMON_DEPEND}
-	app-arch/xz-utils
-	>=sys-devel/bison-3.0.1
-"
-
 BDEPEND="
+		app-arch/xz-utils
+		>=sys-devel/bison-3.0.1
 		dev-util/re2c
 		virtual/pkgconfig
 "

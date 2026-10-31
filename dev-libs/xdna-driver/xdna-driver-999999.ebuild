@@ -56,7 +56,6 @@ BDEPEND+="
 	compress-xz? ( app-arch/xz-utils )
 	compress-zstd? ( app-arch/zstd )
 "
-DEPEND="${PYTHON_DEPS}"
 
 pkg_setup() {
 	if use compress-xz || use compress-zstd ; then

@@ -27,7 +27,6 @@ DEPEND="
 	>=dev-libs/libev-4.31:=
 	dev-libs/libuv:=
 	>=dev-python/cffi-1.12.3[${PYTHON_USEDEP}]
-	>=dev-python/cython-3.0.8[${PYTHON_USEDEP}]
 	>=dev-python/greenlet-3[${PYTHON_USEDEP}]
 	>=net-dns/c-ares-1.12:=
 "
@@ -37,6 +36,7 @@ RDEPEND="
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 "
 BDEPEND="
+	>=dev-python/cython-3.0.8[${PYTHON_USEDEP}]
 	test? (
 	${RDEPEND}
 	dev-python/dnspython[${PYTHON_USEDEP}]

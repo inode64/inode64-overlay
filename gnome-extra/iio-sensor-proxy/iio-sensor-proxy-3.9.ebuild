@@ -16,7 +16,6 @@ IUSE="systemd"
 
 RDEPEND="
 	dev-libs/glib:*
-	gnome-base/gnome-common
 	>=sys-auth/polkit-0.91
 	>=dev-libs/libgudev-237
 	systemd? (
@@ -26,11 +25,8 @@ RDEPEND="
 	virtual/udev
 "
 
-DEPEND="
-	${RDEPEND}
-	dev-build/gtk-doc-am
-	virtual/pkgconfig
-"
+DEPEND="${RDEPEND}"
+BDEPEND="virtual/pkgconfig"
 
 src_prepare() {
 	if use !systemd ; then

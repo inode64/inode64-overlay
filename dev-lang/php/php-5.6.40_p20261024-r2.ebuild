@@ -159,12 +159,11 @@ RDEPEND="${COMMON_DEPEND}
 		systemd? ( sys-apps/systemd ) )
 "
 
-DEPEND="${COMMON_DEPEND}
-	app-arch/xz-utils
-	>=sys-devel/bison-3.0.1
-"
+DEPEND="${COMMON_DEPEND}"
 
 BDEPEND="
+		app-arch/xz-utils
+		>=sys-devel/bison-3.0.1
 		dev-util/re2c
 		virtual/pkgconfig
 "
