@@ -3,9 +3,9 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..14} )
-inherit desktop linux-info optfeature
-inherit python-single-r1 shell-completion systemd tmpfiles toolchain-funcs udev wrapper xdg
+PYTHON_COMPAT=( python3_{12..15} )
+inherit desktop linux-info optfeature python-single-r1 shell-completion
+inherit systemd tmpfiles toolchain-funcs udev wrapper xdg
 
 MY_P=${P/_/-}
 
@@ -16,7 +16,11 @@ if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/networkupstools/${PN}.git"
 	inherit git-r3
 else
-	SRC_URI="https://networkupstools.org/source/${PV%.*}/${MY_P}.tar.gz"
+	inherit verify-sig
+	SRC_URI="
+		https://networkupstools.org/source/${PV%.*}/${MY_P}.tar.gz
+		verify-sig? ( https://networkupstools.org/source/${PV%.*}/${MY_P}.tar.gz.sig )
+	"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
 fi
 
@@ -24,7 +28,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="gpio cgi doc ipmi serial i2c +man snmp +usb modbus selinux ssl tcpd test xml zeroconf python monitor systemd"
+IUSE="cgi doc gpio i2c ipmi +man modbus monitor python selinux serial snmp ssl systemd test tcpd upower +usb xml zeroconf"
 RESTRICT="!test? ( test )"
 
 REQUIRED_USE="
@@ -39,7 +43,7 @@ DEPEND="
 	acct-user/nut
 	dev-libs/libltdl
 	virtual/udev
-	cgi? ( >=media-libs/gd-2[png] )
+	cgi? ( >=media-libs/gd-2:2=[png] )
 	gpio? ( dev-libs/libgpiod:= )
 	i2c? ( sys-apps/i2c-tools )
 	ipmi? ( sys-libs/freeipmi )
@@ -49,6 +53,10 @@ DEPEND="
 	ssl? ( >=dev-libs/openssl-1:= )
 	systemd? ( >=sys-apps/systemd-253 )
 	tcpd? ( sys-apps/tcp-wrappers )
+	upower? (
+		dev-libs/glib:2
+		sys-power/upower
+	)
 	usb? ( virtual/libusb:1 )
 	xml? ( >=net-libs/neon-0.25.0:= )
 	zeroconf? ( net-dns/avahi )
@@ -56,6 +64,10 @@ DEPEND="
 BDEPEND="
 	virtual/pkgconfig
 	man? ( app-text/asciidoc )
+	monitor? ( $(python_gen_cond_dep '
+			dev-python/pyqt6[gui,widgets,${PYTHON_USEDEP}]
+		')
+	)
 	test? ( dev-util/cppunit )
 "
 RDEPEND="
@@ -67,10 +79,14 @@ RDEPEND="
 	selinux? ( sec-policy/selinux-nut )
 "
 
-PATCHES=(
-	"${FILESDIR}/${PN}-2.6.2-lowspeed-buffer-size.patch"
-)
-PATCH_NEEDS_AUTOGEN=1
+BDEPEND+="
+	dev-build/autoconf
+	dev-build/automake
+	dev-build/libtool
+	dev-lang/perl
+"
+
+PATCHES=()
 
 pkg_pretend() {
 	if use i2c; then
@@ -100,6 +116,9 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# configure.ac would otherwise run "systemd-analyze verify", which touches
+	# /run/systemd/systemd-units-load and dies in the sandbox on a host booted
+	# with systemd, whatever the value of USE=systemd.
 	if use systemd; then
 		PATCHES+=( "${FILESDIR}/systemd_notify_285.patch" )
 	else
@@ -108,9 +127,12 @@ src_prepare() {
 
 	default
 
-	if [[ ${PV} == *9999 ]] || [[ ${PATCH_NEEDS_AUTOGEN} == 1 ]] ; then
-		./autogen.sh || die
-	fi
+	# po files not installed so symlinks would be orphans.
+	# Even so symlinks would be only useful for gtk2 and qt5 as per upstream.
+	sed -e '/^install-data-hook-app-locale-symlinks:/,/^$/ { /UTF8_POFILE/d }' \
+		-i scripts/python/Makefile.am || die
+
+	./autogen.sh || die
 
 	xdg_environment_reset
 }
@@ -119,22 +141,25 @@ src_configure() {
 	local myeconfargs=(
 		--datadir=/usr/share/nut
 		--datarootdir=/usr/share/nut
+		--disable-spellcheck # bug #974679
 		--disable-static
 		--disable-strip
 		--disable-Werror
+		--enable-docs-changelog=no
 		--sysconfdir=/etc/nut
 		--with-dev
 		--with-drvpath="/$(get_libdir)/nut"
 		--with-group=nut
 		--with-htmlpath=/usr/share/nut/html
+		--with-libltdl
 		--with-logfacility=LOG_DAEMON
 		--with-statepath=/run/nut
-		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
+		# systemdsystemunitdir implies "basic" systemd support, bug #977380
+		--with-systemdsystemunitdir="$(usex systemd $(systemd_get_systemunitdir) no)"
 		--with-systemdtmpfilesdir="/usr/lib/tmpfiles.d"
 		--with-udev-dir="$(get_udevdir)"
 		--with-user=nut
 		--without-powerman
-		--without-python
 		--without-python2
 		--with-altpidpath=/run/nut
 		--with-pidpath=/run/nut
@@ -143,14 +168,16 @@ src_configure() {
 		$(use_with i2c linux_i2c)
 		$(use_with ipmi freeipmi)
 		$(use_with ipmi)
+		$(use_with modbus)
 		$(use_with monitor nut_monitor)
 		$(use_with python pynut)
 		$(use_with serial)
 		$(use_with snmp)
-		$(use_with ssl)
+		$(use_with ssl ssl openssl)
 		$(use_with systemd libsystemd)
 		$(use_with tcpd wrap)
 		$(use_with usb)
+		$(use_with upower)
 		$(use_with xml neon)
 		$(use_with zeroconf avahi)
 	)
@@ -190,6 +217,13 @@ src_install() {
 		mv "${i}" "${i/.sample/}" || die
 	done
 
+	# These hold passwords and the daemons read them as the nut user.
+	fowners root:nut /etc/nut/{nutauth.conf,ups.conf,upsd.conf,upsd.users,upsmon.conf}
+	fperms 0640 /etc/nut/{nutauth.conf,ups.conf,upsd.conf,upsd.users,upsmon.conf}
+
+	# Upstream ties it to its systemd support, but it applies to any init system.
+	use systemd || dotmpfiles scripts/systemd/nut-common-tmpfiles.conf
+
 	local DOCS=( AUTHORS MAINTAINERS NEWS.adoc README.adoc TODO.adoc UPGRADING.adoc )
 	einstalldocs
 
@@ -215,10 +249,10 @@ src_install() {
 	fi
 
 	if use monitor; then
-		make_wrapper NUT-Monitor-py3qt5 /usr/share/nut/nut-monitor/app/NUT-Monitor-py3qt5 /usr/share/nut/nut-monitor/app
+		make_wrapper NUT-Monitor-py3qt6 /usr/share/nut/nut-monitor/app/NUT-Monitor-py3qt6 /usr/share/nut/nut-monitor/app
 
 		# Install desktop shortcut
-		newmenu scripts/python/app/nut-monitor-py3qt5.desktop nut-monitor.desktop
+		newmenu scripts/python/app/nut-monitor-py3qt6.desktop nut-monitor.desktop
 
 		# Installing Application icons
 		local res

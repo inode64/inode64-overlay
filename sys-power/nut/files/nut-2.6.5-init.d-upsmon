@@ -13,6 +13,8 @@ depend() {
 
 start_pre() {
 	checkpath -q -d -m 0700 -o nut:nut /run/nut
+	# upsmon runs upssched, whose default PIPEFN and LOCKFN live here
+	checkpath -q -d -m 0770 -o nut:nut /run/nut/upssched
 }
 
 start() {
