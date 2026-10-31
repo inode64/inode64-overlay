@@ -20,7 +20,6 @@ LICENSE="BSD-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-RDEPEND="dev-python/fields[${PYTHON_USEDEP}]"
 BDEPEND="test? ( dev-python/process-tests[${PYTHON_USEDEP}]
 		dev-python/tornado[${PYTHON_USEDEP}] )"
 

@@ -23,6 +23,7 @@ RESTRICT="test" # fails
 RDEPEND="brotli? ( app-arch/brotli:= )
 	lzo? ( dev-libs/lzo:2 )
 	sodium? ( dev-libs/libsodium:= )"
+BDEPEND=">=dev-lang/go-1.25.11"
 
 src_configure() {
 	export GOEXPERIMENT=jsonv2

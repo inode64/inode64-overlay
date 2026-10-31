@@ -27,7 +27,7 @@ DEPEND="
 RDEPEND="${DEPEND}
 	amqp? ( dev-php/pecl-amqp )
 	app-admin/sudo
-	>=dev-lang/php-8.1:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,xml,zip]
+	>=dev-lang/php-8.2:*[bcmath,cli,curl,fpm,gd,mysqli,ldap?,pdo,session,simplexml,snmp,sockets,unicode,xml,zip,zlib]
 	dev-php/pecl-imagick
 	dev-php/pecl-memcache
 	ipmi? ( sys-apps/ipmitool )

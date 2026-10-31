@@ -15,4 +15,5 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-RDEPEND="<dev-python/sqlparse-0.6.0[${PYTHON_USEDEP}]"
+RDEPEND=">=dev-python/sqlglot-30.12.0[${PYTHON_USEDEP}]
+	<dev-python/sqlglot-31[${PYTHON_USEDEP}]"

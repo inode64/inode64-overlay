@@ -17,7 +17,7 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-group/node-red
 	acct-user/node-red
-	net-libs/nodejs[npm]
+	>=net-libs/nodejs-22.9[npm]
 "
 
 NODEJS_EXTRA_FILES="packages"

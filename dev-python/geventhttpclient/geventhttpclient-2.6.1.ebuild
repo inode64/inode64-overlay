@@ -20,14 +20,15 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND="
-	app-arch/brotli[python]
-	dev-python/certifi
-	dev-python/gevent
-	dev-python/urllib3
-	net-libs/llhttp
+DEPEND="net-libs/llhttp:="
+RDEPEND="
+	${DEPEND}
+	app-arch/brotli[python,${PYTHON_USEDEP}]
+	dev-python/certifi[${PYTHON_USEDEP}]
+	>=dev-python/gevent-25.9[${PYTHON_USEDEP}]
+	dev-python/urllib3[${PYTHON_USEDEP}]
 "
 
 PATCHES=(
-	"${FILESDIR}"/update_llhttp.patch
+	"${FILESDIR}"/${P}-system-llhttp.patch
 )

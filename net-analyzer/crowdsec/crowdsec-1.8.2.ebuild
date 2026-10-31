@@ -33,7 +33,7 @@ RDEPEND="
 	!net-analyzer/crowdsec-bin
 "
 BDEPEND="
-	>=dev-lang/go-1.26.1
+	>=dev-lang/go-1.27.1
 	virtual/pkgconfig
 "
 

@@ -22,7 +22,7 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-group/openchamber
 	acct-user/openchamber
-	net-libs/nodejs:=[npm]
+	>=net-libs/nodejs-24.14.0:=[npm]
 "
 
 # The prebuilt sherpa-onnx addon needs its RUNPATH fixed, see src_prepare().

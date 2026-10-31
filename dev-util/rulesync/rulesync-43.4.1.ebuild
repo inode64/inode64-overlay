@@ -17,7 +17,7 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	dev-vcs/git
-	>=net-libs/nodejs-22.13.0
+	>=net-libs/nodejs-22.22.0
 "
 BDEPEND=">=net-libs/nodejs-24.11.0[npm]"
 

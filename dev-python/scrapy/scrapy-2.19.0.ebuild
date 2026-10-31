@@ -14,7 +14,7 @@ LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64"
 
-# itemloaders supplies itemadapter and parsel (including cssselect and packaging).
+# itemloaders supplies itemadapter and parsel (including cssselect).
 # pyopenssl supplies cryptography; twisted[http2] supplies h2 and priority.
 RDEPEND="
 	>=app-arch/brotli-1.2.0[python,${PYTHON_USEDEP}]
@@ -23,6 +23,7 @@ RDEPEND="
 	>=dev-python/defusedxml-0.7.1[${PYTHON_USEDEP}]
 	>=dev-python/itemloaders-1.0.1[${PYTHON_USEDEP}]
 	>=dev-python/lxml-4.6.4[${PYTHON_USEDEP}]
+	dev-python/packaging[${PYTHON_USEDEP}]
 	>=dev-python/platformdirs-2.0.0[${PYTHON_USEDEP}]
 	>=dev-python/protego-0.1.15[${PYTHON_USEDEP}]
 	>=dev-python/pydispatcher-2.0.5[${PYTHON_USEDEP}]

@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
 RDEPEND="app-backup/restic"
-BDEPEND=">=dev-lang/go-1.25.0"
+BDEPEND=">=dev-lang/go-1.26.2"
 
 src_compile() {
 	ego build -trimpath -ldflags "-s -w" || die

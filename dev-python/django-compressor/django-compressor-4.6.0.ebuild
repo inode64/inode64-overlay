@@ -16,10 +16,10 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
+	>=dev-python/django-4.2[${PYTHON_USEDEP}]
 	dev-python/django-appconf[${PYTHON_USEDEP}]
 	dev-python/rcssmin[${PYTHON_USEDEP}]
 	dev-python/rjsmin[${PYTHON_USEDEP}]
-	dev-python/six[${PYTHON_USEDEP}]
 "
 
 python_test() {

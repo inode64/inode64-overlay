@@ -22,7 +22,6 @@ RDEPEND="
 	dev-python/cssselect[${PYTHON_USEDEP}]
 	dev-python/jmespath[${PYTHON_USEDEP}]
 	dev-python/lxml[${PYTHON_USEDEP}]
-	dev-python/packaging[${PYTHON_USEDEP}]
 	dev-python/w3lib[${PYTHON_USEDEP}]
 "
 BDEPEND="

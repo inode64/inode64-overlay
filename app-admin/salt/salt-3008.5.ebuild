@@ -25,7 +25,7 @@ SLOT="0"
 IUSE="
 	cheetah ldap libcloud libvirt genshi keyring mako
 	mongodb nova portage profile redis selinux test test-full
-	raet +zeromq vim-syntax
+	+zeromq vim-syntax
 "
 
 RDEPEND="
@@ -37,13 +37,11 @@ RDEPEND="
 	>=dev-python/cryptography-42.0.2[${PYTHON_USEDEP}]
 	>=dev-python/distro-1.8.0[${PYTHON_USEDEP}]
 	>=dev-python/frozenlist-1.5.0[${PYTHON_USEDEP}]
-	>=dev-python/immutables-0.21[${PYTHON_USEDEP}]
 	>=dev-python/importlib-metadata-8.7.0[${PYTHON_USEDEP}]
 	>=dev-python/jaraco-functools-4.1.0[${PYTHON_USEDEP}]
 	>=dev-python/jaraco-text-4.0.0[${PYTHON_USEDEP}]
 	>=dev-python/jinja2-3.1.5[${PYTHON_USEDEP}]
 	>=dev-python/jmespath-1.0.1[${PYTHON_USEDEP}]
-	>=dev-python/libnacl-1.7.1[${PYTHON_USEDEP}]
 	>=dev-python/looseversion-1.3.0[${PYTHON_USEDEP}]
 	>=dev-python/markupsafe-2.1.3[${PYTHON_USEDEP}]
 	>=dev-python/msgpack-1.0.7[${PYTHON_USEDEP}]
@@ -51,7 +49,7 @@ RDEPEND="
 	>=dev-python/psutil-5.9.6[${PYTHON_USEDEP}]
 	>=dev-python/pycryptodome-3.19.1[${PYTHON_USEDEP}]
 	>=dev-python/pyopenssl-24.0.0[${PYTHON_USEDEP}]
-	>=dev-python/python-dateutil-2.8.2[${PYTHON_USEDEP}]
+	>=dev-python/python-dateutil-2.9.0_p0[${PYTHON_USEDEP}]
 	>=dev-python/python-gnupg-0.5.2[${PYTHON_USEDEP}]
 	>=dev-python/pyyaml-6.0.1[${PYTHON_USEDEP}]
 	>=dev-python/requests-2.32.5[${PYTHON_USEDEP}]
@@ -71,10 +69,6 @@ RDEPEND="
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
 	libvirt? (
 		dev-python/libvirt-python[${PYTHON_USEDEP}]
-	)
-	raet? (
-		>=dev-python/ioflo-1.1.7[${PYTHON_USEDEP}]
-		>=dev-python/raet-0.6.0[${PYTHON_USEDEP}]
 	)
 	cheetah? ( >=dev-python/cheetah3-3.2.6[${PYTHON_USEDEP}] )
 	genshi? ( >=dev-python/genshi-0.7.7[${PYTHON_USEDEP}] )
@@ -127,7 +121,7 @@ BDEPEND="
 DOCS=( README.rst AUTHORS )
 
 REQUIRED_USE="
-	|| ( raet zeromq )
+	zeromq
 	test? ( cheetah genshi )
 "
 RESTRICT="

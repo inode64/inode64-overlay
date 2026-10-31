@@ -20,6 +20,7 @@ RDEPEND="
 	acct-user/go2rtc
 	media-video/ffmpeg[x264,x265,opus]
 "
+BDEPEND=">=dev-lang/go-1.26.0"
 
 DOCS=(README.md)
 

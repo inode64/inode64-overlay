@@ -13,7 +13,7 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="test"
-BDEPEND+=" >=dev-lang/go-1.27.1"
+BDEPEND+=" >=dev-lang/go-1.27.3"
 
 RESTRICT="!test? ( test )"
 

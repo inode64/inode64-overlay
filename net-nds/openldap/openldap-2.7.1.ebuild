@@ -6,7 +6,7 @@ EAPI=7
 # Re cleanups:
 # 2.5.x is an LTS release so we want to keep it for a while.
 
-inherit autotools db-use flag-o-matic multilib multilib-minimal preserve-libs ssl-cert toolchain-funcs systemd tmpfiles
+inherit autotools flag-o-matic multilib multilib-minimal preserve-libs ssl-cert toolchain-funcs systemd tmpfiles
 
 BIS_PN=rfc2307bis.schema
 BIS_PV=20140524
@@ -27,26 +27,16 @@ SLOT="0"
 KEYWORDS="amd64 x86"
 
 IUSE_DAEMON="crypt samba tcpd experimental minimal"
-IUSE_BACKEND="+berkdb"
 IUSE_OVERLAY="overlays perl"
 IUSE_OPTIONAL="gnutls iodbc sasl ssl odbc debug ipv6 +syslog selinux static-libs test"
 IUSE_CONTRIB="smbkrb5passwd kerberos kinit pbkdf2 sha2"
 IUSE_CONTRIB="${IUSE_CONTRIB} cxx"
-IUSE="${IUSE_DAEMON} ${IUSE_BACKEND} ${IUSE_OVERLAY} ${IUSE_OPTIONAL} ${IUSE_CONTRIB}"
+IUSE="${IUSE_DAEMON} ${IUSE_OVERLAY} ${IUSE_OPTIONAL} ${IUSE_CONTRIB}"
 REQUIRED_USE="cxx? ( sasl )
 	pbkdf2? ( ssl )
-	test? ( berkdb )
 	?? ( test minimal )
 	kerberos? ( ?? ( kinit smbkrb5passwd ) )"
 RESTRICT="!test? ( test )"
-
-# always list newer first
-# Do not add any AGPL-3 BDB here!
-# See bug 525110, comment 15.
-# Advanced usage: OPENLDAP_BDB_SLOTS in the environment can be used to force a slot during build.
-BDB_SLOTS="${OPENLDAP_BDB_SLOTS:=5.3 4.8}"
-BDB_PKGS=''
-for _slot in $BDB_SLOTS; do BDB_PKGS="${BDB_PKGS} sys-libs/db:${_slot}" ; done
 
 # openssl is needed to generate lanman-passwords required by samba
 COMMON_DEPEND="
@@ -72,10 +62,6 @@ COMMON_DEPEND="
 		samba? (
 			dev-libs/openssl:0=
 		)
-		berkdb? (
-			<sys-libs/db-6.0:=
-			|| ( ${BDB_PKGS} )
-			)
 		smbkrb5passwd? (
 			dev-libs/openssl:0=
 			kerberos? ( app-crypt/heimdal )
@@ -268,43 +254,20 @@ openldap_find_versiontags() {
 	done
 	[[ "${have_files}" == "1" ]] && einfo "DB files present" || einfo "No DB files present"
 
-	# Now we must check for the major version of sys-libs/db linked against.
+	# The bdb and hdb backends are gone, so a slapd still linked against
+	# sys-libs/db holds data the new one cannot read.
 	SLAPD_PATH="${EROOT}/usr/$(get_libdir)/openldap/slapd"
 	if [[ "${have_files}" == "1" ]] && [[ -f "${SLAPD_PATH}" ]]; then
 		OLDVER="$(/usr/bin/ldd ${SLAPD_PATH} \
 			| awk '/libdb-/{gsub("^libdb-","",$1);gsub(".so$","",$1);print $1}')"
-		if use berkdb; then
-			# find which one would be used
-			for bdb_slot in ${BDB_SLOTS} ; do
-				NEWVER="$(db_findver "=sys-libs/db-${bdb_slot}*")"
-				[[ -n "${NEWVER}" ]] && break
-			done
-		fi
-		local fail=0
-		if [[ -z "${OLDVER}" ]] && [[ -z "${NEWVER}" ]]; then
-			:
-			# Nothing wrong here.
-		elif [[ -z "${OLDVER}" ]] && [[ -n "${NEWVER}" ]]; then
-			eerror "	Your existing version of OpenLDAP was not built against"
-			eerror "	any version of sys-libs/db, but the new one will build"
-			eerror "	against	${NEWVER} and your database may be inaccessible."
-			echo
-			fail=1
-		elif [[ -n "${OLDVER}" ]] && [[ -z "${NEWVER}" ]]; then
+		if [[ -n "${OLDVER}" ]]; then
 			eerror "	Your existing version of OpenLDAP was built against"
 			eerror "	sys-libs/db:${OLDVER}, but the new one will not be"
 			eerror "	built against any version and your database may be"
 			eerror "	inaccessible."
 			echo
-			fail=1
-		elif [[ "${OLDVER}" != "${NEWVER}" ]]; then
-			eerror "	Your existing version of OpenLDAP was built against"
-			eerror "	sys-libs/db:${OLDVER}, but the new one will build against"
-			eerror "	${NEWVER} and your database would be inaccessible."
-			echo
-			fail=1
+			openldap_upgrade_howto
 		fi
-		[[ "${fail}" == "1" ]] && openldap_upgrade_howto
 	fi
 
 	echo
@@ -460,16 +423,6 @@ multilib_src_configure() {
 
 		# backends
 		myconf+=( --enable-slapd )
-		if use berkdb ; then
-			einfo "Using Berkeley DB for local backend"
-			myconf+=( --enable-bdb --enable-hdb )
-			DBINCLUDE=$(db_includedir ${BDB_SLOTS})
-			einfo "Using ${DBINCLUDE} for sys-libs/db version"
-			# We need to include the slotted db.h dir for FreeBSD
-			append-cppflags -I${DBINCLUDE}
-		else
-			myconf+=( --disable-bdb --disable-hdb )
-		fi
 		for backend in dnssrv ldap mdb meta monitor null passwd relay shell sock; do
 			myconf+=( --enable-${backend}=mod )
 		done
@@ -512,8 +465,6 @@ multilib_src_configure() {
 		myconf+=(
 			--disable-backends
 			--disable-slapd
-			--disable-bdb
-			--disable-hdb
 			--disable-mdb
 			--disable-overlays
 			--disable-syslog

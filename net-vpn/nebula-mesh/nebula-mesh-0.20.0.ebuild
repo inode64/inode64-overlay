@@ -31,6 +31,7 @@ RDEPEND="
 	)
 	agent? ( net-vpn/nebula )
 "
+BDEPEND=">=dev-lang/go-1.27.3"
 
 src_prepare() {
 	default

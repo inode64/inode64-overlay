@@ -15,7 +15,4 @@ LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-RDEPEND="dev-python/aspectlib[${PYTHON_USEDEP}]
-	dev-python/six[${PYTHON_USEDEP}]"
-
 distutils_enable_tests pytest

@@ -23,6 +23,7 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	>=dev-python/annotated-doc-0.0.4[${PYTHON_USEDEP}]
+	>=dev-python/opentelemetry-api-1.44.0[${PYTHON_USEDEP}]
 	>=dev-python/starlette-0.46.0[${PYTHON_USEDEP}]
 	>=dev-python/pydantic-2.9.0[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.8.0[${PYTHON_USEDEP}]

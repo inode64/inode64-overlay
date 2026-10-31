@@ -17,6 +17,8 @@ KEYWORDS="~amd64 ~x86"
 IUSE="+client gencert"
 REQUIRED_USE="|| ( client gencert )"
 
+BDEPEND=">=dev-lang/go-1.27.3"
+
 # Kernel features the nebula daemon relies on at runtime (overlay/tun_linux.go):
 # a TUN device opened through /dev/net/tun with IFF_MULTI_QUEUE, addresses and
 # routes managed over rtnetlink in the main table (no policy routing, no
