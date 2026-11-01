@@ -1,0 +1,16 @@
+# Fix SyntaxWarning with Python 3.12.
+# Closes: #1085615
+
+diff --git a/geo-replication/syncdaemon/resource.py b/geo-replication/syncdaemon/resource.py
+index 480c2ea..29cba6f 100644
+--- a/geo-replication/syncdaemon/resource.py
++++ b/geo-replication/syncdaemon/resource.py
+@@ -804,7 +804,7 @@ class Server(object):
+             val = struct.pack(cls.FRGN_FMTSTR,
+                               *(dct['version'] +
+                                 tuple(int(x, 16)
+-                                      for x in re.findall('(?:[\da-f]){2}',
++                                      for x in re.findall(r'(?:[\da-f]){2}',
+                                                           dct['uuid'])) +
+                                 (dct['retval'],) + dct['volume_mark'][0:2] + (
+                                     dct['timeout'],)))

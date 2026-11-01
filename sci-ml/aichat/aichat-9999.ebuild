@@ -23,6 +23,8 @@ SLOT="0"
 PROPERTIES="live"
 
 # reqwest is built with rustls, so no OpenSSL dependency.
+RDEPEND="dev-libs/oniguruma:="
+DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
 QA_FLAGS_IGNORED="usr/bin/aichat"
@@ -30,6 +32,13 @@ QA_FLAGS_IGNORED="usr/bin/aichat"
 src_unpack() {
 	git-r3_src_unpack
 	cargo_live_src_unpack
+}
+
+src_configure() {
+	# Link the system library instead of the copy bundled in onig_sys. Exported
+	# for all phases: cargo_src_install rebuilds and would pick the bundled copy.
+	export RUSTONIG_SYSTEM_LIBONIG=1
+	cargo_src_configure
 }
 
 src_install() {

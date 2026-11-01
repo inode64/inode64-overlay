@@ -16,8 +16,3 @@ depend() {
 	need net
 	after firewall
 }
-
-status() {
-	ebegin "Showing Cloundflared tunnel status"
-	/usr/bin/cloudflared tunnel info
-}

@@ -23,10 +23,6 @@ RDEPEND="
 	>=dev-python/anyio-4.4.0[${PYTHON_USEDEP}]
 	>=dev-python/keyring-25.6.0[${PYTHON_USEDEP}]
 "
-BDEPEND="
-	>=dev-python/uv-build-0.11.4[${PYTHON_USEDEP}]
-	<dev-python/uv-build-0.12[${PYTHON_USEDEP}]
-"
 
 # Tests require optional backends and development dependencies.
 RESTRICT="test"

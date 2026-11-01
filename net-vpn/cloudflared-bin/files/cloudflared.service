@@ -12,8 +12,9 @@ Restart=on-failure
 RestartSec=5s
 TimeoutStartSec=0
 
-# Allow cloudflared access to logfile
-ReadWritePaths=/var/log/cloudflared/tunnel.log
+# Allow cloudflared access to logfile. The directory is listed because the
+# file does not exist on first start and a missing path aborts the namespace.
+ReadWritePaths=/var/log/cloudflared
 
 # Allow cloudflared to bind ports in the range of 0-1024 and restrict it to
 # that capability

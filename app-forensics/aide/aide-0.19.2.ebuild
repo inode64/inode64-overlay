@@ -70,13 +70,13 @@ src_configure() {
 		--disable-static
 
 		--with-zlib
-		--without-gcrypt
 		$(use_with curl)
 		$(use_with acl posix-acl)
 		$(use_with selinux)
 		$(use_with xattr)
 		$(use_with e2fs e2fsattrs)
 		$(use_with nettle nettle)
+		$(use_with !nettle gcrypt)
 		$(use_with audit)
 	)
 

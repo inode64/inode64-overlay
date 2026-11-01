@@ -3,6 +3,7 @@
 
 EAPI=8
 
+RPM_COMPRESS_TYPE="zstd"
 inherit readme.gentoo-r1 rpm secureboot
 
 MY_PR="${PR:1}"

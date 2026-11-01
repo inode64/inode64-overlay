@@ -16,7 +16,6 @@ EGIT_REPO_URI="https://github.com/lemonade-sdk/lemonade.git"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64"
 IUSE="+system-fastflowlm +system-llamacpp +system-rocm tauri webui"
 
 # Missing cpp-httplib pkg-config metadata or optional dependencies make
@@ -184,7 +183,7 @@ pkg_postinst() {
 	elog ""
 	ewarn "Privacy: at startup lemond sends a UDP presence broadcast on LAN"
 	ewarn "interfaces, even with the loopback bind. Disable it by setting"
-	ewarn "broadcast to false in ~/.cache/lemonade/config.json."
+	ewarn "broadcast to false in ~/.config/lemonade/config.json."
 	elog ""
 	elog "Models are stored in the shared store ${LEMONADE_MODELS_DIR}"
 	elog "(models_dir in every new config.json), owned by the lemonade user."
@@ -233,7 +232,7 @@ pkg_postinst() {
 	fi
 	if use system-fastflowlm; then
 		elog "system-fastflowlm: the shipped defaults pin flm.npu_bin=/usr/bin/flm."
-		elog "An existing ~/.cache/lemonade/config.json is not touched; set it with:"
+		elog "An existing ~/.config/lemonade/config.json is not touched; set it with:"
 		elog "  lemonade config set flm.npu_bin=/usr/bin/flm"
 		elog "Confirm 'flm validate' passes before lemonade drives the NPU."
 	else

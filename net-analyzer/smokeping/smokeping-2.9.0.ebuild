@@ -33,6 +33,7 @@ DEPEND="
 	dev-perl/Net-OpenSSH
 	dev-perl/Net-SNMP
 	dev-perl/Net-Telnet
+	dev-perl/Path-Tiny
 	dev-perl/libwww-perl
 	dev-perl/perl-ldap
 	virtual/perl-libnet
@@ -49,10 +50,9 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
-src_prepare() {
-	eapply "${FILESDIR}/${PN}-2.7.3-curl-help.patch"
-	eapply_user
+PATCHES=( "${FILESDIR}/${P}-ssh-probe-no-dsa.patch" )
 
+src_prepare() {
 	default
 
 	sed -i -e '/^SUBDIRS = / s|thirdparty||g' Makefile.am || die

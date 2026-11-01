@@ -17,3 +17,10 @@ HOMEPAGE="
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
+
+EPYTEST_PLUGINS=()
+EPYTEST_DESELECT=(
+	# Connects to public TLS endpoints
+	tests/test_ctx.py::test_ctx_use_system_store
+)
+distutils_enable_tests pytest

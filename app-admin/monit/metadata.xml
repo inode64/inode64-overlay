@@ -6,6 +6,6 @@
 		<name>Patrick Lauer</name>
 	</maintainer>
 	<upstream>
-		<remote-id type="bitbucket">tildeslash/monit</remote-id>
+		<remote-id type="github">MMonit/monit</remote-id>
 	</upstream>
 </pkgmetadata>

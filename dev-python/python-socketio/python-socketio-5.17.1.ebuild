@@ -18,8 +18,6 @@ HOMEPAGE="
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="test"
-RESTRICT="!test? ( test )"
 
 RDEPEND="
 	>=dev-python/aiohttp-3.4[${PYTHON_USEDEP}]
@@ -30,13 +28,13 @@ RDEPEND="
 "
 BDEPEND="
 	test? (
-	${RDEPEND}
-	dev-python/msgpack[${PYTHON_USEDEP}]
-	dev-python/pytest-asyncio[${PYTHON_USEDEP}]
-	dev-python/uvicorn[${PYTHON_USEDEP}]
+		dev-python/msgpack[${PYTHON_USEDEP}]
+		dev-python/redis[${PYTHON_USEDEP}]
+		dev-python/uvicorn[${PYTHON_USEDEP}]
+		dev-python/valkey[${PYTHON_USEDEP}]
 	)
 "
-REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-distutils_enable_sphinx docs
+EPYTEST_PLUGINS=( pytest-asyncio )
+distutils_enable_sphinx docs dev-python/furo
 distutils_enable_tests pytest

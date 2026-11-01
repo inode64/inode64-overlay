@@ -11,5 +11,6 @@
 	</maintainer>
 	<upstream>
 		<remote-id type="github">macbre/sql-metadata</remote-id>
+		<remote-id type="pypi">sql_metadata</remote-id>
 	</upstream>
 </pkgmetadata>

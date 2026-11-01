@@ -7,12 +7,13 @@ inherit autotools flag-o-matic linux-info shell-completion tmpfiles udev
 
 DESCRIPTION="mirror/replicate block-devices across a network-connection"
 HOMEPAGE="https://linbit.com/drbd/"
-SRC_URI="https://github.com/LINBIT/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+# Not GitHub's tag archive: it lacks the drbd-headers submodule and the man pages
+SRC_URI="https://pkg.linbit.com/downloads/drbd/utils/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+udev xen"
+IUSE="+udev"
 
 DEPEND="
 	sys-apps/keyutils
@@ -89,10 +90,9 @@ src_configure() {
 		--without-rgmanager
 		--without-pacemaker
 		$(use_with udev)
-		$(use_with xen)
 	)
 
-	econf "${myeconfargs[@]}g"
+	econf "${myeconfargs[@]}"
 }
 
 src_compile() {

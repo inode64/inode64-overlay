@@ -8,7 +8,7 @@ PYTHON_COMPAT=( python3_{12..14} )
 
 inherit distutils-r1 git-r3
 
-DESCRIPTION="OpenTelemetry requests instrumentation"
+DESCRIPTION="OpenTelemetry threading instrumentation"
 HOMEPAGE="https://github.com/open-telemetry/opentelemetry-python-contrib"
 EGIT_REPO_URI="https://github.com/open-telemetry/opentelemetry-python-contrib.git"
 S="${WORKDIR}/${P}/instrumentation/${PN}"

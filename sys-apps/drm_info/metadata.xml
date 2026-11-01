@@ -6,6 +6,7 @@
 		<name>Haelwenn (lanodan) Monnier</name>
 	</maintainer>
 	<use>
+		<flag name="edid">Print EDID identification via <pkg>media-libs/libdisplay-info</pkg></flag>
 		<flag name="pci">Print PCI device names via libpci</flag>
 	</use>
 	<upstream>

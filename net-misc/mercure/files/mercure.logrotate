@@ -1,7 +1,9 @@
-/var/log/mercure/mercure.log {
+/var/log/mercure/*.log {
 	daily
 	missingok
 	rotate 28
 	compress
 	notifempty
+	# The service keeps the file open and cannot be told to reopen it.
+	copytruncate
 }

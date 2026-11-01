@@ -12,6 +12,8 @@ inherit edo git-r3 multiprocessing systemd tmpfiles toolchain-funcs
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
 EGIT_REPO_URI="https://github.com/Snapchat/${MY_PN}.git"
+PATCH_TARBALL="${PN}-6.3.4-patches-1.tar.xz"
+SRC_URI="https://www.inode64.com/dist/${PATCH_TARBALL}"
 
 LICENSE="BSD"
 SLOT="0"
@@ -19,11 +21,16 @@ IUSE="curl flash ssl systemd test"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
-	app-arch/lz4
-	app-arch/snappy
-	app-arch/zstd
+	dev-libs/openssl:0=
+	sys-apps/util-linux
+	virtual/zlib:=
 	curl? ( net-misc/curl )
-	ssl? ( dev-libs/openssl:0= )
+	flash? (
+		app-arch/bzip2
+		app-arch/lz4
+		app-arch/snappy
+		app-arch/zstd
+	)
 	systemd? ( sys-apps/systemd:= )
 "
 
@@ -34,13 +41,15 @@ RDEPEND="
 "
 
 BDEPEND="
-	${COMMON_DEPEND}
 	virtual/pkgconfig
 "
 
 # Tcl is only needed in the CHOST test env
+# Accounts are needed at build time for fowners in src_install
 DEPEND="
 	${COMMON_DEPEND}
+	acct-group/keydb
+	acct-user/keydb
 	test? (
 		dev-lang/tcl:0=
 		ssl? ( dev-tcltk/tls )
@@ -49,14 +58,19 @@ DEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-6.3.2-config.patch"
 	"${FILESDIR}/${PN}-sentinel-6.3.2-config.patch"
+	"${WORKDIR}/patches"
 )
 
-src_compile() {
-	local myconf=""
+src_unpack() {
+	git-r3_src_unpack
+	unpack "${PATCH_TARBALL}"
+}
 
-	if use ssl; then
-		myconf+=" BUILD_TLS=yes"
-	fi
+src_compile() {
+	# Upstream defaults to BUILD_TLS=yes and OPTIMIZATION="-O2 -flto": without
+	# these, USE=-ssl would be ignored and CFLAGS could not turn off LTO.
+	local myconf="BUILD_TLS=$(usex ssl) OPTIMIZATION= V=1"
+
 	if use flash; then
 		myconf+=" ENABLE_FLASH=yes"
 	fi
@@ -66,8 +80,8 @@ src_compile() {
 
 	export USE_SYSTEMD=$(usex systemd)
 
-	tc-export AR CC RANLIB
-	emake ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}" DEBUG=""
+	tc-export AR CC CXX RANLIB
+	emake ${myconf} AR="${AR}" CC="${CC}" CXX="${CXX}" RANLIB="${RANLIB}" DEBUG=""
 }
 
 src_test() {
@@ -83,6 +97,9 @@ src_test() {
 	if use ssl; then
 		edo ./utils/gen-test-certs.sh
 		runtestargs+=( --tls )
+	else
+		# Both start the server with a directive that only exists with TLS
+		runtestargs+=( --skipunit unit/tls --skipunit unit/tls-rotation )
 	fi
 
 	edo ./runtest "${runtestargs[@]}"

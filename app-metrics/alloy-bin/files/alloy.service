@@ -8,9 +8,9 @@ After=network-online.target
 Restart=always
 User=alloy
 Environment=HOSTNAME=%H
-EnvironmentFile=/etc/conf.d/alloy
+EnvironmentFile=-/etc/default/alloy
 WorkingDirectory=/var/lib/alloy
-ExecStart=/usr/bin/alloy run $command_args --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+ExecStart=/usr/bin/alloy run $CUSTOM_ARGS --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
 ExecReload=/usr/bin/env kill -HUP $MAINPID
 TimeoutStopSec=20s
 

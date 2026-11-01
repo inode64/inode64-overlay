@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit linux-mod-r1 git-r3
+inherit linux-mod-r1 git-r3 toolchain-funcs
 
 DESCRIPTION="Kernel driver for AMD Ryzen's System Management Unit"
 HOMEPAGE="https://github.com/amkillam/ryzen_smu"
@@ -19,7 +19,12 @@ src_compile() {
 
 	linux-mod-r1_src_compile
 
-	emake -C userspace
+	# The upstream Makefile forces -march=native, which breaks binary packages
+	# built on another host, and strips the result
+	set -- $(tc-getCC) ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} -Ilib \
+		-o userspace/monitor_cpu userspace/monitor_cpu.c lib/libsmu.c -lm
+	echo "$@"
+	"$@" || die "building monitor_cpu failed"
 }
 
 src_install() {

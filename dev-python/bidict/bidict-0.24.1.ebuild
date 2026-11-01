@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DISTUTILS_USE_PEP517=setuptools
+DISTUTILS_USE_PEP517=uv-build
 PYTHON_COMPAT=( python3_{11..14} )
 
 inherit distutils-r1
@@ -17,12 +17,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 BDEPEND="test? (
-	dev-python/pytest-benchmark[${PYTHON_USEDEP}]
-	dev-python/pytest-xdist[${PYTHON_USEDEP}]
-	dev-python/hypothesis[${PYTHON_USEDEP}]
 	dev-python/sortedcollections[${PYTHON_USEDEP}]
 	)
 "
 
+# pyproject.toml passes --hypothesis-profile and --numprocesses.
+EPYTEST_PLUGINS=( hypothesis )
+EPYTEST_XDIST=1
 distutils_enable_tests pytest
 distutils_enable_sphinx docs dev-python/furo dev-python/sphinx-copybutton

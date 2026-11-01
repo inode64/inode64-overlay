@@ -23,6 +23,6 @@ RDEPEND="
 "
 
 python_test() {
-	django-admin.py test --settings=compressor.test_settings compressor ||
+	"${EPYTHON}" -m django test --settings=compressor.test_settings compressor ||
 	die "Tests failed with ${EPYTHON}"
 }

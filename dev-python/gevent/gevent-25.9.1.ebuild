@@ -20,7 +20,7 @@ HOMEPAGE="
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="doc examples test"
+IUSE="examples test"
 RESTRICT="test"
 
 DEPEND="
@@ -36,7 +36,9 @@ RDEPEND="
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 "
 BDEPEND="
+	>=dev-python/cffi-1.17.1[${PYTHON_USEDEP}]
 	>=dev-python/cython-3.0.11[${PYTHON_USEDEP}]
+	>=dev-python/greenlet-3.2.2[${PYTHON_USEDEP}]
 	test? (
 	${RDEPEND}
 	dev-python/dnspython[${PYTHON_USEDEP}]
@@ -44,8 +46,6 @@ BDEPEND="
 	dev-python/requests[${PYTHON_USEDEP}]
 	)
 "
-
-distutils_enable_sphinx doc
 
 python_prepare_all() {
 	export GEVENTSETUP_EMBED="false"

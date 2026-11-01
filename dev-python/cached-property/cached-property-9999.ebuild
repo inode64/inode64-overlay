@@ -17,6 +17,7 @@ SLOT="1"
 
 BDEPEND="test? ( dev-python/freezegun[${PYTHON_USEDEP}] )"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
 
 DOCS=( {HISTORY,README}.md )

@@ -3,9 +3,8 @@
 
 EAPI=8
 
-DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
-inherit python-single-r1
+inherit optfeature python-single-r1
 
 DESCRIPTION="Script to talk to TI CC13xx/CC2538/CC26xx Serial Boot Loader"
 HOMEPAGE="https://github.com/JelmerT/cc2538-bsl"
@@ -26,21 +25,19 @@ RDEPEND="
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
 		dev-python/pyserial[${PYTHON_USEDEP}]
-		dev-python/python-magic[${PYTHON_USEDEP}]
 		dev-python/intelhex[${PYTHON_USEDEP}]
 	')
 "
 
 DOCS=( README.md )
 
-src_prepare() {
-	default
-}
-
-src_compile() {
-	default
-}
-
 src_install() {
-	dosbin cc2538_bsl/cc2538_bsl.py
+	python_scriptinto /usr/sbin
+	python_doscript cc2538_bsl/cc2538_bsl.py
+
+	einstalldocs
+}
+
+pkg_postinst() {
+	optfeature "automatic detection of the firmware file type" dev-python/python-magic
 }

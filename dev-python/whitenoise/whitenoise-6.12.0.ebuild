@@ -20,12 +20,15 @@ BDEPEND="
 	test? (
 		app-arch/brotli[python,${PYTHON_USEDEP}]
 		dev-python/django[${PYTHON_USEDEP}]
+		dev-python/requests[${PYTHON_USEDEP}]
 	)
 "
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
 distutils_enable_sphinx docs \
-	dev-python/furo
+	dev-python/furo \
+	dev-python/sphinx-copybutton
 
 pkg_postinst() {
 	optfeature "brotli compression" "app-arch/brotli[python]"

@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_EXT=1
-DISTUTILS_USE_PEP517=( maturin crates/jiter-python )
+DISTUTILS_USE_PEP517=maturin
 PYPI_VERIFY_REPO=https://github.com/pydantic/jiter
 PYTHON_COMPAT=( python3_{11..14} )
 
@@ -30,11 +30,21 @@ KEYWORDS="~amd64 ~arm64"
 
 QA_FLAGS_IGNORED="usr/lib.*/py.*/site-packages/jiter/jiter.*.so"
 
-# Tests pull dirty-equals (::guru-only); skip in fork.
-RESTRICT="test"
+BDEPEND="
+	test? (
+		dev-python/dirty-equals[${PYTHON_USEDEP}]
+	)
+"
+
+EPYTEST_PLUGINS=()
+distutils_enable_tests pytest
 
 src_unpack() {
 	# Required for verify-provenance
 	pypi_src_unpack
 	cargo_src_unpack
+}
+
+python_test() {
+	epytest crates/jiter-python/tests
 }

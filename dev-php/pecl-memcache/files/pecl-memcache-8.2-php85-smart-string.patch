@@ -1,0 +1,59 @@
+PHP 8.5 dropped ext/standard/php_smart_string*.h; Zend/zend_smart_string.h has
+been the real header since PHP 7.2, so this also works on the 7.x targets.
+
+Upstream: https://github.com/websupport-sk/pecl-memcache/commit/a743dc843bb487513386d31eb9481bd6a6825087
+--- a/src/memcache_ascii_protocol.c
++++ b/src/memcache_ascii_protocol.c
+@@ -24,7 +24,7 @@
+ #endif
+ 
+ #include "memcache_pool.h"
+-#include "ext/standard/php_smart_string.h"
++#include "Zend/zend_smart_string.h"
+ 
+ typedef struct mmc_ascii_request {
+ 	mmc_request_t	base;							/* enable cast to mmc_request_t */
+--- a/src/memcache_binary_protocol.c
++++ b/src/memcache_binary_protocol.c
+@@ -34,7 +34,7 @@
+ #include <netinet/in.h>
+ #endif
+ #include "memcache_pool.h"
+-#include "ext/standard/php_smart_string.h"
++#include "Zend/zend_smart_string.h"
+ 
+ #ifdef htonll
+ #undef htonll
+--- a/src/memcache_pool.c
++++ b/src/memcache_pool.c
+@@ -35,7 +35,7 @@
+ #include "ext/standard/crc32.h"
+ #include "ext/standard/php_var.h"
+ #include "ext/standard/php_string.h"
+-#include "ext/standard/php_smart_string.h"
++#include "Zend/zend_smart_string.h"
+ #include "zend_smart_str.h"
+ #include "memcache_pool.h"
+ 
+--- a/src/memcache_pool.h
++++ b/src/memcache_pool.h
+@@ -42,7 +42,7 @@
+ #include <string.h>
+ 
+ #include "php.h"
+-#include "ext/standard/php_smart_string_public.h"
++#include "Zend/zend_smart_string.h"
+ #include "memcache_queue.h"
+ 
+ /*
+--- a/src/memcache_session.c
++++ b/src/memcache_session.c
+@@ -29,7 +29,7 @@
+ #include "php_variables.h"
+ 
+ #include "SAPI.h"
+-#include "ext/standard/php_smart_string.h"
++#include "Zend/zend_smart_string.h"
+ #include "ext/standard/url.h"
+ #include "ext/session/php_session.h"
+ #ifdef PHP_WIN32

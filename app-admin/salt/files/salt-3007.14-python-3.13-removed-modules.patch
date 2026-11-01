@@ -1,0 +1,198 @@
+Python 3.13 removed the spwd and cgi modules, so on 3007.14 shadow.info and
+shadow.list_users raise NameError and rest_tornado cannot be imported.
+
+spwd: https://github.com/saltstack/salt/pull/68402 (also in Fedora and Void).
+cgi: backport of the _parse_header helper shipped in salt 3008.
+
+--- a/salt/modules/linux_shadow.py
++++ b/salt/modules/linux_shadow.py
+@@ -8,6 +8,7 @@
+     <module-provider-override>`.
+ """
+ 
++import collections
+ import datetime
+ import functools
+ import logging
+@@ -18,12 +19,6 @@
+ from salt.exceptions import CommandExecutionError
+ 
+ try:
+-    import spwd  # pylint: disable=deprecated-module
+-except ImportError:
+-    pass
+-
+-
+-try:
+     import salt.utils.pycrypto
+ 
+     HAS_CRYPT = True
+@@ -34,6 +29,21 @@
+ 
+ log = logging.getLogger(__name__)
+ 
++struct_spwd = collections.namedtuple(
++    "struct_spwd",
++    [
++        "sp_namp",
++        "sp_pwdp",
++        "sp_lstchg",
++        "sp_min",
++        "sp_max",
++        "sp_warn",
++        "sp_inact",
++        "sp_expire",
++        "sp_flag",
++    ],
++)
++
+ 
+ def __virtual__():
+     return __virtualname__ if __grains__.get("kernel", "") == "Linux" else False
+@@ -71,7 +81,7 @@
+     if root is not None:
+         getspnam = functools.partial(_getspnam, root=root)
+     else:
+-        getspnam = functools.partial(spwd.getspnam)
++        getspnam = functools.partial(_getspnam, root="/")
+ 
+     try:
+         data = getspnam(name)
+@@ -509,7 +519,7 @@
+     if root is not None:
+         getspall = functools.partial(_getspall, root=root)
+     else:
+-        getspall = functools.partial(spwd.getspall)
++        getspall = functools.partial(_getspall, root="/")
+ 
+     return sorted(
+         user.sp_namp if hasattr(user, "sp_namp") else user.sp_nam for user in getspall()
+@@ -529,7 +539,7 @@
+                 # Generate a getspnam compatible output
+                 for i in range(2, 9):
+                     comps[i] = int(comps[i]) if comps[i] else -1
+-                return spwd.struct_spwd(comps)
++                return struct_spwd(*comps)
+     raise KeyError
+ 
+ 
+@@ -545,4 +555,4 @@
+             # Generate a getspall compatible output
+             for i in range(2, 9):
+                 comps[i] = int(comps[i]) if comps[i] else -1
+-            yield spwd.struct_spwd(comps)
++            yield struct_spwd(*comps)
+--- a/salt/netapi/rest_tornado/saltnado.py
++++ b/salt/netapi/rest_tornado/saltnado.py
+@@ -185,12 +185,12 @@
+ .. |500| replace:: internal server error
+ """
+ 
+-import cgi  # pylint: disable=deprecated-module
+ import fnmatch
+ import logging
+ import time
+ from collections import defaultdict
+ from copy import copy
++from email.message import EmailMessage
+ 
+ import tornado.escape
+ import tornado.gen
+@@ -219,6 +219,26 @@
+ log = logging.getLogger(__name__)
+ 
+ 
++def _parse_header(line):
++    """
++    Parse a Content-Type-like HTTP header value into ``(main_type, params)``.
++
++    Replaces :func:`cgi.parse_header`, removed in Python 3.13 (:pep:`594`).
++    """
++    if not line or not str(line).strip():
++        return "", {}
++    msg = EmailMessage()
++    try:
++        msg["content-type"] = line
++    except ValueError:
++        main = str(line).split(";", 1)[0].strip()
++        return main, {}
++    main = msg.get_content_type()
++    ct_hdr = msg["content-type"]
++    params = dict(ct_hdr.params) if hasattr(ct_hdr, "params") else {}
++    return main, params
++
++
+ def _json_dumps(obj, **kwargs):
+     """
+     Invoke salt.utils.json.dumps using the alternate json module loaded using
+@@ -476,7 +496,7 @@
+         accept_header = self.request.headers.get("Accept", "*/*")
+         # Ignore any parameter, including q (quality) one
+         parsed_accept_header = [
+-            cgi.parse_header(h)[0] for h in accept_header.split(",")
++            _parse_header(h)[0] for h in accept_header.split(",")
+         ]
+ 
+         def find_acceptable_content_type(parsed_accept_header):
+@@ -559,8 +579,8 @@
+         }
+ 
+         try:
+-            # Use cgi.parse_header to correctly separate parameters from value
+-            value, parameters = cgi.parse_header(self.request.headers["Content-Type"])
++            # Use _parse_header to correctly separate parameters from value
++            value, parameters = _parse_header(self.request.headers["Content-Type"])
+             return ct_in_map[value](tornado.escape.native_str(data))
+         except KeyError:
+             self.send_error(406)
+--- a/tests/pytests/unit/modules/test_linux_shadow.py
++++ b/tests/pytests/unit/modules/test_linux_shadow.py
+@@ -1,5 +1,5 @@
+ """
+-    :codeauthor: Erik Johnson <erik@saltstack.com>
++:codeauthor: Erik Johnson <erik@saltstack.com>
+ """
+ 
+ import types
+@@ -175,6 +175,11 @@
+     Test if info shows the correct user information
+     """
+ 
++    data = {
++        "/etc/shadow": f"foo:{password.pw_hash}:31337:0:99999:7:::",
++        "*": Exception("Attempted to open something other than /etc/shadow"),
++    }
++
+     # First test is with a succesful call
+     expected_result = [
+         ("expire", -1),
+@@ -186,10 +191,7 @@
+         ("passwd", password.pw_hash),
+         ("warn", 7),
+     ]
+-    getspnam_return = spwd.struct_spwd(
+-        ["foo", password.pw_hash, 31337, 0, 99999, 7, -1, -1, -1]
+-    )
+-    with patch("spwd.getspnam", return_value=getspnam_return):
++    with patch("salt.utils.files.fopen", mock_open(read_data=data)):
+         result = shadow.info("foo")
+         assert expected_result == sorted(result.items(), key=lambda x: x[0])
+ 
+@@ -204,15 +206,8 @@
+         ("passwd", ""),
+         ("warn", ""),
+     ]
+-    # We get KeyError exception for non-existent users in glibc based systems
+-    getspnam_return = KeyError
+-    with patch("spwd.getspnam", side_effect=getspnam_return):
+-        result = shadow.info("foo")
+-        assert expected_result == sorted(result.items(), key=lambda x: x[0])
+-    # And FileNotFoundError in musl based systems
+-    getspnam_return = FileNotFoundError
+-    with patch("spwd.getspnam", side_effect=getspnam_return):
+-        result = shadow.info("foo")
++    with patch("salt.utils.files.fopen", mock_open(read_data=data)):
++        result = shadow.info("bar")
+         assert expected_result == sorted(result.items(), key=lambda x: x[0])
+ 
+ 

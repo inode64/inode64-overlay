@@ -8,7 +8,7 @@ DISTUTILS_USE_PEP517=setuptools
 
 inherit distutils-r1 pypi
 
-DESCRIPTION="MySQL driver written in Python"
+DESCRIPTION="Time expression parser"
 HOMEPAGE="https://github.com/onegreyonewhite/pytimeparse2"
 
 LICENSE="MIT"

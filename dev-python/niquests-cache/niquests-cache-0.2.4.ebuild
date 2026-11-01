@@ -24,3 +24,11 @@ RDEPEND=">=dev-python/aiosqlite-0.22.1[${PYTHON_USEDEP}]
 	>=dev-python/niquests-3.18.6[${PYTHON_USEDEP}]
 	>=dev-python/platformdirs-4.9.6[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.15.0[${PYTHON_USEDEP}]"
+BDEPEND="
+	test? (
+		dev-python/mock[${PYTHON_USEDEP}]
+	)
+"
+
+EPYTEST_PLUGINS=( pytest-asyncio pytest-mock )
+distutils_enable_tests pytest

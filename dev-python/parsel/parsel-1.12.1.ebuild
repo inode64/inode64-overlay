@@ -31,6 +31,11 @@ BDEPEND="
 	)
 "
 
+EPYTEST_PLUGINS=()
+EPYTEST_DESELECT=(
+	# Expects the XPath of older cssselect, 1.6.0 adds a contains(@class, ...) prefilter
+	tests/test_selector_csstranslator.py::test_css2xpath
+)
 distutils_enable_tests pytest
 
 distutils_enable_sphinx docs \

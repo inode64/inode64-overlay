@@ -5,7 +5,6 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
 DISTUTILS_USE_PEP517=hatchling
-PYPI_PN="portage-${PN}"
 
 inherit distutils-r1 git-r3
 
@@ -27,9 +26,8 @@ RDEPEND=">=dev-python/anyio-4.15.1[${PYTHON_USEDEP}]
 	>=dev-python/niquests-3.21.2[${PYTHON_USEDEP}]
 	>=dev-python/niquests-cache-0.2.4[${PYTHON_USEDEP}]
 	>=dev-python/platformdirs-4.12.0[${PYTHON_USEDEP}]
-	>=sys-apps/portage-3.0.82.2
+	>=sys-apps/portage-3.0.82.2[${PYTHON_USEDEP}]
 	>=dev-python/tomlkit-0.15.1[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.16.0[${PYTHON_USEDEP}]"
-DEPEND="${RDEPEND}"
 
 distutils_enable_tests pytest

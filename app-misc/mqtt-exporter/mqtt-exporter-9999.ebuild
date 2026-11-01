@@ -3,8 +3,9 @@
 
 EAPI=8
 
+DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
-inherit python-single-r1 systemd
+inherit distutils-r1 systemd
 
 DESCRIPTION="Simple and generic Prometheus exporter for MQTT"
 HOMEPAGE="https://github.com/kpetremann/mqtt-exporter"
@@ -20,30 +21,29 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	${PYTHON_DEPS}
 	acct-user/mosquitto
 	acct-group/mosquitto
-	dev-python/paho-mqtt
-	dev-python/prometheus-client
+	dev-python/paho-mqtt[${PYTHON_USEDEP}]
+	dev-python/prometheus-client[${PYTHON_USEDEP}]
 "
 
-REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+EPYTEST_PLUGINS=( pytest-mock )
+distutils_enable_tests pytest
 
 src_prepare() {
-	default
+	# Upstream declares no build backend, which the eclass requires
+	cat >> pyproject.toml <<-EOF || die
+
+		[build-system]
+		requires = ["setuptools"]
+		build-backend = "setuptools.build_meta"
+	EOF
+
+	distutils-r1_src_prepare
 }
 
-src_compile() {
-	default
-}
-
-src_install() {
-	insinto /usr/$(get_libdir)/${PN}
-
-	doins exporter.py
-	doins -r mqtt_exporter
-
-	dodoc README.md
+python_install_all() {
+	distutils-r1_python_install_all
 
 	keepdir /var/log/${PN}
 

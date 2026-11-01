@@ -31,13 +31,12 @@ SRC_URI+="
 
 LICENSE="MIT"
 SLOT="0"
-CPU_FLAGS_X86=( avx avx2 f16c )
 
 # hip-graphs / vmm only take effect with USE=rocm, see
 # https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md#hip
 # hip-graphs is off by default: with ROCm 10 the HIP graph path cuts token
 # generation by ~30% on RDNA4 (gfx1201).
-IUSE="curl openblas +openmp blis rocm cuda opencl openssl vulkan flexiblas hip-graphs +vmm examples"
+IUSE="openblas +openmp blis rocm cuda opencl openssl vulkan flexiblas hip-graphs +vmm examples"
 
 REQUIRED_USE="
 	?? (
@@ -47,10 +46,7 @@ REQUIRED_USE="
 	)
 "
 
-# curl is needed for pulling models from huggingface
-# numpy is used by convert_hf_to_gguf.py
 CDEPEND="
-	curl? ( net-misc/curl:= )
 	openblas? ( sci-libs/openblas:= )
 	openmp? ( llvm-runtimes/openmp:= )
 	blis? ( sci-libs/blis:= )
@@ -70,15 +66,10 @@ DEPEND="${CDEPEND}
 	)
 "
 RDEPEND="${CDEPEND}
-	dev-python/numpy
 	opencl? ( dev-libs/opencl-icd-loader )
 	vulkan? ( media-libs/vulkan-loader )
 "
-BDEPEND="media-libs/shaderc"
-
-PATCHES=(
-	"${FILESDIR}/llama-cpp-9999-rocm-wmma-bf16-types.patch"
-)
+BDEPEND="vulkan? ( media-libs/shaderc )"
 
 pkg_setup() {
 	if use rocm; then
@@ -103,17 +94,24 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DLLAMA_BUILD_WEBUI=OFF
+		-DLLAMA_BUILD_UI=OFF
+		# would fetch the UI from a Hugging Face bucket during src_compile
+		-DLLAMA_USE_PREBUILT_UI=OFF
 		-DLLAMA_BUILD_TESTS=OFF
 		-DLLAMA_BUILD_EXAMPLES=$(usex examples)
 		-DLLAMA_BUILD_SERVER=ON
 		-DCMAKE_SKIP_BUILD_RPATH=ON
 		-DGGML_NATIVE=0	# don't set march
+		# GGML_NATIVE=0 alone still adds these -m flags; leave them to CFLAGS
+		-DGGML_SSE42=OFF
+		-DGGML_AVX=OFF
+		-DGGML_AVX2=OFF
+		-DGGML_BMI2=OFF
+		-DGGML_FMA=OFF
+		-DGGML_F16C=OFF
 		-DGGML_RPC=ON
-		-DLLAMA_CURL=$(usex curl)
 		-DLLAMA_OPENSSL=$(usex openssl)
 		-DBUILD_NUMBER="1"
-		-DGENTOO_REMOVE_CMAKE_BLAS_HACK=ON
 		-DGGML_CUDA=$(usex cuda)
 		-DGGML_OPENCL=$(usex opencl)
 		-DGGML_OPENMP=$(usex openmp)
@@ -172,7 +170,6 @@ src_configure() {
 
 src_install() {
 	cmake_src_install
-	dobin "${BUILD_DIR}/bin/ggml-rpc-server"
 
 	# avoid clashing with whisper.cpp
 	rm -rf "${ED}/usr/include"

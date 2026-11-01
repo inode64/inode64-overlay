@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit git-r3 go-module
+inherit git-r3 go-env go-module
 
 DESCRIPTION="A command runner with healthchecks.io integration"
 HOMEPAGE="https://github.com/bdd/runitor/"
@@ -21,13 +21,14 @@ PATCHES=( "${FILESDIR}/0001-Initial-pidfile-version.patch" )
 
 src_unpack() {
 	git-r3_src_unpack
+	# go-module_src_unpack is what sets GOFLAGS (-buildmode=pie among them) and
+	# the cgo flags, and this path does not go through it.
+	go-env_set_compile_environment
 	go-module_live_vendor
 }
 
 src_compile() {
-	local ld_flags="-s -w"
-
-	ego build -trimpath -ldflags "-s -w" ./cmd/${PN} || die
+	ego build -trimpath -ldflags "-s -w -X main.Version=${PV}-${EGIT_VERSION:0:8}" ./cmd/${PN} || die
 }
 
 src_test() {

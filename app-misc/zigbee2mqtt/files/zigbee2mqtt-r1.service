@@ -1,6 +1,6 @@
 [Unit]
 Description=zigbee2mqtt
-After=network.target
+After=network.target mosquitto.service
 Wants=mosquitto.service
 
 [Service]

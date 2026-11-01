@@ -1,0 +1,145 @@
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=8
+inherit flag-o-matic systemd tmpfiles
+
+DESCRIPTION="This is the proxy-daemon used by www-apps/guacamole"
+HOMEPAGE="https://guacamole.apache.org/"
+
+if [[ "${PV}" == *9999 ]]; then
+	inherit autotools git-r3
+	EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
+	EGIT_BRANCH="main"
+else
+	SRC_URI="mirror://apache/guacamole/${PV}/source/${P}.tar.gz"
+	KEYWORDS="~amd64 ~x86"
+fi
+
+LICENSE="Apache-2.0"
+SLOT="0"
+IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
+RESTRICT="!test? ( test )"
+
+FONTS="
+	media-fonts/dejavu
+	media-fonts/liberation-fonts
+	media-fonts/terminus-font
+"
+COMMON_DEPEND="
+	dev-libs/openssl:0=
+	media-libs/libjpeg-turbo:0=
+	media-libs/libpng:0=
+	sys-apps/util-linux
+	x11-libs/cairo
+	encode? ( media-video/ffmpeg:= )
+	kubernetes? (
+		net-libs/libwebsockets:=[client,ssl]
+		x11-libs/pango
+	)
+	rdp? ( ~net-misc/freerdp-3.9.0[client(+),ffmpeg,jpeg] )
+	ssh? (
+		net-libs/libssh2
+		x11-libs/pango
+	)
+	telnet?	(
+		net-libs/libtelnet
+		x11-libs/pango
+	)
+	vnc? (
+		net-libs/libvncserver[jpeg]
+		pulseaudio? ( media-libs/libpulse )
+	)
+	vorbis? (
+		media-libs/libogg
+		media-libs/libvorbis
+	)
+	webp? ( media-libs/libwebp:= )
+"
+RDEPEND="${COMMON_DEPEND}
+	acct-group/guacamole
+	acct-user/guacamole
+	net-analyzer/openbsd-netcat
+	kubernetes? ( ${FONTS} )
+	print? ( app-text/ghostscript-gpl[-X] )
+	ssh? ( ${FONTS} )
+	telnet? ( ${FONTS} )
+"
+DEPEND="${COMMON_DEPEND}
+	test? ( dev-util/cunit )
+"
+BDEPEND="
+	virtual/pkgconfig
+	rdp? ( dev-lang/perl )
+"
+
+# inet_pton() got a 4-byte buffer for AF_INET6, which _FORTIFY_SOURCE aborts on
+PATCHES=( "${FILESDIR}/${P}-wol-sockaddr.patch" )
+
+src_prepare() {
+	default
+
+	append-cflags -Wno-error
+	append-cflags -std=gnu17
+
+	if [[ "${PV}" == *9999 ]]; then
+		eautoreconf -fi
+	fi
+
+	# Fix issue _XOPEN_SOURCE for glibc 2.42 and later
+	{ printf '#ifndef GUAC_GENERATED_CONFIG_H\n#define GUAC_GENERATED_CONFIG_H\n' &&
+		cat config.h.in && printf '#endif\n'; } > "${T}"/config.h.in || die
+	mv "${T}"/config.h.in config.h.in || die
+}
+
+src_configure() {
+	local myconf=(
+		--disable-static
+		--with-libuuid
+		$(use_enable encode guacenc)
+		$(use_enable kubernetes)
+		$(use_with kubernetes websockets)
+		$(use_with rdp)
+		$(use_with ssh)
+		$(use_with telnet)
+		$(use_with vnc)
+		$(use_with vorbis)
+		$(use_with webp)
+	)
+
+	# Only the VNC client consumes PulseAudio input
+	if use vnc; then
+		myconf+=( $(use_with pulseaudio pulse) )
+	else
+		myconf+=( --without-pulse )
+	fi
+
+	# libguac-terminal backs every text protocol and renders through pango
+	if use kubernetes || use ssh || use telnet; then
+		myconf+=( --with-terminal --with-pango )
+	else
+		myconf+=( --without-terminal --without-pango )
+	fi
+
+	if use rdp; then
+		myconf+=(--enable-allow-freerdp-snapshots)
+	fi
+
+	econf "${myconf[@]}"
+}
+
+src_install() {
+	default
+
+	find "${D}" -type f -name '*.la' -delete || die
+
+	newinitd "${FILESDIR}/guacd.initd" guacd
+	newconfd "${FILESDIR}/guacd.confd" guacd
+
+	systemd_newunit "${FILESDIR}/guacd.service" guacd.service
+	newtmpfiles "${FILESDIR}/guacd.conf" guacd.conf
+}
+
+pkg_postinst() {
+	tmpfiles_process guacd.conf
+}

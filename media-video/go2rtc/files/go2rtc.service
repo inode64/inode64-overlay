@@ -5,7 +5,6 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/usr/bin/go2rtc -config /etc/go2rtc/%i.yaml
-ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=10
 StandardOutput=append:/var/log/go2rtc/%i.log

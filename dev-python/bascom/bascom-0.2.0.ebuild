@@ -17,3 +17,11 @@ KEYWORDS="~amd64 ~ppc64 ~x86"
 RDEPEND=">=dev-python/click-8.4.2[${PYTHON_USEDEP}]
 	>=dev-python/colorlog-6.12.0[${PYTHON_USEDEP}]
 	>=dev-python/typing-extensions-4.16.0[${PYTHON_USEDEP}]"
+BDEPEND="
+	test? (
+		dev-python/mock[${PYTHON_USEDEP}]
+	)
+"
+
+EPYTEST_PLUGINS=( pytest-mock )
+distutils_enable_tests pytest

@@ -44,14 +44,15 @@ IUSE="test"
 RESTRICT="!test? ( test )"
 
 RDEPEND="
-	dev-debug/systemtap
 	dev-libs/boost:=
 	dev-libs/openssl:=
 	sys-apps/util-linux
 "
 
+# systemtap only provides <sys/sdt.h> for the USDT probes
 DEPEND="
 	${RDEPEND}
+	dev-debug/systemtap
 	dev-libs/cxxopts
 	dev-libs/opencl-icd-loader
 	dev-libs/rapidjson

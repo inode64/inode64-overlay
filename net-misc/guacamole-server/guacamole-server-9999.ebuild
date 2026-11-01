@@ -10,9 +10,9 @@ HOMEPAGE="https://guacamole.apache.org/"
 if [[ "${PV}" == *9999 ]]; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://github.com/apache/guacamole-server.git"
-	EGIT_BRANCH="staging/${PV}"
+	EGIT_BRANCH="main"
 else
-	SRC_URI="https://mirrors.ircam.fr/pub/apache/guacamole/${PV}/source/guacamole-server-${PV}.tar.gz"
+	SRC_URI="mirror://apache/guacamole/${PV}/source/${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -21,49 +21,56 @@ SLOT="0"
 IUSE="encode kubernetes print pulseaudio rdp ssh telnet test vnc vorbis webp"
 RESTRICT="!test? ( test )"
 
-REQUIRED_USE="pulseaudio? ( vnc )"
 FONTS="
 	media-fonts/dejavu
 	media-fonts/liberation-fonts
 	media-fonts/terminus-font
 "
-RDEPEND="
-	kubernetes? ( ${FONTS} )
-	net-analyzer/openbsd-netcat
-	print? ( app-text/ghostscript-gpl[-X] )
-	ssh? ( ${FONTS} )
-	telnet? ( ${FONTS} )
-"
-DEPEND="${RDEPEND}
-	acct-group/guacamole
-	acct-user/guacamole
+COMMON_DEPEND="
 	dev-libs/openssl:0=
-	|| ( dev-libs/ossp-uuid sys-libs/libuuid )
-	encode? ( media-video/ffmpeg )
-	kubernetes? ( net-libs/libwebsockets )
-	media-libs/libpng:0=
 	media-libs/libjpeg-turbo:0=
+	media-libs/libpng:0=
+	sys-apps/util-linux
+	x11-libs/cairo
+	encode? ( media-video/ffmpeg:= )
+	kubernetes? (
+		net-libs/libwebsockets:=[client,ssl]
+		x11-libs/pango
+	)
 	rdp? ( ~net-misc/freerdp-3.9.0[client(+),ffmpeg,jpeg] )
 	ssh? (
 		net-libs/libssh2
 		x11-libs/pango
-		)
+	)
 	telnet?	(
 		net-libs/libtelnet
 		x11-libs/pango
-		)
+	)
 	vnc? (
 		net-libs/libvncserver[jpeg]
-		pulseaudio? (
-			media-libs/libpulse
-			)
+		pulseaudio? ( media-libs/libpulse )
 	)
-	vorbis? ( media-libs/libvorbis )
-	webp? ( media-libs/libwebp )
-	x11-libs/cairo
-	test? (
-		dev-util/cunit
+	vorbis? (
+		media-libs/libogg
+		media-libs/libvorbis
 	)
+	webp? ( media-libs/libwebp:= )
+"
+RDEPEND="${COMMON_DEPEND}
+	acct-group/guacamole
+	acct-user/guacamole
+	net-analyzer/openbsd-netcat
+	kubernetes? ( ${FONTS} )
+	print? ( app-text/ghostscript-gpl[-X] )
+	ssh? ( ${FONTS} )
+	telnet? ( ${FONTS} )
+"
+DEPEND="${COMMON_DEPEND}
+	test? ( dev-util/cunit )
+"
+BDEPEND="
+	virtual/pkgconfig
+	rdp? ( dev-lang/perl )
 "
 
 src_prepare() {
@@ -84,9 +91,11 @@ src_prepare() {
 
 src_configure() {
 	local myconf=(
+		--disable-static
+		--with-libuuid
 		$(use_enable encode guacenc)
 		$(use_enable kubernetes)
-		$(use_with pulseaudio pulse)
+		$(use_with kubernetes websockets)
 		$(use_with rdp)
 		$(use_with ssh)
 		$(use_with telnet)
@@ -95,16 +104,18 @@ src_configure() {
 		$(use_with webp)
 	)
 
-	if use ssh || use telnet; then
-	    myconf+=(
-	    --with-terminal
-	    --with-pango
-	    )
+	# Only the VNC client consumes PulseAudio input
+	if use vnc; then
+		myconf+=( $(use_with pulseaudio pulse) )
 	else
-	    myconf+=(
-	    --without-terminal
-	    --without-pango
-	    )
+		myconf+=( --without-pulse )
+	fi
+
+	# libguac-terminal backs every text protocol and renders through pango
+	if use kubernetes || use ssh || use telnet; then
+		myconf+=( --with-terminal --with-pango )
+	else
+		myconf+=( --without-terminal --without-pango )
 	fi
 
 	if use rdp; then

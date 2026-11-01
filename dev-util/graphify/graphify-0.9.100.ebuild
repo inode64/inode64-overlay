@@ -43,4 +43,3 @@ RDEPEND="
 	dev-libs/tree-sitter-html
 	dev-libs/tree-sitter-tsx
 "
-DEPEND="${RDEPEND}"

@@ -21,10 +21,5 @@ IUSE="test"
 RDEPEND="dev-python/attrs[${PYTHON_USEDEP}]"
 BDEPEND=" test? ( ${RDEPEND} )"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
-
-python_prepare_all() {
-	sed -r -e "/packages *=/ s|\[[^]]*\]\+||" -i -- setup.py
-
-	distutils-r1_python_prepare_all
-}

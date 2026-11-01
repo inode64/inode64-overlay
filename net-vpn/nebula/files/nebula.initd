@@ -5,7 +5,7 @@
 extra_commands="checkconfig reload"
 
 vpn=${SVCNAME#*.}
-[[ $SVCNAME == nebula ]] && vpn=config
+[ "${SVCNAME}" = nebula ] && vpn=config
 
 : ${NEBULA_CONFDIR:=${RC_PREFIX%/}/etc/nebula}
 : ${NEBULA_CONFIG:=${NEBULA_CONFDIR}/${vpn}.yml}
@@ -20,6 +20,12 @@ description="A scalable overlay networking tool with a focus on performance, sim
 
 required_dirs="${NEBULA_CONFDIR}"
 required_files="${NEBULA_CONFIG}"
+
+depend() {
+	need net
+	use dns logger
+	after firewall
+}
 
 checkconfig() {
 	"${command}" -test ${command_args} || return 1

@@ -1,0 +1,41 @@
+Drop the deprecated import: it only prints "If you're reading this, you're
+unnecessarily importing github.com/ncruces/go-sqlite3/embed." on every start,
+and the driver already carries the database engine.
+https://github.com/garethgeorge/backrest/pull/1293
+
+diff --git a/internal/kvstore/sqlitekvstore.go b/internal/kvstore/sqlitekvstore.go
+index 9453228..e360a2c 100644
+--- a/internal/kvstore/sqlitekvstore.go
++++ b/internal/kvstore/sqlitekvstore.go
+@@ -8,7 +8,6 @@ import (
+ 	"strings"
+ 
+ 	_ "github.com/ncruces/go-sqlite3/driver"
+-	_ "github.com/ncruces/go-sqlite3/embed"
+ )
+ 
+ var ErrNotExist = errors.New("key does not exist")
+diff --git a/internal/logstore/logstore.go b/internal/logstore/logstore.go
+index 48e0509..dd6ac17 100644
+--- a/internal/logstore/logstore.go
++++ b/internal/logstore/logstore.go
+@@ -17,7 +17,6 @@ import (
+ 
+ 	"github.com/hashicorp/go-multierror"
+ 	_ "github.com/ncruces/go-sqlite3/driver"
+-	_ "github.com/ncruces/go-sqlite3/embed"
+ 	"go.uber.org/zap"
+ )
+ 
+diff --git a/internal/oplog/sqlitestore/sqlitestore.go b/internal/oplog/sqlitestore/sqlitestore.go
+index 41b12ac..08a53e0 100644
+--- a/internal/oplog/sqlitestore/sqlitestore.go
++++ b/internal/oplog/sqlitestore/sqlitestore.go
+@@ -27,7 +27,6 @@ import (
+ 
+ 	"github.com/gofrs/flock"
+ 	_ "github.com/ncruces/go-sqlite3/driver"
+-	_ "github.com/ncruces/go-sqlite3/embed"
+ 	"github.com/ncruces/go-sqlite3/vfs"
+ 	"github.com/ncruces/go-sqlite3/vfs/memdb"
+ 	_ "github.com/ncruces/go-sqlite3/vfs/memdb"

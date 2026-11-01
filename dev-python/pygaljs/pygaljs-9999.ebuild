@@ -18,4 +18,5 @@ SLOT="0"
 RDEPEND="dev-python/aspectlib[${PYTHON_USEDEP}]
 	dev-python/six[${PYTHON_USEDEP}]"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest

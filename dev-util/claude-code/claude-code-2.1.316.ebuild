@@ -3,6 +3,8 @@
 
 EAPI=8
 
+inherit optfeature
+
 DESCRIPTION="Claude Code - an agentic coding tool by Anthropic"
 HOMEPAGE="https://claude.com/product/claude-code"
 
@@ -58,4 +60,6 @@ pkg_postinst() {
 		ewarn "Failure to properly integrate changes to /etc/claude-code/managed-settings.json"
 		ewarn "may lead to claude installing itself to your homedir without asking."
 	fi
+
+	optfeature "sandboxed shell commands" "sys-apps/bubblewrap net-misc/socat"
 }

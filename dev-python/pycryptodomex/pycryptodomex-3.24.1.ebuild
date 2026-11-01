@@ -16,10 +16,19 @@ HOMEPAGE="
 	https://github.com/Legrandin/pycryptodome/
 	https://pypi.org/project/pycryptodomex/
 "
+# The sdist lacks the test vectors, without them most of SelfTest is skipped.
+SRC_URI+="
+	test? (
+		https://github.com/Legrandin/pycryptodome/archive/v${PV}.tar.gz
+			-> pycryptodome-${PV}.gh.tar.gz
+	)
+"
 
 LICENSE="BSD-2 Unlicense"
 SLOT="0"
-KEYWORDS="-* ~amd64"
+KEYWORDS="~amd64"
+IUSE="test"
+RESTRICT="!test? ( test )"
 
 DEPEND="dev-libs/gmp:="
 RDEPEND="${DEPEND}"
@@ -27,7 +36,7 @@ RDEPEND="${DEPEND}"
 DOCS=( README.rst )
 
 python_test() {
-	local -x PYTHONPATH="${BUILD_DIR}/install$(python_get_sitedir)"
+	local -x PYTHONPATH="${BUILD_DIR}/install$(python_get_sitedir):${WORKDIR}/pycryptodome-${PV}/test_vectors"
 	"${EPYTHON}" - <<-EOF || die
 		import sys
 		from Cryptodome import SelfTest

@@ -18,4 +18,5 @@ LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64 ~x86"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest

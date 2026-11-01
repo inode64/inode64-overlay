@@ -19,7 +19,13 @@ BDEPEND="
 	dev-python/hatch-vcs[${PYTHON_USEDEP}]
 "
 
-# Tests require optional pytest plugins.
-RESTRICT="test"
+EPYTEST_PLUGINS=( pytest-{asyncio,timeout} )
+distutils_enable_tests pytest
 
 export SETUPTOOLS_SCM_PRETEND_VERSION=${PV}
+
+src_prepare() {
+	# Coverage gates are for upstream's CI, not for validating the package.
+	sed -i -e '/--cov/d' pyproject.toml || die
+	distutils-r1_src_prepare
+}

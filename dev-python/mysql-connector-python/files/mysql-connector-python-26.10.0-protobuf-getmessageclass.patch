@@ -1,0 +1,19 @@
+Create X protocol messages with an API that current protobuf still has.
+
+Upstream pins protobuf==5.29.4. MessageFactory.GetPrototype() no longer exists
+in the protobuf that Gentoo ships (checked with 7.35.1), so without the
+optional _mysqlxpb C extension creating any message fails with AttributeError.
+GetMessageClass() is its documented replacement. Fedora avoids this path by
+building the C extension.
+
+--- a/mysqlx-connector-python/lib/mysqlx/protobuf/__init__.py
++++ b/mysqlx-connector-python/lib/mysqlx/protobuf/__init__.py
+@@ -285,7 +285,7 @@
+             Returns:
+                 object: Protobuf message.
+             """
+-            cls = _mysqlxpb_pure.factory.GetPrototype(
++            cls = message_factory.GetMessageClass(
+                 _DESCRIPTOR_POOL.FindMessageTypeByName(name)
+             )
+             return cls()

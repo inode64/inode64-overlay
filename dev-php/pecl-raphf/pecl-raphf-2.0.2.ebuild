@@ -9,7 +9,7 @@ PHP_EXT_ZENDEXT="no"
 PHP_EXT_ECONF_ARGS=""
 PHP_INI_NAME="30-${PHP_EXT_NAME}"
 
-USE_PHP="php8-2 php8-3 php8-4"
+USE_PHP="php8-2 php8-3 php8-4 php8-5"
 
 inherit php-ext-pecl-r3
 

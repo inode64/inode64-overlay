@@ -4,14 +4,6 @@
 
 description="Lemonade local AI server (lemond) — OpenAI-compatible LLM inference."
 
-# Design note: the systemd unit runs lemond as the dedicated acct-user
-# 'lemonade'. OpenRC intentionally does NOT assume that account -- it runs
-# as an admin-chosen LEMONADE_USER that already owns ~/.cache/lemonade.
-# This asymmetry is deliberate; don't "unify" the two onto the lemonade
-# system user without rechecking cache ownership.
-
-# Set LEMONADE_USER in /etc/conf.d/lemonade. No default — the service
-# refuses to start until it's configured.
 : ${LEMONADE_USER:=lemonade}
 : ${LEMONADE_HOST:=127.0.0.1}
 : ${LEMONADE_PORT:=}
@@ -102,6 +94,9 @@ start_pre() {
 	[ -n "${LEMONADE_PORT}" ] && args="${args} --port ${LEMONADE_PORT}"
 	[ -n "${LEMONADE_EXTRA_OPTS}" ] && args="${args} ${LEMONADE_EXTRA_OPTS}"
 	args="${args} ${LEMONADE_CACHE}"
+	# Given only the cache dir, lemond also keeps its config there and ignores
+	# STATE_DIRECTORY.
+	[ -n "${LEMONADE_STATE_DIR}" ] && args="${args} ${LEMONADE_STATE_DIR}"
 	command_args="${args}"
 	command_user="${LEMONADE_USER}:${LEMONADE_USER}"
 }

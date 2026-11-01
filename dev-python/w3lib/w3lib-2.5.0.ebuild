@@ -18,10 +18,10 @@ LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64 ~x86"
 
+EPYTEST_PLUGINS=( hypothesis )
 distutils_enable_tests pytest
 
 distutils_enable_sphinx docs \
-	dev-python/sphinx-hoverxref \
 	dev-python/sphinx-notfound-page \
 	dev-python/sphinx-rtd-theme
 

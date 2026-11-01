@@ -17,6 +17,7 @@ KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv ~x86"
 
 BDEPEND="test? ( dev-python/freezegun[${PYTHON_USEDEP}] )"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
 
 DOCS=( {HISTORY,README}.md )

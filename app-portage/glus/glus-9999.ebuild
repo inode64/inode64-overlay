@@ -17,9 +17,11 @@ fi
 LICENSE="MIT"
 SLOT="0"
 
-RDEPEND="${DEPEND}
+RDEPEND="
 	app-admin/perl-cleaner
 	app-portage/gentoolkit
+	app-portage/portage-utils
+	virtual/mailx
 	virtual/mta
 "
 

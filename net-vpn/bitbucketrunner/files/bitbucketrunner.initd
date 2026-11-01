@@ -49,10 +49,10 @@ start_pre() {
 	command_args="-jar "
 
 	if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
-		command_args+="-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
+		command_args="${command_args}-Dlogback.configurationFile=$LOGBACK_CONFIGURATION_FILE "
 	fi
 
-	command_args+="
+	command_args="${command_args}
 		-Dbitbucket.pipelines.runner.account.uuid=$ACCOUNT_UUID \
 		-Dbitbucket.pipelines.runner.repository.uuid=$REPOSITORY_UUID \
 		-Dbitbucket.pipelines.runner.uuid=$RUNNER_UUID \

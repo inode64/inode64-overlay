@@ -2,13 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-MY_VER=72
 
 DESCRIPTION="Run just one instance of a command and its args at a time"
 HOMEPAGE="https://launchpad.net/run-one"
-SRC_URI="https://bazaar.launchpad.net/~run-one/run-one/trunk/tarball/${MY_VER} -> ${P}.tar.gz"
+SRC_URI="https://launchpad.net/${PN}/trunk/${PV}/+download/${PN}_${PV}.orig.tar.gz"
 
-S="${WORKDIR}/~run-one/run-one/trunk"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"

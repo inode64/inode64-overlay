@@ -19,7 +19,6 @@ EGIT_SUBMODULES=( '*' )
 # revenue threshold, no redistribution grant, hence bindist.
 LICENSE="MIT FastFlowLM-Terms"
 SLOT="0"
-KEYWORDS="~amd64"
 
 # Cargo (inside tokenizers-cpp/rust) fetches crates at build time.
 PROPERTIES="live"
@@ -29,19 +28,18 @@ BDEPEND="
 	>=dev-build/cmake-3.22
 	dev-build/ninja
 	|| ( dev-lang/rust dev-lang/rust-bin )
+	virtual/pkgconfig
 "
 RDEPEND="
 	acct-group/fastflowlm
 	acct-user/fastflowlm
 	dev-libs/boost:=
+	dev-libs/libedit
 	dev-libs/xdna-driver
 	dev-libs/xrt-xdna
 	dev-util/xrt
 	media-video/ffmpeg:=
 	net-misc/curl:=
-	sci-libs/fftw:3.0=
-	sys-libs/ncurses:=
-	sys-libs/readline:=
 "
 # xrt-2.21.75-r1 is the first to install aiebu's headers and static library.
 DEPEND="

@@ -17,6 +17,8 @@ S="${WORKDIR}/${PN}"
 LICENSE="LGPL-2.1"
 SLOT="0"
 
+BDEPEND="sys-devel/gettext"
+
 RDEPEND="${DEPEND}
 	app-admin/cockpit
 	sys-apps/lm-sensors

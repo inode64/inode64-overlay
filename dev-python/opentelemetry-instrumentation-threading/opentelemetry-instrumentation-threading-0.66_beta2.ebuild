@@ -8,7 +8,7 @@ PYTHON_COMPAT=( python3_{12..14} )
 
 inherit distutils-r1 pypi
 
-DESCRIPTION="OpenTelemetry requests instrumentation"
+DESCRIPTION="OpenTelemetry threading instrumentation"
 HOMEPAGE="https://github.com/open-telemetry/opentelemetry-python-contrib"
 
 LICENSE="Apache-2.0"

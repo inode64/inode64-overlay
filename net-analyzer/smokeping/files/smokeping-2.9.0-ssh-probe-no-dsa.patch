@@ -1,0 +1,29 @@
+Remove DSA from the host keys probed by the SSH probe: OpenSSH 10 dropped it, so
+"ssh-keyscan -t dsa,..." fails and the probe cannot start.
+
+Adapted to 2.9.0 from Debian smokeping 2.8.2+ds-2 ssh-probe-remove-dsa.patch.
+Bug: https://github.com/oetiker/SmokePing/issues/447
+Applied-Upstream: a1244391c482d0b0e063a25de095b57cebad9e3f
+
+--- a/lib/Smokeping/probes/SSH.pm
++++ b/lib/Smokeping/probes/SSH.pm
+@@ -58,7 +58,7 @@
+     # no need for this if we run as a cgi
+     unless ( $ENV{SERVER_SOFTWARE} ) {
+         
+-        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa $self->{properties}{init_host}";
++        my $call = "$self->{properties}{binary} -t rsa,ecdsa,ed25519 $self->{properties}{init_host}";
+         my $return = `$call 2>&1`;
+         if ($return =~ m/$ssh_re/s){
+             print "### parsing ssh-keyscan output...OK\n";
+@@ -152,8 +152,8 @@
+         return $class->_makevars($class->SUPER::targetvars, {
+            keytype => {
+                _doc => "Type of key, used in ssh-keyscan -t I<keytype>",
+-	       _re => "[ecdr]sa*",
+-               _example => 'dsa',
++	       _re => "(rsa|ecdsa|ed25519)",
++               _example => 'ecdsa',
+                _default => 'rsa',
+            },
+            port => {

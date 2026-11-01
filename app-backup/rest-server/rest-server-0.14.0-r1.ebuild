@@ -1,0 +1,57 @@
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=8
+
+inherit go-module systemd tmpfiles
+
+DESCRIPTION="High-performance HTTP server that implements restic's REST backend API"
+HOMEPAGE="https://github.com/restic/rest-server"
+
+SRC_URI="https://github.com/restic/rest-server/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://www.inode64.com/dist/${P}-vendor.tar.xz"
+
+LICENSE="BSD-2"
+SLOT="0"
+KEYWORDS="~amd64 ~x86"
+
+RDEPEND="
+	acct-group/nobody
+	acct-user/nobody
+	app-admin/apache-tools
+"
+
+src_prepare() {
+	default
+
+	sed -i -e 's|/usr/local/bin/rest-server|/usr/bin/rest-server|g' examples/systemd/rest-server.service || die
+	sed -i -e 's|/path/to/backups|/srv/backups|g' examples/systemd/rest-server.service || die
+	# The example user does not exist in Gentoo and the unit would not start.
+	sed -i -e 's|^User=www-data|User=nobody|' -e 's|^Group=www-data|Group=nobody|' \
+		examples/systemd/rest-server.service || die
+}
+
+src_compile() {
+	ego build -trimpath -ldflags "-s -w" -o rest-server ./cmd/rest-server || die
+}
+
+src_test() {
+	ego test ./... || die "test failed"
+}
+
+src_install() {
+	dobin rest-server
+
+	dodoc *.md
+	dotmpfiles "${FILESDIR}"/${PN}.conf
+	newinitd "${FILESDIR}/${PN}.initd" ${PN}
+
+	systemd_dounit examples/systemd/rest-server.{service,socket}
+}
+
+pkg_postinst() {
+	tmpfiles_process rest-server.conf
+
+	elog "The systemd unit runs as nobody and needs /srv/backups to exist and be"
+	elog "owned by that user; change it with \"systemctl edit rest-server.service\"."
+}

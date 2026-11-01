@@ -1,9 +1,12 @@
 [Unit]
 Description=Run the Nebula networking overlay as a daemon
-Wants=basic.target
-After=basic.target network-online.target
+Wants=basic.target network-online.target nss-lookup.target time-sync.target
+After=basic.target network.target network-online.target
+Before=sshd.service
 
 [Service]
+Type=notify
+NotifyAccess=main
 User=root
 SyslogIdentifier=nebula-%i
 ExecReload=/bin/kill -HUP $MAINPID

@@ -1,0 +1,28 @@
+Author: s3v <c0llapsed@yahoo.it>
+Last-Update: 2024-01-22
+Origin: https://github.com/jplana/python-etcd/commit/b8f3ad0d19626b21b08892ac910fc2e72e0001b6
+Description: Convert unit tests to work with pytest
+Forwarded: no
+
+--- a/src/etcd/tests/unit/test_lock.py
++++ b/src/etcd/tests/unit/test_lock.py
+@@ -90,8 +90,7 @@
+         """
+         self.locker._sequence = '4'
+         retval = ('/_locks/test_lock/4', None)
+-        self.locker._get_locker = mock.MagicMock(
+-            spec=self.locker._get_locker, return_value=retval)
++        self.locker._get_locker = mock.MagicMock(return_value=retval)
+         self.assertTrue(self.locker._acquired())
+         self.assertTrue(self.locker.is_taken)
+         retval = ('/_locks/test_lock/1', '/_locks/test_lock/4')
+@@ -112,8 +111,7 @@
+         def side_effect():
+             return returns.pop()
+ 
+-        self.locker._get_locker = mock.MagicMock(
+-            spec=self.locker._get_locker, side_effect=side_effect)
++        self.locker._get_locker = mock.MagicMock(side_effect=side_effect)
+         self.assertTrue(self.locker._acquired())
+ 
+     def test_acquired_no_timeout(self):

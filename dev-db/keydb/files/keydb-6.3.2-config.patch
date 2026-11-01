@@ -5,7 +5,7 @@
  # Creating a pid file is best effort: if KeyDB is not able to create it
  # nothing bad happens, the server will start and run normally.
 -pidfile /var/run/keydb_6379.pid
-+pidfile /run/keydb.pid
++pidfile /run/keydb/keydb.pid
  
  # Specify the server verbosity level.
  # This can be one of:

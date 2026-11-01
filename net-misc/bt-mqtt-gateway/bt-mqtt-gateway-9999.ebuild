@@ -4,11 +4,10 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_REQ_USE="bluetooth"
 
 inherit python-single-r1 git-r3
 
-# see scripts/download_import_cldr.py
-CLDR_PV=41.0
 DESCRIPTION="Bluetooth MQTT gateway"
 HOMEPAGE="https://github.com/zewelor/bt-mqtt-gateway"
 EGIT_REPO_URI="https://github.com/zewelor/bt-mqtt-gateway.git"
@@ -20,15 +19,16 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="
 	${PYTHON_DEPS}
-	dev-lang/python[bluetooth]
-	dev-python/apscheduler
-	dev-python/interruptingcow
-	dev-python/paho-mqtt
-	dev-python/pyyaml
-	dev-python/tenacity
+	$(python_gen_cond_dep '
+		dev-python/apscheduler[${PYTHON_USEDEP}]
+		dev-python/interruptingcow[${PYTHON_USEDEP}]
+		dev-python/paho-mqtt[${PYTHON_USEDEP}]
+		dev-python/pyyaml[${PYTHON_USEDEP}]
+		dev-python/tenacity[${PYTHON_USEDEP}]
+	')
 "
 BDEPEND="
-	${RDEPEND}
+	${PYTHON_DEPS}
 "
 
 DOCS=( README.md )
@@ -42,10 +42,10 @@ pkg_setup() {
 }
 
 src_install() {
-	python_optimize
-
 	insinto /opt/btmqttgateway
 	doins *.py logger.yaml config.yaml.example
 	insinto /opt/btmqttgateway/workers
 	doins workers/*.py
+
+	python_optimize "${ED}"/opt/btmqttgateway
 }

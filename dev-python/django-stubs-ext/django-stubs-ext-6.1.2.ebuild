@@ -18,5 +18,3 @@ RDEPEND="
 	dev-python/django[${PYTHON_USEDEP}]
 	dev-python/typing-extensions[${PYTHON_USEDEP}]
 "
-
-distutils_enable_tests pytest

@@ -15,25 +15,29 @@ EGIT_REPO_URI="https://github.com/modelcontextprotocol/python-sdk.git"
 LICENSE="MIT"
 SLOT="0"
 
-RDEPEND="dev-python/annotated-types[${PYTHON_USEDEP}]
-	dev-python/anyio[${PYTHON_USEDEP}]
-	dev-python/httpx[${PYTHON_USEDEP}]
-	dev-python/httpx-sse[${PYTHON_USEDEP}]
-	dev-python/jsonschema[${PYTHON_USEDEP}]
-	dev-python/multipart[${PYTHON_USEDEP}]
-	dev-python/pydantic[${PYTHON_USEDEP}]
-	dev-python/pydantic-settings[${PYTHON_USEDEP}]
-	dev-python/pyjwt[${PYTHON_USEDEP}]
-	dev-python/python-dotenv[${PYTHON_USEDEP}]
-	dev-python/starlette[${PYTHON_USEDEP}]
-	dev-python/sse-starlette[${PYTHON_USEDEP}]
-	dev-python/typer[${PYTHON_USEDEP}]
-	dev-python/typing-extensions[${PYTHON_USEDEP}]
-	dev-python/typing-inspection[${PYTHON_USEDEP}]
-	dev-python/uvicorn[${PYTHON_USEDEP}]"
-BDEPEND="test? ( dev-python/dirty-equals[${PYTHON_USEDEP}]
+# httpx2 supplies anyio; mcp-types supplies pydantic and its typing dependencies.
+# sse-starlette supplies starlette, which also requires python-multipart.
+# PyJWT only suggests cryptography, so its crypto extra needs an explicit dep.
+RDEPEND="
+	dev-python/cryptography[${PYTHON_USEDEP}]
+	>=dev-python/httpx2-2.10.0[${PYTHON_USEDEP}]
+	>=dev-python/jsonschema-4.20.0[${PYTHON_USEDEP}]
+	dev-python/mcp-types[${PYTHON_USEDEP}]
+	>=dev-python/opentelemetry-api-1.28.0[${PYTHON_USEDEP}]
+	>=dev-python/pyjwt-2.10.1[${PYTHON_USEDEP}]
+	>=dev-python/python-dotenv-1.0.0[${PYTHON_USEDEP}]
+	>=dev-python/sse-starlette-3.0.0[${PYTHON_USEDEP}]
+	>=dev-python/typer-0.16.0[${PYTHON_USEDEP}]
+	>=dev-python/uvicorn-0.31.1[${PYTHON_USEDEP}]
+"
+BDEPEND="
+	dev-python/uv-dynamic-versioning[${PYTHON_USEDEP}]
+	test? (
+		dev-python/dirty-equals[${PYTHON_USEDEP}]
 		dev-python/websockets[${PYTHON_USEDEP}]
-		dev-util/ruff )"
+		dev-util/ruff
+	)
+"
 
 EPYTEST_XDIST=1
 EPYTEST_PLUGINS=( anyio inline-snapshot pytest-examples )

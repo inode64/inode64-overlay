@@ -3,19 +3,13 @@
 
 EAPI=8
 
-DOC_PV="3.1.8"
-
 DESCRIPTION="A template engine for PHP"
 HOMEPAGE="https://www.smarty.net/"
-SRC_URI="https://github.com/smarty-php/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	doc? ( https://www.smarty.net/files/docs/manual-en.${DOC_PV}.zip )"
+SRC_URI="https://github.com/smarty-php/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="doc"
-
-BDEPEND="doc? ( app-arch/unzip )"
 
 # PHP unicode support is detected at runtime, and the cached templates
 # that smarty generates depend on it. If, later on, PHP is reinstalled
@@ -29,8 +23,6 @@ src_install() {
 	doins -r libs/*
 
 	local DOCS=( CHANGELOG.md README.md SECURITY.md )
-	local HTML_DOCS
-	use doc && HTML_DOCS="${WORKDIR}/manual-en/"*
 	einstalldocs
 }
 

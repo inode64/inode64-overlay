@@ -11,7 +11,7 @@ METRICBEAT_OPTS="${METRICBEAT_OPTS:-}"
 
 command="/usr/bin/metricbeat"
 command_args="-c ${METRICBEAT_CONFIG} ${METRICBEAT_OPTS} -path.config $(dirname $METRICBEAT_CONFIG) \
-	-path.data ${METRICBEAT_DATADIR} -path.home ${METRICBEAT_DATADIR} -path.logs ${METRICBEAT_LOGDIR}"
+	-path.data ${METRICBEAT_DATADIR} -path.home /usr/share/metricbeat -path.logs ${METRICBEAT_LOGDIR}"
 command_background="true"
 command_user="${METRICBEAT_USER}:${METRICBEAT_GROUP}"
 extra_commands="checkconfig"

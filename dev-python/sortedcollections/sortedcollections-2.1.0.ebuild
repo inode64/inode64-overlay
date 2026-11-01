@@ -22,6 +22,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 RDEPEND="dev-python/sortedcontainers[${PYTHON_USEDEP}]"
 BDEPEND="doc? ( ${RDEPEND} )"
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
 distutils_enable_sphinx docs
 

@@ -35,6 +35,8 @@ RDEPEND="
 HTML_DOCS="docs/"
 DOCS="README.md"
 
+PATCHES=( "${FILESDIR}/${PN}-8.0-CVE-2025-63261.patch" )
+
 src_prepare() {
 	default
 

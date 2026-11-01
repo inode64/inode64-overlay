@@ -5,7 +5,7 @@
   <use>
     <flag name="promtail">Build the promtail log gathering agent</flag>
     <flag name="server">Build the loki server</flag>
-    <flag name="tools">Build the loki tools logcli and loki-canary</flag>
+    <flag name="tools">Build the loki tools logcli, loki-canary and lokitool</flag>
   </use>
   <upstream>
     <remote-id type="github">grafana/loki</remote-id>

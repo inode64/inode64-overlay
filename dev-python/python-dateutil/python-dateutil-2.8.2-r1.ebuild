@@ -37,6 +37,11 @@ PATCHES=(
 	"${FILESDIR}/python-dateutil-2.8.1-no-pytest-cov.patch"
 )
 
+EPYTEST_PLUGINS=( hypothesis )
+EPYTEST_DESELECT=(
+	# pytest.warns(None) stopped working in pytest 7, fixed upstream in 2.9.0
+	dateutil/test/test_internals.py::test_parser_parser_private_not_warns
+)
 distutils_enable_tests pytest
 
 python_prepare_all() {

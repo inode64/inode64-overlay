@@ -3,7 +3,7 @@
 name="patroni"
 description="Runners to orchestrate a high-availability PostgreSQL"
 
-command="/bin/patroni"
+command="/usr/bin/patroni"
 command_args="/etc/patroni/patroni.yml"
 command_user="postgres:postgres"
 command_background="yes"

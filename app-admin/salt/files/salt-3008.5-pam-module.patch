@@ -1,0 +1,15 @@
+/usr/bin/python3 is the python-exec wrapper: once pathlib resolves it, it runs
+as python-exec2c and exits with 127, so every PAM authentication fails. Use the
+interpreter running salt, which is what the deployed package needs anyway.
+
+--- a/salt/auth/pam.py
++++ b/salt/auth/pam.py
+@@ -364,8 +364,6 @@
+             return __opts__.get("auth.pam.python")
+         if salt.utils.package.bundled():
+             return sys.executable
+-        if os.path.exists("/usr/bin/python3"):
+-            return "/usr/bin/python3"
+         return sys.executable
+ 
+     env = os.environ.copy()

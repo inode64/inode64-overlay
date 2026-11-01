@@ -19,7 +19,7 @@ HOMEPAGE="
 
 LICENSE="BSD-2 Unlicense"
 SLOT="0"
-KEYWORDS="-* ~amd64"
+KEYWORDS="~amd64"
 
 DEPEND="dev-libs/gmp:="
 RDEPEND="${DEPEND}"

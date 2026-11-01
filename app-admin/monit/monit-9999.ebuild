@@ -3,11 +3,11 @@
 
 EAPI=8
 
-inherit git-r3 pam shell-completion systemd
+inherit git-r3 pam systemd
 
 DESCRIPTION="Monitoring and managing daemons or similar programs running on a Unix system"
 HOMEPAGE="https://mmonit.com/monit/"
-EGIT_REPO_URI="https://bitbucket.org/tildeslash/monit.git"
+EGIT_REPO_URI="https://github.com/MMonit/monit.git"
 
 LICENSE="AGPL-3"
 SLOT="0"
@@ -20,15 +20,20 @@ RDEPEND="virtual/zlib:=
 	ssl? ( dev-libs/openssl:0= )
 "
 DEPEND="${RDEPEND}"
+# autotools and perl (pod2man) are what ./bootstrap runs on the git tree
 BDEPEND="
 	app-alternatives/yacc
 	app-alternatives/lex
+	dev-build/autoconf
+	dev-build/automake
+	dev-build/libtool
+	dev-lang/perl
 "
 PATCHES=( "${FILESDIR}/monit_404.patch" )
 
 src_prepare() {
 	default
-	./bootstrap
+	./bootstrap || die
 	sed -i -e '/^INSTALL_PROG/s/-s//' Makefile.in || die
 }
 
@@ -52,8 +57,6 @@ src_install() {
 	systemd_dounit system/startup/${PN}.service
 
 	use pam && newpamd "${FILESDIR}"/${PN}.pamd ${PN}
-
-	dobashcomp system/bash/monit
 }
 
 pkg_postinst() {

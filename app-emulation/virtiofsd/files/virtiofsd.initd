@@ -41,6 +41,7 @@ start() {
         --make-pidfile --pidfile "/run/virtiofsd-${name}.pid" \
         --exec /usr/libexec/virtiofsd -- \
             --socket-path="/run/virtiofsd/${name}.sock" \
+            --socket-group=qemu \
             --shared-dir="${SHARED_DIR}" \
             --inode-file-handles="${INODE_HANDLES:-prefer}" \
             --announce-submounts \

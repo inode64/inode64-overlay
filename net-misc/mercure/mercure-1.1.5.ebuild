@@ -17,11 +17,9 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-group/mercure
 	acct-user/mercure
-	app-admin/sudo
-	app-crypt/certbot
-	dev-java/openjdk-bin
-	dev-libs/nss
 "
+# fowners in src_install needs them on the build host.
+DEPEND="${RDEPEND}"
 
 DOCS=(README.md)
 
@@ -35,7 +33,7 @@ src_install() {
 	newins "${FILESDIR}/mercure.logrotate" mercure
 
 	insinto /etc/${PN}
-	doins Caddyfile dev.Caddyfile
+	doins Caddyfile
 	fowners -R mercure:mercure /etc/${PN}
 
 	newinitd "${FILESDIR}/mercure.initd" mercure

@@ -1,0 +1,22 @@
+# Workaround these warnings:
+# glusterfs-common: bash-term-in-posix-shell '${gfid:0:2}' [usr/lib/x86_64-linux-gnu/glusterfs/gfind_missing_files/gfid_to_path.sh:24]
+# glusterfs-common: bash-term-in-posix-shell '/dev/tcp' [usr/lib/x86_64-linux-gnu/glusterfs/gfind_missing_files/gfind_missing_files.sh:32]
+
+diff -Naur glusterfs-10.2.orig/tools/gfind_missing_files/gfid_to_path.sh glusterfs-10.2/tools/gfind_missing_files/gfid_to_path.sh
+--- glusterfs-10.2.orig/tools/gfind_missing_files/gfid_to_path.sh	2022-05-13 11:46:25.339563911 +0200
++++ glusterfs-10.2/tools/gfind_missing_files/gfid_to_path.sh	2022-09-14 10:12:40.081125914 +0200
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ ## Copyright (c) 2015 Red Hat, Inc. <http://www.redhat.com/>
+ ## This file is part of GlusterFS.
+diff -Naur glusterfs-10.2.orig/tools/gfind_missing_files/gfind_missing_files.sh glusterfs-10.2/tools/gfind_missing_files/gfind_missing_files.sh
+--- glusterfs-10.2.orig/tools/gfind_missing_files/gfind_missing_files.sh	2022-05-13 11:46:25.339563911 +0200
++++ glusterfs-10.2/tools/gfind_missing_files/gfind_missing_files.sh	2022-09-14 10:12:48.985093471 +0200
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ ##  Copyright (c) 2015 Red Hat, Inc. <http://www.redhat.com/>
+ ##  This file is part of GlusterFS.

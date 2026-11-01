@@ -19,7 +19,6 @@
         <flag name="bind">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from BIND via its
             REST interface
         </flag>
-        <flag name="discovery">Support discover PCP services on the network</flag>
         <flag name="doc">Enable building of the PCP books</flag>
         <flag name="infiniband">Support for inifiniband metrics</flag>
         <flag name="influxdb">Customizable performance metrics exporter tool from PCP to InfluxDB</flag>
@@ -36,6 +35,7 @@
         </flag>
         <flag name="pie">Build programs as Position Independent Executables (a security hardening technique)</flag>
         <flag name="podman">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics from podman</flag>
+        <flag name="qt5">Build the Qt GUI tools (pmchart, pmtime)</flag>
         <flag name="qt6">Build the Qt6 GUI tools (pmchart, pmtime) using <pkg>dev-qt/qtbase</pkg></flag>
         <flag name="postgres">Enable PCP Performance Metrics Domain Agent (PMDA) for collecting metrics about the
             PostgreSQL database

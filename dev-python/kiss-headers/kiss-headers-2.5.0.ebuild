@@ -18,3 +18,16 @@ HOMEPAGE="
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
+
+# These fetch from httpbin.org.
+EPYTEST_IGNORE=(
+	tests/test_serializer.py
+	tests/test_with_http_request.py
+)
+EPYTEST_PLUGINS=()
+distutils_enable_tests pytest
+
+python_test() {
+	# testpaths adds src/ for doctests, which clash with the installed package.
+	epytest tests
+}

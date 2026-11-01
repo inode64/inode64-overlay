@@ -7,9 +7,9 @@
 #NEBULA_MGMT_USER="nebula-mgmt"
 #NEBULA_MGMT_GROUP="nebula-mgmt"
 
-# File with the CA passphrase for non-interactive startup (mode 0600).
-# Format: NEBULA_MGMT_CA_PASSPHRASE=your-passphrase-here
-#NEBULA_MGMT_PASSPHRASE_ENV="/etc/nebula-mgmt/passphrase.env"
+# Master key, instead of master_key in the configuration file. Keep this file
+# at mode 0600 if you set it here.
+#export NEBULA_MGMT_MASTER_KEY=""
 
 # Extra options passed to nebula-mgmt serve
 #NEBULA_MGMT_OPTS=""

@@ -20,4 +20,4 @@ RDEPEND="
 	>=dev-python/starlette-0.49.1[${PYTHON_USEDEP}]
 "
 
-# Upstream's source distribution does not include tests.
+# The sdist omits tests/conftest.py, which also needs the unpackaged asgi-lifespan.

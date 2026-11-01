@@ -7,8 +7,8 @@ After=network-online.target mosquitto.service prometheus.service zigbee2mqtt.ser
 Type=simple
 User=mosquitto
 Group=mosquitto
-EnvironmentFile=-/etc/sysconfig/mqtt-exporter
-ExecStart=/usr/bin/python3 /usr/lib64/mqtt-exporter/exporter.py
+EnvironmentFile=-/etc/conf.d/mqtt-exporter
+ExecStart=/usr/bin/mqtt-exporter
 Restart=always
 
 [Install]

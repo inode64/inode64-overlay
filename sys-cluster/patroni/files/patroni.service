@@ -30,7 +30,7 @@ Environment=PG_MALLOC_ARENA_MAX=
 #ExecStartPre=-+/bin/chown postgres /dev/watchdog
 
 # Start the patroni process
-ExecStart=/bin/patroni /etc/patroni/patroni.yml
+ExecStart=/usr/bin/patroni /etc/patroni/patroni.yml
 
 # Send HUP to reload from patroni.yml
 ExecReload=/bin/kill -s HUP $MAINPID

@@ -19,6 +19,7 @@ else
 	inherit verify-sig
 	SRC_URI="
 		https://networkupstools.org/source/${PV%.*}/${MY_P}.tar.gz
+		https://www.inode64.com/dist/${P}-patches-1.tar.xz
 		verify-sig? ( https://networkupstools.org/source/${PV%.*}/${MY_P}.tar.gz.sig )
 	"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
@@ -84,7 +85,7 @@ VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/nut.asc
 
 PATCHES=(
 	# https://github.com/networkupstools/nut/pull/3499
-	"${FILESDIR}/${P}-CVE-2026-54161.patch"
+	"${WORKDIR}/patches"
 	# https://github.com/networkupstools/nut/commit/0e051f9f6853e9ae0087b388b70840c9651a5eed
 	"${FILESDIR}/${P}-pynut-eof.patch"
 	"${FILESDIR}/${P}-monitor-qt6.patch"
@@ -115,6 +116,15 @@ pkg_pretend() {
 
 pkg_setup() {
 	use python && python-single-r1_pkg_setup
+}
+
+src_unpack() {
+	# verify-sig_src_unpack dies on any distfile without a signature, and only
+	# the upstream tarball is signed: the patches come from our own dist.
+	if use verify-sig; then
+		verify-sig_verify_detached "${DISTDIR}/${MY_P}.tar.gz"{,.sig}
+	fi
+	unpack "${MY_P}.tar.gz" "${P}-patches-1.tar.xz"
 }
 
 src_prepare() {

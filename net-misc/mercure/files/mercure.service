@@ -6,7 +6,7 @@ After=network.target
 Environment=XDG_DATA_HOME=/var/lib/mercure
 Environment=XDG_CONFIG_HOME=/var/lib/mercure
 ExecStart=/usr/bin/mercure run --config /etc/mercure/Caddyfile
-ExecReload=/usr/bin/mercure reload --config /etc/mercure/Caddyfil
+ExecReload=/usr/bin/mercure reload --config /etc/mercure/Caddyfile
 StandardOutput=append:/var/log/mercure/mercure.log
 StandardError=append:/var/log/mercure/mercure.log
 User=mercure

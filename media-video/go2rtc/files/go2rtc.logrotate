@@ -1,7 +1,9 @@
-/var/log/go2rtc/go2rtc.log {
+/var/log/go2rtc/*.log {
 	daily
 	missingok
 	rotate 28
 	compress
 	notifempty
+	# The service keeps the file open and cannot be told to reopen it.
+	copytruncate
 }

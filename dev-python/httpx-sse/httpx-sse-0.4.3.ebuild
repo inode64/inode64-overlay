@@ -16,6 +16,18 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="dev-python/httpx[${PYTHON_USEDEP}]"
-BDEPEND="dev-python/setuptools-scm[${PYTHON_USEDEP}]"
+BDEPEND="
+	dev-python/setuptools-scm[${PYTHON_USEDEP}]
+	test? (
+		dev-python/sse-starlette[${PYTHON_USEDEP}]
+		dev-python/starlette[${PYTHON_USEDEP}]
+	)
+"
 
-# Upstream's source distribution does not include tests.
+EPYTEST_PLUGINS=( pytest-asyncio )
+distutils_enable_tests pytest
+
+python_test() {
+	# Upstream's addopts need pytest-cov and enforce full coverage.
+	epytest -o addopts=
+}

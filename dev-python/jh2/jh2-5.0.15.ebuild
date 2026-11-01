@@ -48,7 +48,11 @@ KEYWORDS="~amd64"
 
 QA_FLAGS_IGNORED="usr/lib.*/py.*/site-packages/jh2/_hazmat.*.so"
 
-src_unpack() {
-	cargo_src_unpack
-	default
+EPYTEST_PLUGINS=( hypothesis )
+distutils_enable_tests pytest
+
+python_test() {
+	# The source tree has no extension and would shadow the built package.
+	rm -rf jh2 || die
+	epytest tests
 }

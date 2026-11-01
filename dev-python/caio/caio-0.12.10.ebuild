@@ -20,5 +20,20 @@ BDEPEND="
 	>=dev-python/setuptools-77[${PYTHON_USEDEP}]
 "
 
-# Tests require unpackaged aiomisc.
-RESTRICT="test"
+# The asyncio adapter tests need aiomisc, which is not packaged.
+EPYTEST_IGNORE=( tests/test_asyncio_adapter.py )
+EPYTEST_PLUGINS=()
+distutils_enable_tests pytest
+
+src_prepare() {
+	distutils-r1_src_prepare
+
+	# Debug info is up to CFLAGS.
+	sed -i -E '/extra_compile_args/s/,\s*"-g"|"-g",\s*|"-g"//g' setup.py || die
+}
+
+python_test() {
+	# The source tree has no extensions and would shadow the built package.
+	rm -rf caio || die
+	epytest
+}

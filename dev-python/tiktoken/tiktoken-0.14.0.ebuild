@@ -8,14 +8,6 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{12..15} )
 
 RUST_MIN_VER="1.85.0"
-# Bump PyO3 to 0.29.0 (RUSTSEC-2026-0176, RUSTSEC-2026-0177)
-CRATES="
-	pyo3-build-config@0.29.0
-	pyo3-ffi@0.29.0
-	pyo3-macros-backend@0.29.0
-	pyo3-macros@0.29.0
-	pyo3@0.29.0
-"
 
 inherit cargo distutils-r1
 
@@ -37,7 +29,6 @@ HOMEPAGE="
 SRC_URI="
 	https://github.com/openai/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.gh.tar.gz
 	https://github.com/fasys-crate-dist/${PN}/releases/download/${PV}/${P}-crates.tar.xz
-	${CARGO_CRATE_URIS}
 	test? (
 		${TTE_BASE_URI}/v${TTE_TAG}/tiktoken-encodings-v${TTE_TAG%.*}.tar.xz
 	)
@@ -70,11 +61,6 @@ EPYTEST_PLUGINS=(
 	pytest-{asyncio,timeout}
 )
 distutils_enable_tests pytest
-
-src_prepare() {
-	distutils-r1_src_prepare
-	sed '/^pyo3 =/s/version = "0\.28\.3"/version = "0.29.0"/' -i Cargo.toml || die
-}
 
 python_test() {
 	local -x PATH=${BUILD_DIR}/install/usr/bin:${PATH}

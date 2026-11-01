@@ -5,8 +5,6 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-Environment="FILEBEAT_USER=root"
-Environment="FILEBEAT_GROUP=root"
 Environment="FILEBEAT_CONFIG=/etc/filebeat/filebeat.yml"
 Environment="FILEBEAT_DATADIR=/var/lib/filebeat"
 Environment="FILEBEAT_LOGDIR=/var/log/filebeat"
@@ -14,8 +12,9 @@ Environment="FILEBEAT_OPTS="
 EnvironmentFile=-/etc/conf.d/filebeat
 ExecStart=/usr/bin/filebeat -c $FILEBEAT_CONFIG $FILEBEAT_OPTS -path.config /etc/filebeat -path.data ${FILEBEAT_DATADIR} -path.home /usr/share/filebeat -path.logs ${FILEBEAT_LOGDIR}
 Restart=on-failure
-User=$FILEBEAT_USER
-Group=$FILEBEAT_GROUP
+# systemd takes these literally, it does not expand variables in User= or Group=.
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target

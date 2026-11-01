@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DESCRIPTION="Tools needed for developing in gentoo"
+DESCRIPTION="Tools needed for developing applications in python"
 SLOT="${PV}"
 KEYWORDS="~amd64"
 
