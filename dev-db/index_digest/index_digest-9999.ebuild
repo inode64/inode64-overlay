@@ -28,6 +28,14 @@ RDEPEND="dev-python/docopt[${PYTHON_USEDEP}]
 	dev-python/yamlloader[${PYTHON_USEDEP}]
 "
 
-PATCHES=(
-	"${FILESDIR}/0001-migrate-to-yamlloader.patch"
-)
+src_prepare() {
+	# yamlordereddictloader left the tree. A sed survives the pin changes in
+	# setup.py, which broke the patch that did this on the live sources.
+	sed -i \
+		-e 's/^import yamlordereddictloader$/import yamlloader/' \
+		-e 's/yamlordereddictloader\.Dumper/yamlloader.ordereddict.Dumper/' \
+		indexdigest/formatters/yaml.py || die
+	sed -i -e "s/'yamlordereddictloader==[^']*'/'yamlloader'/" setup.py || die
+
+	distutils-r1_src_prepare
+}

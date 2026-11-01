@@ -1,0 +1,5 @@
+{
+  "type": "regex",
+  "regex": "href=\"monit-([0-9.]+)\\.tar\\.gz\"",
+  "url": "https://mmonit.com/monit/dist/"
+}

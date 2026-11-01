@@ -24,3 +24,11 @@ BDEPEND="test? ( dev-python/process-tests[${PYTHON_USEDEP}]
 		dev-python/tornado[${PYTHON_USEDEP}] )"
 
 distutils_enable_tests pytest
+
+python_prepare_all() {
+	# Its pytest_ignore_collect(path, config) hook is rejected by pytest 9, and
+	# it only filters doctests in src/, which testpaths does not collect.
+	rm tests/conftest.py || die
+
+	distutils-r1_python_prepare_all
+}

@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit git-r3 go-module tmpfiles
+inherit git-r3 go-env go-module tmpfiles
 
 DESCRIPTION="Sermo is a safe service monitoring and control system for Linux"
 HOMEPAGE="https://github.com/inode64/sermo"
@@ -19,13 +19,17 @@ RESTRICT="!test? ( test )"
 
 src_unpack() {
 	git-r3_src_unpack
+	# go-module_src_unpack is what sets GOFLAGS (-buildmode=pie among them) and
+	# the cgo flags, and this path does not go through it.
+	go-env_set_compile_environment
 	# Fetch modules during unpack, where live ebuilds may access the network.
 	go-module_live_vendor
 }
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w" -o sermoctlr ./cmd/sermoctl || die
-	ego build -trimpath -ldflags "-s -w" -o sermod ./cmd/sermod || die
+	# Not "ego build": the Makefile embeds the version and the catalog path,
+	# and "make install" always rebuilds through this target.
+	emake build
 }
 
 src_test() {

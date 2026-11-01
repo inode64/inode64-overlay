@@ -21,4 +21,5 @@ RDEPEND="${DEPEND}
 	>=dev-python/parsel-1.8.1[${PYTHON_USEDEP}]
 "
 
+EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
