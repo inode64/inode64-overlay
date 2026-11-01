@@ -85,7 +85,7 @@ VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/nut.asc
 PATCHES=(
 	# https://github.com/networkupstools/nut/pull/3499
 	"${FILESDIR}/${P}-CVE-2026-54161.patch"
-	# https://github.com/networkupstools/nut/commit/3e675fedbbec7f8a38b477e20bb85f00d9a42226
+	# https://github.com/networkupstools/nut/commit/0e051f9f6853e9ae0087b388b70840c9651a5eed
 	"${FILESDIR}/${P}-pynut-eof.patch"
 	"${FILESDIR}/${P}-monitor-qt6.patch"
 )
