@@ -25,15 +25,38 @@ src_unpack() {
 	default
 
 	# livecheck populates node_modules after unpacking. Translate the pnpm
-	# overrides before that step so npm builds the same gray-matter/YAML tree.
+	# workspace before that step so npm builds the same tree: npm rejects
+	# "catalog:" specs, and vite is an alias of Vite+ core outside the peer
+	# range of vitest, which pnpm only allows through peerDependencyRules.
 	cd "${S}" || die
 	node -e '
 		const fs = require("fs");
 		const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 		pkg.overrides = {
 			"gray-matter": { "js-yaml": "4.3.2" },
-			"js-yaml@<4.3.2": "4.3.2"
+			"js-yaml@<4.3.2": "4.3.2",
+			"vitest": { "vite": "$vite" },
+			"@vitest/mocker": { "vite": "$vite" }
 		};
+
+		const workspace = fs.readFileSync("pnpm-workspace.yaml", "utf8");
+		const block = /^catalog:\n((?:[ \t].*\n)+)/m.exec(workspace);
+		const catalog = {};
+		for (const [, name, spec] of (block ? block[1] : "").matchAll(
+			/^[ \t]+"?([^"#\s]+?)"?:[ \t]+(\S+)/gm)) {
+			catalog[name] = spec;
+		}
+		for (const deps of [pkg.dependencies, pkg.devDependencies]) {
+			for (const name in deps) {
+				if (deps[name] === "catalog:") {
+					if (!catalog[name]) {
+						throw new Error(name + " is not in the pnpm catalog");
+					}
+					deps[name] = catalog[name];
+				}
+			}
+		}
+
 		fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
 	' || die "Failed to prepare npm dependencies"
 
