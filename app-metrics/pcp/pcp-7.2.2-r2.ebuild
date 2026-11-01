@@ -85,7 +85,6 @@ DEPEND="
 	)
 "
 RDEPEND="${DEPEND}
-	acct-group/pcp
 	acct-user/pcp
 	!sys-process/atop
 	!sys-process/htop

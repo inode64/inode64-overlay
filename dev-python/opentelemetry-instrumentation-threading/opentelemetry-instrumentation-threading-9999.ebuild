@@ -16,9 +16,8 @@ S="${WORKDIR}/${P}/instrumentation/${PN}"
 LICENSE="Apache-2.0"
 SLOT=0
 
-RDEPEND="dev-python/opentelemetry-api[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-instrumentation[${PYTHON_USEDEP}]
-	dev-python/wrapt[${PYTHON_USEDEP}]"
+RDEPEND="
+	dev-python/opentelemetry-instrumentation[${PYTHON_USEDEP}]"
 BDEPEND="test? ( dev-python/opentelemetry-test-utils[${PYTHON_USEDEP}] )"
 
 EPYTEST_PLUGINS=()

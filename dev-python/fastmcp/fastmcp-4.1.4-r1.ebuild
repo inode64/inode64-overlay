@@ -27,20 +27,15 @@ KEYWORDS="~amd64"
 # Audit bundled fastmcp_slim/pyproject.toml, not root Requires-Dist, which only
 # pins slim extras. # verified 2026-11-01
 RDEPEND="
-	>=dev-python/mcp-types-2.0.0[${PYTHON_USEDEP}]
 	<dev-python/mcp-types-3[${PYTHON_USEDEP}]
 	>=dev-python/platformdirs-4.0.0[${PYTHON_USEDEP}]
-	>=dev-python/pydantic-2.12.0[${PYTHON_USEDEP}]
 	dev-python/email-validator[${PYTHON_USEDEP}]
 	>=dev-python/pydantic-settings-2.0.0[${PYTHON_USEDEP}]
 	>=dev-python/python-dotenv-1.1.0[${PYTHON_USEDEP}]
 	>=dev-python/rich-13.9.4[${PYTHON_USEDEP}]
-	>=dev-python/typing-extensions-4.0.0[${PYTHON_USEDEP}]
 	>=dev-python/exceptiongroup-1.2.2[${PYTHON_USEDEP}]
-	>=dev-python/httpx2-2.5.0[${PYTHON_USEDEP}]
 	>=dev-python/mcp-2.3.0[${PYTHON_USEDEP}]
 	<dev-python/mcp-3[${PYTHON_USEDEP}]
-	>=dev-python/opentelemetry-api-1.28.0[${PYTHON_USEDEP}]
 	>=dev-python/starlette-1.0.1[${PYTHON_USEDEP}]
 	>=dev-python/authlib-1.6.11[${PYTHON_USEDEP}]
 	>=dev-python/py-key-value-aio-0.4.4[${PYTHON_USEDEP}]
@@ -49,7 +44,6 @@ RDEPEND="
 	>=dev-python/griffelib-2.0.0[${PYTHON_USEDEP}]
 	>=dev-python/jsonref-1.1.0[${PYTHON_USEDEP}]
 	>=dev-python/jsonschema-path-0.3.4[${PYTHON_USEDEP}]
-	>=dev-python/joserfc-1.5.0[${PYTHON_USEDEP}]
 	>=dev-python/openapi-pydantic-0.6.0[${PYTHON_USEDEP}]
 	>=dev-python/packaging-24.0[${PYTHON_USEDEP}]
 	>=dev-python/pyperclip-1.9.0[${PYTHON_USEDEP}]
@@ -62,7 +56,6 @@ RDEPEND="
 	>=dev-python/websockets-15.0.1[${PYTHON_USEDEP}]
 "
 BDEPEND="
-	dev-python/hatchling[${PYTHON_USEDEP}]
 	>=dev-python/uv-dynamic-versioning-0.7.0[${PYTHON_USEDEP}]
 "
 

@@ -21,7 +21,6 @@ KEYWORDS="~amd64"
 RESTRICT="mirror strip test"
 
 DEPEND="
-	acct-group/ds
 	acct-user/ds
 "
 RDEPEND="${DEPEND}

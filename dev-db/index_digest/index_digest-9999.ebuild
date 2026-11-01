@@ -21,7 +21,6 @@ DOCS="CONTRIBUTING.md"
 
 # Its linters import sql_metadata.compat, which 3.0 removed.
 RDEPEND="dev-python/docopt[${PYTHON_USEDEP}]
-	dev-python/pyyaml[${PYTHON_USEDEP}]
 	dev-python/mysqlclient[${PYTHON_USEDEP}]
 	<dev-python/sql_metadata-3[${PYTHON_USEDEP}]
 	dev-python/termcolor[${PYTHON_USEDEP}]

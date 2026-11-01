@@ -22,8 +22,6 @@ RDEPEND="
 	>=dev-python/fastmcp-4.0.0[${PYTHON_USEDEP}]
 	<dev-python/fastmcp-5[${PYTHON_USEDEP}]
 	>=dev-python/httpx2-2.12.0[${PYTHON_USEDEP}]
-	>=dev-python/pydantic-2.12.0[${PYTHON_USEDEP}]
-	>=dev-python/python-dotenv-1.0.0[${PYTHON_USEDEP}]
 "
 
 # The suite needs a live LibreNMS instance.

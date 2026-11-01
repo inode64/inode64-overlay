@@ -24,7 +24,6 @@ KEYWORDS="~amd64"
 IUSE="homeassistant"
 
 RDEPEND="
-	acct-group/zigbee2mqtt
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
 	net-libs/nodejs:=

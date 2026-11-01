@@ -27,7 +27,6 @@ RDEPEND=">=dev-python/anyio-4.15.1[${PYTHON_USEDEP}]
 	>=dev-python/niquests-cache-0.2.4[${PYTHON_USEDEP}]
 	>=dev-python/platformdirs-4.12.0[${PYTHON_USEDEP}]
 	>=sys-apps/portage-3.0.82.2[${PYTHON_USEDEP}]
-	>=dev-python/tomlkit-0.15.1[${PYTHON_USEDEP}]
-	>=dev-python/typing-extensions-4.16.0[${PYTHON_USEDEP}]"
+	>=dev-python/tomlkit-0.15.1[${PYTHON_USEDEP}]"
 
 distutils_enable_tests pytest

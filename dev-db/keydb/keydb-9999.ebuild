@@ -36,19 +36,13 @@ COMMON_DEPEND="
 
 RDEPEND="
 	${COMMON_DEPEND}
-	acct-group/keydb
 	acct-user/keydb
-"
-
-BDEPEND="
-	virtual/pkgconfig
 "
 
 # Tcl is only needed in the CHOST test env
 # Accounts are needed at build time for fowners in src_install
 DEPEND="
 	${COMMON_DEPEND}
-	acct-group/keydb
 	acct-user/keydb
 	test? (
 		dev-lang/tcl:0=

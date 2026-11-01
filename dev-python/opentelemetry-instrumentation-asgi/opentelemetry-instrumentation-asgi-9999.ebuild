@@ -17,9 +17,7 @@ LICENSE="Apache-2.0"
 SLOT=0
 
 RDEPEND="dev-python/asgiref[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-api[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-instrumentation[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-semantic-conventions[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-util-http[${PYTHON_USEDEP}]"
 BDEPEND="test? ( dev-python/opentelemetry-test-utils[${PYTHON_USEDEP}] )"
 

@@ -29,8 +29,6 @@ RDEPEND="
 	app-emulation/libvirt[firewalld,policykit]
 	app-emulation/qemu[usbredir]
 	app-emulation/virt-manager[policykit]
-	dev-python/pygobject
-	sys-libs/libosinfo[introspection]
 "
 
 src_install() {

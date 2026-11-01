@@ -16,13 +16,11 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 RDEPEND="
-	acct-group/go2rtc
 	acct-user/go2rtc
 	media-video/ffmpeg[x264,x265,opus]
 "
 # fowners in src_install needs them on the build host.
 DEPEND="
-	acct-group/go2rtc
 	acct-user/go2rtc
 "
 BDEPEND=">=dev-lang/go-1.26.0"

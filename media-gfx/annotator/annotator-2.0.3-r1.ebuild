@@ -16,10 +16,8 @@ KEYWORDS="~amd64 ~arm ~x86"
 DEPEND="
 	app-arch/libarchive:=
 	>=dev-libs/granite-7.0.0:=
-	dev-libs/glib:2
 	dev-libs/libgee:0.8=
 	dev-libs/libxml2:=
-	gui-libs/gtk:4
 	media-libs/libwebp:=
 	x11-libs/pango
 "
@@ -30,7 +28,6 @@ BDEPEND="
 	$(vala_depend)
 	dev-libs/glib:2
 	sys-devel/gettext
-	virtual/pkgconfig
 "
 
 src_configure() {

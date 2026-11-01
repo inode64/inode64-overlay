@@ -48,7 +48,6 @@ BDEPEND="
 "
 DEPEND="
 	>=app-crypt/mit-krb5-1.11
-	>=dev-libs/glib-2.68:2
 	>=dev-libs/json-glib-1.4
 	>=net-libs/gnutls-3.6.0:=
 	>=sys-apps/systemd-235:=[policykit]
@@ -57,14 +56,11 @@ DEPEND="
 	${PYTHON_DEPS}
 "
 RDEPEND="${DEPEND}
-	acct-group/cockpit-ws
-	acct-group/cockpit-wsinstance
 	acct-user/cockpit-ws
 	acct-user/cockpit-wsinstance
 	app-crypt/sscg
 	dev-libs/libgudev
 	dev-libs/libpwquality
-	dev-libs/openssl
 	>=sys-auth/polkit-0.105[systemd]
 	net-libs/glib-networking[ssl]
 	virtual/krb5

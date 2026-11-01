@@ -138,7 +138,6 @@ DEPEND="${COMMON_DEPEND}"
 BDEPEND="
 	app-arch/xz-utils
 	sys-devel/bison
-	virtual/pkgconfig
 "
 
 PATCHES=(

@@ -27,14 +27,12 @@ RDEPEND="
 	${DEPEND}
 	app-misc/ca-certificates
 	server? (
-		acct-group/nobody
 		acct-user/nobody
 	)
 	!net-analyzer/crowdsec-bin
 "
 BDEPEND="
 	>=dev-lang/go-1.27.1
-	virtual/pkgconfig
 "
 
 src_unpack() {

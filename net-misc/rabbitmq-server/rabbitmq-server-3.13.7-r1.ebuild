@@ -20,7 +20,6 @@ RESTRICT="test"
 # See https://www.rabbitmq.com/which-erlang.html for Erlang version
 # See https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbitmq_cli/mix.exs for Elixir version
 RDEPEND="
-	acct-group/rabbitmq
 	acct-user/rabbitmq
 	>=dev-lang/erlang-26.0[ssl] <dev-lang/erlang-26.3
 "
@@ -31,7 +30,6 @@ BDEPEND="
 	app-text/docbook-xml-dtd:4.5
 	app-text/xmlto
 	>=dev-lang/elixir-1.13.4 <dev-lang/elixir-1.17.0
-	dev-libs/libxslt
 	${PYTHON_DEPS}
 "
 

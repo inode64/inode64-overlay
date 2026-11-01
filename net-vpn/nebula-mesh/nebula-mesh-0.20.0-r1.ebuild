@@ -25,7 +25,6 @@ CONFIG_AGENT_FILE="/etc/nebula-agent/agent.yml"
 
 RDEPEND="
 	mgmt? (
-		acct-group/nebula-mgmt
 		acct-user/nebula-mgmt
 		dev-libs/openssl
 	)
@@ -34,7 +33,6 @@ RDEPEND="
 # fowners in src_install needs them on the build host.
 DEPEND="
 	mgmt? (
-		acct-group/nebula-mgmt
 		acct-user/nebula-mgmt
 	)
 "

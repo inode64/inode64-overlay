@@ -43,7 +43,6 @@ DEPEND="
 	valgrind? ( dev-debug/valgrind )
 "
 BDEPEND="
-	virtual/pkgconfig
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
 		dev-python/sphinx[${PYTHON_USEDEP}]

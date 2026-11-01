@@ -20,7 +20,6 @@ BDEPEND="
 	dev-python/setuptools-scm[${PYTHON_USEDEP}]
 	test? (
 		dev-python/sse-starlette[${PYTHON_USEDEP}]
-		dev-python/starlette[${PYTHON_USEDEP}]
 	)
 "
 

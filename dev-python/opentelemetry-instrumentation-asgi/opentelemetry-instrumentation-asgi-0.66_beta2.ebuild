@@ -16,9 +16,7 @@ SLOT=0
 KEYWORDS="~amd64 ~x86"
 
 RDEPEND="dev-python/asgiref[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-api[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-instrumentation[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-semantic-conventions[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-util-http[${PYTHON_USEDEP}]"
 BDEPEND="test? ( dev-python/opentelemetry-test-utils[${PYTHON_USEDEP}] )"
 

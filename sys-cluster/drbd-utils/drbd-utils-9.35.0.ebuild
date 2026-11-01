@@ -22,7 +22,6 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND="
 	app-alternatives/lex
-	virtual/pkgconfig
 "
 
 PATCHES=(

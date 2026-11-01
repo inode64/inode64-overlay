@@ -34,7 +34,6 @@ RDEPEND="
 	net-libs/mbedtls:0=
 	sys-libs/libcap
 	x11-libs/libdrm[video_cards_amdgpu]
-	acct-group/lemonade
 	acct-user/lemonade
 	system-fastflowlm? ( sci-ml/fastflowlm )
 	system-llamacpp? ( sci-misc/llama-cpp )
@@ -44,9 +43,7 @@ RDEPEND="
 		x11-misc/xdg-utils
 	)
 	tauri? (
-		net-libs/libsoup:3.0
 		net-libs/webkit-gtk:4.1
-		x11-libs/gtk+:3
 	)
 "
 DEPEND="
@@ -56,9 +53,7 @@ DEPEND="
 "
 BDEPEND="
 	${PYTHON_DEPS}
-	>=dev-build/cmake-3.12
 	app-misc/jq
-	virtual/pkgconfig
 	webui? ( net-libs/nodejs[npm] )
 	tauri? (
 		net-libs/nodejs[npm]

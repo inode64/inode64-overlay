@@ -24,8 +24,6 @@ DEPEND="${RDEPEND}"
 BDEPEND="
 	app-alternatives/yacc
 	app-alternatives/lex
-	dev-build/autoconf
-	dev-build/automake
 	dev-build/libtool
 	dev-lang/perl
 "

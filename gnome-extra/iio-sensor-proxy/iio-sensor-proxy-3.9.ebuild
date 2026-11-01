@@ -26,7 +26,6 @@ RDEPEND="
 "
 
 DEPEND="${RDEPEND}"
-BDEPEND="virtual/pkgconfig"
 
 src_prepare() {
 	if use !systemd ; then

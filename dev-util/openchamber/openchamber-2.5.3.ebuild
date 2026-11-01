@@ -20,7 +20,6 @@ KEYWORDS="~amd64"
 
 # node-pty is a native addon built against the Node ABI, hence the subslot dep.
 RDEPEND="
-	acct-group/openchamber
 	acct-user/openchamber
 	>=net-libs/nodejs-24.14.0:=[npm]
 "

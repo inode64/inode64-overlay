@@ -20,7 +20,6 @@ SLOT="0"
 IUSE="amqp ipmi ldap radius redis"
 
 DEPEND="
-	acct-group/librenms
 	acct-user/librenms
 "
 
@@ -34,7 +33,6 @@ RDEPEND="${DEPEND}
 	media-gfx/graphviz
 	>=net-analyzer/fping-4.2[suid]
 	net-analyzer/mtr
-	net-analyzer/net-snmp
 	net-analyzer/nmap
 	net-analyzer/rrdtool[rrdcached]
 	net-misc/whois
@@ -45,12 +43,10 @@ RDEPEND="${DEPEND}
 	virtual/mysql
 	dev-python/command-runner
 	dev-python/pip
-	dev-python/psutil
 	dev-python/pymysql
 	dev-python/python-dotenv
 	dev-python/python-memcached
 	dev-python/redis
-	dev-python/setuptools
 "
 
 LIBRENMS_HOME="/opt/librenms"

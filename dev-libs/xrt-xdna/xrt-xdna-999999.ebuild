@@ -66,14 +66,12 @@ RESTRICT="bindist mirror strip"
 
 RDEPEND="
 	~dev-util/xrt-${PV}
-	sys-apps/util-linux
 "
 
 # Mostly thowaway dependencies, not actually used in final lib...
 DEPEND="
 	sys-apps/util-linux
 	dev-debug/systemtap
-	dev-libs/boost
 	dev-libs/opencl-icd-loader
 	dev-libs/rapidjson
 	dev-util/opencl-headers

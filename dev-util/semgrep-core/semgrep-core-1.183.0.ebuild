@@ -135,8 +135,7 @@ RDEPEND=">=dev-lang/ocaml-5.3.0:0=[flambda,ocamlopt?]
 	dev-ml/visitors-cleanroom:0=[ocamlopt?]
 	dev-ml/xmlm:0=
 	dev-ml/yaml:0=[ocamlopt?]
-	dev-ml/yojson:0=[ocamlopt?]
-	net-misc/curl"
+	dev-ml/yojson:0=[ocamlopt?]"
 BDEPEND="test? ( dev-ml/qcheck
 		dev-ml/py
 		dev-vcs/git )"

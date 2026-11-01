@@ -26,7 +26,6 @@ RDEPEND="
 	>=dev-python/pydantic-1.9.0[${PYTHON_USEDEP}]
 	dev-python/sniffio[${PYTHON_USEDEP}]
 	>=dev-python/tqdm-4.0[${PYTHON_USEDEP}]
-	>=dev-python/typing-extensions-4.14[${PYTHON_USEDEP}]
 "
 BDEPEND="
 	dev-python/hatch-fancy-pypi-readme[${PYTHON_USEDEP}]

@@ -19,8 +19,6 @@ SLOT=0
 RDEPEND="dev-python/deprecated[${PYTHON_USEDEP}]
 	dev-python/googleapis-common-protos[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-exporter-otlp-proto-common[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-api[${PYTHON_USEDEP}]
-	dev-python/opentelemetry-proto[${PYTHON_USEDEP}]
 	dev-python/opentelemetry-sdk[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]"
 BDEPEND="test? ( dev-python/responses[${PYTHON_USEDEP}] )"

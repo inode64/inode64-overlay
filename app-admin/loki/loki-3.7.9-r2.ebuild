@@ -18,7 +18,7 @@ REQUIRED_USE="|| ( server tools )"
 
 RESTRICT="mirror strip"
 
-RDEPEND="acct-group/grafana
+RDEPEND="
 	acct-user/${PN}"
 DEPEND="${RDEPEND}"
 BDEPEND=">=dev-lang/go-1.26.10"

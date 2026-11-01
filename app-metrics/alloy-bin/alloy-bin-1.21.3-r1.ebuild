@@ -19,7 +19,6 @@ RESTRICT="mirror strip"
 
 RDEPEND="${DEPEND}
 	acct-user/alloy
-	acct-group/alloy
 "
 BDEPEND="app-arch/unzip"
 

@@ -25,8 +25,6 @@ RDEPEND="
 	<dev-python/mcp-3[${PYTHON_USEDEP}]
 	dev-python/openapi-core[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
-	dev-python/python-dotenv[${PYTHON_USEDEP}]
-	dev-python/typer[${PYTHON_USEDEP}]
 "
 
 # Tests hit a live Redmine instance.

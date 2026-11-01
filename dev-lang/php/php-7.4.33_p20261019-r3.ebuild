@@ -149,7 +149,6 @@ BDEPEND="
 		app-arch/xz-utils
 		>=sys-devel/bison-3.0.1
 		dev-util/re2c
-		virtual/pkgconfig
 "
 
 php_install_ini() {

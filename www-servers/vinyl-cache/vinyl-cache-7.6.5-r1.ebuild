@@ -34,7 +34,6 @@ RDEPEND="
 	${PYTHON_DEPS}
 	${CDEPEND}
 	acct-user/varnish
-	acct-group/varnish
 	sys-devel/gcc
 	selinux? ( sec-policy/selinux-varnishd )
 "
@@ -42,12 +41,9 @@ RDEPEND="
 DEPEND="
 	${CDEPEND}
 	acct-user/varnish
-	acct-group/varnish
 "
 BDEPEND="
-	dev-python/docutils
 	dev-python/sphinx
-	virtual/pkgconfig
 "
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"

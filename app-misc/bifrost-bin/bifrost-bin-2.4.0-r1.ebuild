@@ -22,7 +22,6 @@ KEYWORDS="-* ~amd64"
 RESTRICT="strip"
 
 RDEPEND="
-	acct-group/bifrost
 	acct-user/bifrost
 "
 

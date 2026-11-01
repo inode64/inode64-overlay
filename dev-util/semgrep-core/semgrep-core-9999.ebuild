@@ -75,7 +75,6 @@ RDEPEND=">=dev-lang/ocaml-5.3.0:0=[flambda,ocamlopt?]
 	dev-ml/re:0=[ocamlopt?]
 	dev-ml/sarif:0=[ocamlopt?]
 	dev-ml/semver:0=[ocamlopt?]
-	dev-ml/ppx_sexp_conv:0=[ocamlopt?]
 	dev-ml/terminal_size:0=[ocamlopt?]
 	dev-ml/testo:0=[ocamlopt?]
 	dev-ml/timedesc:0=[ocamlopt?]
@@ -89,8 +88,7 @@ RDEPEND=">=dev-lang/ocaml-5.3.0:0=[flambda,ocamlopt?]
 	dev-ml/visitors-cleanroom:0=[ocamlopt?]
 	dev-ml/xmlm:0=
 	dev-ml/yaml:0=[ocamlopt?]
-	dev-ml/yojson:0=[ocamlopt?]
-	net-misc/curl"
+	dev-ml/yojson:0=[ocamlopt?]"
 BDEPEND="test? ( dev-ml/qcheck
 		dev-ml/py )"
 

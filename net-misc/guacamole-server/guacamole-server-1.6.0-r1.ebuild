@@ -51,13 +51,11 @@ COMMON_DEPEND="
 		pulseaudio? ( media-libs/libpulse )
 	)
 	vorbis? (
-		media-libs/libogg
 		media-libs/libvorbis
 	)
 	webp? ( media-libs/libwebp:= )
 "
 RDEPEND="${COMMON_DEPEND}
-	acct-group/guacamole
 	acct-user/guacamole
 	net-analyzer/openbsd-netcat
 	kubernetes? ( ${FONTS} )
@@ -69,7 +67,6 @@ DEPEND="${COMMON_DEPEND}
 	test? ( dev-util/cunit )
 "
 BDEPEND="
-	virtual/pkgconfig
 	rdp? ( dev-lang/perl )
 "
 

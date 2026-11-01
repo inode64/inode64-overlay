@@ -19,17 +19,14 @@ IUSE="systemd"
 DEPEND="
 	>=app-emulation/libvirt-3.0.0:=
 	>=app-emulation/libvirt-glib-0.0.7
-	>=dev-libs/glib-2.44.0:2
 	systemd? ( sys-apps/systemd )
 "
 RDEPEND="${DEPEND}
 	acct-user/libvirtdbus
-	sys-apps/dbus
 	sys-auth/polkit
 "
 BDEPEND="
 	dev-python/docutils
-	virtual/pkgconfig
 "
 
 src_configure() {

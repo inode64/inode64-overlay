@@ -97,7 +97,6 @@ RDEPEND="${COMMON_DEPEND}
 BDEPEND="
 	sys-apps/groff
 	!minimal? (
-		acct-group/ldap
 		acct-user/ldap
 	)
 "

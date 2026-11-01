@@ -15,7 +15,6 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	acct-group/mercure
 	acct-user/mercure
 "
 # fowners in src_install needs them on the build host.

@@ -33,7 +33,6 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	sys-kernel/linux-headers
 "
-BDEPEND="virtual/pkgconfig"
 
 CONFIG_CHECK="~HSA_AMD ~DRM_AMDGPU"
 

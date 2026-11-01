@@ -33,7 +33,6 @@ PATCHES=(
 
 # sys-apps/util-linux is required for libuuid
 RDEPEND="
-	acct-group/gluster
 	acct-user/gluster
 	dev-libs/libaio
 	dev-libs/openssl:=[-bindist(-)]
@@ -70,7 +69,6 @@ DEPEND="
 BDEPEND="
 	sys-devel/bison
 	sys-devel/flex
-	virtual/pkgconfig
 	test? (
 		app-benchmarks/dbench
 		dev-libs/yajl

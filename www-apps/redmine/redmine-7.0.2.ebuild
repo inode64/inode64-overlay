@@ -65,7 +65,6 @@ ruby_add_rdepend "
 "
 
 RDEPEND+="
-	acct-group/redmine
 	acct-user/redmine
 	imagemagick? ( media-gfx/imagemagick )
 	pdf? (

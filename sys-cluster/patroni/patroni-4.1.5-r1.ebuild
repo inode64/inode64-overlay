@@ -16,7 +16,6 @@ KEYWORDS="~amd64 ~ppc64 ~x86"
 IUSE="s3 systemd +etcd"
 
 DEPEND="
-	acct-group/postgres
 	acct-user/postgres
 "
 

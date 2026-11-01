@@ -16,19 +16,13 @@ KEYWORDS="~amd64 ~x86"
 IUSE="apache2 curl dig ipv6 radius"
 
 DEPEND="
-	acct-group/smokeping
 	acct-user/smokeping
-	>=dev-lang/perl-5.8.8-r8
 	>=dev-perl/SNMP_Session-1.13
 	>=net-analyzer/fping-4.1[suid]
 	>=net-analyzer/rrdtool-1.2[graph,perl]
-	dev-perl/CGI
 	dev-perl/CGI-Session
 	dev-perl/Config-Grammar
-	dev-perl/Digest-HMAC
-	dev-perl/FCGI
 	dev-perl/IO-Socket-SSL
-	dev-perl/IO-Tty
 	dev-perl/Net-DNS
 	dev-perl/Net-OpenSSH
 	dev-perl/Net-SNMP
@@ -36,7 +30,6 @@ DEPEND="
 	dev-perl/Path-Tiny
 	dev-perl/libwww-perl
 	dev-perl/perl-ldap
-	virtual/perl-libnet
 	dev-perl/CGI-Fast
 	!apache2? ( virtual/httpd-cgi )
 	apache2? (

@@ -21,7 +21,6 @@ KEYWORDS="~amd64 ~riscv ~x86"
 IUSE="geoip2 ipv6"
 
 RDEPEND="
-	>=dev-lang/perl-5.6.1
 	dev-perl/URI
 	virtual/perl-Time-Local
 	geoip2? (

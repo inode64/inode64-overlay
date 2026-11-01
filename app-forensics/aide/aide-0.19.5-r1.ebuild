@@ -26,7 +26,6 @@ DEPEND="
 	xattr? ( sys-apps/attr )
 	!nettle? (
 		dev-libs/libgcrypt:=
-		dev-libs/libgpg-error
 	)
 "
 RDEPEND="

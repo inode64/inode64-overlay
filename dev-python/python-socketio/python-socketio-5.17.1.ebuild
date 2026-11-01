@@ -20,7 +20,6 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	>=dev-python/aiohttp-3.4[${PYTHON_USEDEP}]
 	>=dev-python/bidict-0.21.0[${PYTHON_USEDEP}]
 	>=dev-python/python-engineio-4.15.1[${PYTHON_USEDEP}]
 	>=dev-python/requests-2.21.0[${PYTHON_USEDEP}]

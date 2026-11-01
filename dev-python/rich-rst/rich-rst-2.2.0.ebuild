@@ -25,7 +25,6 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	>=dev-python/rich-12.0.0[${PYTHON_USEDEP}]
-	>=dev-python/pygments-2.0.0[${PYTHON_USEDEP}]
 "
 
 EPYTEST_PLUGINS=()

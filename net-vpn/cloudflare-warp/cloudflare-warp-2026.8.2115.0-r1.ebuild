@@ -19,28 +19,16 @@ RESTRICT="bindist mirror"
 RDEPEND="
 	app-crypt/tpm2-tss
 	dev-libs/glib:2
-	dev-libs/nspr
 	dev-libs/nss
 	net-firewall/nftables
 	net-libs/libpcap
 	sys-apps/dbus
 	gui? (
-		app-accessibility/at-spi2-core:2
-		dev-libs/ayatana-ido
 		dev-libs/libayatana-appindicator
 		dev-libs/libayatana-indicator:3
-		dev-libs/libdbusmenu
-		media-libs/fontconfig
-		media-libs/harfbuzz
-		media-libs/libepoxy
-		net-libs/libsoup:3.0
 		net-libs/webkit-gtk:4.1
 		net-misc/curl
-		virtual/zlib
-		x11-libs/cairo
-		x11-libs/gdk-pixbuf:2
 		x11-libs/gtk+:3[X,wayland]
-		x11-libs/pango
 	)
 "
 BDEPEND="

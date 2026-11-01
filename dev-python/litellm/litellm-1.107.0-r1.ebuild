@@ -632,7 +632,6 @@ RDEPEND="
 		>=dev-python/python-dotenv-1.0.0[${PYTHON_USEDEP}]
 		>=dev-python/pyyaml-6.0.3[${PYTHON_USEDEP}]
 		>=dev-python/tiktoken-0.12.0[${PYTHON_USEDEP}]
-		>=dev-python/typing-extensions-4.13.0[${PYTHON_USEDEP}]
 		caching? ( >=dev-python/diskcache-5.6.3[${PYTHON_USEDEP}] )
 		cli? (
 			>=dev-python/inquirerpy-0.3.4[${PYTHON_USEDEP}]
@@ -642,7 +641,6 @@ RDEPEND="
 			>=dev-python/tomlkit-0.13.3[${PYTHON_USEDEP}]
 		)
 		mcp? (
-			>=dev-python/httpx2-2.10.0[${PYTHON_USEDEP}]
 			>=dev-python/mcp-2.3.0[${PYTHON_USEDEP}]
 			<dev-python/mcp-3[${PYTHON_USEDEP}]
 		)

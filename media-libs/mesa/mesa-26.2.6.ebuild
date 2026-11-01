@@ -145,7 +145,6 @@ DEPEND="${RDEPEND}
 	wayland? ( >=dev-libs/wayland-protocols-1.41 )
 	X? (
 		x11-libs/libXrandr[${MULTILIB_USEDEP}]
-		x11-base/xorg-proto
 	)
 "
 
@@ -162,7 +161,6 @@ BDEPEND="
 	>=dev-build/meson-1.7.0
 	app-alternatives/yacc
 	sys-devel/flex
-	virtual/pkgconfig
 	$(python_gen_any_dep "
 		>=dev-python/mako-0.8.0[\${PYTHON_USEDEP}]
 		dev-python/packaging[\${PYTHON_USEDEP}]

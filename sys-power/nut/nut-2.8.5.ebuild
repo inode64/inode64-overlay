@@ -40,7 +40,6 @@ REQUIRED_USE="
 
 # sys-apps/systemd-253 required for Type=notify-reload
 DEPEND="
-	acct-group/nut
 	acct-user/nut
 	dev-libs/libltdl
 	virtual/udev
@@ -55,7 +54,6 @@ DEPEND="
 	systemd? ( >=sys-apps/systemd-253 )
 	tcpd? ( sys-apps/tcp-wrappers )
 	upower? (
-		dev-libs/glib:2
 		sys-power/upower
 	)
 	usb? ( virtual/libusb:1 )
@@ -63,7 +61,6 @@ DEPEND="
 	zeroconf? ( net-dns/avahi )
 "
 BDEPEND="
-	virtual/pkgconfig
 	man? ( app-text/asciidoc )
 	monitor? ( $(python_gen_cond_dep '
 			dev-python/pyqt6[gui,widgets,${PYTHON_USEDEP}]

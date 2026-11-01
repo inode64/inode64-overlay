@@ -28,7 +28,6 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 BDEPEND="
 	sys-apps/help2man
-	virtual/pkgconfig
 "
 
 DOCS=( README.md )

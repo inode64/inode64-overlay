@@ -25,26 +25,21 @@ PROPERTIES="live"
 RESTRICT="bindist network-sandbox"
 
 BDEPEND="
-	>=dev-build/cmake-3.22
 	dev-build/ninja
 	|| ( dev-lang/rust dev-lang/rust-bin )
-	virtual/pkgconfig
 "
 RDEPEND="
-	acct-group/fastflowlm
 	acct-user/fastflowlm
 	dev-libs/boost:=
 	dev-libs/libedit
 	dev-libs/xdna-driver
 	dev-libs/xrt-xdna
-	dev-util/xrt
 	media-video/ffmpeg:=
 	net-misc/curl:=
 "
 # xrt-2.21.75-r1 is the first to install aiebu's headers and static library.
 DEPEND="
 	${RDEPEND}
-	>=dev-util/xrt-2.21.75-r1
 "
 
 CMAKE_USE_DIR="${S}/src"

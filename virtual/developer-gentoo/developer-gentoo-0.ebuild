@@ -13,5 +13,4 @@ RDEPEND="
 		app-portage/portage-utils
 		dev-util/pkgdev
 		dev-util/shellcheck-bin
-		dev-vcs/git
 "

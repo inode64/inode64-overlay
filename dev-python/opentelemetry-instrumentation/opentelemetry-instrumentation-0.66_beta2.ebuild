@@ -15,7 +15,7 @@ LICENSE="Apache-2.0"
 SLOT=0
 KEYWORDS="~amd64 ~x86"
 
-RDEPEND="dev-python/opentelemetry-api[${PYTHON_USEDEP}]
+RDEPEND="
 	dev-python/opentelemetry-semantic-conventions[${PYTHON_USEDEP}]
 	dev-python/packaging[${PYTHON_USEDEP}]
 	dev-python/wrapt[${PYTHON_USEDEP}]"

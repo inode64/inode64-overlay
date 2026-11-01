@@ -139,7 +139,7 @@ COMMON_DEPEND="
 	vpx? ( media-libs/libvpx:0= )
 	wddx? ( >=dev-libs/libxml2-2.6.8:= )
 	xml? ( >=dev-libs/libxml2-2.6.8:= )
-	xmlrpc? ( >=dev-libs/libxml2-2.6.8 virtual/libiconv )
+	xmlrpc? ( >=dev-libs/libxml2-2.6.8 )
 	xmlreader? ( >=dev-libs/libxml2-2.6.8:= )
 	xmlwriter? ( >=dev-libs/libxml2-2.6.8:= )
 	xpm? (
@@ -165,7 +165,6 @@ BDEPEND="
 		app-arch/xz-utils
 		>=sys-devel/bison-3.0.1
 		dev-util/re2c
-		virtual/pkgconfig
 "
 
 php_install_ini() {

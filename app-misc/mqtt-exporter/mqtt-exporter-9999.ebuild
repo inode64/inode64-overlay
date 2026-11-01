@@ -22,7 +22,6 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	acct-user/mosquitto
-	acct-group/mosquitto
 	dev-python/paho-mqtt[${PYTHON_USEDEP}]
 	dev-python/prometheus-client[${PYTHON_USEDEP}]
 "

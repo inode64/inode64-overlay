@@ -25,13 +25,11 @@ IUSE="test"
 RDEPEND="
 	>=dev-libs/libxml2-2.13.9:=
 	>=dev-libs/libxslt-1.1.43
-	>=virtual/zlib-1.3.1:=
-	virtual/libiconv"
+	>=virtual/zlib-1.3.1:="
 DEPEND="
 	>=dev-libs/libxml2-2.13.9:=
 	>=dev-libs/libxslt-1.1.43
-	>=virtual/zlib-1.3.1:=
-	virtual/libiconv"
+	>=virtual/zlib-1.3.1:="
 
 ruby_add_rdepend ">=dev-ruby/racc-1.4:0"
 

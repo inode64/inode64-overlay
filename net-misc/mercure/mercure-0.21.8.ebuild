@@ -15,7 +15,6 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	acct-group/mercure
 	acct-user/mercure
 	app-admin/sudo
 	app-crypt/certbot

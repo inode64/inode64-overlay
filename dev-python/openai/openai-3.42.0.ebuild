@@ -27,7 +27,6 @@ RDEPEND="
 	>=dev-python/pydantic-2.4[${PYTHON_USEDEP}]
 	<dev-python/pydantic-3[${PYTHON_USEDEP}]
 	dev-python/sniffio[${PYTHON_USEDEP}]
-	>=dev-python/typing-extensions-4.14[${PYTHON_USEDEP}]
 	<dev-python/typing-extensions-5[${PYTHON_USEDEP}]
 "
 # httpx2 already requires anyio >= 4.10.0; retain OpenAI's upper bound.

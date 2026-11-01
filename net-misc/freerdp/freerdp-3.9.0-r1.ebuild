@@ -31,7 +31,6 @@ IUSE="aad alsa cpu_flags_arm_neon +client cups debug +ffmpeg +fuse gstreamer +ic
 RESTRICT="!test? ( test )"
 
 BDEPEND+="
-	virtual/pkgconfig
 	app-text/docbook-xsl-stylesheets
 	dev-libs/libxslt
 "
@@ -49,9 +48,7 @@ COMMON_DEPEND="
 	)
 	X? (
 		x11-libs/libXcursor
-		x11-libs/libXext
 		x11-libs/libXi
-		x11-libs/libXrender
 		xinerama? ( x11-libs/libXinerama )
 		xv? ( x11-libs/libXv )
 	)
@@ -61,7 +58,6 @@ COMMON_DEPEND="
 	)
 	fuse? ( sys-fs/fuse:3= )
 	gstreamer? (
-		media-libs/gstreamer:1.0
 		media-libs/gst-plugins-base:1.0
 		X? ( x11-libs/libXrandr )
 	)
@@ -76,13 +72,9 @@ COMMON_DEPEND="
 	)
 	server? (
 		X? (
-			x11-libs/libXcursor
 			x11-libs/libXdamage
-			x11-libs/libXext
-			x11-libs/libXfixes
 			x11-libs/libXrandr
 			x11-libs/libXtst
-			xinerama? ( x11-libs/libXinerama )
 		)
 	)
 	smartcard? ( sys-apps/pcsc-lite )
@@ -94,7 +86,6 @@ COMMON_DEPEND="
 		)
 	)
 	X? (
-		x11-libs/libX11
 		x11-libs/libxkbfile
 	)
 "

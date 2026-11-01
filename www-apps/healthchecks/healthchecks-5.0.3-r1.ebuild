@@ -36,7 +36,6 @@ RDEPEND="
 		postgres? ( dev-python/psycopg[${PYTHON_USEDEP}] )
 		dev-python/argon2-cffi[${PYTHON_USEDEP}]
 		dev-python/cronsim[${PYTHON_USEDEP}]
-		dev-python/cryptography[${PYTHON_USEDEP}]
 		>=dev-python/django-6.1[${PYTHON_USEDEP}]
 		dev-python/django-compressor[${PYTHON_USEDEP}]
 		dev-python/django-stubs-ext[${PYTHON_USEDEP}]
