@@ -14,9 +14,7 @@ LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64"
 
-RDEPEND="${PYTHON_DEPS}"
-DEPEND="${RDEPEND}"
-BDEPEND="${DEPEND}
+BDEPEND="
 	test? (
 		dev-python/attrs[${PYTHON_USEDEP}]
 		dev-python/pydantic[${PYTHON_USEDEP}]
