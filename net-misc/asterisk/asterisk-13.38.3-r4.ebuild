@@ -50,12 +50,10 @@ PATCHES=(
 )
 
 DEPEND="acct-user/asterisk
-	acct-group/asterisk
 	dev-db/sqlite:3
 	dev-libs/popt
 	dev-libs/jansson:=
 	dev-libs/libedit
-	dev-libs/libxml2:2
 	dev-libs/libxslt
 	virtual/libcrypt:=
 	sys-libs/zlib
@@ -100,7 +98,6 @@ DEPEND="acct-user/asterisk
 	)
 	systemd? ( sys-apps/systemd )
 	vorbis? (
-		media-libs/libogg
 		media-libs/libvorbis
 	)
 	voicemail_storage_imap? ( virtual/imap-c-client )
@@ -114,8 +111,7 @@ RDEPEND="${DEPEND}
 	selinux? ( sec-policy/selinux-asterisk )
 	syslog? ( virtual/logger )"
 
-BDEPEND="dev-libs/libxml2:2
-	virtual/pkgconfig"
+BDEPEND="dev-libs/libxml2:2"
 
 QA_DT_NEEDED="/usr/lib.*/libasteriskssl[.]so[.][0-9]\+"
 
