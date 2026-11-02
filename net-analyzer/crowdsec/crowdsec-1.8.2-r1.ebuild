@@ -12,7 +12,9 @@ SRC_URI="
 	https://github.com/crowdsecurity/crowdsec/releases/download/v${PV}/${PN}-v${PV}-vendor.tar.xz
 "
 
-LICENSE="Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0 WTFPL-2"
+LICENSE="MIT"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT-0 MPL-2.0 public-domain"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE="+server"
