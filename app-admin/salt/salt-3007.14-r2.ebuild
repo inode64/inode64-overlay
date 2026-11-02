@@ -82,7 +82,6 @@ RDEPEND="
 	' python3_{13..14})
 "
 BDEPEND="
-	sys-apps/findutils
 	dev-python/build[${PYTHON_USEDEP}]
 	test? (
 		${RDEPEND}

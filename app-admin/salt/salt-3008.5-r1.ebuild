@@ -80,7 +80,6 @@ RDEPEND="
 	' python3_{13..14})
 "
 BDEPEND="
-	sys-apps/findutils
 	dev-python/build[${PYTHON_USEDEP}]
 	>=dev-python/importlib-metadata-8.7.0[${PYTHON_USEDEP}]
 	dev-python/looseversion[${PYTHON_USEDEP}]
