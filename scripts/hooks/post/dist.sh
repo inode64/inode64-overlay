@@ -13,6 +13,13 @@ distdir="$(portageq envvar DISTDIR 2>/dev/null)"
 
 . /etc/portage/inode64.conf
 
+# livecheck only learns that an upload failed from the exit status, but a
+# package with two archives must still try to upload the second one.
+status=0
+upload() {
+	rsync -av "${distdir}/$1" "$INODE64_OVERLAY_REPO" || status=$?
+}
+
 if [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] || \
@@ -22,8 +29,7 @@ if [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "dev-util/rulesync" ] || \
     [ "$cp" == "sys-process/pm2" ] || \
     [ "$cp" == "www-apps/guacamole-client" ] ; then
-	file="${ebuild}-${new_version}-node_modules.tar.xz"
-	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
+	upload "${ebuild}-${new_version}-node_modules.tar.xz"
 fi
 
 if [ "$cp" == "app-backup/autorestic" ] || \
@@ -35,21 +41,17 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "dev-php/composer" ] || \
     [ "$cp" == "media-video/go2rtc" ] || \
     [ "$cp" == "sys-process/runitor" ] || \
-    [ "$cp" == "net-vpn/cloudflared" ] || \
     [ "$cp" == "net-vpn/nebula-mesh" ] || \
     [ "$cp" == "net-vpn/nebula" ] ; then
-	file="${ebuild}-${new_version}-vendor.tar.xz"
-	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
+	upload "${ebuild}-${new_version}-vendor.tar.xz"
 fi
 
 if [ "$cp" == "www-apps/guacamole-client" ]; then
-	file="${ebuild}-${new_version}-mvn.tar.xz"
-	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO"
+	upload "${ebuild}-${new_version}-mvn.tar.xz"
 fi
 
 if [ "$cp" == "dev-python/jiter" ]; then
-	file="${ebuild}-${new_version}-crates.tar.xz"
-	rsync -av "${distdir}/${file}" "$INODE64_OVERLAY_REPO" || exit "$?"
+	upload "${ebuild}-${new_version}-crates.tar.xz"
 fi
 
-exit 0
+exit "$status"
