@@ -39,7 +39,6 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	virtual/os-headers
 	valgrind? ( dev-debug/valgrind )
 "
 BDEPEND="
