@@ -30,7 +30,6 @@ KEYWORDS="-* ~amd64 ~arm64"
 RESTRICT="strip"
 
 RDEPEND="
-	sys-devel/gcc
 	sys-libs/glibc
 "
 
