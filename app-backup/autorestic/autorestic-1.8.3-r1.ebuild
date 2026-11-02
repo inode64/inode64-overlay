@@ -11,6 +11,8 @@ SRC_URI="https://github.com/cupcakearmy/autorestic/archive/v${PV}.tar.gz -> ${P}
 	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="Apache-2.0"
+# Dependent licenses
+LICENSE+=" BSD BSD-2 ISC MIT MPL-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
