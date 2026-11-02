@@ -14,8 +14,7 @@ LICENSE="BSD"
 SLOT=0
 KEYWORDS="~amd64 ~arm64"
 
-DEPEND="${PYTHON_DEPS}"
-RDEPEND="${DEPEND}
+RDEPEND="
 	dev-python/itemadapter[${PYTHON_USEDEP}]
 	>=dev-python/parsel-1.8.1[${PYTHON_USEDEP}]
 "
