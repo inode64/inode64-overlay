@@ -34,7 +34,7 @@ SRC_URI+="
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 IUSE="ldap +mysql postgres radius sso test totp"
 REQUIRED_USE="|| ( mysql postgres )"
 BDEPEND="
@@ -68,11 +68,20 @@ src_unpack() {
 		unpack ${P}.tar.gz
 	fi
 
-	unpack ${P}-node_modules.tar.xz
-	unpack ${P}-mvn.tar.xz
+	# livecheck regenerates these archives from an ebuild whose SRC_URI
+	# does not list them yet, so they are not always in A.
+	local archive
+	for archive in ${P}-node_modules.tar.xz ${P}-mvn.tar.xz; do
+		if has ${archive} ${A}; then
+			unpack ${archive}
+		fi
+	done
 
 	if use mysql; then
-		unpack mysql-connector-j-8.3.0.tar.gz
+		# Only the driver is installed. The connector sources carry a pom.xml
+		# that livecheck would take for the guacamole build.
+		tar -xf "${DISTDIR}"/mysql-connector-j-8.3.0.tar.gz -C "${WORKDIR}" \
+			mysql-connector-j-8.3.0/mysql-connector-j-8.3.0.jar || die
 	fi
 }
 
@@ -155,7 +164,7 @@ src_install() {
 		insinto "${GUACAMOLE_HOME}/extensions"
 		doins extensions/guacamole-auth-jdbc/modules/guacamole-auth-jdbc-postgresql/target/guacamole-auth-jdbc-postgresql-${MY_PV}.jar
 		insinto "${GUACAMOLE_HOME}/lib"
-		doins "${WORKDIR}"/postgresql-42.7.3.jar
+		doins "${DISTDIR}"/postgresql-42.7.3.jar
 
 		insinto "/usr/share/${PN}/schema/postgres"
 		find "${S}/extensions/${MY_PN}-auth-jdbc/modules/${MY_PN}-auth-jdbc-postgresql/schema/" \
