@@ -1,6 +1,10 @@
 [Unit]
 Description=Backrest Daemon
 After=network.target
+# /var/lib/backrest, which also holds the restic cache, can be a volume of
+# its own: without it backrest would start over with an empty config. Does
+# nothing while it is part of the root filesystem.
+RequiresMountsFor=/var/lib/backrest
 
 [Service]
 Type=simple
@@ -8,6 +12,12 @@ ExecStart=/usr/bin/backrest -restic-cmd /usr/bin/restic -data-dir /var/lib/backr
 Restart=on-failure
 StandardOutput=append:/var/log/backrest/backrest.log
 StandardError=append:/var/log/backrest/backrest.log
+# restic keeps its cache in $XDG_CACHE_HOME/restic. To move it elsewhere,
+# add a drop-in with "systemctl edit backrest":
+#   [Unit]
+#   RequiresMountsFor=/var/cache/backup/restic
+#   [Service]
+#   Environment=RESTIC_CACHE_DIR=/var/cache/backup/restic
 Environment=XDG_CACHE_HOME=/var/lib/backrest/
 
 [Install]

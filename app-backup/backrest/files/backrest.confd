@@ -26,4 +26,8 @@
 # Leave empty to keep restic's default (~/.cache/restic of the user running
 # the service). The systemd unit uses /var/lib/backrest/restic. A --cache-dir
 # flag set on a repository in backrest still takes precedence.
+#
+# /var/lib/backrest and the cache can be volumes of their own. When
+# /etc/fstab mounts one of them, or a directory above them, backrest does not
+# start until it is mounted, so that nothing lands on the root filesystem.
 #BACKREST_RESTIC_CACHE_DIR=""

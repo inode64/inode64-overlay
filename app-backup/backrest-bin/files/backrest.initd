@@ -13,6 +13,8 @@ description="backrest Daemon"
 : "${BACKREST_BIND_TIMEOUT:=30}"
 : "${BACKREST_RESTIC_CACHE_DIR:=}"
 
+backrest_data_dir="/var/lib/backrest"
+
 command="/usr/bin/backrest"
 command_background=true
 pidfile="/run/backrest.pid"
@@ -22,7 +24,7 @@ output_log="/var/log/backrest/backrest.log"
 error_log="/var/log/backrest/backrest.log"
 
 depend() {
-	need net
+	need net localmount
 	# Only orders the start when netifrc manages the interface; the address
 	# itself is waited for in start_pre().
 	if [ -n "${BACKREST_BIND_INTERFACE}" ]; then
@@ -36,8 +38,44 @@ _interface_address() {
 		awk '!/ (tentative|deprecated|dadfailed|temporary) / { sub("/.*", "", $4); print $4; exit }'
 }
 
+# Mount points of /etc/fstab that hold the path $1, itself or one of its
+# parents, leaving out the root filesystem.
+_fstab_mounts_for() {
+	awk -v path="$1" '
+		$1 !~ /^#/ && $2 ~ /^\/./ {
+			mnt = $2
+			sub("/+$", "", mnt)
+			if (path == mnt || index(path, mnt "/") == 1)
+				print mnt
+		}' /etc/fstab
+}
+
+# The data directory and the restic cache may live on volumes of their own.
+# If one listed in /etc/fstab is missing, backrest would start over with an
+# empty config and restic would fill the root filesystem underneath it.
+_check_mounts() {
+	local dir mnt
+	for dir in "$@"; do
+		[ -n "${dir}" ] || continue
+		dir="$(readlink -f "${dir}" 2>/dev/null || printf '%s' "${dir%/}")"
+		for mnt in $(_fstab_mounts_for "${dir}"); do
+			if ! mountpoint -q "${mnt}"; then
+				eerror "${mnt} is in /etc/fstab but not mounted (needed for ${dir})"
+				return 1
+			fi
+		done
+	done
+}
+
 start_pre() {
 	local host="${BACKREST_BIND_HOST}"
+	local cache_dir="${BACKREST_RESTIC_CACHE_DIR}"
+
+	# restic's own default, which is what it uses when the variable is empty.
+	if [ -z "${cache_dir}" ] && [ -n "${HOME}" ]; then
+		cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/restic"
+	fi
+	_check_mounts "${backrest_data_dir}" "${cache_dir}" || return 1
 
 	if [ -n "${BACKREST_BIND_INTERFACE}" ]; then
 		case "${BACKREST_BIND_FAMILY}" in
@@ -77,5 +115,5 @@ start_pre() {
 		export RESTIC_CACHE_DIR="${BACKREST_RESTIC_CACHE_DIR}"
 	fi
 
-	command_args="-restic-cmd /usr/bin/restic -data-dir /var/lib/backrest/ -config-file /var/lib/backrest/config.json -bind-address ${host}:${BACKREST_BIND_PORT}"
+	command_args="-restic-cmd /usr/bin/restic -data-dir ${backrest_data_dir}/ -config-file ${backrest_data_dir}/config.json -bind-address ${host}:${BACKREST_BIND_PORT}"
 }
