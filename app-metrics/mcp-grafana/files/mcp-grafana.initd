@@ -1,0 +1,46 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Model Context Protocol (MCP) server for Grafana"
+
+: "${MCP_GRAFANA_CONF:=/etc/mcp-grafana/mcp-grafana.conf}"
+: "${MCP_GRAFANA_TOKEN:=/etc/mcp-grafana/token}"
+
+command="/usr/bin/mcp-grafana"
+command_user="mcp-grafana:mcp-grafana"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log"
+error_log="${output_log}"
+
+depend() {
+	need net
+	after grafana
+}
+
+start_pre() {
+	# The systemd unit reads the same file through EnvironmentFile.
+	# start-stop-daemon hands the exported variables to the service.
+	if [ -r "${MCP_GRAFANA_CONF}" ]; then
+		set -a
+		. "${MCP_GRAFANA_CONF}"
+		set +a
+	fi
+	command_args="${MCP_GRAFANA_OPTS}"
+
+	checkpath -d -m 0750 -o "${command_user}" "/var/log/${RC_SVCNAME}"
+
+	# As LoadCredential does in the unit, the token stays root-only in /etc
+	# and the service user reads a private copy.
+	if [ -r "${MCP_GRAFANA_TOKEN}" ]; then
+		checkpath -d -m 0700 -o "${command_user}" "/run/${RC_SVCNAME}"
+		install -m 0400 -o "${command_user%:*}" -g "${command_user#*:}" \
+			"${MCP_GRAFANA_TOKEN}" "/run/${RC_SVCNAME}/grafana-token" || return 1
+		export GRAFANA_SERVICE_ACCOUNT_TOKEN_FILE="/run/${RC_SVCNAME}/grafana-token"
+	fi
+}
+
+stop_post() {
+	rm -f "/run/${RC_SVCNAME}/grafana-token"
+}

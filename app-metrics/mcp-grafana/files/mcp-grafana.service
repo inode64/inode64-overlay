@@ -7,7 +7,7 @@ After=network-online.target grafana.service
 [Service]
 Type=simple
 DynamicUser=yes
-EnvironmentFile=/etc/conf.d/mcp-grafana
+EnvironmentFile=/etc/mcp-grafana/mcp-grafana.conf
 # The token stays root-only on disk; systemd hands a copy to the dynamic user.
 LoadCredential=grafana-token:/etc/mcp-grafana/token
 Environment=GRAFANA_SERVICE_ACCOUNT_TOKEN_FILE=%d/grafana-token
