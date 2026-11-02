@@ -46,7 +46,6 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	dev-libs/boost:=
 	dev-libs/openssl:=
-	sys-apps/util-linux
 "
 
 # systemtap only provides <sys/sdt.h> for the USDT probes
