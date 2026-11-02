@@ -31,7 +31,6 @@ RDEPEND="
 "
 BDEPEND="
 	dev-lang/perl
-	sys-apps/file
 "
 
 PATCHES=(
