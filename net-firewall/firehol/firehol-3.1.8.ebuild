@@ -20,7 +20,6 @@ MY_BASH_VERSION=4.0
 MY_IPRANGE_VERSION=1.0.2
 
 RDEPEND="
-	app-arch/gzip
 	>=app-shells/bash-${MY_BASH_VERSION}:0
 	net-analyzer/traceroute
 	net-firewall/iptables
