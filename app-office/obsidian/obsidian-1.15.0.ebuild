@@ -44,7 +44,6 @@ RDEPEND="
 	media-libs/alsa-lib
 	media-libs/mesa[gbm(+)]
 	net-print/cups
-	sys-apps/util-linux
 	sys-libs/glibc
 	virtual/libudev
 	x11-libs/gtk+:3
