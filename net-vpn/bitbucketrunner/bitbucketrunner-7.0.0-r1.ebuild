@@ -17,7 +17,6 @@ RESTRICT="test mirror"
 # runner.jar is class file version 69, it cannot load on Java older than 25.
 RDEPEND="
 	app-misc/ca-certificates
-	app-shells/bash
 	>=virtual/jre-25
 	dev-libs/glib
 	dev-vcs/git
