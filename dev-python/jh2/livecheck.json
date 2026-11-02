@@ -1,3 +1,4 @@
 {
-  "crates": true
+  "crates": true,
+  "crates_mode": "native"
 }
