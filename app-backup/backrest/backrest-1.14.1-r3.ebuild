@@ -26,6 +26,8 @@ SRC_URI="https://github.com/garethgeorge/backrest/archive/v${PV}.tar.gz -> ${P}.
 "
 
 LICENSE="GPL-3"
+# Dependent licenses
+LICENSE+=" 0BSD Apache-2.0 BSD BSD-2 EPL-2.0 ISC MIT MIT-0 MPL-2.0 Unlicense"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="test"
