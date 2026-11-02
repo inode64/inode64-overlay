@@ -34,7 +34,6 @@ RDEPEND="
 	${PYTHON_DEPS}
 	${CDEPEND}
 	acct-user/varnish
-	sys-devel/gcc
 	selinux? ( sec-policy/selinux-varnishd )
 "
 # Accounts are needed at build time for fowners in src_install
