@@ -31,7 +31,6 @@ RESTRICT="test"
 CDEPEND="
 	>=app-eselect/eselect-postgresql-2.0
 	acct-user/postgres
-	sys-apps/less
 	sys-libs/readline:0=
 	virtual/libcrypt:=
 	virtual/libintl
