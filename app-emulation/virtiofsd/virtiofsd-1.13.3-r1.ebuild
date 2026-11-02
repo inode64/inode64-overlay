@@ -149,7 +149,6 @@ DEPEND="
 "
 RDEPEND="
 	acct-group/qemu
-	sys-apps/shadow
 	${DEPEND}
 "
 
