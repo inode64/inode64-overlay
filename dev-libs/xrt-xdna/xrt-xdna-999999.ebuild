@@ -23,8 +23,6 @@ if [[ ${PV} == 999999 ]] ; then
 	)
 	inherit git-r3
 
-	BDEPEND="net-misc/wget"
-
 	MGS_COMMIT=master
 	MGS=markdown_graphviz_svg
 	MGS_PY=${MGS}-${MGS_COMMIT}.py
@@ -70,7 +68,6 @@ RDEPEND="
 
 # Mostly thowaway dependencies, not actually used in final lib...
 DEPEND="
-	sys-apps/util-linux
 	dev-debug/systemtap
 	dev-libs/opencl-icd-loader
 	dev-libs/rapidjson
