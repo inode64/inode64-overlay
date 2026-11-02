@@ -12,6 +12,8 @@ SRC_URI="https://github.com/restic/rest-server/archive/v${PV}.tar.gz -> ${P}.tar
 	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="BSD-2"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
