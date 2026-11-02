@@ -20,7 +20,6 @@ DEPEND="
 	acl? ( virtual/acl )
 	audit? ( sys-process/audit )
 	curl? ( net-misc/curl )
-	e2fs? ( sys-fs/e2fsprogs )
 	nettle? ( dev-libs/nettle:= )
 	selinux? ( sys-libs/libselinux )
 	xattr? ( sys-apps/attr )
