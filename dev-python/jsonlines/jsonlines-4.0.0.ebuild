@@ -19,7 +19,6 @@ LICENSE="BSD"
 SLOT="0"
 IUSE="test"
 RDEPEND="dev-python/attrs[${PYTHON_USEDEP}]"
-BDEPEND=" test? ( ${RDEPEND} )"
 
 EPYTEST_PLUGINS=()
 distutils_enable_tests pytest
