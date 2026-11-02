@@ -23,11 +23,9 @@ RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
 	dev-libs/openssl:0=
-	sys-apps/util-linux
 	virtual/zlib:=
 	curl? ( net-misc/curl )
 	flash? (
-		app-arch/bzip2
 		app-arch/lz4
 		app-arch/snappy
 		app-arch/zstd
