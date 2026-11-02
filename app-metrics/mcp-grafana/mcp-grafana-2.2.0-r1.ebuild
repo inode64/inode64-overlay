@@ -17,7 +17,6 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
-	acct-group/mcp-grafana
 	acct-user/mcp-grafana
 "
 BDEPEND=">=dev-lang/go-1.26.10"
