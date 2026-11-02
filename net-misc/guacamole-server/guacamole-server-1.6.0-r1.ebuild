@@ -30,7 +30,6 @@ COMMON_DEPEND="
 	dev-libs/openssl:0=
 	media-libs/libjpeg-turbo:0=
 	media-libs/libpng:0=
-	sys-apps/util-linux
 	x11-libs/cairo
 	encode? ( media-video/ffmpeg:= )
 	kubernetes? (
