@@ -32,7 +32,6 @@ BDEPEND="
 
 DEPEND="
 	${PYTHON_DEPS}
-	app-arch/xz-utils
 	dev-db/sqlite:3
 	dev-lang/perl:=
 	dev-libs/inih
