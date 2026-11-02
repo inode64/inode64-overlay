@@ -39,7 +39,6 @@ RDEPEND="
 	media-libs/alsa-lib
 	media-libs/mesa
 	net-print/cups
-	sys-apps/util-linux
 	sys-apps/xdg-desktop-portal
 	sys-libs/libcap-ng
 	sys-libs/libseccomp
