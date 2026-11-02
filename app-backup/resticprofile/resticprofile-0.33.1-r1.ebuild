@@ -11,6 +11,8 @@ SRC_URI="https://github.com/creativeprojects/resticprofile/archive/v${PV}.tar.gz
 	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="GPL-3"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
