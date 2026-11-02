@@ -12,6 +12,8 @@ HOMEPAGE="https://github.com/bdd/runitor/"
 EGIT_REPO_URI="https://github.com/bdd/runitor.git"
 
 LICENSE="0BSD"
+# Dependent licenses
+LICENSE+=" BSD BSD-2 CC0-1.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
