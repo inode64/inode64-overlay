@@ -162,7 +162,6 @@ RDEPEND="${COMMON_DEPEND}
 DEPEND="${COMMON_DEPEND}"
 
 BDEPEND="
-		app-arch/xz-utils
 		>=sys-devel/bison-3.0.1
 		dev-util/re2c
 "
