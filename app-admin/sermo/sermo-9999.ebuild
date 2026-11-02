@@ -10,6 +10,8 @@ HOMEPAGE="https://github.com/inode64/sermo"
 EGIT_REPO_URI="https://github.com/inode64/Sermo.git"
 
 LICENSE="Apache-2.0"
+# Dependent licenses
+LICENSE+=" BSD BSD-2 ISC LGPL-3 MIT MPL-2.0 public-domain"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="test"
