@@ -1,0 +1,2 @@
+d /var/lib/listmonk 0750 listmonk listmonk -
+d /var/lib/listmonk/uploads 0750 listmonk listmonk -

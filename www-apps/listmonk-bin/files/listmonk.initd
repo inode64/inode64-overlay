@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Self-hosted newsletter and mailing list manager"
+
+: "${LISTMONK_CONFIG:=/etc/listmonk/config.toml}"
+
+command="/usr/bin/listmonk"
+command_args="--config ${LISTMONK_CONFIG} ${LISTMONK_OPTS}"
+command_user="listmonk:listmonk"
+supervisor="supervise-daemon"
+pidfile="/run/${RC_SVCNAME}.pid"
+# Media uploads go to "uploads" under the working directory.
+directory="/var/lib/listmonk"
+umask="027"
+output_log="/var/log/listmonk/${RC_SVCNAME}.log"
+error_log="${output_log}"
+
+depend() {
+	need net
+	use postgresql
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o "${command_user}" /var/log/listmonk
+}

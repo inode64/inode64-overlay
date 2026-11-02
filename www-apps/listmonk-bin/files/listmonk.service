@@ -1,0 +1,41 @@
+[Unit]
+Description=listmonk mailing list and newsletter manager
+Documentation=https://listmonk.app/docs/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=listmonk
+Group=listmonk
+# Media uploads go to "uploads" under the working directory.
+WorkingDirectory=/var/lib/listmonk
+# Unlike upstream's unit, no --upgrade here: schema changes are applied on
+# purpose with emerge --config, after a database backup.
+ExecStart=/usr/bin/listmonk --config /etc/listmonk/config.toml
+Restart=on-failure
+RestartSec=5
+UMask=0027
+
+NoNewPrivileges=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+ProtectSystem=strict
+ReadWritePaths=/var/lib/listmonk
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+# AF_UNIX too, for a local PostgreSQL reached through its socket.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

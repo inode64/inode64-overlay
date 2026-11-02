@@ -1,0 +1,6 @@
+# supervise-daemon keeps the log open, hence copytruncate.
+/var/log/listmonk/*.log {
+	missingok
+	notifempty
+	copytruncate
+}

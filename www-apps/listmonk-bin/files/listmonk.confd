@@ -1,0 +1,5 @@
+# Configuration file read by listmonk.
+#LISTMONK_CONFIG="/etc/listmonk/config.toml"
+
+# Extra options, e.g. --passive to serve the UI without processing campaigns.
+#LISTMONK_OPTS=""
