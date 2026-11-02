@@ -12,6 +12,8 @@ SRC_URI="https://github.com/AlexxIT/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P
 "
 
 LICENSE="MIT"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD BSD-2 EPL-2.0 ISC"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
