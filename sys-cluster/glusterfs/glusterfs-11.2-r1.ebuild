@@ -38,7 +38,6 @@ RDEPEND="
 	dev-libs/openssl:=[-bindist(-)]
 	net-libs/rpcsvc-proto
 	dev-libs/userspace-rcu:=
-	sys-apps/util-linux
 	sys-libs/readline:=
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
@@ -50,7 +49,6 @@ RDEPEND="
 	emacs? ( >=app-editors/emacs-23.1:* )
 	firewalld? ( net-firewall/firewalld )
 	fuse? ( >=sys-fs/fuse-2.7.0:0 )
-	georeplication? ( net-misc/rsync )
 	libtirpc? ( net-libs/libtirpc:= )
 	!libtirpc? ( elibc_glibc? ( sys-libs/glibc[rpc(-)] ) )
 	selinux? ( sec-policy/selinux-glusterfs )
