@@ -12,6 +12,8 @@ SRC_URI="https://github.com/slackhq/nebula/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 LICENSE="MIT"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC ZLIB"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="+client gencert"
