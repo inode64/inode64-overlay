@@ -10,6 +10,8 @@ HOMEPAGE="https://grafana.com/loki"
 SRC_URI="https://github.com/grafana/loki/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="AGPL-3 Apache-2.0"
+# Dependent licenses
+LICENSE+=" BSD BSD-2 Boost-1.0 ISC MIT MIT-0 MPL-2.0 Unlicense"
 SLOT="0"
 KEYWORDS="~amd64"
 
