@@ -24,7 +24,7 @@ LICENSE="AGPL-3"
 # Dependent licenses: Go modules, admin UI, email builder and fonts in the binary
 LICENSE+=" Apache-2.0 BSD BSD-2 ISC LGPL-2.1 MIT OFL-1.1"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 # The admin UI, templates and SQL queries are a zip appended to the binary,
 # which strip would drop.
 RESTRICT="strip"

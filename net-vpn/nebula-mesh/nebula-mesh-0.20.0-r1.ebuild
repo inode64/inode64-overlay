@@ -40,6 +40,8 @@ DEPEND="
 "
 BDEPEND=">=dev-lang/go-1.27.3"
 
+DOCS=( README.md CHANGELOG.md )
+
 src_prepare() {
 	default
 
@@ -67,7 +69,7 @@ src_test() {
 }
 
 src_install() {
-	dodoc README.md CHANGELOG.md
+	einstalldocs
 
 	if use agent; then
 		dobin nebula-agent

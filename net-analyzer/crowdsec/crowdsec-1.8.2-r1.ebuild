@@ -140,7 +140,7 @@ src_install() {
 		newfishcomp cscli.fish cscli.fish
 		newzshcomp cscli.zsh _cscli
 	fi
-	dodoc README.md
+	einstalldocs
 }
 
 pkg_config() {

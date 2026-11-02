@@ -45,6 +45,8 @@ RDEPEND="${CDEPEND}
 	!dev-db/postgresql-server:${SLOT}
 "
 
+DOCS=( README HISTORY doc/{TODO,bug.template} )
+
 src_prepare() {
 	default
 
@@ -141,7 +143,7 @@ src_install() {
 	emake DESTDIR="${D}" install
 	emake DESTDIR="${D}" install -C contrib
 
-	dodoc README HISTORY doc/{TODO,bug.template}
+	einstalldocs
 
 	# Las paginas de manual ya vienen construidas y las instala 'make install'
 	# bajo /usr/share/postgresql-${SLOT}/man para que las gestione eselect.

@@ -48,4 +48,5 @@ src_install() {
 	doins workers/*.py
 
 	python_optimize "${ED}"/opt/btmqttgateway
+	einstalldocs
 }

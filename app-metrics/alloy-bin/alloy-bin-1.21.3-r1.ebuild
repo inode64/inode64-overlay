@@ -14,7 +14,7 @@ SRC_URI="https://github.com/grafana/${MY_PN}/releases/download/v${PV}/${MY_PN}-l
 S="${WORKDIR}"
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="-* amd64"
 RESTRICT="mirror strip"
 
 RDEPEND="${DEPEND}

@@ -13,7 +13,7 @@ S="${WORKDIR}"
 
 LICENSE="Microsoft-ODBC"
 SLOT="${PV%%.*}"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 RDEPEND="dev-db/unixODBC

@@ -21,7 +21,7 @@ S="${WORKDIR}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="-* amd64"
 
 # The sync and async APIs also import pyee (>=13,<15), which neither ::gentoo nor
 # this overlay package yet, so only the CLI works until it is added here.

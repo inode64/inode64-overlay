@@ -33,7 +33,7 @@ S="${WORKDIR}"
 
 LICENSE="Obsidian-EULA"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="-* ~amd64 ~arm64"
 IUSE="appindicator wayland"
 RESTRICT="mirror strip bindist"
 

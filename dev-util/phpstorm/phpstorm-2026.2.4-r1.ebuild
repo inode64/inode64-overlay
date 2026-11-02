@@ -17,7 +17,7 @@ LICENSE="|| ( IDEA IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )
 	EPL-1.0 EPL-2.0 GPL-2 GPL-2-with-classpath-exception GPL-3 ISC JDOM
 	LGPL-2.1+ LGPL-3 MIT MPL-1.0 MPL-1.1 public-domain PSF-2 UoI-NCSA ZLIB"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 IUSE="30bits server"
 RESTRICT="mirror"
 

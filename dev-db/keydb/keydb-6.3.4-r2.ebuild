@@ -57,6 +57,8 @@ PATCHES=(
 	"${WORKDIR}/patches"
 )
 
+DOCS=( 00-RELEASENOTES README.md )
+
 src_compile() {
 	# Upstream defaults to BUILD_TLS=yes and OPTIMIZATION="-O2 -flto": without
 	# these, USE=-ssl would be ignored and CFLAGS could not turn off LTO.
@@ -115,7 +117,7 @@ src_install() {
 	insinto /etc/logrotate.d/
 	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
-	dodoc 00-RELEASENOTES README.md
+	einstalldocs
 
 	if use ssl; then
 	    dodoc TLS.md

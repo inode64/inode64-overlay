@@ -21,6 +21,11 @@ DEPEND="sys-libs/pam[${MULTILIB_USEDEP}]
 
 RDEPEND="${DEPEND}"
 
+DOCS=(
+	pam.conf ldap.conf ldapns.schema chsh chfn certutil
+	ChangeLog CVSVersionInfo.txt README AUTHORS ns-pwd-policy.schema
+)
+
 multilib_src_configure() {
 	local myconf=(
 		--with-ldap-lib=openldap
@@ -42,8 +47,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	dodoc pam.conf ldap.conf ldapns.schema chsh chfn certutil
-	dodoc ChangeLog CVSVersionInfo.txt README AUTHORS ns-pwd-policy.schema
+	einstalldocs
 	doman pam_ldap.5
 
 	docinto pam.d

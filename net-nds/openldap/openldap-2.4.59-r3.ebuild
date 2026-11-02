@@ -186,6 +186,8 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-2.4.59-implicit-function.patch
 )
 
+DOCS=( ANNOUNCEMENT CHANGES COPYRIGHT README )
+
 openldap_filecount() {
 	local dir="$1"
 	find "${dir}" -type f ! -name '.*' ! -name 'DB_CONFIG*' | wc -l
@@ -882,7 +884,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	dodoc ANNOUNCEMENT CHANGES COPYRIGHT README
+	einstalldocs
 	docinto rfc ; dodoc doc/rfc/*.txt
 }
 

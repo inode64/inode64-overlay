@@ -43,7 +43,7 @@ src_configure() {
 
 src_install() {
 	cargo_src_install
-	dodoc README.md
+	einstalldocs
 	docinto examples
 	dodoc config.example.yaml
 

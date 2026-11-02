@@ -14,17 +14,14 @@ SRC_URI="https://artifacts.elastic.co/downloads/beats/${MY_PN}/${MY_P}.tar.gz"
 S="${WORKDIR}/${MY_P}"
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 RESTRICT="strip"
 
-DOCS="NOTICE.txt README.md"
-
-src_compile() {
-	default
-}
+DOCS=( NOTICE.txt README.md )
 
 src_install() {
 	dobin ${MY_PN}
+	einstalldocs
 
 	insinto /etc/${MY_PN}
 	doins fields.yml

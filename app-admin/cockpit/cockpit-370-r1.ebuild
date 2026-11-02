@@ -126,7 +126,6 @@ src_install() {
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
 	newpamd "${FILESDIR}/cockpit.pam" cockpit
-	dodoc README.md AUTHORS
 
 	# Required for store self-signed certificates
 	keepdir /etc/cockpit/ws-certs.d/

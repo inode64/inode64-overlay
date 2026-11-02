@@ -26,5 +26,5 @@ SLOT="0"
 
 src_install() {
 	dobin "${BUILD_DIR}"/source/app/gpr_tools/gpr_tools
-	dodoc README.md
+	einstalldocs
 }

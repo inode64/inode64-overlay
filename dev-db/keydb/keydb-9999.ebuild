@@ -55,6 +55,8 @@ PATCHES=(
 	"${WORKDIR}/patches"
 )
 
+DOCS=( 00-RELEASENOTES README.md )
+
 src_unpack() {
 	git-r3_src_unpack
 	unpack "${PATCH_TARBALL}"
@@ -118,7 +120,7 @@ src_install() {
 	insinto /etc/logrotate.d/
 	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
-	dodoc 00-RELEASENOTES README.md
+	einstalldocs
 
 	if use ssl; then
 	    dodoc TLS.md

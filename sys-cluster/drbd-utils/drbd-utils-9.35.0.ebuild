@@ -28,6 +28,8 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-9.23.1-respect-flags.patch
 )
 
+DOCS=( ChangeLog README-windrbd.md README.md scripts/drbd.conf.example )
+
 pkg_setup() {
 	# verify that CONFIG_BLK_DEV_DRBD is enabled in the kernel or
 	# warn otherwise
@@ -105,8 +107,6 @@ src_install() {
 
 	# Install our own init script
 	newinitd "${FILESDIR}"/${PN}-8.0.rc ${PN/-utils/}
-
-	dodoc scripts/drbd.conf.example
 
 	keepdir /var/lib/drbd
 	rm -r "${ED}"/var/run || die

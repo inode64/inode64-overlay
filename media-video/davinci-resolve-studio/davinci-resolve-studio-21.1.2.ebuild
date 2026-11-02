@@ -53,7 +53,7 @@ SRC_URI="${PKG_NAME}.zip"
 S="${WORKDIR}"
 LICENSE="Blackmagic"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 IUSE="bundled-libs developer video_cards_amdgpu video_cards_nvidia"
 RESTRICT="fetch mirror strip test"
 
@@ -112,6 +112,11 @@ BDEPEND="
 "
 
 QA_PREBUILT="*"
+
+DOCS=(
+	docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
+	"Technical Documentation"/{"DaVinci Remote Panel.txt","User Configuration folders and customization.txt"}
+)
 
 include_dir() {
 	local _dir
@@ -344,8 +349,7 @@ src_install() {
 	doins -r "share/DaVinci Resolve Renderer.ofx.bundle"
 	fperms +x "/usr/OFX/Plugins/DaVinci Resolve Renderer.ofx.bundle/Contents/Linux-x86-64/DaVinci Resolve Renderer.ofx"
 
-	dodoc docs/{DaVinci_Resolve_Manual.pdf,ReadMe.html,Welcome.txt}
-	dodoc "Technical Documentation"/{"DaVinci Remote Panel.txt","User Configuration folders and customization.txt"}
+	einstalldocs
 	# Resolve's Help menu looks for this path beneath its installation root.
 	docompress -x "/usr/share/doc/${PF}/DaVinci_Resolve_Manual.pdf"
 	dosym -r "/usr/share/doc/${PF}/DaVinci_Resolve_Manual.pdf" \

@@ -51,6 +51,8 @@ RDEPEND="${DEPEND}
 
 LIBRENMS_HOME="/opt/librenms"
 
+DOCS=( AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md )
+
 src_compile() {
 	return
 }
@@ -67,7 +69,7 @@ src_install() {
 	insinto /etc/bash_completion.d
 	doins misc/lnms-completion.bash
 
-	dodoc AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md
+	einstalldocs
 
 	# Remove developer files
 	rm *.md LICENSE.txt || die

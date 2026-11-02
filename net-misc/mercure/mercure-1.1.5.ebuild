@@ -12,7 +12,7 @@ SRC_URI="https://github.com/dunglas/${PN}/releases/download/v${PV}/${PN}_Linux_x
 S="${WORKDIR}"
 LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 
 RDEPEND="
 	acct-user/mercure

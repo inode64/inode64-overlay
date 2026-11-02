@@ -39,6 +39,8 @@ PATCHES=(
 	"${FILESDIR}/${P}-CVE-2025-50200.patch"
 )
 
+DOCS=( deps/rabbit/README.md )
+
 pkg_setup() {
 	python-any-r1_pkg_setup
 }
@@ -83,7 +85,7 @@ src_install() {
 
 	# install documentation
 	dodoc deps/rabbit/docs/*.example
-	dodoc deps/rabbit/README.md
+	einstalldocs
 	doman deps/rabbit/docs/*.5
 	doman deps/rabbit/docs/*.8
 

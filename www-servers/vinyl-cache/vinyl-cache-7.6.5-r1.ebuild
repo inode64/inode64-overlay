@@ -53,6 +53,8 @@ PATCHES=(
 	"${FILESDIR}/${P}-vsv00018-20.patch"
 )
 
+DOCS=( README.rst doc/changes.rst )
+
 src_prepare() {
 	default
 
@@ -120,8 +122,7 @@ src_install() {
 	doins vmod/vmod_*.vcc
 	doins etc/example.vcl
 
-	dodoc README.rst
-	dodoc doc/changes.rst
+	einstalldocs
 
 	fowners root:varnish /etc/varnish/
 	fowners varnish:varnish /var/lib/varnish/
