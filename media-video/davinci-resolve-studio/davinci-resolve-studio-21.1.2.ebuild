@@ -60,9 +60,7 @@ RESTRICT="fetch mirror strip test"
 # Runtime dependencies of the prebuilt executables and Qt plugins.
 RDEPEND="
 	app-arch/brotli
-	app-arch/bzip2
 	app-arch/lz4
-	app-arch/xz-utils
 	app-crypt/mit-krb5
 	>=dev-libs/glib-2.82
 	dev-libs/icu
@@ -75,7 +73,6 @@ RDEPEND="
 	media-libs/glu
 	sys-apps/dbus
 	sys-apps/pciutils
-	sys-devel/gcc
 	sys-libs/glibc
 	sys-libs/libxcrypt[compat]
 	sys-libs/mtdev
