@@ -13,6 +13,8 @@ SRC_URI="https://github.com/forgekeep/nebula-mesh/archive/v${PV}.tar.gz -> ${P}.
 "
 
 LICENSE="MIT"
+# Dependent licenses
+LICENSE+=" Apache-2.0 BSD ISC MPL-2.0 ZLIB public-domain"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="+agent mgmt"
