@@ -12,7 +12,9 @@ SRC_URI="https://github.com/elastic/beats/archive/v${PV}.tar.gz -> ${P}.tar.gz
 
 S="${WORKDIR}/beats-${PV}"
 
-LICENSE="Apache-2.0 BSD-2 MIT"
+LICENSE="Apache-2.0"
+# Dependent licenses
+LICENSE+=" BSD BSD-2 EPL-1.0 ISC MIT MPL-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 RESTRICT="test"
