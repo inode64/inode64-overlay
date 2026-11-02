@@ -53,7 +53,6 @@ IUSE="compress-xz compress-zstd"
 REQUIRED_USE="?? ( compress-xz compress-zstd )"
 
 BDEPEND+="
-	compress-xz? ( app-arch/xz-utils )
 	compress-zstd? ( app-arch/zstd )
 "
 
