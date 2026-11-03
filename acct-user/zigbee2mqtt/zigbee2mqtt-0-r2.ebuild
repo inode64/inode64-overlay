@@ -6,7 +6,7 @@ EAPI=8
 inherit acct-user
 
 DESCRIPTION="A user for zigbee2mqtt"
-ACCT_USER_ID=313
+ACCT_USER_ID=-1
 ACCT_USER_HOME=/var/lib/zigbee2mqtt
 ACCT_USER_GROUPS=( zigbee2mqtt dialout )
 
