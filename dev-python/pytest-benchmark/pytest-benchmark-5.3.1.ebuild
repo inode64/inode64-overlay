@@ -23,6 +23,10 @@ BDEPEND="test? ( dev-python/aspectlib[${PYTHON_USEDEP}]
 		dev-python/pygal[${PYTHON_USEDEP}]
 		dev-python/pygaljs[${PYTHON_USEDEP}] )"
 
+# The tests run pytest in a subprocess through pytester, which only gets the
+# plugin from PYTEST_PLUGINS.
+EPYTEST_PLUGIN_LOAD_VIA_ENV=1
+EPYTEST_PLUGINS=( "${PN}" )
 EPYTEST_XDIST=1
 distutils_enable_tests pytest
 
