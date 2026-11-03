@@ -3,7 +3,7 @@
 
 EAPI=8
 
-USE_RUBY="ruby31 ruby32 ruby33"
+USE_RUBY="ruby33 ruby34"
 inherit depend.apache ruby-ng
 
 DESCRIPTION="Flexible project management web application using the Ruby on Rails framework"
@@ -18,48 +18,53 @@ IUSE="fastcgi imagemagick ldap +minimagick mysql passenger pdf postgres +standal
 # Bundler resolves the Gemfile each time Redmine starts and in pkg_config,
 # so the gems must stay installed: as build-only dependencies a
 # depclean --with-bdeps=n removes them.
-# commonmarker 2.x shares the slot but renamed the module Redmine 6.0 uses.
+# rb_sys is a runtime dependency in the commonmarker 2.x gemspec, but only
+# a build dependency of its ebuild.
 ruby_add_rdepend "
 	fastcgi? ( dev-ruby/fcgi )
-	ldap? ( >=dev-ruby/ruby-net-ldap-0.17.0 )
-	minimagick? ( >=dev-ruby/mini_magick-5.0.1 )
+	ldap? ( >=dev-ruby/ruby-net-ldap-0.20.0 )
+	minimagick? ( >=dev-ruby/mini_magick-5.2.0:5 )
 	mysql? (
 		>=dev-ruby/mysql2-0.5.0:0.5
-		dev-ruby/with_advisory_lock
+		>=dev-ruby/with_advisory_lock-7.0
 	)
 	passenger? ( www-apache/passenger )
-	postgres? ( >=dev-ruby/pg-1.5.3:1 )
-	sqlite? ( >=dev-ruby/sqlite3-1.7.0 )
+	postgres? ( >=dev-ruby/pg-1.6.2:1 )
+	sqlite? ( >=dev-ruby/sqlite3-2.9.4:2 )
 	standalone? ( www-servers/puma )
-	dev-ruby/actionpack-xml_parser:2
+	>=dev-ruby/actionpack-xml_parser-2.0.1-r5:2
 	dev-ruby/addressable
-	>=dev-ruby/commonmarker-0.23.8
-	<dev-ruby/commonmarker-1
-	>=dev-ruby/csv-3.2.8:3
-	>=dev-ruby/deckar01-task_list-2.3.2
-	>=dev-ruby/html-pipeline-2.13.2
+	dev-ruby/bcrypt-ruby
+	>=dev-ruby/commonmarker-2.3.0
+	>=dev-ruby/csv-3.3.5:3
+	>=dev-ruby/doorkeeper-5.8.2
+	>=dev-ruby/doorkeeper-i18n-5.2
 	>=dev-ruby/i18n-1.14.1:1
-	>=dev-ruby/mail-2.8.1
+	>=dev-ruby/importmap-rails-2.0:2
+	>=dev-ruby/mail-2.9.0:2.9
 	dev-ruby/marcel
 	>=dev-ruby/mini_mime-1.1.0
-	>=dev-ruby/net-imap-0.4.20
+	>=dev-ruby/net-imap-0.6.1:*
 	>=dev-ruby/net-pop-0.1.2
-	>=dev-ruby/net-smtp-0.4.0
+	>=dev-ruby/net-smtp-0.5.1
 	>=dev-ruby/nokogiri-1.19.1
-	>=dev-ruby/propshaft-1.1.0:1
-	>=dev-ruby/rack-3.1.3:3.1
-	>=dev-ruby/rails-7.2.2.1:7.2
+	dev-ruby/ostruct
+	>=dev-ruby/propshaft-1.3.0:1
+	>=dev-ruby/rack-3.1.3:*
+	>=dev-ruby/rails-8.1.3:8.1
 	>=dev-ruby/rbpdf-1.21.4
-	>=dev-ruby/roadie-rails-3.2.0:3
+	>=dev-ruby/requestjs-rails-0.0.13
+	>=dev-ruby/roadie-rails-3.4.0:3
 	>=dev-ruby/rotp-5.0.0
-	>=dev-ruby/rouge-4.5.0
+	>=dev-ruby/rouge-5.0.0:5
 	dev-ruby/rqrcode
-	>=dev-ruby/rubyzip-2.3.0:2
-	>=dev-ruby/sanitize-6.0:6
+	>=dev-ruby/rubyzip-3.2.0:3
+	>=dev-ruby/sanitize-7.0:7
+	>=dev-ruby/stimulus-rails-1.3
+	~dev-ruby/rb_sys-0.9.117
 "
 
 RDEPEND+="
-	dev-ruby/rack:3.1
 	acct-user/redmine
 	imagemagick? ( media-gfx/imagemagick )
 	pdf? (
@@ -76,7 +81,7 @@ all_ruby_prepare() {
 	rm -fr public/help || die
 
 	# bug #406605
-	rm .{git,hg}ignore || die
+	rm .gitignore || die
 
 	# newenvd not working here
 	cat > "${T}/50${PN}" <<-EOF || die
@@ -88,9 +93,14 @@ all_ruby_prepare() {
 	sed -i -e "s/~>/>=/g" Gemfile || die
 
 	# bug #724464
-	sed -i -e "s/gem 'rails',.*/gem 'rails', '~>7.2.2'/" Gemfile || die
+	sed -i -e "s/gem 'rails',.*/gem 'rails', '~>8.1.3'/" Gemfile || die
 
-	sed -i -e "s/'deckar01-task_list',.*/'deckar01-task_list', '~>2.3.2'/" Gemfile || die
+	# Allow the versions available in the tree, their API is the same
+	sed -i \
+		-e "s/gem 'commonmarker',.*/gem 'commonmarker', '>= 2.3.0'/" \
+		-e "s/gem 'i18n',.*/gem 'i18n', '>= 1.14.1'/" \
+		-e "s/gem 'rubyzip',.*/gem 'rubyzip', '>= 3.2.0'/" \
+		Gemfile || die
 
 	sed -i -e "/group :development, :test do/,/^end$/d" Gemfile || die
 	sed -i -e "/group :development do/,/^end$/d" Gemfile || die
@@ -114,7 +124,7 @@ all_ruby_prepare() {
 }
 
 all_ruby_install() {
-	dodoc doc/* README.rdoc
+	dodoc -r doc/* README.rdoc
 	rm -r doc test CONTRIBUTING.md README.rdoc || die
 
 	keepdir /var/log/${PN}
@@ -144,7 +154,6 @@ all_ruby_install() {
 		/var/log/${PN}
 
 	if use passenger; then
-		has_apache
 		insinto "${APACHE_VHOSTS_CONFDIR}"
 		doins "${FILESDIR}/10_redmine_vhost.conf"
 	fi
@@ -178,6 +187,14 @@ redmine_fix_perms() {
 	# protect sensitive data, see bug #406605; a world writable log dir
 	# also makes logrotate skip it
 	chmod -R go-rwx "${d}/config" "${EROOT}/var/log/${PN}" || die
+}
+
+pkg_setup() {
+	ruby-ng_pkg_setup
+	# Take the Apache paths from USE=passenger, not from the Apache that the
+	# build host may lack: without it APACHE_VHOSTS_CONFDIR stays empty and
+	# the vhost lands at the root of the image.
+	depend.apache_pkg_setup passenger
 }
 
 pkg_postinst() {
@@ -289,6 +306,10 @@ pkg_config() {
 		einfo "# chown redmine:redmine db/ db/*.sqlite3"
 		einfo
 	fi
+
+	# Stimulus controllers and importmap pins are served from public/assets
+	einfo "Precompiling assets."
+	RAILS_ENV="${RAILS_ENV}" ${RUBY} -S rake assets:precompile || die
 
 	# the rake tasks above run as root
 	redmine_fix_perms
