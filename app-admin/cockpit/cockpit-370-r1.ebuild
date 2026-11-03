@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
-inherit autotools pam python-single-r1 tmpfiles
+inherit autotools pam python-single-r1 tmpfiles xdg
 
 DESCRIPTION="Server Administration Web Interface "
 HOMEPAGE="https://cockpit-project.org/"
@@ -132,6 +132,7 @@ src_install() {
 }
 
 pkg_postinst() {
+	xdg_pkg_postinst
 	tmpfiles_process cockpit-ws.conf
 
 	elog ""
