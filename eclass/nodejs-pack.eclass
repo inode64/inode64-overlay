@@ -22,7 +22,7 @@ if [[ -z ${_NODEJS_PACK_ECLASS} ]]; then
 	_NODEJS_PACK_ECLASS=1
 
 case ${EAPI} in
-    8|8) ;;
+    8|9) ;;
     *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
@@ -33,7 +33,7 @@ if has nodejs-mod ${INHERITED}; then
 fi
 
 # Upstream does not support stripping nodejs packages
-RESTRICT="test strip"
+RESTRICT+=" test strip"
 
 # @FUNCTION: nodejs-pack_src_prepare
 # @DESCRIPTION:
@@ -47,27 +47,6 @@ nodejs-pack_src_prepare() {
         eerror "Consider not inheriting the nodejs-pack eclass."
         die "FATAL: Unable to find package.json"
     fi
-
-    # Check if node and npm/yarn are available
-    if ! type -P node >/dev/null; then
-        eerror "Node.js is required but not installed or not in PATH"
-        die "Node.js not available"
-    fi
-
-    case ${NODEJS_MANAGER} in
-        npm)
-            if ! type -P npm >/dev/null; then
-                eerror "npm is required but not installed or not in PATH"
-                die "npm not available"
-            fi
-            ;;
-        yarn)
-            if ! type -P yarn >/dev/null; then
-                eerror "yarn is required but not installed or not in PATH"
-                die "yarn not available"
-            fi
-            ;;
-    esac
 
     default_src_prepare
 }

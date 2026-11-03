@@ -38,7 +38,6 @@ esac
 
 # @ECLASS_VARIABLE: NODEJS_MANAGER
 # @PRE_INHERIT
-# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Specify a NodeJS package manager to use. ( npm | yarn )
 # The default is set to "npm".
@@ -66,10 +65,11 @@ NODEJS_FILES="babel.config.js babel.config.json bin cli.js dist index.js lib nod
 # Can be either files, or directories.
 # Example: NODEJS_EXTRA_FILES="rigger.js modules"
 
-# @VARIABLE: MYNPMARGS
+# @ECLASS_VARIABLE: mynpmargs
 # @DEFAULT_UNSET
 # @DESCRIPTION:
-# User-controlled environment variable containing arguments to be passed to npm
+# Optional array of extra arguments that the ebuild passes to every npm or
+# yarn invocation made through enpm.
 
 case ${NODEJS_MANAGER} in
     npm)
@@ -187,14 +187,22 @@ nodejs_has_package() {
 # @DESCRIPTION:
 # Install docs usually found in NodeJS/NPM packages
 nodejs_docs() {
-    # If docs variable is not empty when install docs usually found in NodeJS/NPM packages
-    [[ ! "${DOCS}" ]] || return
+    # An explicit DOCS from the ebuild replaces the guesswork below.
+    if [[ ${DOCS} ]]; then
+        einstalldocs
+        return
+    fi
 
     einfo "Installing documentation"
 
     local f
     for f in README* HISTORY* ChangeLog AUTHORS NEWS TODO CHANGES \
         THANKS BUGS FAQ CREDITS CHANGELOG* *.md; do
+        # LICENSE already records the licenses, and the rest is addressed to
+        # whoever contributes upstream, not to whoever runs the package.
+        case ${f} in
+            LICEN[CS]E*|COPYING*|CODE_OF_CONDUCT*|CONTRIBUTING*|GOVERNANCE*) continue ;;
+        esac
         if [[ -s "${f}" ]]; then
             dodoc "${f}"
         fi
@@ -290,13 +298,13 @@ nodejs_remove_dev() {
     # library only wastes space, deleting a native one breaks the package.
     local foreign_arches=() arch_token
     case ${ARCH} in
-        amd64) foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 s390x ) ;;
+        amd64) foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 armv8 i386 i686 ia32 ppc64 ppc64le riscv64 s390x ) ;;
         arm)   foreign_arches=( aarch64 amd64 arm64 i386 i686 ia32 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
         arm64) foreign_arches=( amd64 arm armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
-        ppc64) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 riscv64 s390x x64 x86_64 ) ;;
-        riscv) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le s390x x64 x86_64 ) ;;
-        s390)  foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 i386 i686 ia32 ppc64 ppc64le riscv64 x64 x86_64 ) ;;
-        x86)   foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
+        ppc64) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 armv8 i386 i686 ia32 riscv64 s390x x64 x86_64 ) ;;
+        riscv) foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 armv8 i386 i686 ia32 ppc64 ppc64le s390x x64 x86_64 ) ;;
+        s390)  foreign_arches=( aarch64 amd64 arm arm64 armhf armv6 armv7 armv8 i386 i686 ia32 ppc64 ppc64le riscv64 x64 x86_64 ) ;;
+        x86)   foreign_arches=( aarch64 arm arm64 armhf armv6 armv7 armv8 ppc64 ppc64le riscv64 s390x x64 x86_64 ) ;;
     esac
 
     for arch_token in "${foreign_arches[@]}"; do
@@ -306,6 +314,37 @@ nodejs_remove_dev() {
 
     # shellcheck disable=SC2185
     find -type f \( "${foreign_libs[@]}" \) -delete || die
+
+    # The same goes for the trees of prebuilt binaries named after a
+    # platform, either as one name (linux-arm64) or as one directory per
+    # system and architecture (linux/arm64, as in 7zip-bin). Those of Windows,
+    # macOS and Android can always go; of the Linux ones only the native
+    # architecture and libc may stay, or an arm64 or musl system would lose
+    # the very binaries it needs.
+    local foreign_dirs=(
+        -iwholename '*/android-arm' -o
+        -iwholename '*/android-arm64' -o
+        -iwholename '*/darwin-x64' -o
+        -iwholename '*/darwin-x64+arm64' -o
+        -iwholename '*/mac/arm64' -o
+        -iwholename '*/mac/x64' -o
+        -iwholename '*/win/arm64' -o
+        -iwholename '*/win/ia32' -o
+        -iwholename '*/win/x64' -o
+        -iwholename '*/win32-arm64' -o
+        -iwholename '*/win32-ia32' -o
+        -iwholename '*/win32-x64'
+    )
+
+    for arch_token in "${foreign_arches[@]}"; do
+        foreign_dirs+=( -o -iwholename "*/linux-${arch_token}" -o -iwholename "*/linux/${arch_token}" )
+    done
+
+    if [[ ${CHOST} == *-musl* ]]; then
+        foreign_dirs+=( -o -iwholename '*/*-gnu' -o -iwholename '*/*-glibc' )
+    else
+        foreign_dirs+=( -o -iwholename '*/*-musl' )
+    fi
 
     # Remove what node-gyp leaves behind in a native addon: only the compiled
     # .node under build/Release is needed at run time, the object files, the
@@ -363,23 +402,11 @@ nodejs_remove_dev() {
         -iwholename '*/.vitest' -o \
         -iwholename '*/.vitest-cache' -o \
         -iwholename '*/.vscode' -o \
-        -iwholename '*/android-arm' -o \
-        -iwholename '*/android-arm64' -o \
         -iwholename '*/coverage' -o \
-        -iwholename '*/darwin-x64' -o \
-        -iwholename '*/darwin-x64+arm64' -o \
         -iwholename '*/git-hooks' -o \
-        -iwholename '*/linux-arm' -o \
-        -iwholename '*/linux-arm64' -o \
-        -iwholename '*/linux-armv6' -o \
-        -iwholename '*/linux-armv7' -o \
-        -iwholename '*/linux-armv8' -o \
         -iwholename '*/prebuilds' -o \
         -iwholename '*/storybook-static' -o \
-        -iwholename '*/win32-arm64' -o \
-        -iwholename '*/win32-ia32' -o \
-        -iwholename '*/win32-x64' -o \
-        -iwholename '*/*-musl' \
+        "${foreign_dirs[@]}" \
     \) \
     -exec rm -rvf {} + || ewarn "Failed to remove some directories"
 
@@ -427,24 +454,19 @@ nodejs_remove_dev() {
 enpm() {
     debug-print-function "${FUNCNAME}" "${@}"
 
-    local mynpmargs_local mynpmargstype npmargs
+    local npmargs
 
-    # Make the array a local variable since <=portage-2.1.6.x does not support
-    # global arrays (see bug #297255). But first make sure it is initialised.
-    [[ -z ${mynpmargs} ]] && declare -a mynpmargs=()
-    mynpmargstype=$(declare -p mynpmargs 2>&-)
-    if [[ "${mynpmargstype}" != "declare -a mynpmargs="* ]]; then
+    if [[ -v mynpmargs && $(declare -p mynpmargs) != "declare -a"* ]]; then
         die "mynpmargs must be declared as array"
     fi
 
-    mynpmargs_local=("${mynpmargs[@]}")
     npmargs=(
         --color false
         --foreground-scripts
         --offline
         --progress false
         --verbose
-        "${mynpmargs_local[@]}"
+        "${mynpmargs[@]}"
     )
 
     case ${NODEJS_MANAGER} in
@@ -454,7 +476,7 @@ enpm() {
                 die "npm not available"
             fi
             npmargs+=( --audit false )
-            npm "$@" "${npmargs[@]}"
+            set -- npm "$@" "${npmargs[@]}"
             ;;
         yarn)
             if ! type -P yarn >/dev/null; then
@@ -462,9 +484,13 @@ enpm() {
                 die "yarn not available"
             fi
             npmargs+=( --cache-folder ".cache" )
-            yarn "$@" "${npmargs[@]}"
+            set -- yarn "$@" "${npmargs[@]}"
             ;;
     esac
+
+    # Callers decide whether a failure is fatal, so only log the command.
+    echo "$@" >&2
+    "$@"
 }
 
 # @FUNCTION: enpm_clean
@@ -535,23 +561,22 @@ enpm_install() {
         fi
     done
 
-    pushd "${ED}/${module_path}" >/dev/null || die
+    # npm tarballs often carry a stray execute bit on data files. Keep it only
+    # on what can actually be run, ELF binaries and scripts, and decide that
+    # before touching any bit: the executables shipped in the tarball, such as
+    # the ripgrep of @vscode/ripgrep, must keep theirs.
+    local magic
+    while IFS= read -r -d '' f; do
+        magic=
+        LC_ALL=C read -r -n 4 -d '' magic < "${f}"
+        if [[ ${magic} != $'\x7f'ELF && ${magic} != '#!'* ]]; then
+            chmod a-x "${f}" || die "Failed to reset the permissions of ${f}"
+        fi
+    done < <(find "${ED}/${module_path}" -type f -perm /111 -print0)
 
-    # Reset permissions for all files
-    find -type f | while read -r f; do
-        fperms -x "${module_path}/${f}"
-    done
-
-    # Set permissions for executables and libraries
-    find -type f -name "*.node" | while read -r f; do
-        fperms +x "${module_path}/${f}"
-    done
-
-    find -type f -executable | while read -r f; do
-        fperms +x "${module_path}/${f}"
-    done
-
-    popd >/dev/null || die
+    # Native addons are shared objects, installed 0755 like any library.
+    find "${ED}/${module_path}" -type f -name '*.node' -exec chmod a+x {} + ||
+        die "Failed to set the permissions of the native addons"
 
     if nodejs_has_bin; then
         einfo "Installing binary files..."
