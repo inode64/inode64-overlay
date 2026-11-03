@@ -54,7 +54,7 @@ src_prepare() {
 src_compile() {
 	# Upstream releases inject the version through goreleaser; without it
 	# `nebula-agent version` and `nebula-mgmt version` report "dev".
-	local ldflags="-s -w -X main.versionStr=${PV}"
+	local ldflags="-X main.versionStr=${PV}"
 
 	if use agent; then
 		ego build -trimpath -ldflags "${ldflags}" -o nebula-agent ./cmd/nebula-agent || die
