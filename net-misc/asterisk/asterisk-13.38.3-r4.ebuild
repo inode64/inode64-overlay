@@ -1,7 +1,7 @@
 # Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 LUA_COMPAT=( lua5-{1..4} )
 
@@ -121,7 +121,6 @@ _make_args=(
 	"ASTVARRUNDIR=/run/asterisk"
 	"OPTIMIZE="
 	"DEBUG="
-	"DESTDIR=${D}"
 	"CONFIG_SRC=configs/samples"
 	"CONFIG_EXTEN=.sample"
 )
@@ -288,7 +287,7 @@ src_install() {
 	diropts -m 0750 -o root -g asterisk
 	dodir	/etc/asterisk
 
-	emake "${_make_args[@]}" install install-configs
+	emake "${_make_args[@]}" DESTDIR="${D}" install install-configs
 
 	fowners asterisk: /var/lib/asterisk/astdb
 
@@ -303,15 +302,16 @@ src_install() {
 	diropts -m 0750 -o asterisk -g asterisk
 	keepdir /var/log/asterisk/{cdr-csv,cdr-custom}
 
+	# Reset diropts else dodoc uses it for doc installations, and the helpers
+	# below that go through doins for the directories they create.
+	diropts -m0755
+
 	newinitd "${FILESDIR}"/initd-13.38.3-r4 asterisk
 	newconfd "${FILESDIR}"/confd-13.38.3-r4 asterisk
 
 	systemd_dounit "${FILESDIR}"/asterisk.service
 	newtmpfiles "${FILESDIR}"/asterisk.tmpfiles-13.38.3-r2.conf asterisk.conf
 	systemd_install_serviced "${FILESDIR}"/asterisk.service.conf
-
-	# Reset diropts else dodoc uses it for doc installations.
-	diropts -m0755
 
 	# install the upgrade documentation
 	dodoc UPGRADE* BUGS CREDITS
