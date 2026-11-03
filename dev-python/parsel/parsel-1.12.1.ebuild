@@ -33,15 +33,14 @@ BDEPEND="
 
 EPYTEST_PLUGINS=()
 EPYTEST_DESELECT=(
-	# Expects the XPath of older cssselect, 1.6.0 adds a contains(@class, ...) prefilter
+	# Expect the XPath of older cssselect, 1.6.0 adds a contains(@class, ...)
+	# prefilter. Fixed upstream in 893eb22ff (#384), after 1.12.1.
 	tests/test_selector_csstranslator.py::test_css2xpath
+	docs/usage.rst::line:1280,column:1
+	docs/usage.rst::line:1282,column:1
 )
 distutils_enable_tests pytest
 
 distutils_enable_sphinx docs \
 	dev-python/sphinx-notfound-page \
 	dev-python/sphinx-rtd-theme
-
-python_test() {
-	epytest --ignore=docs
-}
