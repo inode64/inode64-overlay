@@ -27,6 +27,14 @@ RDEPEND="
 # The prebuilt sherpa-onnx addon needs its RUNPATH fixed, see src_prepare().
 BDEPEND="dev-util/patchelf"
 
+# Upstream ships these binaries prebuilt: ripgrep for the content search,
+# 7-Zip and the speech to text addon with its libraries.
+QA_PREBUILT="
+	usr/lib*/node_modules/@openchamber/web/node_modules/@vscode/ripgrep-linux-x64/bin/rg
+	usr/lib*/node_modules/@openchamber/web/node_modules/7zip-bin/linux/x64/7za
+	usr/lib*/node_modules/@openchamber/web/node_modules/sherpa-onnx-linux-x64/*
+"
+
 # The npm release ships only the build output, not the sources or the test
 # toolchain the test script needs.
 RESTRICT="test"
