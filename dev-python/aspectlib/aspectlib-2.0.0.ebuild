@@ -23,6 +23,8 @@ KEYWORDS="~amd64 ~x86"
 BDEPEND="test? ( dev-python/process-tests[${PYTHON_USEDEP}]
 		dev-python/tornado[${PYTHON_USEDEP}] )"
 
+# test_pytestsupport.py needs the weave fixture of aspectlib's own plugin.
+EPYTEST_PLUGINS=( "${PN}" )
 distutils_enable_tests pytest
 
 python_prepare_all() {
