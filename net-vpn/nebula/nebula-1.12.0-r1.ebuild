@@ -34,7 +34,7 @@ pkg_setup() {
 }
 
 src_configure() {
-	export EGO_LDFLAGS="-s -w -X main.Build=${PV}"
+	export EGO_LDFLAGS="-X main.Build=${PV}"
 
 	default
 }
