@@ -15,9 +15,10 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-# httpx2 supplies anyio; mcp-types supplies pydantic and its typing dependencies.
-# sse-starlette supplies starlette, which also requires python-multipart.
-# PyJWT only suggests cryptography, so its crypto extra needs an explicit dep.
+# httpx2 supplies anyio, mcp-types pydantic and sse-starlette starlette.
+# python-multipart and the typing packages are two steps away, so they are
+# declared. PyJWT only suggests cryptography, so its crypto extra needs an
+# explicit dep.
 RDEPEND="
 	dev-python/cryptography[${PYTHON_USEDEP}]
 	>=dev-python/httpx2-2.10.0[${PYTHON_USEDEP}]
@@ -26,8 +27,11 @@ RDEPEND="
 	>=dev-python/opentelemetry-api-1.28.0[${PYTHON_USEDEP}]
 	>=dev-python/pyjwt-2.10.1[${PYTHON_USEDEP}]
 	>=dev-python/python-dotenv-1.0.0[${PYTHON_USEDEP}]
+	>=dev-python/python-multipart-0.0.9[${PYTHON_USEDEP}]
 	>=dev-python/sse-starlette-3.0.0[${PYTHON_USEDEP}]
 	>=dev-python/typer-0.16.0[${PYTHON_USEDEP}]
+	>=dev-python/typing-extensions-4.13.0[${PYTHON_USEDEP}]
+	>=dev-python/typing-inspection-0.4.1[${PYTHON_USEDEP}]
 	>=dev-python/uvicorn-0.31.1[${PYTHON_USEDEP}]
 "
 BDEPEND="
@@ -39,5 +43,4 @@ RESTRICT="test"
 
 pkg_postinst() {
 	optfeature "support rich" dev-python/rich
-	optfeature "support ws" dev-python/websockets
 }
