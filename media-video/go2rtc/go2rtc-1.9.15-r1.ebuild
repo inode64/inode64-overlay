@@ -32,7 +32,7 @@ DOCS=(README.md)
 PATCHES=( "${FILESDIR}/${PN}-release-version.patch" )
 
 src_compile() {
-	CGO_ENABLED=0 ego build -trimpath -ldflags "-s -w"
+	CGO_ENABLED=0 ego build -trimpath
 }
 
 src_test() {
