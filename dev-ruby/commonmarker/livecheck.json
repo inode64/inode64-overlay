@@ -1,0 +1,5 @@
+{
+  "crates": true,
+  "crates_mode": "native",
+  "restrict_version": "minor"
+}
