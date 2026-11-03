@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{12..15} )
 
-inherit cmake desktop git-r3 python-any-r1 systemd
+inherit cmake desktop git-r3 python-any-r1 systemd xdg
 
 DESCRIPTION="Local AI server: optimized LLM inference on AMD NPU + GPU"
 HOMEPAGE="
@@ -173,6 +173,8 @@ src_install() {
 }
 
 pkg_postinst() {
+	xdg_pkg_postinst
+
 	elog "lemond binds 127.0.0.1:13305 by default; expose it beyond localhost"
 	elog "only behind API-key auth (LEMONADE_API_KEY) or a VPN/SSH tunnel."
 	elog ""
