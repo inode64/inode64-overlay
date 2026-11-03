@@ -8,7 +8,7 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="ssl(+),threads(+)"
 
-inherit distutils-r1 flag-o-matic pypi
+inherit distutils-r1 flag-o-matic optfeature pypi
 
 DESCRIPTION="Coroutine-based network library"
 HOMEPAGE="
@@ -102,4 +102,8 @@ python_install_all() {
 	use examples && dodoc -r examples
 
 	distutils-r1_python_install_all
+}
+
+pkg_postinst() {
+	optfeature "memory usage checks in the monitor thread" dev-python/psutil
 }

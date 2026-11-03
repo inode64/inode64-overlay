@@ -8,7 +8,7 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="ssl(+),threads(+)"
 
-inherit distutils-r1 flag-o-matic pypi
+inherit distutils-r1 flag-o-matic optfeature pypi
 
 DESCRIPTION="Coroutine-based network library"
 HOMEPAGE="
@@ -26,8 +26,8 @@ RESTRICT="test"
 DEPEND="
 	>=dev-libs/libev-4.31:=
 	dev-libs/libuv:=
-	>=dev-python/cffi-1.12.3[${PYTHON_USEDEP}]
-	>=dev-python/greenlet-3[${PYTHON_USEDEP}]
+	>=dev-python/cffi-1.17.1[${PYTHON_USEDEP}]
+	>=dev-python/greenlet-3.2.2[${PYTHON_USEDEP}]
 	>=net-dns/c-ares-1.12:=
 "
 RDEPEND="
@@ -36,9 +36,9 @@ RDEPEND="
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 "
 BDEPEND="
-	>=dev-python/cffi-1.12.3[${PYTHON_USEDEP}]
-	>=dev-python/cython-3.0.8[${PYTHON_USEDEP}]
-	>=dev-python/greenlet-3[${PYTHON_USEDEP}]
+	>=dev-python/cffi-1.17.1[${PYTHON_USEDEP}]
+	>=dev-python/cython-3.0.11[${PYTHON_USEDEP}]
+	>=dev-python/greenlet-3.2.2[${PYTHON_USEDEP}]
 	test? (
 	${RDEPEND}
 	dev-python/dnspython[${PYTHON_USEDEP}]
@@ -102,4 +102,8 @@ python_install_all() {
 	use examples && dodoc -r examples
 
 	distutils-r1_python_install_all
+}
+
+pkg_postinst() {
+	optfeature "memory usage checks in the monitor thread" dev-python/psutil
 }
