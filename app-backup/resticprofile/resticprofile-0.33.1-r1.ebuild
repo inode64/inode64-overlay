@@ -23,7 +23,7 @@ src_compile() {
 	# main.go carries the next development version, the release one comes from
 	# the linker. Updates belong to Portage, so leave "self-update" out.
 	ego build -trimpath -tags no_self_update \
-		-ldflags "-s -w -X main.version=${PV} -X main.builtBy=portage" || die
+		-ldflags "-X main.version=${PV} -X main.builtBy=portage" || die
 }
 
 src_test() {
