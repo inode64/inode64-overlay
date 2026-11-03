@@ -18,6 +18,7 @@ KEYWORDS="~amd64"
 
 BDEPEND="test? (
 	dev-python/sortedcollections[${PYTHON_USEDEP}]
+	dev-python/typing-extensions[${PYTHON_USEDEP}]
 	)
 "
 
