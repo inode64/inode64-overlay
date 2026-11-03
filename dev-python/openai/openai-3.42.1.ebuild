@@ -6,7 +6,7 @@ EAPI=8
 DISTUTILS_USE_PEP517=hatchling
 PYTHON_COMPAT=( python3_{12..14} )
 
-inherit distutils-r1 pypi
+inherit distutils-r1 optfeature pypi
 
 DESCRIPTION="The official Python library for the openai API"
 HOMEPAGE="
@@ -33,3 +33,11 @@ RDEPEND="
 
 # Tests need the same Stainless mock-server stack as anthropic.
 RESTRICT="test"
+
+pkg_postinst() {
+	optfeature "the aiohttp transport (DefaultAioHttpClient)" dev-python/aiohttp
+	optfeature "Amazon Bedrock authentication" dev-python/botocore
+	optfeature "the Google Vertex AI provider" dev-python/google-auth
+	optfeature "the Realtime API over WebSocket" dev-python/websockets
+	optfeature "the data helpers" "dev-python/numpy dev-python/pandas"
+}
