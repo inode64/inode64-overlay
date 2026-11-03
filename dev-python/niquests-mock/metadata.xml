@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/0x12th/niquests-mock/issues</bugs-to>
+		<changelog>https://github.com/0x12th/niquests-mock/releases</changelog>
+		<remote-id type="github">0x12th/niquests-mock</remote-id>
+		<remote-id type="pypi">niquests-mock</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -20,7 +20,7 @@ SRC_URI="
 	https://openldap.org/software/download/OpenLDAP/openldap-release/${P}.tgz
 	http://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/${P}.tgz
 	http://mirror.eu.oneandone.net/software/openldap/openldap-release/${P}.tgz
-	mirror://gentoo/${BIS_P}"
+	https://www.inode64.com/dist/${BIS_P}"
 
 LICENSE="OPENLDAP GPL-2"
 SLOT="0"
