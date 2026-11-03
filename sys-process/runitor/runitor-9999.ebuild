@@ -30,7 +30,7 @@ src_unpack() {
 }
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w -X main.Version=${PV}-${EGIT_VERSION:0:8}" ./cmd/${PN} || die
+	ego build -trimpath -ldflags "-X main.Version=${PV}-${EGIT_VERSION:0:8}" ./cmd/${PN} || die
 }
 
 src_test() {

@@ -17,7 +17,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w -X main.Version=v${PV}" ./cmd/${PN} || die
+	ego build -trimpath -ldflags "-X main.Version=v${PV}" ./cmd/${PN} || die
 }
 
 src_test() {
