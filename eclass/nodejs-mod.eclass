@@ -90,7 +90,7 @@ nodejs-mod_src_compile() {
 
             pushd "${dir}" >/dev/null || die "Failed to change to ${dir} directory"
             npm_config_nodedir="${ESYSROOT}/usr" \
-                node "${node_gyp}" rebuild --verbose --jobs "$(makeopts_jobs)" ||
+                node "${node_gyp}" rebuild --verbose --jobs "$(get_makeopts_jobs)" ||
                 die "Failed to build the native addon in ${dir}"
             popd >/dev/null || die
         done < <(find node_modules/ -name binding.gyp -print0)
