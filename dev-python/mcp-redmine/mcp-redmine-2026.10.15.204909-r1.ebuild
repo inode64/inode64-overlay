@@ -23,17 +23,19 @@ RDEPEND="
 	dev-python/httpx[${PYTHON_USEDEP}]
 	>=dev-python/mcp-2[${PYTHON_USEDEP}]
 	<dev-python/mcp-3[${PYTHON_USEDEP}]
-	dev-python/openapi-core[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
 "
 
-# Tests hit a live Redmine instance.
-RESTRICT="test"
+EPYTEST_PLUGINS=()
+distutils_enable_tests pytest
 
 src_prepare() {
 	distutils-r1_src_prepare
 	# Drop the exact version pins so the system packages satisfy them.
-	sed -i -E 's/^(\s*"[A-Za-z0-9_\[\]-]+)==[0-9.]+(",?)$/\1\2/' pyproject.toml || die
+	sed -i -E 's/^(\s*"[][A-Za-z0-9_-]+)==[0-9.]+(",?)$/\1\2/' pyproject.toml || die
+	# Declared upstream but never imported: the server reads its OpenAPI
+	# spec with PyYAML.
+	sed -i -e '/"openapi-core/d' pyproject.toml || die
 }
 
 pkg_postinst() {
@@ -42,6 +44,7 @@ pkg_postinst() {
 	elog "  REDMINE_API_KEY=<API key>            (My account -> API access key)"
 	elog "  REDMINE_REQUEST_INSTRUCTIONS=/path/to/instructions.md   (optional)"
 	elog "  REDMINE_ALLOWED_DIRECTORIES=/tmp     (optional, for attachments)"
+	elog "  REDMINE_READ_ONLY=1                  (optional, refuses non-GET requests)"
 	elog "Register it in your MCP client, e.g. for Claude Code:"
 	elog "  claude mcp add redmine -e REDMINE_URL=... -e REDMINE_API_KEY=... -- mcp-redmine"
 }
