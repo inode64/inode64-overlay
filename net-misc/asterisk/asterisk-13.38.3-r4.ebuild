@@ -351,11 +351,11 @@ pkg_postinst() {
 
 	if [[ -f /var/lib/asterisk/astdb.sqlite3 ]]; then
 		ewarn "Default astdb location has changed from /var/lib/asterisk to /var/lib/asterisk/astdb"
-		ewarn "You still have a /var/lib/asterisk/astdb.sqlite file.  You need to either set"
+		ewarn "You still have a /var/lib/asterisk/astdb.sqlite3 file.  You need to either set"
 		ewarn "astdbdir in /etc/asterisk/asterisk.conf to /var/lib/asterisk or follow these"
 		ewarn "steps to migrate:"
 		ewarn "1.  /etc/init.d/asterisk stop"
-		ewarn "2.  mv /var/lib/asterisk/astdb.sqlite /var/lib/asterisk/astdb/"
+		ewarn "2.  mv /var/lib/asterisk/astdb.sqlite3 /var/lib/asterisk/astdb/"
 		ewarn "3.  /etc/init.d/asterisk start"
 		ewarn "This update was done partly for security reasons so that /var/lib/asterisk can be root owned."
 	fi
