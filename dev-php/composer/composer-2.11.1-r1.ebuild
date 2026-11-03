@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit git-r3 shell-completion
+inherit git-r3 optfeature shell-completion
 
 DESCRIPTION="Dependency Manager for PHP"
 HOMEPAGE="https://github.com/composer/composer"
@@ -66,4 +66,14 @@ src_install() {
 	if use doc; then
 		dodoc -r doc
 	fi
+}
+
+pkg_postinst() {
+	optfeature "HTTP downloads through curl instead of PHP streams" "dev-lang/php[curl]"
+	optfeature "extracting ZIP archives without unzip or 7z" "dev-lang/php[zip]"
+	optfeature "gzip compressed HTTP requests" "dev-lang/php[zlib]"
+	optfeature "Git repositories" dev-vcs/git
+	optfeature "Subversion repositories" dev-vcs/subversion
+	optfeature "Mercurial repositories" dev-vcs/mercurial
+	optfeature "Fossil repositories" dev-vcs/fossil
 }
