@@ -19,7 +19,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 RDEPEND="app-backup/restic"
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w" || die
+	ego build -trimpath || die
 
 	if ! tc-is-cross-compiler; then
 		local shell
