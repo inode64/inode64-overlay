@@ -1,0 +1,5 @@
+{
+  "type": "regex",
+  "url": "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages",
+  "regex": "Filename: pool/main/c/claude-desktop/claude-desktop_([0-9.]+)_amd64\\.deb"
+}

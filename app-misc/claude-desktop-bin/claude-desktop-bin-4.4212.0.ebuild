@@ -9,14 +9,13 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 
 inherit chromium-2 desktop optfeature pax-utils unpacker xdg
 
-# curl -sA 'Mozilla/5.0' "https://claude.ai/api/desktop/linux/x64/deb/latest" | jq -r '.url'
-BUILD_ID="df1d8a339dfabcf359af7144fe142b59ff7d9a0f"
-
 MY_PN="${PN%-bin}"
 
 DESCRIPTION="Desktop application for Claude.ai"
 HOMEPAGE="https://claude.ai/ https://code.claude.com/docs/en/desktop-linux"
-SRC_URI="https://downloads.claude.ai/releases/linux/x64/${PV}/Claude-${BUILD_ID}.deb
+# Anthropic's APT repository names the .deb after the version, unlike the
+# releases/ path, whose file name carried a per-build hash.
+SRC_URI="https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/${MY_PN}/${MY_PN}_${PV}_amd64.deb
 	-> ${P}.deb"
 S="${WORKDIR}"
 
@@ -27,6 +26,8 @@ KEYWORDS="-* ~amd64"
 IUSE="egl wayland"
 RESTRICT="bindist mirror strip"
 
+# The @ant/claude-native addon links libpipewire-0.3.so.0, which comes with
+# sys-apps/xdg-desktop-portal.
 RDEPEND="
 	|| (
 		sys-apps/systemd
@@ -99,7 +100,7 @@ pkg_postinst() {
 	xdg_pkg_postinst
 
 	optfeature "sandboxed code execution in a virtual machine" \
-		"app-emulation/qemu sys-firmware/edk2-ovmf app-emulation/virtiofsd"
+		"app-emulation/qemu sys-firmware/edk2 app-emulation/virtiofsd"
 	optfeature "system tray icon" dev-libs/libayatana-appindicator
 	optfeature "storing credentials in a keyring" virtual/secret-service
 }
