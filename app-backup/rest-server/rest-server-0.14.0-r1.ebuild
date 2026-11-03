@@ -33,7 +33,7 @@ src_prepare() {
 }
 
 src_compile() {
-	ego build -trimpath -ldflags "-s -w" -o rest-server ./cmd/rest-server || die
+	ego build -trimpath -o rest-server ./cmd/rest-server || die
 }
 
 src_test() {
