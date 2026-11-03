@@ -6,7 +6,7 @@ EAPI=8
 inherit acct-user
 
 DESCRIPTION="A user for OnlyOffice document server"
-ACCT_USER_ID=551
+ACCT_USER_ID=-1
 ACCT_USER_HOME=/usr/share/onlyoffice/documentserver
 ACCT_USER_GROUPS=( ds )
 
