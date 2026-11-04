@@ -38,6 +38,7 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
     [ "$cp" == "app-metrics/mcp-grafana" ] || \
+    [ "$cp" == "app-metrics/varnish_exporter" ] || \
     [ "$cp" == "dev-php/composer" ] || \
     [ "$cp" == "media-video/go2rtc" ] || \
     [ "$cp" == "sys-process/runitor" ] || \
