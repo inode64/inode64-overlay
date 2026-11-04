@@ -49,8 +49,9 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "The service runs as varnish_exporter, a member of the vinyl group so"
-	elog "that vinylstat can read the shared memory of vinyld. It listens on"
+	elog "The service runs as varnish_exporter, a member of the vinyl and varnish"
+	elog "groups so that vinylstat or varnishstat can read the cache's shared"
+	elog "memory. It listens on"
 	elog "127.0.0.1:9131; change VARNISH_EXPORTER_OPTS in /etc/conf.d/${PN}"
 	elog "(OpenRC) or override ExecStart in a drop-in (systemd)."
 	elog "Check it before enabling it:"
