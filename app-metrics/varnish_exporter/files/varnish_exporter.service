@@ -1,0 +1,14 @@
+[Unit]
+Description=Prometheus exporter for Varnish Cache and Vinyl Cache
+After=network-online.target varnishd.service vinyld.service
+Wants=network-online.target
+
+[Service]
+User=varnish_exporter
+Group=varnish_exporter
+# Override with a drop-in; see /etc/conf.d/varnish_exporter for the options.
+ExecStart=/usr/bin/varnish_exporter -web.listen-address=127.0.0.1:9131 -varnishstat-path=/usr/bin/vinylstat
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

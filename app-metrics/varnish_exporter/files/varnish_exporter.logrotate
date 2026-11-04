@@ -1,0 +1,8 @@
+/var/log/varnish_exporter/varnish_exporter.log {
+	missingok
+	notifempty
+	size 5M
+	rotate 3
+	compress
+	copytruncate
+}
