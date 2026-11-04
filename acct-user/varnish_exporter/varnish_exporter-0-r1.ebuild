@@ -8,7 +8,8 @@ inherit acct-user
 DESCRIPTION="User for app-metrics/varnish_exporter"
 # Dynamic, as acct-user.eclass asks of overlays, so it cannot clash with ::gentoo.
 ACCT_USER_ID=-1
-# vinylstat has to read the VSM files of vinyld, which are 0640 vinyl:vinyl.
-ACCT_USER_GROUPS=( varnish_exporter vinyl )
+# The stats tool reads the cache's VSM files, 0640 to its group: vinyl for
+# Vinyl Cache (vinylstat), varnish for Varnish Cache (varnishstat).
+ACCT_USER_GROUPS=( varnish_exporter vinyl varnish )
 
 acct-user_add_deps
