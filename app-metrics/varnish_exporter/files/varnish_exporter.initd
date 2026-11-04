@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Prometheus exporter for Varnish Cache and Vinyl Cache"
+
+command="/usr/bin/varnish_exporter"
+command_args="${VARNISH_EXPORTER_OPTS}"
+command_user="varnish_exporter:varnish_exporter"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log"
+error_log="${output_log}"
+
+depend() {
+	need net
+	after varnishd vinyld
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o "${command_user}" "/var/log/${RC_SVCNAME}"
+}

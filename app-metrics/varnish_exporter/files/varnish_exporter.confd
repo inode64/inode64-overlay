@@ -1,0 +1,6 @@
+# Options for varnish_exporter (varnish_exporter -h lists them all).
+# On every scrape it runs "<varnishstat-path> -j -t 0": vinylstat for Vinyl
+# Cache, varnishstat for Varnish Cache. Add -n if the cache runs with its own
+# -n instance name or working directory.
+# Only loopback by default: set the address Prometheus scrapes.
+VARNISH_EXPORTER_OPTS="-web.listen-address=127.0.0.1:9131 -varnishstat-path=/usr/bin/vinylstat"
