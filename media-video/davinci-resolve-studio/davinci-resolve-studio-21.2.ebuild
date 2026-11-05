@@ -147,12 +147,13 @@ pkg_nofetch() {
 }
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="30G"
+	# 21.1.2 peaked at about 32 GiB, when squashfs-root and image/ coexist.
+	CHECKREQS_DISK_BUILD="34G"
 
 	check-reqs_pkg_pretend
 }
 pkg_setup() {
-	CHECKREQS_DISK_BUILD="30G"
+	CHECKREQS_DISK_BUILD="34G"
 
 	check-reqs_pkg_pretend
 }
