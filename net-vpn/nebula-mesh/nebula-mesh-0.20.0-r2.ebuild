@@ -10,6 +10,7 @@ HOMEPAGE="https://github.com/forgekeep/nebula-mesh"
 
 SRC_URI="https://github.com/forgekeep/nebula-mesh/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	https://www.inode64.com/dist/${P}-vendor.tar.xz
+	https://www.inode64.com/dist/${P}-patches-1.tar.xz
 "
 
 LICENSE="MIT"
@@ -41,6 +42,10 @@ DEPEND="
 BDEPEND=">=dev-lang/go-1.27.3"
 
 DOCS=( README.md CHANGELOG.md )
+
+# Extra static_host_map endpoints for lighthouses (advanced.extra_endpoints),
+# from https://github.com/forgekeep/nebula-mesh/pull/412
+PATCHES=( "${WORKDIR}/patches" )
 
 src_prepare() {
 	default
