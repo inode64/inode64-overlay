@@ -66,21 +66,20 @@ src_prepare() {
 
 	local remove_me=(
 		help/ReferenceCardForMac.pdf
-		lib/async-profiler/amd64/jniSymbolsResolver.dll
-		lib/async-profiler/amd64/dbghelp.dll
-		lib/async-profiler/amd64/libasyncProfiler.dll
-		lib/async-profiler/amd64/symsrv.dll
-		lib/async-profiler/libasyncProfiler.dylib
+		lib/ijent/ijent-aarch64-unknown-linux-musl-release
+		lib/ijent/ijent-x86_64-unknown-linux-musl-release
 		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-darwin-amd64
 		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-darwin-arm64
 		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-windows-amd64.exe
 		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-linux-arm64
 		plugins/gateway-plugin/lib/remote-dev-workers/remote-dev-worker-windows-arm64.exe
-		plugins/platform-ijent-bundledBinaries/ijent-aarch64-unknown-linux-musl-release
-		plugins/platform-ijent-bundledBinaries/ijent-x86_64-unknown-linux-musl-release
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/aarch64
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/amd64/dbghelp.dll
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/amd64/jniSymbolsResolver.dll
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/amd64/libasyncProfiler.dll
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/amd64/symsrv.dll
+		plugins/profiler-asyncOne-plugin/lib/async-profiler/libasyncProfiler.dylib
 	)
-
-	rm -rvf lib/async-profiler/aarch64 || die
 
 	if ! use server; then
 		remove_me+=( plugins/remote-dev-server/selfcontained )
