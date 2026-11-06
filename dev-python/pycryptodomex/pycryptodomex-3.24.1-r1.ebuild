@@ -17,10 +17,12 @@ HOMEPAGE="
 	https://pypi.org/project/pycryptodomex/
 "
 # The sdist lacks the test vectors, without them most of SelfTest is skipped.
+# Upstream tags pycryptodomex releases v${PV}x; since pycryptodome moved to
+# 4.x, newer 3.x releases have no v${PV} tag.
 SRC_URI+="
 	test? (
-		https://github.com/Legrandin/pycryptodome/archive/v${PV}.tar.gz
-			-> pycryptodome-${PV}.gh.tar.gz
+		https://github.com/Legrandin/pycryptodome/archive/v${PV}x.tar.gz
+			-> ${P}.gh.tar.gz
 	)
 "
 
@@ -51,7 +53,7 @@ python_prepare_all() {
 }
 
 python_test() {
-	local -x PYTHONPATH="${BUILD_DIR}/install$(python_get_sitedir):${WORKDIR}/pycryptodome-${PV}/test_vectors"
+	local -x PYTHONPATH="${BUILD_DIR}/install$(python_get_sitedir):${WORKDIR}/pycryptodome-${PV}x/test_vectors"
 	"${EPYTHON}" - <<-EOF || die
 		import sys
 		from Cryptodome import SelfTest
