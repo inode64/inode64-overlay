@@ -1,0 +1,20 @@
+# Covers every vinylncsa and vinyllog instance, e.g. vinylncsa.backend.
+/var/log/vinyl-cache/*.log {
+	daily
+	rotate 31
+	dateext
+	dateyesterday
+	delaycompress
+	compress
+	notifempty
+	missingok
+	sharedscripts
+	postrotate
+		# On SIGHUP vinylncsa and vinyllog reopen their -w file: no line is
+		# lost, unlike copytruncate.  Same pidfiles for OpenRC and systemd.
+		for pidfile in /run/vinylncsa*.pid /run/vinyllog*.pid; do
+			[ -s "${pidfile}" ] && kill -HUP "$(cat "${pidfile}")" 2>/dev/null
+		done
+		true
+	endscript
+}

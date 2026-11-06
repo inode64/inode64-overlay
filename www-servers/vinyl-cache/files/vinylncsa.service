@@ -1,0 +1,20 @@
+[Unit]
+Description=Vinyl Cache HTTP accelerator NCSA logging daemon
+Documentation=man:vinylncsa(1)
+After=vinyld.service
+
+[Service]
+Type=forking
+PIDFile=/run/vinylncsa.pid
+
+# systemd also expands '%' in unit files: double every '%' of a -F format,
+# or read the format from a file with -f.
+ExecStart=/usr/bin/vinylncsa -a -D -P /run/vinylncsa.pid \
+	-w /var/log/vinyl-cache/vinylncsa.log
+ExecReload=/bin/kill -HUP $MAINPID
+# libvinylapi can abort under a log overrun while vinyld restarts with load
+# (seen with 9.1.0); start again instead of losing the log.
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target

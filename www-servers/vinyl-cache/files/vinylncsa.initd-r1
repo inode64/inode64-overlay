@@ -1,0 +1,36 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+VINYLNCSA_PID=${VINYLNCSA_PID:-/run/${SVCNAME}.pid}
+
+command="${VINYLNCSA:-/usr/bin/vinylncsa}"
+command_args="-D -P ${VINYLNCSA_PID} ${VINYLNCSA_OPTS}"
+pidfile="${VINYLNCSA_PID}"
+
+extra_started_commands="reload rotate flush"
+
+description_rotate="Rotate the log file"
+description_flush="Flush any outstanding transactions"
+
+depend() {
+	# Started first it gives up after 5 s without a running instance.
+	after vinyld
+}
+
+rotate() {
+	ebegin "Rotating log file"
+	start-stop-daemon -p ${VINYLNCSA_PID} -s SIGHUP
+	eend $?
+}
+
+flush() {
+	ebegin "Flushing any outstanding transactions"
+	start-stop-daemon -p ${VINYLNCSA_PID} -s SIGUSR1
+	eend $?
+}
+
+reload() {
+	flush
+	rotate
+}

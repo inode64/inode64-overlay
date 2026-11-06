@@ -1,0 +1,41 @@
+[Unit]
+Description=Vinyl Cache, a high-performance HTTP accelerator
+Documentation=https://vinyl-cache.org/docs/ man:vinyld(1)
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+# TERM goes only to the manager, which stops the worker cleanly; a KILL at
+# the end of TimeoutStopSec reaches every process left.
+KillMode=mixed
+# The manager gives the worker up to cli_timeout (60 s by default) to finish
+# the requests in flight: keep this above it.
+TimeoutStopSec=90
+# The manager exits with 64 (or 192 with a core dump) when it had to kill a
+# worker that did not finish in time: an expected end of a stop under load.
+SuccessExitStatus=64 192
+
+# Maximum number of open files (for ulimit -n)
+LimitNOFILE=131072
+# Shared memory (VSM) segments are locked in memory; vsl_space (-l) is 80 MB
+# by default.
+LimitMEMLOCK=100M
+# Avoid "fork failed" on reload.
+TasksMax=infinity
+
+RuntimeDirectory=vinyld
+PIDFile=/run/vinyld/vinyld.pid
+
+# To change the options, run "systemctl edit vinyld" and set an empty
+# ExecStart= followed by your own.
+ExecStart=/usr/sbin/vinyld \
+	-j unix,user=vinyl \
+	-P /run/vinyld/vinyld.pid \
+	-f /etc/vinyl-cache/default.vcl \
+	-a localhost:8080 \
+	-s malloc,256m
+ExecReload=/usr/sbin/vinylreload
+
+[Install]
+WantedBy=multi-user.target

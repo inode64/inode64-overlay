@@ -1,0 +1,72 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+: "${CONFIGFILE:=/etc/vinyl-cache/default.vcl}"
+: "${VINYLD_PID:=/run/${RC_SVCNAME}.pid}"
+
+command="${VINYLD:-/usr/sbin/vinyld}"
+command_args="-j unix,user=vinyl -P ${VINYLD_PID} -f ${CONFIGFILE} ${VINYLD_OPTS}"
+pidfile="${VINYLD_PID}"
+
+# On TERM the manager stops accepting connections and gives the worker up to
+# cli_timeout (60 s by default) to finish the requests in flight before it
+# kills it.  OpenRC's default wait of 5 s gave up first: under load a restart
+# failed and the manager exited later, leaving the service crashed.
+retry="${retry:-TERM/90/KILL/10}"
+
+extra_commands="configtest"
+extra_started_commands="reload"
+
+description_configtest="Run syntax tests for configuration files."
+description_reload="Compile the configuration file again and switch to it."
+
+depend() {
+	need net
+	use dns logger
+}
+
+checkconfig() {
+	local out
+	out=$("${command}" -C -f "${CONFIGFILE}" 2>&1) && return 0
+	eerror "${RC_SVCNAME} has detected an error in your setup:"
+	printf '%s\n' "${out}" >&2
+	return 1
+}
+
+configtest() {
+	ebegin "Checking ${RC_SVCNAME} configuration"
+	checkconfig
+	eend $?
+}
+
+start_pre() {
+	checkconfig
+}
+
+stop_pre() {
+	if [ "${RC_CMD}" = "restart" ]; then
+		checkconfig
+	fi
+}
+
+# vinylreload has to reach the same instance, so pass on any -n.
+workdir() {
+	set -- ${VINYLD_OPTS}
+	while [ $# -gt 0 ]; do
+		case "$1" in
+			-n) printf '%s\n' "$2"; return ;;
+			-n?*) printf '%s\n' "${1#-n}"; return ;;
+		esac
+		shift
+	done
+}
+
+reload() {
+	local n
+	n=$(workdir)
+	ebegin "Reloading ${RC_SVCNAME}"
+	"${VINYLRELOAD:-/usr/sbin/vinylreload}" ${n:+-n "${n}"} ${VINYLRELOAD_OPTS} \
+		"${CONFIGFILE}" >/dev/null
+	eend $? "${RC_SVCNAME} could not load ${CONFIGFILE}"
+}
