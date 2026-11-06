@@ -10,7 +10,6 @@ HOMEPAGE="https://github.com/forgekeep/nebula-mesh"
 
 SRC_URI="https://github.com/forgekeep/nebula-mesh/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	https://www.inode64.com/dist/${P}-vendor.tar.xz
-	https://www.inode64.com/dist/${P}-patches-1.tar.xz
 "
 
 LICENSE="MIT"
@@ -43,17 +42,15 @@ BDEPEND=">=dev-lang/go-1.27.3"
 
 DOCS=( README.md CHANGELOG.md )
 
-# Extra static_host_map endpoints for lighthouses (advanced.extra_endpoints),
-# from https://github.com/forgekeep/nebula-mesh/pull/412
-PATCHES=( "${WORKDIR}/patches" )
-
 src_prepare() {
 	default
 
-	sed -i -e 's|/usr/local/bin/|/usr/bin/|g' deploy/systemd/nebula-{agent,mgmt}.service || die
 	# Nothing creates this file and the binary reads no variable from it unless
 	# NEBULA_MGMT_MASTER_KEY is set there, so its absence must not stop the unit.
-	sed -i -e 's|^EnvironmentFile=/etc|EnvironmentFile=-/etc|' deploy/systemd/nebula-mgmt.service || die
+	# internal/releaseconfig tests require deploy/packaging to match
+	# deploy/systemd except for ExecStart, so both copies get the same edit.
+	sed -i -e 's|^EnvironmentFile=/etc|EnvironmentFile=-/etc|' \
+		deploy/{systemd,packaging}/nebula-mgmt.service || die
 }
 
 src_compile() {
@@ -86,7 +83,7 @@ src_install() {
 
 		newinitd "${FILESDIR}/nebula-agent.initd" nebula-agent
 		newconfd "${FILESDIR}/nebula-agent.confd" nebula-agent
-		systemd_dounit deploy/systemd/nebula-agent.service
+		systemd_dounit deploy/packaging/nebula-agent.service
 
 		dotmpfiles "${FILESDIR}/nebula-agent.tmpfiles.conf"
 	fi
@@ -102,7 +99,7 @@ src_install() {
 
 		newinitd "${FILESDIR}/nebula-mgmt.initd" nebula-mgmt
 		newconfd "${FILESDIR}/nebula-mgmt.confd" nebula-mgmt
-		systemd_dounit deploy/systemd/nebula-mgmt.service
+		systemd_dounit deploy/packaging/nebula-mgmt.service
 
 		dotmpfiles "${FILESDIR}/nebula-mgmt.tmpfiles.conf"
 	fi
