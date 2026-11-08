@@ -16,3 +16,7 @@ depend() {
 	need net
 	after firewall
 }
+
+start_pre() {
+	checkpath -d -m 0700 -o "${CLOUDFLARED_USER:-cloudflared}:${CLOUDFLARED_GROUP:-cloudflared}" /var/log/cloudflared
+}

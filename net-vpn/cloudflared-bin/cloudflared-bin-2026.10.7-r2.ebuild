@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit systemd tmpfiles
+inherit systemd
 
 DESCRIPTION="Argo Tunnel client, written in GoLang"
 HOMEPAGE="https://github.com/cloudflare/cloudflared"
@@ -56,11 +56,12 @@ src_install() {
 	newins "${FILESDIR}"/config.yml config-example.yml
 	newinitd "${FILESDIR}"/cloudflared.initd cloudflared
 	newconfd "${FILESDIR}"/cloudflared.confd cloudflared
+
+	insinto /etc/logrotate.d
+	newins "${FILESDIR}"/cloudflared.logrotate cloudflared
+
+	# The log directory belongs to the user set in conf.d: the init script
+	# creates it with checkpath and the unit with LogsDirectory. A tmpfiles
+	# entry would hand it back to root.
 	systemd_newunit "${FILESDIR}"/cloudflared.service cloudflared.service
-
-	dotmpfiles "${FILESDIR}/cloudflared.tmpfiles.conf"
-}
-
-pkg_postinst() {
-	tmpfiles_process cloudflared.tmpfiles.conf
 }
