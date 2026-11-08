@@ -79,6 +79,7 @@ RDEPEND="
 		dev-python/libpass[${PYTHON_USEDEP}]
 	' python3_{13..14})
 "
+# The tests use the subtests fixture, built into pytest since 9.0.
 BDEPEND="
 	dev-python/build[${PYTHON_USEDEP}]
 	>=dev-python/importlib-metadata-8.7.0[${PYTHON_USEDEP}]
@@ -98,8 +99,10 @@ BDEPEND="
 		dev-python/pip[${PYTHON_USEDEP}]
 		dev-python/pygit2[${PYTHON_USEDEP}]
 		dev-python/pyinotify[${PYTHON_USEDEP}]
-		>=dev-python/pytest-salt-factories-1.0.5[${PYTHON_USEDEP}]
-		dev-python/pytest-subtests[${PYTHON_USEDEP}]
+		>=dev-python/pytest-9[${PYTHON_USEDEP}]
+		$(python_gen_cond_dep '
+			>=dev-python/pytest-salt-factories-1.0.5[${PYTHON_USEDEP}]
+		' python3_12)
 		dev-python/pytest-custom-exit-code[${PYTHON_USEDEP}]
 		dev-python/pytest-rerunfailures[${PYTHON_USEDEP}]
 		net-dns/bind
@@ -367,6 +370,12 @@ python_install_all() {
 }
 
 python_test() {
+	# ::gentoo builds pytest-salt-factories for python3_12 only.
+	if [[ ${EPYTHON} != python3.12 ]]; then
+		einfo "Skipping tests on ${EPYTHON}: dev-python/pytest-salt-factories is python3_12 only"
+		return
+	fi
+
 	local -a EPYTEST_DESELECT=(
 		# Takes several hours to run
 		tests/integration/states/
