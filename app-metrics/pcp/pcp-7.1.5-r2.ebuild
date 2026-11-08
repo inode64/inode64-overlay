@@ -13,13 +13,13 @@ if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/performancecopilot/pcp.git"
 else
-	KEYWORDS=""
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/performancecopilot/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt6 selinux snmp ssp +threads X xls"
+IUSE="activemq bind doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
@@ -32,7 +32,6 @@ BDEPEND="
 
 DEPEND="
 	${PYTHON_DEPS}
-	dev-db/sqlite:3
 	dev-lang/perl:=
 	dev-libs/inih
 	dev-libs/libuv:=
@@ -43,10 +42,7 @@ DEPEND="
 	virtual/libelf:=
 	virtual/zlib:=
 	X? ( x11-libs/libXt )
-	qt6? (
-		dev-qt/qtbase:6[network,widgets]
-		dev-qt/qtsvg:6
-	)
+	qt5? ( dev-qt/qtsvg:6 )
 	activemq? ( dev-perl/libwww-perl )
 	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? (
@@ -85,22 +81,18 @@ DEPEND="
 "
 RDEPEND="${DEPEND}
 	acct-user/pcp
-	!sys-process/atop
-	!sys-process/htop
-	!sys-apps/dstat
 "
+
+# Fixes that upstream only released in 7.2, which is masked here (it blocks
+# htop, atop and dstat). CVE-2026-16524 and -16526 chain into local root
+# through pmdaroot. Keep this version while 7.2 has no keywords.
+PATCHES=(
+	"${FILESDIR}/${PV}-security"
+)
 
 src_prepare() {
 	default
 	eapply_user
-
-	# pmview.ui wires its actions to custom slots of the top-level window.
-	# Qt6 uic generates pointer-to-member connections by default, which
-	# resolve against QMainWindow and fail ('optionsMenubar' is not a member
-	# of 'QMainWindow'). Fall back to the string based SIGNAL/SLOT syntax.
-	# pmview is disabled below (--without-qt3d); kept so it builds if enabled.
-	# https://github.com/inode64/inode64-overlay/issues/34
-	echo 'QMAKE_UIC_FLAGS += -connections string' >> src/pmview/pmview.pro || die
 }
 
 src_configure() {
@@ -113,12 +105,10 @@ src_configure() {
 		$(use_enable pie)
 		$(use_enable ssp)
 		$(use_with infiniband)
+		$(use_with json pmdajson)
 		$(use_with nutcracker pmdanutcracker)
 		$(use_with perfevent)
-		$(use_with qt6 qt)
-		# pmview (developer preview) needs Coin3/SoQt, which is not packaged;
-		# do not let configure pick it up automagically
-		--without-qt3d
+		$(use_with qt5 qt)
 		$(use_with selinux)
 		$(use_with snmp pmdasnmp)
 		$(use_with threads)
@@ -153,7 +143,10 @@ src_install() {
 }
 
 pkg_postinst() {
-	tmpfiles_process pcp.conf
+	# Both files, as at boot: processing ours alone used to leave pmcd's log
+	# directory and config/ with the ownership upstream's file reverts on the
+	# next reboot.
+	tmpfiles_process pcp-reboot-init.conf pcp.conf
 
 	elog ""
 	elog "To install basic PCP tools and services and enable collecting performance data on systemd based distributions, run:"
