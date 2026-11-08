@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit systemd tmpfiles
+inherit systemd
 
 MY_PN="metricbeat"
 MY_P="${MY_PN}-${PV}-linux-x86_64"
@@ -34,11 +34,9 @@ src_install() {
 	cp -r kibana "${ED}"/usr/share/${MY_PN} || die
 
 	newconfd "${FILESDIR}/${MY_PN}.confd" ${MY_PN}
+	# The data and log directories belong to the user set in conf.d: the init
+	# script creates them with checkpath and the unit with StateDirectory and
+	# LogsDirectory. A tmpfiles entry would hand them back to root.
 	newinitd "${FILESDIR}/${MY_PN}.initd" ${MY_PN}
 	systemd_dounit "${FILESDIR}/${MY_PN}.service"
-	dotmpfiles "${FILESDIR}/${MY_PN}.tmpfiles.conf"
-}
-
-pkg_postinst() {
-	tmpfiles_process metricbeat.tmpfiles.conf
 }

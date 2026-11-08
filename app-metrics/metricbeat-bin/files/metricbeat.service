@@ -6,6 +6,10 @@ After=network-online.target
 
 [Service]
 Restart=always
+StateDirectory=metricbeat
+StateDirectoryMode=0750
+LogsDirectory=metricbeat
+LogsDirectoryMode=0750
 WorkingDirectory=/var/log/metricbeat
 ExecStart=/usr/bin/metricbeat -c /etc/metricbeat/metricbeat.yml -path.config /etc/metricbeat -path.data /var/lib/metricbeat -path.home /usr/share/metricbeat -path.logs /var/log/metricbeat
 
