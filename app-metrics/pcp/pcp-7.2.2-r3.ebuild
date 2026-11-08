@@ -83,7 +83,10 @@ DEPEND="
 		')
 	)
 "
+# pgpool2 ships its own libpcp (the pgpool Communication Protocol library),
+# so both packages install /usr/lib64/libpcp.so. https://bugs.gentoo.org/925483
 RDEPEND="${DEPEND}
+	!dev-db/pgpool2
 	acct-user/pcp
 	!sys-process/atop
 	!sys-process/htop

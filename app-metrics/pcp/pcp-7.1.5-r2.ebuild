@@ -19,7 +19,7 @@ fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-IUSE="activemq bind doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt5 selinux snmp ssp +threads X xls"
+IUSE="activemq bind doc infiniband influxdb json libvirt mysql nginx nutcracker perfevent pie podman postgres qt6 selinux snmp ssp +threads X xls"
 DOC="CHANGELOG README.md INSTALL.md"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
@@ -42,7 +42,10 @@ DEPEND="
 	virtual/libelf:=
 	virtual/zlib:=
 	X? ( x11-libs/libXt )
-	qt5? ( dev-qt/qtsvg:6 )
+	qt6? (
+		dev-qt/qtbase:6[network,widgets]
+		dev-qt/qtsvg:6
+	)
 	activemq? ( dev-perl/libwww-perl )
 	bind? ( dev-perl/libwww-perl dev-perl/XML-LibXML dev-perl/File-Slurp )
 	influxdb? (
@@ -79,7 +82,10 @@ DEPEND="
 		')
 	)
 "
+# pgpool2 ships its own libpcp (the pgpool Communication Protocol library),
+# so both packages install /usr/lib64/libpcp.so. https://bugs.gentoo.org/925483
 RDEPEND="${DEPEND}
+	!dev-db/pgpool2
 	acct-user/pcp
 "
 
@@ -108,7 +114,10 @@ src_configure() {
 		$(use_with json pmdajson)
 		$(use_with nutcracker pmdanutcracker)
 		$(use_with perfevent)
-		$(use_with qt5 qt)
+		$(use_with qt6 qt)
+		# pmview (developer preview) needs Coin3/SoQt, which is not packaged;
+		# do not let configure pick it up automagically
+		--without-qt3d
 		$(use_with selinux)
 		$(use_with snmp pmdasnmp)
 		$(use_with threads)
