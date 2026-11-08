@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit systemd tmpfiles
+inherit systemd
 
 DESCRIPTION="Bitbucket self-hosted Pipelines runner"
 HOMEPAGE="https://support.atlassian.com/bitbucket-cloud/docs/runners/"
@@ -33,13 +33,14 @@ src_install() {
 
 	newinitd "${FILESDIR}/bitbucketrunner.initd" bitbucketrunner
 	newconfd "${FILESDIR}/bitbucketrunner.confd" bitbucketrunner
+	# The log and working directories belong to the service user, which
+	# conf.d can change: the init script creates them with checkpath and the
+	# unit with LogsDirectory/CacheDirectory. A tmpfiles entry would hand them
+	# back to root on every boot and upgrade.
 	systemd_dounit "${FILESDIR}/bitbucketrunner.service"
-
-	dotmpfiles "${FILESDIR}/${PN}.tmpfiles.conf"
 }
 
 pkg_postinst() {
-	tmpfiles_process ${PN}.tmpfiles.conf
 	if [[ ! -d /etc/ssl/certs/java/cacerts ]]; then
 		# Java certificates is necessary for the runner to work properly
 		mkdir -p /etc/ssl/certs/java

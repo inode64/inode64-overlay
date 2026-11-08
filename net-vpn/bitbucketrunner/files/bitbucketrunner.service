@@ -7,6 +7,10 @@ EnvironmentFile=/etc/bitbucketrunner/tunnel.cfg
 WorkingDirectory=/opt/bitbucketrunner
 User=root
 Group=root
+LogsDirectory=bitbucketrunner
+LogsDirectoryMode=0750
+CacheDirectory=bitbucketrunner
+CacheDirectoryMode=0750
 Type=simple
 ExecStart=/bin/sh -ec ' \
   exec /usr/bin/java -jar \
