@@ -12,7 +12,7 @@ inherit edo multiprocessing systemd tmpfiles toolchain-funcs
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
 SRC_URI="https://github.com/Snapchat/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://www.inode64.com/dist/${P}-patches-1.tar.xz"
+	https://www.inode64.com/dist/${P}-patches-2.tar.xz"
 
 S="${WORKDIR}/${MY_PN}-${PV}"
 LICENSE="BSD"

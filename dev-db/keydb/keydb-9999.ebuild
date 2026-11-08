@@ -12,7 +12,7 @@ inherit edo git-r3 multiprocessing systemd tmpfiles toolchain-funcs
 DESCRIPTION="KeyDB is a high performance fork of Redis with a focus on multithreading"
 HOMEPAGE="https://docs.keydb.dev/"
 EGIT_REPO_URI="https://github.com/Snapchat/${MY_PN}.git"
-PATCH_TARBALL="${PN}-6.3.4-patches-1.tar.xz"
+PATCH_TARBALL="${PN}-6.3.4-patches-2.tar.xz"
 SRC_URI="https://www.inode64.com/dist/${PATCH_TARBALL}"
 
 LICENSE="BSD"
