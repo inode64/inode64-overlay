@@ -6,7 +6,7 @@ EAPI=8
 DISTUTILS_USE_PEP517=hatchling
 PYTHON_COMPAT=( python3_{12..14} )
 
-inherit distutils-r1 edo optfeature pypi
+inherit distutils-r1 optfeature pypi
 
 DESCRIPTION="Python SDK for Model Context Protocol"
 HOMEPAGE="https://github.com/modelcontextprotocol/python-sdk"
@@ -25,21 +25,9 @@ RDEPEND="dev-python/annotated-types[${PYTHON_USEDEP}]
 	dev-python/typer[${PYTHON_USEDEP}]
 	dev-python/typing-extensions[${PYTHON_USEDEP}]
 	dev-python/uvicorn[${PYTHON_USEDEP}]"
-BDEPEND="test? ( dev-python/dirty-equals[${PYTHON_USEDEP}]
-		dev-python/websockets[${PYTHON_USEDEP}]
-		dev-util/ruff )"
 
-EPYTEST_XDIST=1
-EPYTEST_PLUGINS=( anyio inline-snapshot pytest-examples )
-distutils_enable_tests pytest
-
-EPYTEST_DESELECT=( tests/client/test_config.py::test_command_execution )
-
-python_test() {
-	edo ln -s /usr/bin/ruff "${BUILD_DIR}"/install/usr/bin/ruff
-	distutils-r1_python_test
-	edo rm "${BUILD_DIR}"/install/usr/bin/ruff
-}
+# Tests require unpackaged logfire and pytest-examples.
+RESTRICT="test"
 
 pkg_postinst() {
 	optfeature "support rich" dev-python/rich

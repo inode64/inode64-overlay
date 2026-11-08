@@ -32,18 +32,10 @@ RDEPEND="
 "
 BDEPEND="
 	dev-python/uv-dynamic-versioning[${PYTHON_USEDEP}]
-	test? (
-		dev-python/dirty-equals[${PYTHON_USEDEP}]
-		dev-python/websockets[${PYTHON_USEDEP}]
-		dev-util/ruff
-	)
 "
 
-EPYTEST_XDIST=1
-EPYTEST_PLUGINS=( anyio inline-snapshot pytest-examples )
-distutils_enable_tests pytest
-
-EPYTEST_DESELECT=( tests/client/test_config.py::test_command_execution )
+# Tests require unpackaged logfire and pytest-examples.
+RESTRICT="test"
 
 pkg_postinst() {
 	optfeature "support rich" dev-python/rich
