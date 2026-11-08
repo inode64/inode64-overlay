@@ -22,7 +22,9 @@
 		<flag name="ipmi">Includes all UPS drivers that use ipmi.</flag>
 		<flag name="modbus">Includes all UPS drivers that use MODBUS.</flag>
 		<flag name="monitor">Add a Qt6 gui monitor.</flag>
-		<flag name="serial">Includes all UPS drivers that use SERIAL.</flag>
+		<flag name="serial">Includes all UPS drivers that use SERIAL, among them
+			apcmicrolink, which with USE=usb also drives APC Smart-UPS units that
+			tunnel the Microlink protocol over USB (such as SMC1000I-2UC).</flag>
 		<flag name="snmp">Includes all UPS drivers that use SNMP.</flag>
 		<flag name="upower">Monitor UPS and battery devices managed by the UPower daemon.</flag>
 		<flag name="usb">Includes all UPS drivers that use USB.</flag>
