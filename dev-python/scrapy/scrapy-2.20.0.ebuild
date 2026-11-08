@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{12..14} )
+PYTHON_COMPAT=( python3_{13..14} )
 DISTUTILS_USE_PEP517=hatchling
 inherit distutils-r1 pypi
 
@@ -36,7 +36,7 @@ RDEPEND="
 	>=dev-python/zope-interface-5.1.0[${PYTHON_USEDEP}]
 	$(python_gen_cond_dep '
 		>=dev-python/backports-zstd-1.3.0[${PYTHON_USEDEP}]
-	' python3_{12,13})
+	' python3_13)
 "
 BDEPEND="
 	test? (
