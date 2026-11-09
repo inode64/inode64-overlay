@@ -31,6 +31,9 @@ src_install() {
 	insopts -m0600
 	doins "${FILESDIR}"/tunnel.cfg
 
+	exeinto /usr/libexec/bitbucketrunner
+	newexe "${FILESDIR}"/bitbucketrunner-cleanup.sh cleanup
+
 	newinitd "${FILESDIR}/bitbucketrunner.initd" bitbucketrunner
 	newconfd "${FILESDIR}/bitbucketrunner.confd" bitbucketrunner
 	# The log and working directories belong to the service user, which

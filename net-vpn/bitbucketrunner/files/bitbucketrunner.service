@@ -12,6 +12,8 @@ LogsDirectoryMode=0750
 CacheDirectory=bitbucketrunner
 CacheDirectoryMode=0750
 Type=simple
+# "+" so the leftovers can go even if a drop-in sets another User=.
+ExecStartPre=+/usr/libexec/bitbucketrunner/cleanup
 ExecStart=/bin/sh -ec ' \
   exec /usr/bin/java -jar \
     -Dbitbucket.pipelines.runner.account.uuid=${ACCOUNT_UUID} \

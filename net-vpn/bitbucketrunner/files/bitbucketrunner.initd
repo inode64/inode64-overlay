@@ -46,6 +46,10 @@ start_pre() {
 	. "$CONFIG_FILE"
 	set +a
 
+	ebegin "Removing leftovers of previous steps"
+	/usr/libexec/bitbucketrunner/cleanup
+	eend $? || return 1
+
 	command_args="-jar "
 
 	if [ "$LOGBACK_CONFIGURATION_FILE" ]; then
