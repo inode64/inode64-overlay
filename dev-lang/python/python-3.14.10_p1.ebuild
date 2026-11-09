@@ -3,16 +3,14 @@
 
 EAPI="8"
 
-LLVM_COMPAT=( 19 )
-LLVM_OPTIONAL=1
 VERIFY_SIG_METHOD=sigstore
 WANT_LIBTOOL="none"
 
-inherit autotools check-reqs flag-o-matic linux-info llvm-r2
+inherit autotools check-reqs flag-o-matic linux-info
 inherit multiprocessing pax-utils python-utils-r1 toolchain-funcs
 inherit verify-sig
 
-MY_PV=${PV/_/}
+MY_PV=${PV}
 MY_P="Python-${MY_PV%_p*}"
 PYVER=$(ver_cut 1-2)
 PATCHSET="python-gentoo-patches-${MY_PV}"
@@ -37,10 +35,9 @@ if [[ ${PV} != *_rc* ]]; then
 	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 ~sparc x86"
 fi
 IUSE="
-	bluetooth build debug +ensurepip examples gdbm jit libedit +ncurses pgo
+	bluetooth build debug +ensurepip examples gdbm libedit +ncurses pgo
 	+readline +sqlite +ssl tail-call-interp test tk valgrind
 "
-REQUIRED_USE="jit? ( ${LLVM_REQUIRED_USE} )"
 RESTRICT="!test? ( test )"
 
 # Do not add a dependency on dev-lang/python to this ebuild.
@@ -90,12 +87,6 @@ BDEPEND="
 	dev-build/autoconf-archive
 	app-alternatives/awk
 	virtual/pkgconfig
-	jit? (
-		$(llvm_gen_dep '
-			llvm-core/clang:${LLVM_SLOT}
-			llvm-core/llvm:${LLVM_SLOT}
-		')
-	)
 	tail-call-interp? (
 		|| (
 			>=sys-devel/gcc-16:*
@@ -124,32 +115,31 @@ QA_PKGCONFIG_VERSION=${PYVER%t}
 QA_CONFIG_IMPL_DECL_SKIP=( chflags lchflags )
 
 declare -rgA PYTHON_KERNEL_CHECKS=(
-	["CROSS_MEMORY_ATTACH"]="test_external_inspection" #bug 938589
-	["DNOTIFY"]="test_fcntl" # bug 938662
+	# Without process_vm_readv/process_vm_writev, remote debugging falls
+	# back to opening /proc/PID/mem read-write, which sandbox denies; this
+	# also breaks PGO, since PROFILE_TASK runs these tests.
+	# bug 938589
+	["CROSS_MEMORY_ATTACH"]="
+		-x test_external_inspection
+		-i PdbAttachTestCase
+		-i TestRemoteExec
+		-i test_sys_remote_exec
+	"
+	["DNOTIFY"]="-x test_fcntl" # bug 938662
 )
 
 pkg_pretend() {
 	if use pgo || use test; then
 		check-reqs_pkg_pretend
 	fi
-
-	if use jit; then
-		ewarn "USE=jit is considered experimental upstream.  Using it"
-		ewarn "could lead to unexpected breakage, including race conditions"
-		ewarn "and crashes, respectively.  Please do not file Gentoo bugs, unless"
-		ewarn "you can reproduce the problem with dev-lang/python[-jit].  Instead,"
-		ewarn "please consider reporting JIT problems upstream."
-	fi
 }
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
-		use jit && llvm-r2_pkg_setup
 		if use test || use pgo; then
 			check-reqs_pkg_setup
 
 			local CONFIG_CHECK
-			local WARNING_CROSS_MEMORY_ATTACH="CONFIG_CROSS_MEMORY_ATTACH:\t is not set: process_vm_readv/process_vm_writev are unavailable, so the remote debugging tests (test_external_inspection, test_remote_pdb, sys.remote_exec) will be skipped"
 			for f in "${!PYTHON_KERNEL_CHECKS[@]}"; do
 				CONFIG_CHECK+="~${f} "
 			done
@@ -331,20 +321,9 @@ src_configure() {
 	for option in "${!PYTHON_KERNEL_CHECKS[@]}"; do
 		if ! linux_config_exists || ! linux_chkconfig_present "${option}"
 		then
-			COMMON_TEST_SKIPS+=( -x "${PYTHON_KERNEL_CHECKS[${option}]}" )
+			COMMON_TEST_SKIPS+=( ${PYTHON_KERNEL_CHECKS[${option}]} )
 		fi
 	done
-	if ! linux_config_exists || ! linux_chkconfig_present CROSS_MEMORY_ATTACH
-	then
-		# Without process_vm_readv/writev, remote debugging falls back to
-		# opening /proc/PID/mem read-write, which sandbox denies; this
-		# also kills PGO, since PROFILE_TASK runs these tests.
-		COMMON_TEST_SKIPS+=(
-			-x test_remote_pdb
-			-i TestRemoteExec
-			-i test_sys_remote_exec
-		)
-	fi
 
 	# musl-specific skips
 	use elibc_musl && COMMON_TEST_SKIPS+=(
@@ -431,7 +410,6 @@ src_configure() {
 		--enable-gil
 
 		$(use_with debug assertions)
-		$(use_enable jit experimental-jit)
 		$(use_enable pgo optimizations)
 		$(use_with readline readline "$(usex libedit editline readline)")
 		$(use_with tail-call-interp)
