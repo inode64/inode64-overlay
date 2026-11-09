@@ -81,7 +81,10 @@ BDEPEND+="
 	dev-lang/perl
 "
 
-PATCHES=()
+PATCHES=(
+	"${FILESDIR}/${PN}-2.8.5-ietf-mib-zero-index.patch"
+	"${FILESDIR}/${PN}-2.8.5-pwnm2-bypass-transfer.patch"
+)
 
 pkg_pretend() {
 	if use i2c; then
