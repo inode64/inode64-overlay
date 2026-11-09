@@ -14,7 +14,7 @@ HOMEPAGE="https://github.com/healthchecks/healthchecks"
 SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.gh.tar.gz"
 
 LICENSE="BSD"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 IUSE="apache apprise inode64 mysql nginx postgres +sqlite"
 REQUIRED_USE="

@@ -7,13 +7,13 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 ---
- .../0125_check_notify_every_ping.py           | 15 +++++++
- hc/api/models.py                              | 40 +++++++++++++++++++
+ .../0125_check_notify_every_ping.py           | 15 ++++++
+ hc/api/models.py                              | 46 +++++++++++++++++++
  hc/api/views.py                               |  2 +
  hc/front/forms.py                             |  2 +
  hc/front/views.py                             |  2 +
- templates/front/filtering_rules_modal.html    | 16 ++++++++
- 6 files changed, 77 insertions(+)
+ templates/front/filtering_rules_modal.html    | 16 +++++++
+ 6 files changed, 83 insertions(+)
  create mode 100644 hc/api/migrations/0125_check_notify_every_ping.py
 
 diff --git a/hc/api/migrations/0125_check_notify_every_ping.py b/hc/api/migrations/0125_check_notify_every_ping.py
@@ -38,7 +38,7 @@ index 0000000..4563320
 +        ),
 +    ]
 diff --git a/hc/api/models.py b/hc/api/models.py
-index a9aac47..1b47517 100644
+index a9aac47..b5d0f64 100644
 --- a/hc/api/models.py
 +++ b/hc/api/models.py
 @@ -127,6 +127,7 @@ class CheckDict(TypedDict):
@@ -81,7 +81,7 @@ index a9aac47..1b47517 100644
              if action == "start":
                  self.last_start = frozen_now
                  self.last_start_rid = rid
-@@ -568,10 +580,38 @@ class Check(models.Model):
+@@ -568,10 +580,44 @@ class Check(models.Model):
          if ping.object_size:
              put_object(self.code, ping.n, body)
  
@@ -99,23 +99,29 @@ index a9aac47..1b47517 100644
 +        y las envía sendalerts; esto cubre «success» con el check en «up»,
 +        «new» o «paused» (sendalerts no avisa de new->up ni paused->up) y
 +        «fail» con el check ya en «down». Un fallo al enviar nunca debe hacer
-+        fallar el ping.
++        fallar el ping, ni un canal que falla dejar sin aviso a los demás.
 +        """
++        import logging
 +
++        logger = logging.getLogger("hc")
 +        try:
-+            for ch in self.channel_set.filter(disabled=False):
-+                # Flip sin guardar, como en las notificaciones de prueba
-+                flip = Flip(owner=self)
-+                flip.created = when
-+                flip.old_status = self.status
-+                flip.new_status = self.status
-+                if action == "fail":
-+                    flip.reason = "fail"
-+                ch.notify(flip)
++            channels = list(self.channel_set.filter(disabled=False))
 +        except Exception:
-+            import logging
++            logger.exception("Exception in notify_every_ping_now")
++            return
 +
-+            logging.getLogger("hc").exception("Exception in notify_every_ping_now")
++        for ch in channels:
++            # Flip sin guardar, como en las notificaciones de prueba
++            flip = Flip(owner=self)
++            flip.created = when
++            flip.old_status = self.status
++            flip.new_status = self.status
++            if action == "fail":
++                flip.reason = "fail"
++            try:
++                ch.notify(flip)
++            except Exception:
++                logger.exception("Exception in notify_every_ping_now (%s)", ch.code)
 +
      def prune(self, wait: bool = False) -> None:
          """Remove old pings and notifications."""

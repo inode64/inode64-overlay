@@ -121,10 +121,19 @@ def datos_aviso(flip: Any, ping: Any = None, body: str | None = None, lineas: in
         estado = "SIN SEÑAL"
         frase = f"La tarea «{nombre}» no ha avisado a tiempo."
         campos.append(("Motivo", "no se recibió la señal de fin dentro del plazo"))
+        # flip.created es going_down_after() = inicio del margen + margen. El
+        # inicio del margen es el ping de inicio si la tarea arrancó antes de
+        # su hora: entonces lo que faltó es la señal de fin dentro del margen.
         vencio = flip.created
-        campos.append(
-            ("Se esperaba", f"antes del {fecha(vencio - check.grace)} (el margen de {duracion(check.grace)} venció el {fecha(vencio)})")
-        )
+        esperado = vencio - check.grace
+        if ping is not None and ping.kind == "start" and esperado >= ping.created:
+            campos.append(
+                ("Se esperaba", f"la señal de fin antes del {fecha(vencio)} ({duracion(check.grace)} desde el inicio)")
+            )
+        else:
+            campos.append(
+                ("Se esperaba", f"antes del {fecha(esperado)} (el margen de {duracion(check.grace)} venció el {fecha(vencio)})")
+            )
         if ping is None:
             detalle = "nunca ha dado señal"
             nota = "La tarea nunca ha enviado una señal."
