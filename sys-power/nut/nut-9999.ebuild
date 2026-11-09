@@ -83,6 +83,7 @@ BDEPEND+="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2.8.5-ietf-mib-zero-index.patch"
+	"${FILESDIR}/${PN}-2.8.5-ietf-mib-zero-config.patch"
 	"${FILESDIR}/${PN}-2.8.5-pwnm2-bypass-transfer.patch"
 )
 

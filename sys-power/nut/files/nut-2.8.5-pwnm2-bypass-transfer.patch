@@ -1,15 +1,30 @@
-eaton-ups-pwnm2-mib: read xupsBypassVoltage.1, add the transfer points
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Mon, 9 Nov 2026 15:20:59 +0100
+Subject: [PATCH] drivers/eaton-ups-pwnm2-mib.c: read xupsBypassVoltage.1, add
+ the transfer points
 
-xupsBypassVoltage is indexed by xupsBypassLineIndex, but the table only
-asked for .0 and .1.0. The 9SX cards with agent firmware 1.7.5 and 2.1.2
-answer .1 alone, so input.bypass.voltage was missing. Also publish
-input.transfer.low and input.transfer.high from the UPS-MIB transfer
-points, which XUPS-MIB lacks and the 2.1.2 card provides.
+The single-phase input.bypass.voltage entries asked for
+xupsBypassVoltage.0 and .1.0, but the table is indexed by
+xupsBypassPhase from 1: Eaton 9SX units with Gigabit Network Card
+firmware 1.7.5 and 2.1.2 answer .1 alone, so the bypass voltage was
+never published. Read .1 as well, after the existing instances.
 
-Upstream: not submitted yet.
+XUPS-MIB has no transfer points. Gigabit Network Card 3 publishes the
+UPS-MIB upsConfigLowVoltageTransferPoint and
+upsConfigHighVoltageTransferPoint, which ietf-mib.c already maps to
+input.transfer.low and input.transfer.high; map them here too, and
+treat 0 as invalid, as for the ietf entries.
+
+Bump PW_MIB_VERSION to 0.107.
+---
+Upstream: not submitted yet. Overlay copy of the commit proposed to NUT.
+
+ drivers/eaton-ups-pwnm2-mib.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/eaton-ups-pwnm2-mib.c b/drivers/eaton-ups-pwnm2-mib.c
-index 5347c06..4097890 100644
+index 5347c06e8..22dfa99dd 100644
 --- a/drivers/eaton-ups-pwnm2-mib.c
 +++ b/drivers/eaton-ups-pwnm2-mib.c
 @@ -31,7 +31,7 @@
@@ -30,18 +45,19 @@ index 5347c06..4097890 100644
  #define IETF_OID_LOAD_LEVEL	"1.3.6.1.2.1.33.1.4.4.1.5"	/* UPS-MIB::upsOutputPercentLoad */
  #define IETF_OID_AUTO_RESTART	"1.3.6.1.2.1.33.1.8.5.0"	/* UPS-MIB::upsAutoRestart */
  
-@@ -507,6 +509,10 @@ static snmp_info_t pw_mib[] = {
+@@ -507,6 +509,11 @@ static snmp_info_t pw_mib[] = {
  
  	/* XUPS-MIB::xupsConfigInputVoltage.0 */
  	snmp_info_default("input.voltage.nominal", 0, 1.0, "1.3.6.1.4.1.534.1.10.2.0", "", 0, NULL),
 +	/* XUPS-MIB has no transfer points; Gigabit Network Card 3 publishes the
-+	 * UPS-MIB ones (100 and 276 V on a 9SX 6KI) */
-+	snmp_info_default("input.transfer.low", 0, 1.0, IETF_OID_CONF_LOW_TRANSFER, "", 0, NULL),
-+	snmp_info_default("input.transfer.high", 0, 1.0, IETF_OID_CONF_HIGH_TRANSFER, "", 0, NULL),
++	 * UPS-MIB ones (100 and 276 V on a 9SX 6KI). A 0 V point is one the
++	 * agent does not implement, as in ietf-mib.c. */
++	snmp_info_default("input.transfer.low", 0, 1.0, IETF_OID_CONF_LOW_TRANSFER, "", SU_FLAG_ZEROINVALID, NULL),
++	snmp_info_default("input.transfer.high", 0, 1.0, IETF_OID_CONF_HIGH_TRANSFER, "", SU_FLAG_ZEROINVALID, NULL),
  	snmp_info_default("input.current", 0, 0.1, PW_OID_IN_CURRENT ".0", "",
  		SU_INPUT_1, NULL),
  	snmp_info_default("input.L1-N.voltage", 0, 1.0, PW_OID_IN_VOLTAGE ".1", "",
-@@ -539,6 +545,10 @@ static snmp_info_t pw_mib[] = {
+@@ -539,6 +546,10 @@ static snmp_info_t pw_mib[] = {
  	/* xupsBypassVoltage.1.0; Value (Integer): 244 */
  	snmp_info_default("input.bypass.voltage", 0, 1.0, "1.3.6.1.4.1.534.1.5.3.1.2.1.0", "",
  		SU_INPUT_1, NULL),
