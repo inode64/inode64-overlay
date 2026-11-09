@@ -6,7 +6,7 @@ EAPI="8"
 FIREFOX_PATCHSET="firefox-140esr-patches-13.tar.xz"
 SPIDERMONKEY_PATCHSET="spidermonkey-140-patches-02.tar.xz"
 
-LLVM_COMPAT=( 20 21 22 )
+LLVM_COMPAT=( 20 21 22 23 )
 RUST_NEEDS_LLVM=1
 RUST_MIN_VER=1.82.0
 RUST_MAX_VER=1.95.1
@@ -16,7 +16,7 @@ PYTHON_REQ_USE="ncurses,ssl,xml(+)"
 
 WANT_AUTOCONF="2.1"
 
-inherit check-reqs flag-o-matic llvm-r1 multiprocessing python-any-r1 rust toolchain-funcs
+inherit check-reqs flag-o-matic llvm-r2 multiprocessing python-any-r1 rust toolchain-funcs
 
 MY_PN="mozjs"
 MY_PV="${PV/_pre*}"
@@ -196,7 +196,7 @@ pkg_setup() {
 		fi
 
 		check-reqs_pkg_setup
-		llvm-r1_pkg_setup
+		llvm-r2_pkg_setup
 		rust_pkg_setup
 		python-any-r1_pkg_setup
 

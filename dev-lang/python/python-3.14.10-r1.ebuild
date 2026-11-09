@@ -8,7 +8,7 @@ LLVM_OPTIONAL=1
 VERIFY_SIG_METHOD=sigstore
 WANT_LIBTOOL="none"
 
-inherit autotools check-reqs flag-o-matic linux-info llvm-r1
+inherit autotools check-reqs flag-o-matic linux-info llvm-r2
 inherit multiprocessing pax-utils python-utils-r1 toolchain-funcs
 inherit verify-sig
 
@@ -144,7 +144,7 @@ pkg_pretend() {
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
-		use jit && llvm-r1_pkg_setup
+		use jit && llvm-r2_pkg_setup
 		if use test || use pgo; then
 			check-reqs_pkg_setup
 
