@@ -83,8 +83,18 @@ src_test() {
 }
 
 src_compile() {
-	DEBUG=False SECRET_KEY=build-key ./manage.py compress --force || die
-	DEBUG=False SECRET_KEY=build-key ./manage.py collectstatic --no-input || die
+	local -x DEBUG=False SECRET_KEY=build-key
+
+	if use inode64; then
+		"${EPYTHON}" "${FILESDIR}"/inode64/merge-migrations.py || die
+	fi
+	# webapp-config ignores a failing migrate in the reconfig hook: stop here
+	# if the migrations have several leaves or miss a model change.
+	DB_NAME=:memory: ./manage.py makemigrations --check --dry-run \
+		|| die "inconsistent migrations"
+
+	./manage.py compress --force || die
+	./manage.py collectstatic --no-input || die
 }
 
 src_install() {
@@ -126,6 +136,11 @@ pkg_postinst() {
 		elog "'manage.py migrate', which adds api 0125_check_notify_every_ping."
 		elog "Restart Apache and ht-sendalerts to load the new code."
 	fi
+
+	elog "webapp-config runs 'manage.py migrate' as the owner of the install dir,"
+	elog "after moving migrations that are not part of the package (for example,"
+	elog "from a 'makemigrations --merge' run on the server) to"
+	elog "<vhost root>/local-migrations/. Do not create migrations on the server."
 
 	optfeature "send Signal notifications\
 	    https://blog.healthchecks.io/2023/01/how-healthchecks-sends-signal-notifications" \

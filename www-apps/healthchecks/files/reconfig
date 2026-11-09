@@ -1,8 +1,10 @@
 #!/bin/bash
+# webapp-config ignores the exit status of this hook: whatever cannot be
+# solved here is only visible in its output.
 
 die() {
     echo "###"
-    echo $1
+    echo "$1"
     echo "###"
     exit 1
 }
@@ -11,7 +13,7 @@ die() {
 
 declare -r config=./hc/local_settings.py
 
-cd ${MY_INSTALLDIR} || die "cd failed"
+cd "${MY_INSTALLDIR}" || die "cd failed"
 
 chmod +x manage.py
 
@@ -22,6 +24,24 @@ if ! grep -q ^SECRET_KEY ${config}; then
     echo "SECRET_KEY = \"$(base64 /dev/urandom 2>/dev/null| head -c50)\"" >>${config}
 fi
 
-./manage.py migrate || die "Failed migrate database"
+# Migrations not shipped by the package (a makemigrations run on the server)
+# survive webapp-config -U and leave several leaf nodes, so migrate refuses to
+# run. No packaged migration depends on them: move them out of htdocs.
+[[ -d ${MY_HTDOCSDIR}/hc && -d ${VHOST_ROOT} ]] || die "MY_HTDOCSDIR or VHOST_ROOT not set"
+moved="${VHOST_ROOT}/local-migrations/$(date +%Y%m%d-%H%M%S)"
+shopt -s nullglob
+for f in hc/*/migrations/*.py; do
+    [[ -e ${MY_HTDOCSDIR}/${f} ]] && continue
+    mkdir -p "${moved}/${f%/*}" || die "Failed to create ${moved}"
+    mv "${f}" "${moved}/${f}" || die "Failed to move ${f}"
+    rm -f "${f%/*}/__pycache__/$(basename "${f}" .py)".*.pyc
+    echo "Local migration moved out of the way: ${f} -> ${moved}/${f}"
+done
+shopt -u nullglob
+
+# Run as the owner of htdocs, who can write the SQLite database and its
+# journal: as root it would leave files the web server cannot write.
+setpriv --reuid="$(stat -c %U .)" --regid="$(stat -c %G .)" --init-groups \
+    ./manage.py migrate --noinput || die "Failed migrate database"
 
 exit 0
