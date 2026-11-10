@@ -10,7 +10,7 @@ HOMEPAGE="https://github.com/composer/composer"
 SRC_URI="https://www.inode64.com/dist/${P}-vendor.tar.xz"
 
 EGIT_REPO_URI="https://github.com/${PN}/${PN}"
-EGIT_COMMIT="472b418967419c6124edd91dc6310a3bec091dae"
+EGIT_COMMIT="12c820dbc3f030954b1d09f5884fcf1e9d29d6cb"
 EGIT_BRANCH="main"
 
 LICENSE="MIT"
