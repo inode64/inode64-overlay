@@ -1,0 +1,9 @@
+/var/log/mcp-redmine/*.log {
+	weekly
+	missingok
+	rotate 8
+	compress
+	notifempty
+	# The service keeps the file open and cannot be told to reopen it.
+	copytruncate
+}

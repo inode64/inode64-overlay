@@ -1,0 +1,15 @@
+[Unit]
+Description=Redmine MCP server
+Documentation=https://github.com/runekaagaard/mcp-redmine
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=/etc/mcp-redmine/mcp-redmine.conf
+ExecStart=/usr/bin/mcp-redmine $MCP_REDMINE_OPTS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

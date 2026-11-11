@@ -1,0 +1,36 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="MCP server for the Redmine REST API"
+
+: "${MCP_REDMINE_CONF:=/etc/mcp-redmine/mcp-redmine.conf}"
+
+command="/usr/bin/mcp-redmine"
+command_user="mcp-redmine:mcp-redmine"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log"
+error_log="${output_log}"
+
+depend() {
+	need net
+}
+
+start_pre() {
+	# The systemd unit reads the same file through EnvironmentFile.
+	# start-stop-daemon hands the exported variables to the service.
+	if [ -r "${MCP_REDMINE_CONF}" ]; then
+		set -a
+		. "${MCP_REDMINE_CONF}"
+		set +a
+	fi
+	# Without it the server only leaves a Python KeyError in its log.
+	if [ -z "${REDMINE_URL}" ]; then
+		eerror "REDMINE_URL is not set in ${MCP_REDMINE_CONF}"
+		return 1
+	fi
+	command_args="${MCP_REDMINE_OPTS}"
+
+	checkpath -d -m 0750 -o "${command_user}" "/var/log/${RC_SVCNAME}"
+}
