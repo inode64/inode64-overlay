@@ -13,7 +13,7 @@ if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/performancecopilot/pcp.git"
 else
-	KEYWORDS=""
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/performancecopilot/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
@@ -88,9 +88,6 @@ DEPEND="
 RDEPEND="${DEPEND}
 	!dev-db/pgpool2
 	acct-user/pcp
-	!sys-process/atop
-	!sys-process/htop
-	!sys-apps/dstat
 "
 
 PATCHES=(
@@ -134,6 +131,12 @@ src_configure() {
 	)
 
 	econf "${myconf[@]}"
+
+	# configure compresses the man pages like those it finds on the build
+	# host and names their links after it, so the result depends on the
+	# host; leave the pages to ecompress
+	sed -i -E 's/^(HAVE_(GZIPP|BZIP2|LZMA|XZ)ED_MANPAGES =).*/\1 false/' \
+		src/include/builddefs || die
 }
 
 src_compile() {
@@ -146,7 +149,27 @@ src_install() {
 
 	find "${ED}" -type f -name '*.la' -delete || die
 	find "${ED}" -type f -name '*.a' -delete || die
-	find "${ED}/usr/share/man" -type f -name "*.bz2" -exec bunzip2 {} + || die
+	# Some links still get the .gz of MANPAGE_SUFFIX: without it ecompress
+	# retargets them to the compressed pages instead of leaving them dangling
+	local link target
+	while IFS= read -r -d '' link; do
+		target=$(readlink "${link}") || die
+		rm "${link}" || die
+		ln -s "${target%.gz}" "${link%.gz}" || die
+	done < <(find "${ED}"/usr/share/man -type l -name '*.gz' -print0)
+
+	# 7.2 makes pcp-atop a drop-in atop: commands, units and man pages
+	# collide with sys-process/atop. Keep it as pcp-atop and pcp atop.
+	rm "${ED}"/usr/bin/{atop,atopsar} \
+		"${ED}"/usr/lib/systemd/system/atop{,-daily}.service \
+		"${ED}"/usr/lib/systemd/system/atop-daily.timer \
+		"${ED}"/usr/libexec/pcp/bin/atop-daily \
+		"${ED}"/etc/conf.d/atop \
+		"${ED}"/usr/share/man/man1/atop-daily.1 || die
+	local page
+	for page in atop atopsar; do
+		mv -f "${ED}"/usr/share/man/man1/{${page},pcp-${page}}.1 || die
+	done
 
 	dotmpfiles "${FILESDIR}"/${PN}.conf
 	mv -vnT "${ED}"/usr/share/doc/pcp-doc/html "${ED}/usr/share/doc/pcp-${PVR}/html" || die
@@ -158,13 +181,16 @@ src_install() {
 	rm -r "${ED}"/usr/share/doc/pcp-doc || die
 	rm -rf "${ED}"/var/log || die
 	rm -rf "${ED}"/run || die
+
+	# pmdaopentelemetry fails at startup when its config.d is missing
+	keepdir /var/lib/pcp/pmdas/opentelemetry/config.d
 }
 
 pkg_postinst() {
 	# Both files, as at boot: processing ours alone used to leave pmcd's log
 	# directory and config/ with the ownership upstream's file reverts on the
 	# next reboot.
-	tmpfiles_process pcp-reboot-init.conf pcp.conf
+	tmpfiles_process pcp-reboot-init.conf pcp.conf libpcp_import.conf
 
 	elog ""
 	elog "To install basic PCP tools and services and enable collecting performance data on systemd based distributions, run:"
