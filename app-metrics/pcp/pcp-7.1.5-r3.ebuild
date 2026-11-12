@@ -94,6 +94,8 @@ RDEPEND="${DEPEND}
 # through pmdaroot. Keep this version while 7.2 has no keywords.
 PATCHES=(
 	"${FILESDIR}/${PV}-security"
+	# Polling filesys.* keeps autofs mounts (USB backup disks) from expiring
+	"${FILESDIR}/${PN}-7.1.5-filesys-automounts.patch"
 )
 
 src_prepare() {

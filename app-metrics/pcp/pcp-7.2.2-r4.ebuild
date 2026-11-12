@@ -93,6 +93,11 @@ RDEPEND="${DEPEND}
 	!sys-apps/dstat
 "
 
+PATCHES=(
+	# Polling filesys.* keeps autofs mounts (USB backup disks) from expiring
+	"${FILESDIR}/${PN}-7.1.5-filesys-automounts.patch"
+)
+
 src_prepare() {
 	default
 	eapply_user
