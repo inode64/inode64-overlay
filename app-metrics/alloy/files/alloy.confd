@@ -1,0 +1,26 @@
+# Configuration for /etc/init.d/alloy
+
+# User (and group) to run alloy as.
+#command_user="alloy"
+
+# Additional arguments for "alloy run", for example
+# "--stability.level=experimental --server.http.listen-addr=0.0.0.0:12345".
+#command_args=
+
+# Where Alloy keeps its state, including the read position of each log.
+# Changing it makes Alloy read every log again from the beginning.
+#STORAGE="/var/lib/alloy"
+
+# Configuration file, or a directory of them.
+#CFGFILE="/etc/alloy/config.alloy"
+
+# Environment for the daemon, for example to turn off multipath TCP.
+#supervise_daemon_args="--env GODEBUG=multipathtcp=0"
+
+# Alloy logs to stderr, which is discarded unless redirected. The file must
+# be writable by command_user, and should not be one of the logs that Alloy
+# itself reads, or each warning would be read back and sent.
+#error_log="/var/log/alloy.log"
+
+# Comment out to disable process supervisor.
+supervisor=supervise-daemon

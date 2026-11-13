@@ -1,0 +1,6 @@
+{
+  "gomodule": true,
+  "gomodule_path": "/collector",
+  "nodejs": true,
+  "nodejs_path": "/internal/web/ui"
+}

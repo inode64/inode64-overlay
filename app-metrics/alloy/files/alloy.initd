@@ -1,0 +1,33 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+name="alloy"
+description="OpenTelemetry Collector distribution with programmable pipelines"
+extra_started_commands="reload"
+
+: "${command_user:=alloy}"
+: "${STORAGE:=/var/lib/alloy}"
+: "${CFGFILE:=/etc/alloy/config.alloy}"
+
+command="/usr/bin/alloy"
+command_args="run --storage.path ${STORAGE} ${command_args} ${CFGFILE}"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+
+depend() {
+	need net
+	after firewall
+}
+
+# Alloy rereads its configuration on SIGHUP, the signal that ExecReload of
+# the systemd unit also sends.
+reload() {
+	ebegin "Reloading ${name}"
+	if [ "${supervisor}" = "supervise-daemon" ]; then
+		supervise-daemon "${RC_SVCNAME}" --signal HUP
+	else
+		start-stop-daemon --signal HUP --pidfile "${pidfile}"
+	fi
+	eend $?
+}
