@@ -21,6 +21,7 @@ upload() {
 }
 
 if [ "$cp" == "app-backup/backrest" ] || \
+    [ "$cp" == "app-metrics/alloy" ] || \
     [ "$cp" == "app-misc/node-red" ] || \
     [ "$cp" == "app-misc/zigbee2mqtt" ] || \
     [ "$cp" == "dev-lang/typescript" ] || \
@@ -37,6 +38,7 @@ if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/wal-g" ] || \
     [ "$cp" == "app-backup/rest-server" ] || \
     [ "$cp" == "app-backup/resticprofile" ] || \
+    [ "$cp" == "app-metrics/alloy" ] || \
     [ "$cp" == "app-metrics/mcp-grafana" ] || \
     [ "$cp" == "app-metrics/varnish_exporter" ] || \
     [ "$cp" == "dev-php/composer" ] || \
