@@ -10,6 +10,10 @@ command="/usr/bin/mcp-redmine"
 command_user="mcp-redmine:mcp-redmine"
 command_background="yes"
 pidfile="/run/${RC_SVCNAME}.pid"
+# Uvicorn waits on SIGTERM until every client closes its streamable-HTTP
+# connection, which an MCP client keeps open: without a KILL the stop fails
+# with the server still running. /etc/conf.d/mcp-redmine may set its own.
+: "${retry:=TERM/30/KILL/5}"
 output_log="/var/log/${RC_SVCNAME}/${RC_SVCNAME}.log"
 error_log="${output_log}"
 

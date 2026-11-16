@@ -10,6 +10,9 @@ DynamicUser=yes
 EnvironmentFile=/etc/mcp-redmine/mcp-redmine.conf
 ExecStart=/usr/bin/mcp-redmine $MCP_REDMINE_OPTS
 Restart=on-failure
+# Uvicorn waits on SIGTERM for clients to close their connections; the MCP
+# clients keep them open, so end it after this instead of systemd's 90 s.
+TimeoutStopSec=30
 
 [Install]
 WantedBy=multi-user.target
