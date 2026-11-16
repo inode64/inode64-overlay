@@ -17,6 +17,10 @@ StandardOutput=inherit
 StandardError=inherit
 Restart=always
 RestartSec=10s
+# On SIGTERM the bridge backs up the coordinator before it exits, reading its
+# tables over the serial link: about 20 seconds with a hundred devices, longer
+# on a larger network.
+TimeoutStopSec=90s
 User=zigbee2mqtt
 
 CapabilityBoundingSet=

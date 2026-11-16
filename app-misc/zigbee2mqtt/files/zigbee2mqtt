@@ -1,6 +1,10 @@
 #!/sbin/openrc-run
 
-retry="30"
+# On SIGTERM the bridge backs up the coordinator before it exits, reading its
+# tables over the serial link: about 20 seconds with a hundred devices, longer
+# on a larger network. A shorter wait reports a failed stop while the process
+# is still on its way out. Override in /etc/conf.d/zigbee2mqtt.
+: "${retry:=TERM/90/KILL/5}"
 
 depend() {
 	need mosquitto
@@ -15,12 +19,16 @@ checkconfig() {
 start() {
 	checkconfig || return 1
 	ebegin "Starting ${SVCNAME}"
-	start-stop-daemon --start --user zigbee2mqtt:zigbee2mqtt --env ZIGBEE2MQTT_DATA=/var/lib/${SVCNAME} --exec /usr/bin/zigbee2mqtt --background --make-pidfile --pidfile /run/${SVCNAME}.pid
+	start-stop-daemon --start --user zigbee2mqtt:zigbee2mqtt \
+		--env ZIGBEE2MQTT_DATA=/var/lib/${SVCNAME} --exec /usr/bin/zigbee2mqtt \
+		--background --make-pidfile --pidfile /run/${SVCNAME}.pid \
+		--stdout /var/log/${SVCNAME}/stdout.log \
+		--stderr /var/log/${SVCNAME}/stderr.log
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping ${SVCNAME}"
-	start-stop-daemon --stop --quiet --retry 10 --pidfile /run/${SVCNAME}.pid
+	start-stop-daemon --stop --quiet --retry "${retry}" --pidfile /run/${SVCNAME}.pid
 	eend $?
 }
