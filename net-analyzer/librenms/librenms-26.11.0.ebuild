@@ -120,14 +120,19 @@ pkg_config() {
 			"${cron}"/librenms{,-scheduler}.cron | crontab -u librenms - || die
 	fi
 
+	# Portage relays this phase's output through its own pty and leaves the
+	# terminal on stdin. With a terminal on stdin sudo puts it in raw mode
+	# while the command runs, so the relayed lines lose their carriage
+	# return. Without a terminal migrate would cancel itself, hence --force,
+	# as daily.sh already runs it every day.
 	einfo "Installing composer deps ..."
-	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev --ansi
+	sudo -u librenms /opt/librenms/scripts/composer_wrapper.php install --no-dev --ansi </dev/null
 
 	einfo "Updating existing installation ..."
-	sudo -u librenms /opt/librenms/lnms migrate
+	sudo -u librenms /opt/librenms/lnms migrate --force </dev/null
 
 	einfo "Validation installation ..."
-	sudo -u librenms /opt/librenms/validate.php
+	sudo -u librenms /opt/librenms/validate.php </dev/null
 
 	einfo "All done."
 }
