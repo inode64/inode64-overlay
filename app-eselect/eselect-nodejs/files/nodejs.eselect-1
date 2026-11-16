@@ -1,0 +1,183 @@
+# -*-eselect-*-  vim: ft=eselect
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+#
+# Ideas from the bentoo overlay's nodejs.eselect, by Lucas Couto.
+
+DESCRIPTION="Manage the default Node.js slot"
+MAINTAINER="web@inode64.com"
+VERSION="1"
+
+# Each slot of net-libs/nodejs is a prefix of its own, /usr/lib*/node-<major>.
+# "<link>|<target inside the slot>": a missing target (npm and npx with
+# USE=-npm) gets no link.
+NODEJS_LINKS=(
+	"/usr/bin/node|bin/node"
+	"/usr/bin/npm|bin/npm"
+	"/usr/bin/npx|bin/npx"
+	"/usr/include/node|include/node"
+	"/usr/share/bash-completion/completions/npm|share/bash-completion/completions/npm"
+)
+
+# Puts the man pages of the default slot, node's and npm's, on MANPATH.
+NODEJS_ENVFILE="/etc/env.d/50nodejs"
+
+# Slot names (node24, node26...) in version order, so the last is the highest.
+find_targets() {
+	local dir
+	for dir in "${EROOT}"/usr/lib*/node-[0-9]*; do
+		# A libdir that is a symlink to another one lists the slot twice.
+		[[ -L ${dir%/*} ]] && continue
+		[[ -x ${dir}/bin/node ]] && echo "node${dir##*/node-}"
+	done | sort -V -u
+}
+
+# The slot directory relative to /usr, such as lib64/node-26.
+slot_dir() {
+	local dir
+	for dir in "${EROOT}"/usr/lib*/node-"${1#node}"; do
+		[[ -L ${dir%/*} ]] && continue
+		[[ -x ${dir}/bin/node ]] || continue
+		echo "${dir#"${EROOT}"/usr/}"
+		return 0
+	done
+	return 1
+}
+
+# The default slot, or nothing when /usr/bin/node is missing, dangling or not
+# ours.
+get_active() {
+	local node="${EROOT}/usr/bin/node" target
+	[[ -L ${node} && -e ${node} ]] || return 0
+	target=$(readlink "${node}")
+	[[ ${target} =~ ^\.\./lib[^/]*/node-([0-9]+)/bin/node$ ]] &&
+		echo "node${BASH_REMATCH[1]}"
+}
+
+resolve_target() {
+	local targets=( $(find_targets) )
+	if is_number "$1"; then
+		[[ $1 -ge 1 && $1 -le ${#targets[@]} ]] && echo "${targets[$1 - 1]}"
+		return
+	fi
+	# Not has(), which would take the argument as a pattern.
+	local target
+	for target in "${targets[@]}"; do
+		[[ $1 == "${target}" ]] && echo "$1"
+	done
+}
+
+remove_links() {
+	local entry link
+	# Checked before removing anything, so a refusal leaves the links as
+	# they were.
+	for entry in "${NODEJS_LINKS[@]}"; do
+		link="${EROOT}${entry%%|*}"
+		# A leftover of the unslotted package, or another package's file.
+		[[ -e ${link} && ! -L ${link} ]] &&
+			die -q "${link} is not a symlink; remove it first if it is a leftover"
+	done
+	for entry in "${NODEJS_LINKS[@]}"; do
+		link="${EROOT}${entry%%|*}"
+		[[ -L ${link} ]] || continue
+		rm -f "${link}" || die -q "Failed to remove ${link}"
+	done
+}
+
+set_links() {
+	local dir entry link target up
+	dir=$(slot_dir "$1") || die -q "$1 is not installed"
+	for entry in "${NODEJS_LINKS[@]}"; do
+		link=${entry%%|*}
+		target="${dir}/${entry#*|}"
+		[[ -e ${EROOT}/usr/${target} ]] || continue
+		# Relative, so the links stay valid when ROOT is not /.
+		up=${link#/usr/}
+		up=${up//[^\/]}
+		up=${up//\//../}
+		mkdir -p "${EROOT}${link%/*}" || die -q "Failed to create ${link%/*}"
+		ln -s "${up}${target}" "${EROOT}${link}" ||
+			die -q "Failed to create ${EROOT}${link}"
+	done
+	echo "MANPATH=\"${EPREFIX}/usr/${dir}/share/man:${EPREFIX}/usr/${dir}/lib/node_modules/npm/man\"" \
+		> "${EROOT}${NODEJS_ENVFILE}" || die -q "Failed to write ${EROOT}${NODEJS_ENVFILE}"
+}
+
+### list action ###
+
+describe_list() {
+	echo "List the installed Node.js slots"
+}
+
+do_list() {
+	local i active targets=( $(find_targets) )
+	active=$(get_active)
+	for (( i = 0; i < ${#targets[@]}; i++ )); do
+		[[ ${targets[i]} == "${active}" ]] &&
+			targets[i]=$(highlight_marker "${targets[i]}")
+	done
+	write_list_start "Installed Node.js slots:"
+	write_numbered_list -m "(none found)" "${targets[@]}"
+}
+
+### show action ###
+
+describe_show() {
+	echo "Show the default Node.js slot; nothing when none is set"
+}
+
+do_show() {
+	get_active
+}
+
+### set action ###
+
+describe_set() {
+	echo "Set the default Node.js slot"
+}
+
+describe_set_parameters() {
+	echo "<target>"
+}
+
+describe_set_options() {
+	echo "target : Slot name (node26) or number (from 'list' action)"
+}
+
+do_set() {
+	[[ $# -eq 1 ]] || die -q "Usage: eselect nodejs set <target>"
+	local target
+	target=$(resolve_target "$1")
+	[[ -n ${target} ]] || die -q "Invalid target $1: see eselect nodejs list"
+	remove_links
+	set_links "${target}"
+	do_action env update noldconfig
+}
+
+### update action ###
+
+describe_update() {
+	echo "Set the highest installed slot as default; remove the links when none is left"
+}
+
+describe_update_parameters() {
+	echo "[--if-unset]"
+}
+
+describe_update_options() {
+	echo "--if-unset : Keep the default slot if it is still installed"
+}
+
+do_update() {
+	[[ -z $1 || $1 == --if-unset ]] || die -q "Unknown option $1"
+	[[ -n $1 && -n $(get_active) ]] && return 0
+
+	local targets=( $(find_targets) )
+	if [[ ${#targets[@]} -gt 0 ]]; then
+		do_set "${targets[-1]}"
+	else
+		remove_links
+		rm -f "${EROOT}${NODEJS_ENVFILE}" || die -q "Failed to remove ${EROOT}${NODEJS_ENVFILE}"
+		do_action env update noldconfig
+	fi
+}
