@@ -47,17 +47,6 @@ src_install() {
 	newinitd "${FILESDIR}"/${PN}.initd ${PN}
 }
 
-pkg_preinst() {
-	# Up to 2.2.0 the settings, client token included, lived in
-	# /etc/conf.d. Carry them over instead of starting with the defaults.
-	local old="${EROOT}/etc/conf.d/${PN}"
-	if [[ -f ${old} && ! -e ${EROOT}/etc/${PN}/${PN}.conf ]]; then
-		cp "${old}" "${ED}/etc/${PN}/${PN}.conf" || die
-		elog "Copied ${old} to ${EROOT}/etc/${PN}/${PN}.conf, the file the service"
-		elog "reads now. The old one is no longer used and can be removed."
-	fi
-}
-
 pkg_postinst() {
 	elog "To run it as a service (streamable HTTP on 127.0.0.1:8000, read only):"
 	elog "  1. Put a Grafana service account token in /etc/${PN}/token (mode 0600)"
