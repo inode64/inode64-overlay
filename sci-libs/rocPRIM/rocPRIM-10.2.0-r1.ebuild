@@ -26,15 +26,13 @@ REQUIRED_USE="
 	test? ( ${ROCM_REQUIRED_USE} )
 "
 
+# header-only: the installed headers include the HIP ones
 RDEPEND="
-	benchmark? (
-		dev-util/amdsmi:${SLOT}
-		dev-util/hip:${SLOT}
-	)
+	dev-util/hip:${SLOT}
+	benchmark? ( dev-util/amdsmi:${SLOT} )
 "
 DEPEND="
 	${RDEPEND}
-	dev-util/hip:${SLOT}
 	test? ( dev-cpp/gtest )
 "
 BDEPEND="dev-build/rocm-cmake"
