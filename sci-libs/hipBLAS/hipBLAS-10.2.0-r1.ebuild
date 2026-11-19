@@ -49,6 +49,8 @@ src_configure() {
 	rocm_use_clang
 
 	local mycmakeargs=(
+		# rocm_install_targets sets RUNPATH to $ORIGIN/../lib otherwise
+		-DCMAKE_SKIP_RPATH=ON
 		# currently hipBLAS is a wrapper of rocBLAS which has tests, so no need to perform test here
 		-DBUILD_CLIENTS_TESTS=OFF
 		-DBUILD_CLIENTS_BENCHMARKS=OFF
