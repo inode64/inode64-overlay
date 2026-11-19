@@ -1,0 +1,29 @@
+Fix linking of unit tests with LLVM_LINK_LLVM_DYLIB
+--- a/test-unit/CMakeLists.txt
++++ b/test-unit/CMakeLists.txt
+@@ -46,6 +46,12 @@
+   endif()
+ endif()
+ 
++# LLVM's gtest depends on LLVM Support, but installed llvm_gtest from
++# a LLVM_LINK_LLVM_DYLIB build does not carry that dependency.
++if(LLVM_LINK_LLVM_DYLIB AND NOT GTest_FOUND)
++  list(APPEND COMGR_GTEST_LIBS LLVM)
++endif()
++
+ # Pin C++17 and mirror LLVM's RTTI setting (avoids type_info link errors
+ # against LLVM libs built with RTTI off, including transpiler::raiser
+ # which carries its own non-RTTI / non-exceptions compile flags via
+@@ -111,7 +117,11 @@
+   ../src/comgr-logger.cpp
+   ../src/comgr-env.cpp)
+ 
+-llvm_map_components_to_libnames(COMGR_TEST_UNIT_SUPPORT_LIBS Support)
++if(LLVM_LINK_LLVM_DYLIB)
++  set(COMGR_TEST_UNIT_SUPPORT_LIBS LLVM)
++else()
++  llvm_map_components_to_libnames(COMGR_TEST_UNIT_SUPPORT_LIBS Support)
++endif()
+ 
+ target_link_libraries(LoggerTests PRIVATE
+   ${COMGR_GTEST_LIBS}

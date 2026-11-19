@@ -1,0 +1,255 @@
+Fix build with LLVM 23
+
+Comgr 10.2 takes ISA properties from TargetParser queries that were added in
+LLVM 24. With LLVM 23, use the per-ISA table that Comgr 10.1 shipped, and the
+SGPR helpers, which are also LLVM 24 only.
+
+--- a/src/comgr-isa-metadata.def
++++ b/src/comgr-isa-metadata.def
+@@ -0,0 +1,91 @@
++//===- comgr-isa-metadata.def - ISA metadata ------------------------------===//
++//
++// Part of Comgr, under the Apache License v2.0 with LLVM Exceptions. See
++// amd/comgr/LICENSE.TXT in this repository for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file defines the HANDLE_ISA macro, which is effectively a table
++// with information on ISA features and properties for different AMDGPU
++// architectures.
++//
++//===----------------------------------------------------------------------===//
++
++#if !(defined HANDLE_ISA)
++#error "Missing macro definition of HANDLE_ISA"
++#endif
++
++/*
++#define HANDLE_ISA(TARGET_TRIPLE, PROCESSOR,                                   \
++        ELF_MACHINE, TRAP_HANDLER_ENABLED, IMAGE_SUPPORT,                      \
++        LDS_SIZE, LDS_BANK_COUNT,                                              \
++        EUS_PER_CU, MAX_WAVES_PER_CU, MAX_FLAT_WORK_GROUP_SIZE,                \
++        VGPR_ALLOC_GRANULE, TOTAL_NUM_VGPRS, ADDRESSABLE_NUM_VGPRS)            \
++
++                                                                                                          --LDS--       --CU--     WG      ----VGPR----
++           TARGET_TRIPLE         PROCESSOR          ELF_MACHINE                            TRAP  IMAGE    Size  Bnks  EUs  Waves    WG  Alloc   Max  Addr */
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx600",          EF_AMDGPU_MACH_AMDGCN_GFX600,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx601",          EF_AMDGPU_MACH_AMDGCN_GFX601,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx602",          EF_AMDGPU_MACH_AMDGCN_GFX602,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx700",          EF_AMDGPU_MACH_AMDGCN_GFX700,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx701",          EF_AMDGPU_MACH_AMDGCN_GFX701,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx702",          EF_AMDGPU_MACH_AMDGCN_GFX702,          true, true,   65536,   16,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx703",          EF_AMDGPU_MACH_AMDGCN_GFX703,          true, true,   65536,   16,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx704",          EF_AMDGPU_MACH_AMDGCN_GFX704,          true, true,   65536,   16,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx705",          EF_AMDGPU_MACH_AMDGCN_GFX705,          true, true,   65536,   16,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx801",          EF_AMDGPU_MACH_AMDGCN_GFX801,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx802",          EF_AMDGPU_MACH_AMDGCN_GFX802,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx803",          EF_AMDGPU_MACH_AMDGCN_GFX803,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx805",          EF_AMDGPU_MACH_AMDGCN_GFX805,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx810",          EF_AMDGPU_MACH_AMDGCN_GFX810,          true, true,   65536,   16,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx900",          EF_AMDGPU_MACH_AMDGCN_GFX900,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx902",          EF_AMDGPU_MACH_AMDGCN_GFX902,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx904",          EF_AMDGPU_MACH_AMDGCN_GFX904,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx906",          EF_AMDGPU_MACH_AMDGCN_GFX906,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx908",          EF_AMDGPU_MACH_AMDGCN_GFX908,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx909",          EF_AMDGPU_MACH_AMDGCN_GFX909,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx90a",          EF_AMDGPU_MACH_AMDGCN_GFX90A,          true, true,   65536,   32,   4,    40, 1024,     8,  512,  512)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx90c",          EF_AMDGPU_MACH_AMDGCN_GFX90C,          true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx942",          EF_AMDGPU_MACH_AMDGCN_GFX942,          true, false,  65536,   32,   4,    40, 1024,     8,  512,  512)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx950",          EF_AMDGPU_MACH_AMDGCN_GFX950,          true, false,  65536,   32,   4,    40, 1024,     8,  512,  512)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1010",         EF_AMDGPU_MACH_AMDGCN_GFX1010,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1011",         EF_AMDGPU_MACH_AMDGCN_GFX1011,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1012",         EF_AMDGPU_MACH_AMDGCN_GFX1012,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1013",         EF_AMDGPU_MACH_AMDGCN_GFX1013,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1030",         EF_AMDGPU_MACH_AMDGCN_GFX1030,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1031",         EF_AMDGPU_MACH_AMDGCN_GFX1031,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1032",         EF_AMDGPU_MACH_AMDGCN_GFX1032,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1033",         EF_AMDGPU_MACH_AMDGCN_GFX1033,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1034",         EF_AMDGPU_MACH_AMDGCN_GFX1034,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1035",         EF_AMDGPU_MACH_AMDGCN_GFX1035,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1036",         EF_AMDGPU_MACH_AMDGCN_GFX1036,         true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1100",         EF_AMDGPU_MACH_AMDGCN_GFX1100,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1101",         EF_AMDGPU_MACH_AMDGCN_GFX1101,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1102",         EF_AMDGPU_MACH_AMDGCN_GFX1102,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1103",         EF_AMDGPU_MACH_AMDGCN_GFX1103,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1150",         EF_AMDGPU_MACH_AMDGCN_GFX1150,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1151",         EF_AMDGPU_MACH_AMDGCN_GFX1151,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1152",         EF_AMDGPU_MACH_AMDGCN_GFX1152,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1153",         EF_AMDGPU_MACH_AMDGCN_GFX1153,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1154",         EF_AMDGPU_MACH_AMDGCN_GFX1154,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1170",         EF_AMDGPU_MACH_AMDGCN_GFX1170,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1171",         EF_AMDGPU_MACH_AMDGCN_GFX1171,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1172",         EF_AMDGPU_MACH_AMDGCN_GFX1172,         true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1200",         EF_AMDGPU_MACH_AMDGCN_GFX1200,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1201",         EF_AMDGPU_MACH_AMDGCN_GFX1201,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1250",         EF_AMDGPU_MACH_AMDGCN_GFX1250,         true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1250-strict",  EF_AMDGPU_MACH_AMDGCN_GFX1250_STRICT,  true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1251",         EF_AMDGPU_MACH_AMDGCN_GFX1251,         true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx1310",         EF_AMDGPU_MACH_AMDGCN_GFX1310,         true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx9-generic",    EF_AMDGPU_MACH_AMDGCN_GFX9_GENERIC,    true, true,   65536,   32,   4,    40, 1024,     4,  256,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx9-4-generic",  EF_AMDGPU_MACH_AMDGCN_GFX9_4_GENERIC,  true, false,  65536,   32,   4,    40, 1024,     8,  512,  512)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx10-1-generic", EF_AMDGPU_MACH_AMDGCN_GFX10_1_GENERIC, true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx10-3-generic", EF_AMDGPU_MACH_AMDGCN_GFX10_3_GENERIC, true, true,   65536,   32,   4,    40, 1024,     8, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx11-generic",   EF_AMDGPU_MACH_AMDGCN_GFX11_GENERIC,   true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx11-7-generic", EF_AMDGPU_MACH_AMDGCN_GFX11_7_GENERIC, true, true,   65536,   32,   4,    40, 1024,    16, 1024,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx12-generic",   EF_AMDGPU_MACH_AMDGCN_GFX12_GENERIC,   true, true,   65536,   32,   4,    40, 1024,    24, 1536,  256)
++HANDLE_ISA("amdgcn-amd-amdhsa-", "gfx12-5-generic", EF_AMDGPU_MACH_AMDGCN_GFX12_5_GENERIC, true, false, 327680,   64,   4,    40, 1024,    16, 1024, 1024)
++
++#undef HANDLE_ISA
+--- a/src/comgr-metadata.cpp
++++ b/src/comgr-metadata.cpp
+@@ -24,6 +24,7 @@
+ #include "llvm/ADT/Twine.h"
+ #include "llvm/BinaryFormat/ELF.h"
+ #include "llvm/BinaryFormat/MsgPackDocument.h"
++#include "llvm/Config/llvm-config.h"
+ #include "llvm/Object/ELFObjectFile.h"
+ #include "llvm/Support/AMDGPUMetadata.h"
+ #include "llvm/Support/BinaryStreamReader.h"
+@@ -39,6 +40,133 @@
+ using namespace llvm;
+ using namespace llvm::object;
+ 
++#if LLVM_VERSION_MAJOR < 24
++// The TargetParser queries used below were added in LLVM 24. With an older
++// LLVM, answer them from the per-ISA table that Comgr used until ROCm 10.1.
++namespace llvm::AMDGPU {
++namespace {
++struct LegacyIsaInfo {
++  StringRef Processor;
++  bool ImageSupport;
++  unsigned LDSSize;
++  unsigned LDSBankCount;
++  unsigned EUsPerCU;
++  unsigned MaxWavesPerCU;
++  unsigned VGPRAllocGranule;
++  unsigned TotalNumVGPRs;
++  unsigned AddressableNumVGPRs;
++};
++
++// ELF_MACHINE is not expanded, so machs unknown to this LLVM do not matter.
++const LegacyIsaInfo LegacyIsaInfos[] = {
++#define HANDLE_ISA(TARGET_TRIPLE, PROCESSOR, ELF_MACHINE,                      \
++                   TRAP_HANDLER_ENABLED, IMAGE_SUPPORT, LDS_SIZE,              \
++                   LDS_BANK_COUNT, EUS_PER_CU, MAX_WAVES_PER_CU,               \
++                   MAX_FLAT_WORK_GROUP_SIZE, VGPR_ALLOC_GRANULE,               \
++                   TOTAL_NUM_VGPRS, ADDRESSABLE_NUM_VGPRS)                     \
++  {PROCESSOR,          IMAGE_SUPPORT,      LDS_SIZE,                           \
++   LDS_BANK_COUNT,     EUS_PER_CU,         MAX_WAVES_PER_CU,                   \
++   VGPR_ALLOC_GRANULE, TOTAL_NUM_VGPRS,    ADDRESSABLE_NUM_VGPRS},
++#include "comgr-isa-metadata.def"
++};
++
++const LegacyIsaInfo *findLegacyIsaInfo(GPUKind AK) {
++  StringRef Name = getArchNameAMDGCN(AK);
++  for (const LegacyIsaInfo &Info : LegacyIsaInfos)
++    if (Info.Processor == Name)
++      return &Info;
++  return nullptr;
++}
++
++// getIsaInfos() only enumerates processors that are in the table.
++const LegacyIsaInfo &getLegacyIsaInfo(GPUKind AK) {
++  const LegacyIsaInfo *Info = findLegacyIsaInfo(AK);
++  assert(Info && "processor missing from comgr-isa-metadata.def");
++  return *Info;
++}
++
++enum AMDGPUFeature : unsigned {
++  FEAT_XNACK_ON_OFF_MODES,
++  FEAT_SRAMECC_SUPPORT,
++  FEAT_IMAGE_INSTS,
++  FEAT_GFX10_INSTS,
++};
++
++class AMDGPUFeatureBitset {
++  unsigned Bits = 0;
++
++public:
++  void set(AMDGPUFeature F) { Bits |= 1u << F; }
++  bool test(AMDGPUFeature F) const { return Bits & (1u << F); }
++};
++
++unsigned getMajorVersion(GPUKind AK) {
++  return getIsaVersion(getSubArch(AK)).Major;
++}
++
++AMDGPUFeatureBitset getFeatureBitset(GPUKind AK) {
++  AMDGPUFeatureBitset Features;
++  unsigned ArchAttr = getArchAttrAMDGCN(AK);
++  if (ArchAttr & FEATURE_XNACK_ON_OFF_MODES)
++    Features.set(FEAT_XNACK_ON_OFF_MODES);
++  if (ArchAttr & FEATURE_SRAMECC)
++    Features.set(FEAT_SRAMECC_SUPPORT);
++  if (getLegacyIsaInfo(AK).ImageSupport)
++    Features.set(FEAT_IMAGE_INSTS);
++  if (getMajorVersion(AK) >= 10)
++    Features.set(FEAT_GFX10_INSTS);
++  return Features;
++}
++
++unsigned getLocalMemorySize(GPUKind AK, bool /*FullSIMDMode*/) {
++  return getLegacyIsaInfo(AK).LDSSize;
++}
++
++// The caller multiplies by its own EUsPerCU, so divide by the same value to
++// report the table's MaxWavesPerCU.
++unsigned getMaxWavesPerEU(GPUKind AK) {
++  unsigned EUsPerCU = getMajorVersion(AK) >= 10 ? 2 : 4;
++  return getLegacyIsaInfo(AK).MaxWavesPerCU / EUsPerCU;
++}
++
++constexpr unsigned getMaxFlatWorkGroupSize() { return 1024; }
++
++unsigned getVGPRAllocGranule(GPUKind AK, bool /*IsWave32*/) {
++  return getLegacyIsaInfo(AK).VGPRAllocGranule;
++}
++
++unsigned getTotalNumVGPRs(GPUKind AK, bool /*IsWave32*/) {
++  return getLegacyIsaInfo(AK).TotalNumVGPRs;
++}
++
++unsigned getAddressableNumVGPRs(GPUKind AK, bool /*IsWave32*/) {
++  return getLegacyIsaInfo(AK).AddressableNumVGPRs;
++}
++
++unsigned getLDSBankCount(GPUKind AK) {
++  return getLegacyIsaInfo(AK).LDSBankCount;
++}
++
++unsigned getTotalNumSGPRs(GPUKind AK) {
++  return getMajorVersion(AK) >= 8 ? 800 : 512;
++}
++
++unsigned getAddressableNumSGPRs(GPUKind AK) {
++  // SGPR init bug
++  if (AK == GK_GFX802 || AK == GK_GFX805)
++    return 96;
++  unsigned Major = getMajorVersion(AK);
++  return Major >= 10 ? 106 : Major >= 8 ? 102 : 104;
++}
++
++unsigned getSGPRAllocGranule(GPUKind AK) {
++  unsigned Major = getMajorVersion(AK);
++  return Major >= 10 ? getAddressableNumSGPRs(AK) : Major >= 8 ? 16 : 8;
++}
++} // namespace
++} // namespace llvm::AMDGPU
++#endif
++
+ namespace COMGR {
+ namespace metadata {
+ 
+@@ -311,6 +439,10 @@
+       // canonical names, including generic targets and target variants.
+       if (Processor != AMDGPU::getArchNameAMDGCN(Kind))
+         continue;
++#if LLVM_VERSION_MAJOR < 24
++      if (!AMDGPU::findLegacyIsaInfo(Kind))
++        continue;
++#endif
+       Infos.push_back({("amdgcn-amd-amdhsa--" + Processor).str(), Kind});
+     }
+     return Infos;
