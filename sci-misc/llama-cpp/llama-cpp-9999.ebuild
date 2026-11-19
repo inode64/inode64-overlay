@@ -85,6 +85,13 @@ pkg_setup() {
 src_prepare() {
 	use cuda && cuda_src_prepare
 	cmake_src_prepare
+
+	# CU_CHECK(err) expands to "hipError_t err = err;": the VMM pool reads an
+	# uninitialized variable and clang compiles its reservation loop as an
+	# endless one, so every HIP run hangs on the first allocation
+	sed -e '/#define CU_CHECK(fn)/s/\<err\>/cu_check_err/g' \
+		-i ggml/src/ggml-cuda/vendors/hip.h || die
+
 	if use examples; then
 		mkdir -p "${BUILD_DIR}/tinyllamas" || die
 		cp "${DISTDIR}/ggml-org_models_tinyllamas_stories15M-q4_0-${TINY_LLAMAS_COMMIT}.gguf" \
