@@ -17,17 +17,16 @@ S="${WORKDIR}/${MY_P}/${components[0]}"
 
 LICENSE="MIT"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS=""
+KEYWORDS="~amd64"
 
 IUSE="test"
 RESTRICT="!test? ( test )"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-6.4.1-extend-isa-compatibility-check.patch"
-	"${FILESDIR}/${PN}-6.1.0-dont-add-nogpulib.patch"
-	"${FILESDIR}/${PN}-10.1.0-llvm-23-compat.patch"
+	"${FILESDIR}/${PN}-10.2.0-llvm-23-compat.patch"
 	"${FILESDIR}/${PN}-10.1.0-llvm-23-gpu-rdc.patch"
-	"${FILESDIR}/${PN}-10.1.0-test-llvm-dylib.patch"
+	"${FILESDIR}/${PN}-10.2.0-test-llvm-dylib.patch"
 )
 
 RDEPEND="
