@@ -148,13 +148,19 @@ src_configure() {
 	# rocisa asserts on comments inside macro bodies, upstream builds without asserts
 	append-cppflags -DNDEBUG
 
+	# targets has a trailing semicolon, this trips up Tensile's input parser, so carefully prune
 	local targets="$(get_amdgpu_flags)"
+	targets=${targets%;}
+	# without device targets upstream builds the host library for every GPU it
+	# knows, and LLVM 23 rejects gfx1250-strict
+	[[ -z ${targets} ]] && targets=$(IFS=";"; echo "${SUPPORTED_GPUS[*]}")
 	local Tensile_SKIP_BUILD=$([ "${AMDGPU_TARGETS[*]}" = "" ] && echo ON || echo OFF )
 	local HIPBLASLT_ENABLE_DEVICE=$([ "${AMDGPU_TARGETS[*]}" != "" ] && echo ON || echo OFF )
 
-	# targets has a trailing semicolon, this trips up Tensile's input parser, so carefully prune
 	local mycmakeargs=(
-		-DGPU_TARGETS="${targets%;}"
+		# upstream sets CMAKE_INSTALL_RPATH to $ORIGIN/../lib:$ORIGIN/../llvm/lib
+		-DCMAKE_SKIP_INSTALL_RPATH=ON
+		-DGPU_TARGETS="${targets}"
 		-DHIPBLASLT_ENABLE_CLIENT="$(usex benchmark ON $(usex test ON OFF))"
 		-DHIPBLASLT_ENABLE_SAMPLES=OFF
 		-DHIPBLASLT_ENABLE_DEVICE=${HIPBLASLT_ENABLE_DEVICE}
@@ -164,11 +170,14 @@ src_configure() {
 		-Dnanobind_DIR="$(python_get_sitedir)/nanobind/cmake"
 		-DPython_EXECUTABLE="${PYTHON}"
 		-DROCM_SYMLINK_LIBS=OFF
-		-DTENSILELITE_BUILD_PARALLEL_LEVEL=$(makeopts_jobs)
 		-DHIPBLASLT_BUILD_TESTING="$(usex test ON OFF)"
 		-DHIPBLASLT_ENABLE_AMD_SMI="$(usex test ON OFF)"
 		-Wno-dev
 	)
+
+	if [[ ${HIPBLASLT_ENABLE_DEVICE} == ON ]]; then
+		mycmakeargs+=( -DTENSILELITE_BUILD_PARALLEL_LEVEL=$(get_makeopts_jobs) )
+	fi
 
 	if use test || use benchmark; then
 		# HIPBLASLT_ENABLE_CLIENT=ON branch
