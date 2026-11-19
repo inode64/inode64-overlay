@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_P}/${components[0]}"
 
 LICENSE="MIT"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~amd64"
+KEYWORDS=""
 
 IUSE="test"
 RESTRICT="!test? ( test )"
