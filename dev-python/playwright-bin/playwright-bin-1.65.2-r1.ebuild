@@ -1,0 +1,65 @@
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=8
+
+DISTUTILS_USE_PEP517=standalone
+PYTHON_COMPAT=( python3_{12..14} )
+
+inherit distutils-r1 pypi
+
+MY_PN=${PN//-bin/}
+
+DESCRIPTION="Automate Chromium, Firefox and WebKit browsers with a single API"
+HOMEPAGE="https://github.com/Microsoft/playwright-python"
+
+SRC_URI="
+	amd64? ( $(pypi_wheel_url "${MY_PN}" "${PV}" py3 none-manylinux1_x86_64) )
+	arm64? ( $(pypi_wheel_url "${MY_PN}" "${PV}" py3 none-manylinux_2_17_aarch64.manylinux2014_aarch64) )
+"
+S="${WORKDIR}"
+
+LICENSE="Apache-2.0"
+SLOT="0"
+KEYWORDS="-* amd64"
+
+# The sync and async APIs also import pyee (>=13,<15), which neither ::gentoo nor
+# this overlay package yet, so only the CLI works until it is added here.
+#
+# The bundled driver runs its own node. net-libs/nodejs[inspector] is for the
+# Playwright npm packages run with the system node (npx @playwright/mcp,
+# @playwright/test): playwright-core loads node:inspector on startup.
+#
+# The rest is what the downloaded Chromium and its headless shell link against
+# (scanelf -n); upstream expects "playwright install-deps" to provide it.
+RDEPEND="
+	app-accessibility/at-spi2-core:2
+	dev-libs/nss
+	dev-python/greenlet[${PYTHON_USEDEP}]
+	media-libs/alsa-lib
+	media-libs/mesa[opengl]
+	net-libs/nodejs[inspector]
+	net-print/cups
+	virtual/libudev
+	x11-libs/libXcomposite
+	x11-libs/libXdamage
+	x11-libs/libXfixes
+	x11-libs/libXrandr
+	x11-libs/libxcb
+	x11-libs/libxkbcommon
+	x11-libs/pango
+"
+
+RESTRICT="test"
+
+QA_PREBUILT="usr/lib/python*/site-packages/playwright/driver/node"
+
+src_unpack() {
+	# Installing the wheel itself keeps the executable bit of the bundled node
+	# and generates the playwright entry point.
+	:
+}
+
+python_compile() {
+	distutils_wheel_install "${BUILD_DIR}/install" "${DISTDIR}/${A}"
+}
