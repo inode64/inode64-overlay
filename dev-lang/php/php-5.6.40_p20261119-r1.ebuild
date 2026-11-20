@@ -13,7 +13,7 @@ HOMEPAGE="https://www.php.net/"
 SRC_URI="https://www.inode64.com/dist/${PHP_PATCH}"
 EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
 EGIT_BRANCH="PHP-5.6-security-backports-openssl11"
-EGIT_COMMIT="048228913b6eeda72b784c59c43a7bfe8eb05f34"
+EGIT_COMMIT="5112179e96d6c4e648cb4047b75b3e6bfd331481"
 
 LICENSE="PHP-3.01
 	BSD
