@@ -9,13 +9,22 @@ inherit flag-o-matic multilib multiprocessing postgres systemd toolchain-funcs
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://www.php.net/"
-SRC_URI="https://www.php.net/distributions/${P}.tar.xz"
+PGO_SYMFONY="benchmarking-symfony-demo-2.2.3"
+PGO_SYMFONY_COMMIT="b482c3e3dd48e4df21d0cb81e26af17a7fe35d24"
+SRC_URI="https://www.php.net/distributions/${P}.tar.xz
+	pgo-apps? (
+		https://wordpress.org/wordpress-6.9.4.tar.gz
+		https://downloads.wordpress.org/plugin/sqlite-database-integration.2.2.23.zip
+		https://github.com/php/${PGO_SYMFONY}/archive/${PGO_SYMFONY_COMMIT}.tar.gz
+			-> ${PGO_SYMFONY}-${PGO_SYMFONY_COMMIT}.tar.gz
+	)"
 
 LICENSE="PHP-3.01
 	BSD
 	Zend-2.0
 	bcmath? ( LGPL-2.1+ )
 	fpm? ( BSD-2 )
+	pgo-apps? ( GPL-2+ MIT )
 	unicode? ( BSD-2 LGPL-2.1 )"
 
 SLOT="$(ver_cut 1-2)"
@@ -36,7 +45,7 @@ IUSE="${IUSE} acl apparmor argon2 avif bcmath berkdb bzip2 calendar
 	capstone cdb +ctype curl debug
 	enchant exif ffi +fileinfo +filter
 	+flatfile ftp gd gdbm gmp +iconv inifile
-	intl iodbc ipv6 +jit jpeg ldap ldap-sasl libedit lmdb lto pgo
+	intl iodbc ipv6 +jit jpeg ldap ldap-sasl libedit lmdb lto pgo pgo-apps
 	mhash mssql mysql mysqli nls
 	odbc +opcache-jit pcntl pdo +phar +posix postgres png
 	qdbm readline selinux +session session-mm sharedmem
@@ -61,6 +70,7 @@ REQUIRED_USE="
 	mysql? ( || ( mysqli pdo ) )
 	mssql? ( pdo )
 	test? ( cli )
+	pgo-apps? ( pgo ctype filter iconv pdo session simplexml sqlite tokenizer )
 	pgo? ( cli )
 	postgres? ( ${POSTGRES_REQ_USE} )
 "
@@ -138,9 +148,12 @@ DEPEND="${COMMON_DEPEND}"
 BDEPEND="
 	app-arch/xz-utils
 	sys-devel/bison
+	pgo-apps? ( app-arch/unzip )
 "
 
 PATCHES=(
+	"${FILESDIR}/php-8.4-gd2-disabled-diagnostic.patch"
+	"${FILESDIR}/php-8.4-proc-nice-pid-namespace.patch"
 	"${FILESDIR}/php-set-fpm-test-executable.patch"
 	"${FILESDIR}/php-8.3.31-ipv6-printing-test-fix.patch"
 	"${FILESDIR}/php-8.5-musl-pathconf.patch"
@@ -262,7 +275,6 @@ src_prepare() {
 	   ext/standard/tests/general_functions/proc_open_sockets1.phpt \
 	   ext/standard/tests/general_functions/proc_open_sockets2.phpt \
 	   ext/standard/tests/general_functions/proc_open_sockets3.phpt \
-	   ext/standard/tests/ini_info/php_ini_loaded_file.phpt \
 	   sapi/cli/tests/016.phpt \
 	   sapi/cli/tests/023.phpt \
 	   sapi/cli/tests/bug65275.phpt \
@@ -629,6 +641,11 @@ src_configure() {
 			--with-config-file-scan-dir="${PHP_EXT_INI_DIR_ACTIVE}"
 		)
 
+		# run-tests.php loads this module on demand for tests with --EXTENSIONS--.
+		if [[ ${one_sapi} == cli ]] && { use test || ( use pgo && tc-is-gcc ); } ; then
+			sapi_conf+=( --enable-zend-test=shared )
+		fi
+
 		# We loop through *all* SAPIs here because we want to
 		# --disable-foo any SAPIs that aren't enabled.
 		for sapi in "${ALL_SAPIS[@]}" ; do
@@ -737,11 +754,6 @@ php_pgo_flags() {
 	fi
 }
 
-# Training run: the whole test suite with opcache on, which is how the
-# binary runs in production. On a Ryzen 7600X it trained WordPress, Symfony
-# and Joomla a little better than a 13-directory slice of it (+1.5 % against
-# about 0 %); profiles from the applications themselves gave +4-6 %, but an
-# ebuild cannot ship them.
 php_pgo_train() {
 	local dir="${WORKDIR}/sapis-build/cli" passed failed
 
@@ -754,7 +766,8 @@ php_pgo_train() {
 	TEST_PHP_EXECUTABLE="${dir}/sapi/cli/php" TEST_PHP_EXTRA_ARGS="-n" \
 	SKIP_SLOW_TESTS=1 SKIP_IO_CAPTURE_TESTS=1 SKIP_PERF_SENSITIVE=1 NO_INTERACTION=1 \
 		"${dir}/sapi/cli/php" -n run-tests.php -n --offline -q -x --no-progress \
-		-j"$(makeopts_jobs)" -d "session.save_path=${T}" \
+		-j"$(get_makeopts_jobs)" -d "session.save_path=${T}" \
+		-d "extension_dir=${dir}/modules" \
 		-d opcache.enable_cli=1 -d opcache.jit=disable -d opcache.jit_buffer_size=0 \
 		> "${T}/pgo-train.log" 2>&1
 	passed=$(sed -n 's/^Tests passed *: *\([0-9]*\).*/\1/p' "${T}/pgo-train.log")
@@ -771,6 +784,13 @@ php_pgo_train() {
 		return 1
 	fi
 	einfo "PGO training: ${passed} tests passed, ${failed} failed"
+	if use pgo-apps ; then
+		einfo "Training with WordPress and Symfony (60 requests each)"
+		bash "${FILESDIR}/php-pgo-apps.sh" "${dir}" "${WORKDIR}/wordpress" \
+			"${WORKDIR}/${PGO_SYMFONY}-${PGO_SYMFONY_COMMIT}" "${WORKDIR}/sqlite-database-integration" \
+			"${T}" "${FILESDIR}/php-pgo-request.php" > "${T}/pgo-apps.log" 2>&1 \
+			|| die "Application training failed, see ${T}/pgo-apps.log"
+	fi
 }
 
 src_compile() {
@@ -919,6 +939,8 @@ src_test() {
 	if [[ -x "${WORKDIR}/sapis-build/fpm/sapi/fpm/php-fpm" ]] ; then
 		local TEST_PHP_FPM_EXECUTABLE="${WORKDIR}/sapis-build/fpm/sapi/fpm/php-fpm"
 		export TEST_PHP_FPM_EXECUTABLE
+		# FPM\Tester starts a separate process and loads the requested modules itself.
+		export TEST_FPM_EXTENSION_DIR="${WORKDIR}/sapis-build/cli/modules"
 	fi
 
 	if [[ -x "${WORKDIR}/sapis-build/phpdbg/sapi/phpdbg/phpdbg" ]] ; then
@@ -940,6 +962,7 @@ src_test() {
 		-j$(get_makeopts_jobs) \
 		$(usex test-full "--set-timeout 300" "") \
 		-d "session.save_path=${T}" \
+		-d "extension_dir=${WORKDIR}/sapis-build/cli/modules" \
 		|| die "tests failed"
 }
 

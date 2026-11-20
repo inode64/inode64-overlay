@@ -1,0 +1,18 @@
+Check the extra libgd diagnostic when the known-good GD2 fixture cannot
+be decoded. Keep the original PHP warnings and return-value expectations
+for both configurations.
+
+--- a/ext/gd/tests/createfromstring-overflow.phpt
++++ b/ext/gd/tests/createfromstring-overflow.phpt
+@@ -33,2 +33,11 @@
+ $source = $fileHeader . $chunkHeader . $trueColorHeader;
++if (@imagecreatefromgd2(__DIR__ . '/src.gd2') === false) {
++    // A build without the GD2 codec emits one additional warning before PHP's own warnings.
++    set_error_handler(static function (int $level, string $message) {
++        restore_error_handler();
++        if ($level !== E_WARNING || $message !== "imagecreatefromstring(): GD2 image support has been disabled\n") {
++            throw new UnexpectedValueException($message);
++        }
++    });
++}
+ $img = imagecreatefromstring($source);

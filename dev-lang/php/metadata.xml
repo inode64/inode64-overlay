@@ -55,6 +55,7 @@
       (GCC only, ignored with Clang); the VM executor (zend_execute.c) is
       left out of the profile and built at -O2, which is faster for it
     </flag>
+    <flag name="pgo-apps">Add offline WordPress and Symfony requests to GCC profile training.</flag>
     <flag name="phar">
       Enables the phar extension to provide phar archive support
     </flag>
