@@ -29,25 +29,9 @@ KEYWORDS="-* amd64"
 # The bundled driver runs its own node. net-libs/nodejs[inspector] is for the
 # Playwright npm packages run with the system node (npx @playwright/mcp,
 # @playwright/test): playwright-core loads node:inspector on startup.
-#
-# The rest is what the downloaded Chromium and its headless shell link against
-# (scanelf -n); upstream expects "playwright install-deps" to provide it.
 RDEPEND="
-	app-accessibility/at-spi2-core:2
-	dev-libs/nss
 	dev-python/greenlet[${PYTHON_USEDEP}]
-	media-libs/alsa-lib
-	media-libs/mesa[opengl]
 	net-libs/nodejs[inspector]
-	net-print/cups
-	virtual/libudev
-	x11-libs/libXcomposite
-	x11-libs/libXdamage
-	x11-libs/libXfixes
-	x11-libs/libXrandr
-	x11-libs/libxcb
-	x11-libs/libxkbcommon
-	x11-libs/pango
 "
 
 RESTRICT="test"
