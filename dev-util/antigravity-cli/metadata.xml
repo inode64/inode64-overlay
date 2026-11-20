@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		Antigravity CLI is the terminal interface to Google's Antigravity agent
+		harness. The installed command is agy. Its self-updater is disabled:
+		new versions come from the package manager.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/google-antigravity/antigravity-cli/issues</bugs-to>
+		<changelog>https://github.com/google-antigravity/antigravity-cli/blob/main/CHANGELOG.md</changelog>
+		<doc>https://antigravity.google/docs/cli/overview</doc>
+		<remote-id type="github">google-antigravity/antigravity-cli</remote-id>
+	</upstream>
+</pkgmetadata>
