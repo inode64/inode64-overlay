@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		Chrome for Testing is the Chrome flavour Google publishes for browser
+		automation: versioned, without auto-update, and the build Playwright and
+		Puppeteer download by default. Installed system-wide in /opt/chrome-for-testing
+		so automation tools can share one browser (for the Playwright MCP server,
+		PLAYWRIGHT_MCP_EXECUTABLE_PATH=/opt/chrome-for-testing/chrome).
+	</longdescription>
+</pkgmetadata>

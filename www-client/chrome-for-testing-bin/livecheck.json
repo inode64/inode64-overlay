@@ -1,0 +1,5 @@
+{
+  "type": "regex",
+  "url": "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json",
+  "regex": "\"channel\":\"Stable\",\"version\":\"([0-9.]+)\""
+}
