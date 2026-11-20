@@ -39,7 +39,9 @@ QA_PREBUILT="
 # toolchain the test script needs.
 RESTRICT="test"
 
-NODEJS_EXTRA_FILES="public server"
+# Since 2.7.3 the server and the CLI ship compiled under build/; the "bin"
+# entry of package.json is build/bin/cli.js, which imports the rest of it.
+NODEJS_EXTRA_FILES="public build"
 
 # OpenChamber is an application, nothing is ever compiled against it, so the
 # TypeScript declarations its dependencies ship are dead weight.
@@ -52,8 +54,9 @@ src_prepare() {
 	# Drop them so the eclass does not try to rebuild them.
 	#
 	# bun-pty goes with them. It is a prebuilt Rust library, the tarball
-	# carries no crate to rebuild it from, and server/lib/terminal/runtime.js
-	# only reaches for it when globalThis.Bun is defined. This runs under
+	# carries no crate to rebuild it from, and
+	# build/server/lib/terminal/runtime.js only reaches for it when
+	# globalThis.Bun is defined. This runs under
 	# Node.js, so node-pty, which is built here from its own sources, is what
 	# gets loaded; even under bun the import is wrapped in a try and falls
 	# back to it. Drop it from the dependencies as well, otherwise "npm
