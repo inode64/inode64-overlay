@@ -94,5 +94,6 @@ pkg_postinst() {
 	elog "ras-mc-ctl 1.0 uses subcommands: dimm --register-labels,"
 	elog "database --summary and database --errors. See ras-mc-ctl --help."
 	elog "Daemon settings are in /etc/sysconfig/rasdaemon."
-	elog "The service mounts tracefs at /sys/kernel/tracing; debugfs is optional."
+	elog "The service mounts tracefs at /sys/kernel/tracing."
+	elog "Keep debugfs available for ACPI EXTLOG events (ras/daemon_active)."
 }
