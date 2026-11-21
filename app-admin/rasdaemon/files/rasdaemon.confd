@@ -1,0 +1,3 @@
+# Store events in /var/lib/rasdaemon/ras-mc_event.db.
+# Configure event handling and database settings in /etc/sysconfig/rasdaemon.
+RASDAEMON_ARGS="--record"
