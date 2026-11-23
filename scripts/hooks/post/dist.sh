@@ -53,7 +53,8 @@ if [ "$cp" == "www-apps/guacamole-client" ]; then
 	upload "${ebuild}-${new_version}-mvn.tar.xz"
 fi
 
-if [ "$cp" == "dev-python/jiter" ]; then
+if [ "$cp" == "dev-python/jiter" ] || \
+    [ "$cp" == "sys-apps/pnpm" ] ; then
 	upload "${ebuild}-${new_version}-crates.tar.xz"
 fi
 
