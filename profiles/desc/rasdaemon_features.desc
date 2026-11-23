@@ -1,0 +1,20 @@
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# This file contains descriptions of RASDAEMON_FEATURES USE_EXPAND flags.
+# Keep it sorted.
+
+abrt-report - Send events to the ABRT problem-reporting daemon
+aer - Record PCIe Advanced Error Reporting (AER) events
+bmc-generic - Report PCIe AER events as standard IPMI SEL records to the BMC (experimental)
+cxl - Record Compute Express Link (CXL) device events
+devlink - Record devlink health reports and network transmit timeouts
+diskerror - Record block device I/O errors
+erst - Read x86 machine checks the firmware saved through ACPI ERST in pstore
+extlog - Record ACPI Extended Error Log (Intel eMCA) memory events
+mce - Record and decode x86 Machine Check Exceptions
+memory-ce-pfa - Account and offline memory pages with repeated corrected errors
+memory-failure - Record the kernel memory failure (hwpoison) handling results
+memory-row-ce-pfa - Account and offline DRAM rows with repeated corrected errors
+pcie-edpc - Configure PCIe Enhanced Downstream Port Containment (eDPC) at startup
+signal - Record SIGBUS signals sent for hardware memory errors (experimental)
