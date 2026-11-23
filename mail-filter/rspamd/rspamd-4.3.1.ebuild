@@ -71,7 +71,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-3.12-cmake-lua-version.patch"
+	"${FILESDIR}/${PN}-4.3.1-cmake-lua-version.patch"
 	"${FILESDIR}/${PN}-4.2-unbundle-lua.patch"
 	"${FILESDIR}/${PN}-3.12-unbundle-snowball.patch"
 )
