@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/pnpm/pnpm/issues</bugs-to>
+		<changelog>https://github.com/pnpm/pnpm/releases</changelog>
+		<doc>https://pnpm.io/motivation</doc>
+		<remote-id type="github">pnpm/pnpm</remote-id>
+	</upstream>
+</pkgmetadata>
