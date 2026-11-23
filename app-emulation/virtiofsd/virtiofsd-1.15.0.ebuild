@@ -97,11 +97,11 @@ CRATES="
 	utf8parse@0.2.1
 	uuid@1.11.0
 	version_check@0.9.4
-	vhost-user-backend@0.22.0
-	vhost@0.16.0
+	vhost-user-backend@0.24.1
+	vhost@0.18.1
 	virtio-bindings@0.2.7
-	virtio-queue@0.17.0
-	vm-memory@0.17.1
+	virtio-queue@0.18.0
+	vm-memory@0.18.0
 	vmm-sys-util@0.15.0
 	wasi@0.11.0+wasi-snapshot-preview1
 	winapi-i686-pc-windows-gnu@0.4.0
@@ -158,10 +158,19 @@ RDEPEND="
 # update with proper path to binaries this crate installs, omit leading /
 QA_FLAGS_IGNORED="usr/libexec/${PN}"
 
+DOCS=(
+	doc
+	README.md
+)
+
 src_unpack() {
 	if [[ ${PV} == *9999* ]]; then
 		git-r3_src_unpack
+		# cargo.eclass no longer enters ${S} here (gentoo commit 0ed513f46179),
+		# and cargo fetch looks for Cargo.toml in the current directory
+		pushd "${S}" >/dev/null || die
 		cargo_live_src_unpack
+		popd >/dev/null || die
 	else
 		cargo_src_unpack
 	fi
@@ -170,16 +179,13 @@ src_unpack() {
 src_install() {
 	cargo_src_install
 
+	dodoc -r "${DOCS[@]}"
+
 	mkdir "${ED}/usr/libexec" || die
 	mv "${ED}/usr/"{bin,libexec}/${PN} || die
 
-	# Install 50-virtiofsd.json but to avoid conflicts with
-	# <app-emulation/qemu-8.0.0 install it under different name. In this case,
-	# smaller number means higher priority, but that's probably what users want
-	# anyway if they install this package on top of app-emulation/qemu.
-	# TODO: remove once old QEMUs are removed from the portage.
 	insinto "/usr/share/qemu/vhost-user"
-	newins "50-virtiofsd.json" "40-virtiofsd.json"
+	doins "50-virtiofsd.json"
 
 	insinto "/etc/${PN}"
 	doins "${FILESDIR}/example.conf"
