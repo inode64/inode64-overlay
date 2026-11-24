@@ -18,7 +18,7 @@ EGIT_REPO_URI="https://github.com/shivammathur/php-src-backports"
 # Alternative
 #EGIT_REPO_URI="https://github.com/remicollet/php-src-security"
 EGIT_BRANCH="PHP-7.4-security-backports"
-EGIT_COMMIT="30c153aa9360ab250148edca799b2313ea36866d"
+EGIT_COMMIT="6870d22eac5e46def46cca6d47dcc4259a11a451"
 
 LICENSE="PHP-3.01
 	BSD
