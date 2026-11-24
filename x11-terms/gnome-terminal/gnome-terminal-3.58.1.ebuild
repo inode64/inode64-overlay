@@ -7,7 +7,7 @@ inherit flag-o-matic gnome.org gnome2-utils meson python-any-r1 readme.gentoo-r1
 
 DESCRIPTION="A terminal emulator for GNOME"
 HOMEPAGE="https://gitlab.gnome.org/GNOME/gnome-terminal"
-SRC_URI+=" https://www.inode64.com/dist/${P}-patches-2.tar.xz"
+SRC_URI+=" https://www.inode64.com/dist/${PN}-selection-trim-r2.tar.xz"
 
 LICENSE="GPL-3+ GPL-3 CC-BY-SA-3.0 FDL-1.3"
 
