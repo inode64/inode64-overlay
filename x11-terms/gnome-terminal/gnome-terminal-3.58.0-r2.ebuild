@@ -7,7 +7,7 @@ inherit flag-o-matic gnome.org gnome2-utils meson python-any-r1 readme.gentoo-r1
 
 DESCRIPTION="A terminal emulator for GNOME"
 HOMEPAGE="https://gitlab.gnome.org/GNOME/gnome-terminal"
-SRC_URI+=" https://www.inode64.com/dist/${P}-patches-1.tar.xz"
+SRC_URI+=" https://www.inode64.com/dist/${P}-patches-2.tar.xz"
 
 LICENSE="GPL-3+ GPL-3 CC-BY-SA-3.0 FDL-1.3"
 
@@ -48,9 +48,9 @@ DOC_CONTENTS="To get previous working directory inherited in new opened tab, or
 	. /etc/profile.d/vte-2.91.sh"
 
 PATCHES=(
-	# Not upstream: profile settings and menu for VteTerminal:selection-trim
-	# and :selection-markdown from the x11-libs/vte patch; the options hide
-	# themselves on a stock VTE
+	# Not upstream: profile setting and menu for VteTerminal:selection-trim
+	# and Copy as Markdown with :selection-markdown, both from the
+	# x11-libs/vte patch; the options hide themselves on a stock VTE
 	"${WORKDIR}"/patches
 )
 
