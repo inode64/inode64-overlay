@@ -33,7 +33,6 @@ src_unpack() {
 		const fs = require("fs");
 		const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 		pkg.overrides = {
-			"gray-matter": { "js-yaml": "4.3.2" },
 			"js-yaml@<4.3.2": "4.3.2",
 			"vitest": { "vite": "$vite" },
 			"@vitest/mocker": { "vite": "$vite" }
@@ -67,14 +66,11 @@ src_unpack() {
 src_prepare() {
 	nodejs-mod_src_prepare
 
-	# npm does not apply pnpm's dependency patches. Keep upstream's removal
-	# of gray-matter's JavaScript evaluator and its js-yaml v4 compatibility.
-	pushd node_modules/gray-matter >/dev/null || die
-	eapply "${S}/patches/gray-matter@4.0.3.patch"
-	popd >/dev/null || die
-
-	# This integration test executes an Amp hook in Bun, which is not needed
-	# to run rulesync and is not available in the Gentoo tree.
+	# These integration tests execute Amp hooks and OpenCode plugins in Bun,
+	# which is not needed to run rulesync and is not available in the Gentoo
+	# tree.
 	sed -i '/it("should preserve shell quoting and expansion when executed by Bun Shell"/s/it(/it.skip(/' \
 		src/features/hooks/amp-hooks.test.ts || die
+	sed -i '/describe("generated plugin at runtime (real Bun)"/s/describe(/describe.skip(/' \
+		src/features/hooks/opencode-hooks.test.ts || die
 }
