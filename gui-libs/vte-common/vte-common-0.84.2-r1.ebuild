@@ -76,7 +76,9 @@ src_install() {
 	newins "${BUILD_DIR}"/src/vte.sh vte-${SLOT}.sh
 	newins "${BUILD_DIR}"/src/vte.csh vte-${SLOT}.csh
 	if  use systemd; then
-		insinto /usr/lib/systemd/user/vte-spawn-.scode.d/
+		# ::gentoo installs it in .scode.d, which systemd never reads; the
+		# vte ebuilds remove it from .scope.d, where meson puts it
+		insinto /usr/lib/systemd/user/vte-spawn-.scope.d/
 		newins "${S}"/src/vte-spawn-.scope.conf defaults.conf
 	fi
 	einstalldocs
