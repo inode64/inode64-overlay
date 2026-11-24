@@ -9,7 +9,9 @@ inherit flag-o-matic gnome.org meson python-any-r1 vala xdg
 
 DESCRIPTION="Library providing a virtual terminal emulator widget"
 HOMEPAGE="https://gitlab.gnome.org/GNOME/vte"
-SRC_URI+=" https://www.inode64.com/dist/${P}-patches-1.tar.xz"
+# 0.84.2 is only in the GitLab package registry, not on download.gnome.org
+SRC_URI="https://gitlab.gnome.org/api/v4/projects/1893/packages/generic/vte/${PV}/vte-${PV}.tar.xz"
+SRC_URI+=" https://www.inode64.com/dist/${PN}-selection-trim-r1.tar.xz"
 
 # Once SIXEL support ships (0.66 or later), might need xterm license (but code might be considered upgraded to LGPL-3+)
 LICENSE="LGPL-3+ GPL-3+"
