@@ -1,0 +1,29 @@
+Keep the client keyboard grab in the Sciter UI on Linux.
+
+Since rustdesk 1.4.7 (commit 7308c448f1, PR #14836) keyboard.rs debounces a
+GrabState::Wait that arrives within 300 ms of the grab and releases the grab
+afterwards unless a new GrabState::Run refreshes it. Flutter refreshes it on
+every hover; the Sciter view only calls handler.enter() on MOUSE_ENTER, and
+the XGrabKeyboard itself makes Sciter emit a MOUSE_LEAVE ~50 ms later, so the
+grab is dropped 300 ms after entering the view and the keyboard no longer
+reaches the peer. Re-enter on the next pointer event inside the view.
+
+--- a/src/ui/remote.tis
++++ b/src/ui/remote.tis
+@@ -217,6 +217,16 @@
+             return;
+         }
+     }
++    // Linux: the X keyboard grab taken by handler.enter() makes Sciter send
++    // MOUSE_LEAVE about 50 ms later with the pointer still over the view, and
++    // keyboard.rs drops the grab 300 ms after the enter unless another enter
++    // arrives. Flutter sends one on every hover; re-enter on the next pointer
++    // event so the keys keep reaching the peer.
++    if (is_linux && !entered && !dragging &&
++        (evt.type == Event.MOUSE_MOVE || evt.type == Event.MOUSE_DOWN)) {
++        entered = true;
++        handler.enter(handler.get_keyboard_mode());
++    }
+     var mask = 0;
+     var wheel_delta_x;
+     var wheel_delta_y;
