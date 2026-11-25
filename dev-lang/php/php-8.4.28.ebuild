@@ -41,6 +41,8 @@ IUSE="${IUSE}
 	${ALL_SAPIS[@]/cli/+cli}
 	threads"
 
+# pspell left the core in PHP 8.4, so spell builds nothing and needs no aspell;
+# it stays in IUSE because mail-client/roundcube depends on dev-lang/php[spell].
 IUSE="${IUSE} acl apparmor argon2 avif bcmath berkdb bzip2 calendar
 	capstone cdb +ctype curl debug
 	enchant exif ffi +fileinfo +filter
@@ -117,7 +119,6 @@ COMMON_DEPEND="
 	session-mm? ( dev-libs/mm )
 	snmp? ( net-analyzer/net-snmp:= )
 	sodium? ( dev-libs/libsodium:=[-minimal(-)] )
-	spell? ( app-text/aspell )
 	sqlite? ( dev-db/sqlite )
 	ssl? ( dev-libs/openssl:0= )
 	tidy? ( app-text/htmltidy )
