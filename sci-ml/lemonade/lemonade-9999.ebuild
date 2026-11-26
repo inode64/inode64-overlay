@@ -22,6 +22,7 @@ IUSE="+system-fastflowlm +system-llamacpp +system-rocm tauri webui"
 # upstream fall back to FetchContent downloads at configure time; webui and
 # tauri fetch npm modules / Rust crates while building.
 PROPERTIES="live"
+RESTRICT="network-sandbox"
 
 # Linux always links libdrm_amdgpu. brotli is macOS-only. Digest verification
 # links mbedtls; only slot 0 matches the probe, otherwise a static copy is fetched.
