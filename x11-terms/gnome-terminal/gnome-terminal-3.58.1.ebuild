@@ -18,13 +18,9 @@ KEYWORDS="amd64 ~arm arm64 ~loong ~ppc ~ppc64 ~riscv x86"
 IUSE="X debug gnome-shell nautilus"
 
 RDEPEND="
-	>=dev-libs/glib-2.52:2
-	>=x11-libs/gtk+-3.22.27:3[X?]
 	>=gui-libs/libhandy-1.6.0:1
 	>=x11-libs/vte-0.80.0:2.91
-	>=dev-libs/libpcre2-10
 	>=gnome-base/gsettings-desktop-schemas-0.1.0
-	sys-apps/util-linux
 	gnome-shell? ( gnome-base/gnome-shell )
 	nautilus? ( >=gnome-base/nautilus-43.0 )
 "
@@ -33,13 +29,11 @@ DEPEND="${RDEPEND}"
 # xmllint required for glib-compile-resources, see bug #549304
 BDEPEND="
 	${PYTHON_DEPS}
-	dev-libs/libxml2:2
 	dev-libs/libxslt
 	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	dev-util/itstool
 	>=sys-devel/gettext-0.19.8
-	virtual/pkgconfig
 "
 
 DOC_CONTENTS="To get previous working directory inherited in new opened tab, or
