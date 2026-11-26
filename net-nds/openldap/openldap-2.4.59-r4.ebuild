@@ -61,6 +61,7 @@ COMMON_DEPEND="
 	)
 	sasl? ( dev-libs/cyrus-sasl:= )
 	!minimal? (
+		acct-user/ldap
 		dev-libs/libltdl
 		>=dev-db/lmdb-0.9.18:=
 		crypt? ( virtual/libcrypt:= )
@@ -91,13 +92,8 @@ RDEPEND="${COMMON_DEPEND}
 	selinux? ( sec-policy/selinux-ldap )
 "
 
-# The user/group are only used for running daemons which are
-# disabled in minimal builds, so elide the accounts too.
 BDEPEND="
 	sys-apps/groff
-	!minimal? (
-		acct-user/ldap
-	)
 "
 
 # for tracking versions
@@ -383,7 +379,7 @@ src_prepare() {
 		-i tests/scripts/* || die "sed failed"
 
 	if test -e configure.in -a ! -e configure.ac ; then
-		mv -f configure.in configure.ac
+		mv -f configure.in configure.ac || die
 	fi
 
 	# Required for autoconf-2.70 #765043
@@ -780,7 +776,7 @@ multilib_src_install() {
 		echo "# to track versions for upgrading." >> "${ED}${OPENLDAP_DEFAULTDIR_VERSIONTAG}/${OPENLDAP_VERSIONTAG}"
 
 		# use our config
-		rm "${ED}"/etc/openldap/slapd.conf
+		rm "${ED}"/etc/openldap/slapd.conf || die
 		insinto /etc/openldap
 		newins "${FILESDIR}"/${PN}-2.4.40-slapd-conf slapd.conf
 		configfile="${ED}"/etc/openldap/slapd.conf
@@ -792,7 +788,7 @@ multilib_src_install() {
 			sed -e "/###INSERTDYNAMICMODULESHERE###$/a# moduleload\t$(basename ${x})" -i "${configfile}" || die
 		done
 		sed -e "s:###INSERTDYNAMICMODULESHERE###$:# modulepath\t${EPREFIX}/usr/$(get_libdir)/openldap/openldap:" \
-			-i "${configfile}"
+			-i "${configfile}" || die
 		use prefix || fowners root:ldap /etc/openldap/slapd.conf
 		fperms 0640 /etc/openldap/slapd.conf
 		cp "${configfile}" "${configfile}".default || die
