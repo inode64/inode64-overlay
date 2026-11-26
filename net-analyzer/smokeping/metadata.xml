@@ -17,6 +17,6 @@
         <remote-id type="github">oetiker/SmokePing</remote-id>
     </upstream>
     <use>
-        <flag name="dig">Install <pkg>net-dns/bind-tools</pkg> for dig functionality</flag>
+        <flag name="dig">Install <pkg>net-dns/bind</pkg> for dig functionality</flag>
     </use>
 </pkgmetadata>

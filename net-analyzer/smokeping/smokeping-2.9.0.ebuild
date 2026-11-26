@@ -37,13 +37,13 @@ DEPEND="
 		www-apache/mod_fcgid
 	)
 	curl? ( >=net-misc/curl-7.21.4 )
-	dig? ( net-dns/bind-tools )
+	dig? ( net-dns/bind )
 	ipv6? ( >=dev-perl/Socket6-0.20 )
 	radius? ( dev-perl/Authen-Radius )
 "
 RDEPEND="${DEPEND}"
 
-PATCHES=( "${FILESDIR}/${P}-ssh-probe-no-dsa.patch" )
+PATCHES=( "${FILESDIR}/${PN}-2.9.0-ssh-probe-no-dsa.patch" )
 
 src_prepare() {
 	default
