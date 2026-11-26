@@ -56,7 +56,6 @@ COMMON_DEPEND=">=app-arch/brotli-1.2.1:=
 	)"
 BDEPEND="${PYTHON_DEPS}
 	app-alternatives/ninja
-	sys-apps/coreutils
 	virtual/pkgconfig
 	test? ( net-misc/curl )
 	pax-kernel? ( sys-apps/elfix )"
