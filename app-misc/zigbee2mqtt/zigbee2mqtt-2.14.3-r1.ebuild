@@ -21,17 +21,11 @@ fi
 LICENSE="0BSD Apache-2.0 BSD-2 CC-BY-4.0 GPL-3 ISC MIT PYTHON"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="homeassistant"
 
 RDEPEND="
 	acct-user/zigbee2mqtt
 	app-misc/mosquitto
 	net-libs/nodejs:=
-	homeassistant? ( || (
-		>=app-misc/homeassistant-2024.4[mosquitto]
-		>=app-misc/homeassistant-min-2024.4[mosquitto]
-		>=app-misc/homeassistant-full-2024.4[mosquitto]
-	) )
 "
 
 pkg_pretend() {
@@ -65,8 +59,9 @@ src_install() {
 	doinitd "${FILESDIR}/${PN}"
 	systemd_newunit "${FILESDIR}/${PN}-r1.service" "${PN}.service"
 
-	dodir /etc/env.d
-	echo "CONFIG_PROTECT=\"/var/lib/${PN}"\" >>"${ED}/etc/env.d/90${PN}" || die
+	newenvd - "90${PN}" <<-EOF
+		CONFIG_PROTECT="/var/lib/${PN}"
+	EOF
 
 	# Hack to gzip frontend files to permit "Accept-Encoding: gzip": upstream only
 	# ships brotli, which browsers do not request over plain HTTP.
@@ -78,4 +73,5 @@ src_install() {
 
 pkg_postinst() {
 	tmpfiles_process zigbee2mqtt.conf
+	elog "For Home Assistant integration, install app-misc/homeassistant from the homeassistant overlay."
 }
