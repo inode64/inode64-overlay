@@ -12,14 +12,17 @@ SRC_URI="https://github.com/garethgeorge/backrest/releases/download/v${PV}/backr
 S="${WORKDIR}"
 
 LICENSE="GPL-3"
+# Dependent licenses
+LICENSE+=" 0BSD Apache-2.0 BSD BSD-2 EPL-2.0 ISC MIT MIT-0 MPL-2.0 Unlicense"
 SLOT="0"
 KEYWORDS="-* ~amd64"
-RESTRICT="strip"
 
 RDEPEND="
 	app-backup/restic
 	!app-backup/backrest
 "
+
+QA_PREBUILT="usr/bin/backrest"
 
 src_install() {
 	dobin backrest
