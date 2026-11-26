@@ -179,5 +179,5 @@ src_install() {
 	cmake_src_install
 
 	# avoid clashing with whisper.cpp
-	rm -rf "${ED}/usr/include"
+	rm -rf "${ED}/usr/include" || die
 }
