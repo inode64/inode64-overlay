@@ -38,7 +38,7 @@ RDEPEND="
 			dev-lang/php[mysqli]
 		)
 	)
-	spell? ( dev-lang/php[curl,spell] )
+	spell? ( dev-lang/php[curl] )
 "
 
 if [[ ${PV} == *9999 ]] ; then
