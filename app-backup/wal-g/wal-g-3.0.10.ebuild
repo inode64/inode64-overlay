@@ -36,7 +36,7 @@ src_compile() {
 	TAGS="$(usex brotli brotli '' '' '') $(usex lzo lzo '' '' '') $(usex sodium libsodium '' '' '')"
 	for db in etcd fdb gp mongo mysql postgres redis sqlserver ; do
 		if use "$db" ; then
-			if [ "$db" == "postgres" ] ; then db="pg" ; fi
+			if [[ "${db}" == "postgres" ]] ; then db="pg" ; fi
 			ego build -trimpath -o wal-g-"$db" -tags "${TAGS}" \
 				-ldflags "-X github.com/wal-g/wal-g/cmd/$db.walgVersion=${PV}
 					-X \"github.com/wal-g/wal-g/cmd/$db.buildDate=${DATE}\"
