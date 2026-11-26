@@ -33,11 +33,11 @@ src_prepare() {
 }
 
 src_compile() {
-	ego build -trimpath -o rest-server ./cmd/rest-server || die
+	ego build -trimpath -o rest-server ./cmd/rest-server
 }
 
 src_test() {
-	ego test ./... || die "test failed"
+	ego test ./...
 }
 
 src_install() {
