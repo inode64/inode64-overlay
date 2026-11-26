@@ -41,24 +41,25 @@ src_configure() {
 
 src_compile() {
 	if use client; then
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula ./cmd/nebula/ || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula ./cmd/nebula/
 	fi
 	if use gencert; then
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula-cert ./cmd/nebula-cert/|| die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -o nebula-cert ./cmd/nebula-cert/
 	fi
 }
 
 src_test() {
-	emake test
+	ego test ./...
 }
 
 src_install() {
 	dodoc *.md
 
-	diropts -m0700
 	insopts -m0600
 	insinto /etc/nebula/
 	newins examples/config.yml config.example.yml
+	fperms 0700 /etc/nebula
+	insopts -m0644
 
 	if use client; then
 		dobin nebula
@@ -72,7 +73,9 @@ src_install() {
 }
 
 pkg_postinst() {
-	chmod 0600 "${EROOT}"/etc/nebula/* 2>/dev/null
+	if [[ -d "${EROOT}/etc/nebula" ]]; then
+		find "${EROOT}/etc/nebula" -maxdepth 1 -type f -exec chmod 0600 {} + || die
+	fi
 
 	if use client && use gencert; then
 		ewarn "It is not recommended to use the same lighthouse server as the certificate generator."
