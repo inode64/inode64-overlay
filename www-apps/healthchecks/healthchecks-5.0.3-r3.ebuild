@@ -17,12 +17,14 @@ LICENSE="BSD"
 KEYWORDS="~amd64"
 
 IUSE="apache apprise inode64 mysql nginx postgres +sqlite"
+PROPERTIES="test_network" # sends a test request
+RESTRICT="test"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	|| ( mysql postgres sqlite )
 "
 
-DOCS="CONTRIBUTING.md README.md SECURITY.md"
+DOCS=( README.md SECURITY.md )
 
 RDEPEND="
 	${PYTHON_DEPS}
@@ -53,7 +55,6 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 "
-PROPERTIES="test_network" #actually sends a test request
 
 pkg_setup() {
 	python-single-r1_pkg_setup
@@ -79,7 +80,7 @@ src_prepare() {
 }
 
 src_test() {
-	./manage.py test
+	./manage.py test || die
 }
 
 src_compile() {
