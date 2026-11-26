@@ -26,20 +26,17 @@ REQUIRED_USE="
 
 DEPEND="
 	>=x11-libs/gtk+-3.24.22:3[X?,introspection?,wayland?]
-	>=x11-libs/cairo-1.0
 	>=dev-libs/libfmt-11.0.0
 	dev-cpp/fast_float
 	>=dev-libs/fribidi-1.0.0
 	>=dev-libs/glib-2.72:2
 	crypt?  ( >=net-libs/gnutls-3.2.7:0= )
 	icu? ( dev-libs/icu:= )
-	>=x11-libs/pango-1.22.0
 	>=dev-libs/libpcre2-10.21:=
 	>=dev-cpp/simdutf-6.2.0:=
 	systemd? ( >=sys-apps/systemd-220:= )
 	>=app-arch/lz4-1.9
 	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
-	x11-libs/pango[introspection?]
 "
 RDEPEND="${DEPEND}
 	~gui-libs/vte-common-${PV}[systemd?]
@@ -50,7 +47,6 @@ BDEPEND="
 	dev-util/glib-utils
 	gtk-doc? ( dev-util/gi-docgen )
 	>=sys-devel/gettext-0.19.8
-	virtual/pkgconfig
 	vala? ( $(vala_depend) )
 "
 
