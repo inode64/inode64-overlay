@@ -33,6 +33,22 @@ if [ "$cp" == "app-backup/backrest" ] || \
 	upload "${ebuild}-${new_version}-node_modules.tar.xz"
 fi
 
+# With "nodejs_archive": "lockfile" the archive is ${PN}-<digest>-node_modules.tar.xz
+# and versions with the same dependencies share it. rsync skips one that is
+# already published.
+if [ "$cp" == "dev-util/orca-ide" ]; then
+	# ${PN} is matched literally, as the ebuild writes it.
+	# shellcheck disable=SC2016
+	archive=$(sed -n 's|.*/${PN}\(-[0-9a-f]\{16\}-node_modules\.tar\.xz\).*|'"${ebuild}"'\1|p' \
+		"${search_dir}/${cp}/${ebuild}-${new_version}.ebuild")
+	if [ -n "$archive" ]; then
+		upload "$archive"
+	else
+		echo "No lockfile-named node_modules archive in ${cp}-${new_version}" >&2
+		status=1
+	fi
+fi
+
 if [ "$cp" == "app-backup/autorestic" ] || \
     [ "$cp" == "app-backup/backrest" ] || \
     [ "$cp" == "app-backup/wal-g" ] || \
