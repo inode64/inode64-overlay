@@ -13,14 +13,20 @@ SRC_URI="https://github.com/grafana/${MY_PN}/releases/download/v${PV}/${MY_PN}-l
 
 S="${WORKDIR}"
 LICENSE="Apache-2.0"
+# Dependent licenses. The logql packages of Loki are AGPL-3.
+LICENSE+=" 0BSD AGPL-3 BSD BSD-2 ISC MIT MIT-0 MPL-2.0"
+LICENSE+=" CC-BY-4.0 OFL-1.1"
 SLOT="0"
 KEYWORDS="-* amd64"
-RESTRICT="mirror strip"
+RESTRICT="mirror"
 
-RDEPEND="${DEPEND}
+RDEPEND="
 	acct-user/alloy
+	!app-metrics/alloy
 "
 BDEPEND="app-arch/unzip"
+
+QA_PREBUILT="usr/bin/alloy"
 
 src_install() {
 	newbin alloy-linux-amd64 alloy
