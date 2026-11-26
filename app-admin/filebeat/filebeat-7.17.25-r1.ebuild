@@ -50,7 +50,7 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /usr/share/${PN}
-	cp -r module "${ED}"/usr/share/${PN}
+	cp -r module "${ED}"/usr/share/${PN} || die
 
 	dobin filebeat
 }
