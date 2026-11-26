@@ -39,6 +39,7 @@ esac
 
 inherit multiprocessing nodejs toolchain-funcs
 
+# shellcheck disable=SC2086
 if has nodejs-pack ${INHERITED}; then
     die "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
@@ -52,7 +53,7 @@ NODEJS_MOD_PREFIX="${NODEJS_MOD_PREFIX:-.}"
 # @DESCRIPTION:
 # Nodejs preparation phase
 nodejs-mod_src_prepare() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     if [[ ! -e "${NODEJS_MOD_PREFIX}/package.json" ]]; then
         eerror "Unable to locate package.json"
@@ -67,7 +68,7 @@ nodejs-mod_src_prepare() {
 # @DESCRIPTION:
 # General function for compiling a NodeJS module
 nodejs-mod_src_compile() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
 
@@ -115,7 +116,7 @@ nodejs-mod_src_compile() {
 # @DESCRIPTION:
 # General function for testing a NodeJS module
 nodejs-mod_src_test() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
 
@@ -133,7 +134,7 @@ nodejs-mod_src_test() {
 # @DESCRIPTION:
 # Function for installing the package
 nodejs-mod_src_install() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     pushd "${NODEJS_MOD_PREFIX}" >/dev/null || die "Failed to change to ${NODEJS_MOD_PREFIX} directory"
 

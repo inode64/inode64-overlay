@@ -32,7 +32,7 @@
 #       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
 #
 # livecheck builds the archive with every node_modules the installs create,
-# and with nodejs_archive set to "lockfile" names it after the lockfiles, see
+# and with archive_mode set to "lockfile" names it after the lockfiles, see
 # nodejs_unpack.
 
 if [[ -z ${_NODEJS_ECLASS} ]]; then
@@ -113,28 +113,28 @@ nodejs_package() {
 # @DESCRIPTION:
 # Returns true if test script exist
 nodejs_has_test() {
-    node -p "if (require('./package.json').scripts.test === undefined) { process.exit(1) }" &>/dev/null
+    node -p "if (require('./package.json').scripts?.test === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: nodejs_has_build
 # @DESCRIPTION:
 # Returns true if build script exist
 nodejs_has_build() {
-    node -p "if (require('./package.json').scripts.build === undefined) { process.exit(1) }" &>/dev/null
+    node -p "if (require('./package.json').scripts?.build === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: nodejs_has_bin
 # @DESCRIPTION:
 # Returns true if bin exist
 nodejs_has_bin() {
-   node -p "if (require('./package.json').bin === undefined) { process.exit(1) }" &>/dev/null
+    node -p "if (require('./package.json').bin === undefined) { process.exit(1) }" &>/dev/null
 }
 
 # @FUNCTION: nodejs_install_bin
 # @DESCRIPTION:
 # Install binary files
 nodejs_install_bin() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     # Create a proper destination
     local module_path
@@ -463,7 +463,7 @@ nodejs_remove_dev() {
 # @DESCRIPTION:
 # Packet manager execution wrapper
 enpm() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     local npmargs
 
@@ -524,14 +524,14 @@ enpm() {
 # @DESCRIPTION:
 # Unpack ${A} in ${WORKDIR}, except for the *-node_modules.tar.xz archives,
 # which go into the given directory (${S} by default). It is meant for an
-# ebuild whose livecheck.json sets "nodejs_archive": "lockfile". livecheck
+# ebuild whose livecheck.json sets "archive_mode": "lockfile". livecheck
 # then names the archive after the lockfiles,
 # ${PN}-<digest>-node_modules.tar.xz, so that versions with the same
 # dependencies share it, and stores its paths relative to the directory of
 # package.json instead of ${WORKDIR}. livecheck unpacks a new version without
 # the archive, which may then be missing.
 nodejs_unpack() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     local dir=${1:-${S}} archive
     local -a archives=()
@@ -555,7 +555,7 @@ nodejs_unpack() {
 # @DESCRIPTION:
 # Delete all unnecessary files
 enpm_clean() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     local nodejs_files f
 
@@ -595,10 +595,10 @@ enpm_clean() {
 # @DESCRIPTION:
 # Install the files and folders necessary for the execution of NodeJS
 enpm_install() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     local nodejs_files f
-    local module_path
+    local module_path pack_name
 
     einfo "Installing NodeJS module"
 
@@ -607,9 +607,12 @@ enpm_install() {
 
     if nodejs_has_package; then
         einfo "Installing packaged files..."
+        pack_name="$(nodejs_package)"
+        pack_name="${pack_name#@}"
+        pack_name="${pack_name/\//-}"
         enpm --prefix "${ED}"/usr \
             install \
-            "$(nodejs_package)-$(nodejs_version).tgz" || die "install failed"
+            "${pack_name}-$(nodejs_version).tgz" || die "install failed"
     fi
 
     nodejs_files="${NODEJS_FILES} ${NODEJS_EXTRA_FILES} $(nodejs_package).js"
@@ -641,7 +644,7 @@ enpm_install() {
 
     if nodejs_has_bin; then
         einfo "Installing binary files..."
-        nodejs_install_bin
+        nodejs_install_bin "$@"
     fi
 }
 

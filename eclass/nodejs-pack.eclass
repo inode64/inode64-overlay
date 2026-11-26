@@ -28,6 +28,7 @@ esac
 
 inherit nodejs
 
+# shellcheck disable=SC2086
 if has nodejs-mod ${INHERITED}; then
     die "nodejs-mod and nodejs-pack eclass are incompatible"
 fi
@@ -39,7 +40,7 @@ RESTRICT+=" test strip"
 # @DESCRIPTION:
 # Nodejs preparation phase
 nodejs-pack_src_prepare() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     # Check for package.json existence
     if ! nodejs_has_package && [[ ! -e package.json ]]; then
@@ -55,7 +56,7 @@ nodejs-pack_src_prepare() {
 # @DESCRIPTION:
 # General function for compiling a NodeJS module
 nodejs-pack_src_compile() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     einfo "Creating package archive..."
 
@@ -67,13 +68,15 @@ nodejs-pack_src_compile() {
 # @DESCRIPTION:
 # Function for installing the package
 nodejs-pack_src_install() {
-    debug-print-function "${FUNCNAME}" "${@}"
+    debug-print-function "${FUNCNAME[0]}" "${@}"
 
     nodejs_docs
 
-    # Get the package information
+    # Get the package information; npm pack strips '@' and turns '/' into '-'
     local package_name package_version package_file module_path
     package_name=$(nodejs_package)
+    package_name="${package_name#@}"
+    package_name="${package_name/\//-}"
     package_version=$(nodejs_version)
     package_file="${package_name}-${package_version}.tgz"
     module_path=$(nodejs_modules)
