@@ -1,0 +1,3 @@
+file - Stores voicemail messages as files.
+imap - Uses an IMAP server to store configuration & messages.
+odbc - Uses ODBC to talk to a SQL database backend.
