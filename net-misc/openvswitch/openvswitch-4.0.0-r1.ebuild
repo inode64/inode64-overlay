@@ -104,7 +104,7 @@ src_test() {
 	# https://docs.openvswitch.org/en/latest/topics/testing/
 	# RECHECK=yes because with parallel tests, sometimes a port is
 	# in use.
-	emake -Onone check TESTSUITEFLAGS="--jobs=$(makeopts_jobs)" RECHECK=yes
+	emake -Onone check TESTSUITEFLAGS="--jobs=$(get_makeopts_jobs)" RECHECK=yes
 }
 
 src_install() {
