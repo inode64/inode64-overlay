@@ -84,7 +84,6 @@ RDEPEND="${DEPEND}
 src_prepare() {
 	default
 
-	eapply_user
 	eaclocal
 	eautoreconf
 	eautomake
@@ -106,11 +105,11 @@ src_install() {
 	python_optimize
 
 	if ! use selinux; then
-		rm -rf "${ED}"/usr/share/cockpit/selinux
+		rm -rf "${ED}"/usr/share/cockpit/selinux || die
 		rm -f "${ED}"/usr/share/metainfo/org.cockpit_project.cockpit_selinux.metainfo.xml || die
 	fi
 
-	rm -rf "${ED}"/usr/share/cockpit/{packagekit,playground,sosreport}
+	rm -rf "${ED}"/usr/share/cockpit/{packagekit,playground,sosreport} || die
 	rm -f "${ED}"/usr/share/metainfo/org.cockpit_project.cockpit_sosreport.metainfo.xml || die
 	rm -f "${ED}"/usr/share/icons/hicolor/64x64/apps/cockpit-sosreport.png || die
 
@@ -121,7 +120,7 @@ src_install() {
 	newins "${DISTDIR}/${GENTOO_LOGO}" favicon.ico
 
 	# Remove branding from others distros
-	rm -rf "${ED}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu}
+	rm -rf "${ED}"/usr/share/cockpit/branding/{arch,centos,debian,fedora,opensuse,rhel,scientific,ubuntu} || die
 
 	ewarn "Installing experimental pam configuration file"
 	ewarn "use at your own risk"
