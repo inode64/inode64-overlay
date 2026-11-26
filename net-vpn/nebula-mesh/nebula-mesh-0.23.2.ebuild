@@ -38,7 +38,7 @@ DEPEND="
 		acct-user/nebula-mgmt
 	)
 "
-BDEPEND=">=dev-lang/go-1.27.3"
+BDEPEND=">=dev-lang/go-1.27.4"
 
 DOCS=( README.md CHANGELOG.md )
 
@@ -59,15 +59,15 @@ src_compile() {
 	local ldflags="-X main.versionStr=${PV}"
 
 	if use agent; then
-		ego build -trimpath -ldflags "${ldflags}" -o nebula-agent ./cmd/nebula-agent || die
+		ego build -trimpath -ldflags "${ldflags}" -o nebula-agent ./cmd/nebula-agent
 	fi
 	if use mgmt; then
-		ego build -trimpath -ldflags "${ldflags}" -o nebula-mgmt ./cmd/nebula-mgmt || die
+		ego build -trimpath -ldflags "${ldflags}" -o nebula-mgmt ./cmd/nebula-mgmt
 	fi
 }
 
 src_test() {
-	ego test ./... || die "test failed"
+	ego test ./...
 }
 
 src_install() {
@@ -80,6 +80,7 @@ src_install() {
 		insinto /etc/nebula-agent
 		doins configs/agent.example.yml
 		fperms 0700 /etc/nebula-agent
+		insopts -m0644
 
 		newinitd "${FILESDIR}/nebula-agent.initd" nebula-agent
 		newconfd "${FILESDIR}/nebula-agent.confd" nebula-agent
@@ -96,6 +97,7 @@ src_install() {
 		doins configs/server.example.yml
 		fperms 0700 /etc/nebula-mgmt
 		fowners -R nebula-mgmt:nebula-mgmt /etc/nebula-mgmt
+		insopts -m0644
 
 		newinitd "${FILESDIR}/nebula-mgmt.initd" nebula-mgmt
 		newconfd "${FILESDIR}/nebula-mgmt.confd" nebula-mgmt
