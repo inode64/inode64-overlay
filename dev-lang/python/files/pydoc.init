@@ -12,13 +12,13 @@ start() {
 
 	ebegin "Starting pydoc server on port ${pydoc_port}" 
 	start-stop-daemon --start --background --make-pidfile \
-			  --pidfile /var/run/@PYDOC@.pid \
+			  --pidfile /run/@PYDOC@.pid \
 			  --exec /usr/bin/@PYDOC@ -- -p "${pydoc_port}"
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping pydoc server"
-	start-stop-daemon --stop --quiet --pidfile /var/run/@PYDOC@.pid
+	start-stop-daemon --stop --quiet --pidfile /run/@PYDOC@.pid
 	eend $?
 }
