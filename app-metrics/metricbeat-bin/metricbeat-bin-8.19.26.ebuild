@@ -15,7 +15,8 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="-* ~amd64"
-RESTRICT="strip"
+
+QA_PREBUILT="usr/bin/${MY_PN}"
 
 DOCS=( NOTICE.txt README.md )
 
