@@ -9,7 +9,7 @@ else
 	GLUSTERFS_NAME="glusterfs"
 fi
 
-GLUSTERFS_PIDFILE="/var/run/${SVCNAME}.pid"
+GLUSTERFS_PIDFILE="/run/${SVCNAME}.pid"
 
 eval 'GLUSTERFS_LOGFILE="${'${GLUSTERFS_NAME}'_log:-/var/log/glusterfs/'${GLUSTERFS_NAME}'.log}"'
 eval 'GLUSTERFS_VOLFILE="${'${GLUSTERFS_NAME}'_vol:-/etc/glusterfs/'${GLUSTERFS_NAME}'.vol}"'
