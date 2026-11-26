@@ -17,7 +17,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="+mmap"
 
-LOCKS="pthreadmutex pthreadrw spinlock semaphore"
+LOCKS="pthreadmutex pthreadrw spinlock"
 
 LUSE=""
 for l in ${LOCKS}; do
@@ -26,7 +26,7 @@ done
 
 IUSE+=" ${LUSE/lock-pthreadrw/+lock-pthreadrw}"
 
-REQUIRED_USE="^^ ( $LUSE )"
+REQUIRED_USE="^^ ( ${LUSE} )"
 
 PATCHES=(
 	"${FILESDIR}/fbec873118715249f072b32ddd08e5014176cfe2.patch"
@@ -35,45 +35,32 @@ PATCHES=(
 	"${FILESDIR}/3a34c9566ace6d5b84fcc5f41a2e44064a718399.patch"
 	"${FILESDIR}/20a56cd02e5b8912a34ea97a3e0c2abe61201f3d.patch"
 	"${FILESDIR}/f289c2dd31247a4e0433eff061ae53afb49fc99a.patch"
+	"${FILESDIR}/${PN}-4.0.11-gcc14-c23.patch"
 )
 
 pkg_setup() {
-	export SED=/bin/sed
-}
-
-src_prepare() {
-	if use php_targets_php5-6 ; then
-		php-ext-source-r3_src_prepare
-	else
-		eapply_user
-	fi
+	export SED="${BROOT}/bin/sed"
 }
 
 src_configure() {
-	if use php_targets_php5-6 ; then
-		local PHP_EXT_ECONF_ARGS=(
-			--enable-apcu
-			$(use_enable mmap apcu-mmap)
-			$(use_enable lock-pthreadrw apcu-rwlocks)
-			$(use_enable lock-spinlock apcu-spinlocks)
-		)
+	local PHP_EXT_ECONF_ARGS=(
+		--enable-apcu
+		$(use_enable mmap apcu-mmap)
+		$(use_enable lock-pthreadrw apcu-rwlocks)
+		$(use_enable lock-spinlock apcu-spinlocks)
+	)
 
-		php-ext-source-r3_src_configure
-	fi
+	php-ext-source-r3_src_configure
 }
 
 src_install() {
-	if use php_targets_php5-6 ; then
-		php-ext-pecl-r3_src_install
+	php-ext-pecl-r3_src_install
 
-		insinto "${PHP_EXT_SHARED_DIR#$EPREFIX}"
-		doins apc.php
-	fi
+	insinto /usr/share/php/apcu
+	doins apc.php
 }
 
 pkg_postinst() {
-	if use php_targets_php5-6 ; then
-		elog "The apc.php file shipped with this release of pecl-apcu was"
-		elog "installed into ${PHP_EXT_SHARED_DIR}."
-	fi
+	elog "The apc.php file shipped with this release of pecl-apcu was"
+	elog "installed into ${EPREFIX}/usr/share/php/apcu/."
 }

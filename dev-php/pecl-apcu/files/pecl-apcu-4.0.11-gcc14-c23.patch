@@ -1,0 +1,118 @@
+From 19bf11235f59ee0d221ff516d6a1d80637cd982b Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:19:40 +0100
+Subject: [PATCH] Fix configure pthread checks and apc_lock_init prototype for
+ GCC >= 14 / C23
+
+---
+ apc_lock.c     |  9 ++-------
+ apc_lock_api.h |  5 ++---
+ config.m4      | 16 +++++++++-------
+ 3 files changed, 13 insertions(+), 17 deletions(-)
+
+diff --git a/apc_lock.c b/apc_lock.c
+index 80697a4..44243fc 100644
+--- a/apc_lock.c
++++ b/apc_lock.c
+@@ -59,11 +59,6 @@
+         }
+ #   endif
+ # else
+-PHP_APCU_API int apc_lock_init(apc_lock_t* lock)
+-{
+-    lock->state = 0;
+-}
+-
+ PHP_APCU_API int apc_lock_try(apc_lock_t* lock)
+ {
+     int failed = 1;
+@@ -109,7 +104,7 @@ static zend_bool apc_lock_ready = 0;
+ #endif /* }}} */
+ 
+ /* {{{ Initialize the global lock attributes */
+-PHP_APCU_API zend_bool apc_lock_init() {
++PHP_APCU_API zend_bool apc_lock_init(void) {
+ #ifndef PHP_WIN32
+ 	if (apc_lock_ready)
+ 		return 1;
+@@ -142,7 +137,7 @@ PHP_APCU_API zend_bool apc_lock_init() {
+ } /* }}} */
+ 
+ /* {{{ Cleanup attributes and statics */
+-PHP_APCU_API void apc_lock_cleanup() {
++PHP_APCU_API void apc_lock_cleanup(void) {
+ #ifndef PHP_WIN32
+ 	if (!apc_lock_ready)
+ 		return;
+diff --git a/apc_lock_api.h b/apc_lock_api.h
+index 1050dab..3cb389d 100644
+--- a/apc_lock_api.h
++++ b/apc_lock_api.h
+@@ -52,7 +52,6 @@ typedef struct {
+     unsigned long state;
+ } apc_lock_t;
+ 
+-PHP_APCU_API int apc_lock_init(apc_lock_t* lock);
+ PHP_APCU_API int apc_lock_try(apc_lock_t* lock);
+ PHP_APCU_API int apc_lock_get(apc_lock_t* lock);
+ PHP_APCU_API int apc_lock_release(apc_lock_t* lock);
+@@ -71,8 +70,8 @@ typedef apc_windows_cs_rwlock_t apc_lock_t;
+ 	apc_lock_cleanup destroys those attributes
+   This saves us from having to create and destroy attributes for
+   every lock we use at runtime */
+-PHP_APCU_API zend_bool apc_lock_init();
+-PHP_APCU_API void      apc_lock_cleanup();
++PHP_APCU_API zend_bool apc_lock_init(void);
++PHP_APCU_API void      apc_lock_cleanup(void);
+ /*
+   The following functions should be self explanitory:
+ */
+diff --git a/config.m4 b/config.m4
+index ee28c44..b71abef 100644
+--- a/config.m4
++++ b/config.m4
+@@ -84,8 +84,9 @@ if test "$PHP_APCU" != "no"; then
+ 	    AC_TRY_RUN(
+ 		    [
+ 			    #include <sys/types.h>
+-			    #include <pthread.h>
+-          main() {
++			    #include <stdio.h>
++#include <pthread.h>
++          int main(void) {
+ 			      pthread_rwlock_t rwlock;
+ 			      pthread_rwlockattr_t attr;	
+ 
+@@ -157,14 +158,15 @@ if test "$PHP_APCU" != "no"; then
+ 		fi
+ 	fi
+   
+-  if test "$PHP_APCU_RWLOCKS" == "no"; then
++  if test "$PHP_APCU_RWLOCKS" = "no"; then
+     orig_LIBS="$LIBS"
+ 	  LIBS="$LIBS -lpthread"
+ 	  AC_TRY_RUN(
+ 			  [
+ 				  #include <sys/types.h>
+-				  #include <pthread.h>
+-          main() {
++				  #include <stdio.h>
++#include <pthread.h>
++          int main(void) {
+ 				    pthread_mutex_t mutex;
+ 				    pthread_mutexattr_t attr;	
+ 
+@@ -210,8 +212,8 @@ if test "$PHP_APCU" != "no"; then
+ 	  LIBS="$orig_LIBS"
+   fi
+   
+-  if test "$PHP_APCU_RWLOCKS" == "no"; then
+-   if test "$PHP_APCU_MUTEX" == "no"; then
++  if test "$PHP_APCU_RWLOCKS" = "no"; then
++   if test "$PHP_APCU_MUTEX" = "no"; then
+     if test "$PHP_APCU_SPINLOCK" != "no"; then
+       AC_DEFINE(APC_SPIN_LOCK, 1, [ ])
+       AC_MSG_WARN([APCu spin locking enabled])
+-- 
+2.56.1
+
