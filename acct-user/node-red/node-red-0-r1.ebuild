@@ -6,7 +6,7 @@ EAPI=8
 inherit acct-user
 
 DESCRIPTION="A user for node-red"
-ACCT_USER_ID=565
+ACCT_USER_ID=-1
 ACCT_USER_HOME=/var/lib/node-red
 ACCT_USER_GROUPS=( node-red )
 
