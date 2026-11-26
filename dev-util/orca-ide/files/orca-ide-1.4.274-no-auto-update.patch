@@ -1,0 +1,23 @@
+Disable the in-app updater. It polls the GitHub release feed and nags, but an
+unpacked install (not an AppImage) can never be updated by it: Portage does.
+
+From the PF4Public overlay (dev-util/orca/files/disable-in-app-auto-update.patch).
+--- a/src/main/updater/lifecycle/updater-setup.ts
++++ b/src/main/updater/lifecycle/updater-setup.ts
+@@ -170,9 +170,13 @@
+       this.sendErrorStatus(`The server update did not complete: ${serveHandoffFailure}`, true)
+     }
+ 
+-    if (!app.isPackaged) {
+-      return
+-    }
++    // Gentoo: the in-app auto-updater is disabled. Orca is installed and
++    // upgraded via portage, and on an unpacked (non-AppImage) install the
++    // updater classifies the package type as "unusable" — it can only poll
++    // the GitHub release feed and nag, never install. Return unconditionally
++    // (the same state as !app.isPackaged / dev) so no feed URL is set and no
++    // background check, resume/focus check, or update nudge is scheduled.
++    return
+ 
+     const autoUpdater = this.getAutoUpdater()
+     configureMacShipItScheduling()

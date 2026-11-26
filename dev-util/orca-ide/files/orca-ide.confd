@@ -1,0 +1,21 @@
+# Settings of every orca-ide.<user> instance. Copy them to
+# /etc/conf.d/orca-ide.<user> to change them for one user only.
+
+# Interface, as a literal IP, that accepts the runtime connections. Keep the
+# loopback for an SSH tunnel or a reverse proxy, or use a Tailscale or LAN
+# address for clients that connect directly. Do not expose the port to the
+# Internet: a paired client runs agents with the files and the shell of the
+# user.
+ORCA_BIND="127.0.0.1"
+
+# Fixed port, for a firewall or a tunnel; empty lets Orca choose one.
+ORCA_PORT=""
+
+# Address that the pairing links tell the clients to dial.
+ORCA_PAIRING_ADDRESS=""
+
+# Extra arguments for "orca-ide serve", for example --refuse-public.
+ORCA_OPTS=""
+
+# Environment of the server, for example:
+#export ORCA_SERVE_GPU=1

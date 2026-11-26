@@ -1,0 +1,255 @@
+Build orcad, the Node.js server of Orca, offline and for the system Node,
+when ORCA_SYSTEM_NODE (the node binary) and ORCA_SYSTEM_NODEDIR (its prefix
+with include/node) are set:
+
+- node-pty is compiled against the system headers instead of the pinned
+  ones that upstream downloads; it targets N-API 8, so any Node 24 runs it;
+- the pinned Node is not fetched nor bundled in the server tarball, whose
+  launcher runs ORCA_SYSTEM_NODE, and its slot records "system" instead of
+  the pinned runtime, which orcad then accepts on any Node 24 or newer; the
+  template keeps the pinned reference that SSH deployments install remotely;
+- the @parcel/watcher binary comes from the platform package already in
+  node_modules instead of a second download from the npm registry;
+- the glibc 2.28 floor is not enforced: it is a CI guard for the upstream
+  release binaries, while this build targets the host glibc;
+- the packaged template is verified for the targets it has, as only the
+  host one can be built here;
+- orca-provider-exec and journal-file-lock are compiled with CC, CPPFLAGS,
+  CFLAGS and LDFLAGS, without -Werror, and linked dynamically instead of
+  statically on a glibc newer than that floor.
+
+Gentoo specific, not sent upstream.
+
+--- a/config/scripts/native-build/build-journal-file-lock.mjs
++++ b/config/scripts/native-build/build-journal-file-lock.mjs
+@@ -13,6 +13,10 @@
+ 
+ // Reuse the desktop glibc-floor Docker image for desktop packaging; server slots follow
+ // build-provider-exec: floor/musl runners compile dynamically, newer Linux hosts link statically.
++// Gentoo: with ORCA_SYSTEM_NODE set, compile with the compiler and the flags of the package
++// manager, without -Werror and dynamically linked.
++const gentooFlags = (variable) => (process.env[variable] ?? '').split(/\s+/).filter(Boolean)
++const gentooBuild = Boolean(process.env.ORCA_SYSTEM_NODE)
+ const LINUX_HARDENING = [
+   '-fstack-protector-strong',
+   '-D_FORTIFY_SOURCE=2',
+@@ -116,7 +120,16 @@
+         `/Fe:${output}`,
+         `/Fo:${output}.obj`
+       ]
+-    : [
++    : gentooBuild
++      ? [
++          ...gentooFlags('CPPFLAGS'),
++          ...gentooFlags('CFLAGS'),
++          ...gentooFlags('LDFLAGS'),
++          source,
++          '-o',
++          output
++        ]
++      : [
+         '-O2',
+         '-Wall',
+         '-Wextra',
+@@ -138,7 +151,7 @@
+   }
+   const compilerEnvironment = windows ? initializeWindowsNativeToolchain() : undefined
+   const result = run({
+-    program: windows ? 'cl.exe' : 'cc',
++    program: windows ? 'cl.exe' : gentooBuild ? process.env.CC || 'cc' : 'cc',
+     args,
+     cwd: root,
+     env: compilerEnvironment
+--- a/config/scripts/native-build/posix/build-provider-exec.mjs
++++ b/config/scripts/native-build/posix/build-provider-exec.mjs
+@@ -23,6 +23,10 @@
+ const PROVIDER_EXEC_EXECUTABLE = 'orca-provider-exec'
+ // Equals the desktop's minimumSystemVersion; the pinned server Node needs a newer macOS anyway.
+ export const MACOS_DEPLOYMENT_TARGET = '13.4'
++// Gentoo: with ORCA_SYSTEM_NODE set, compile with the compiler and the flags of the package
++// manager, without -Werror and dynamically linked.
++const gentooFlags = (variable) => (process.env[variable] ?? '').split(/\s+/).filter(Boolean)
++const gentooBuild = Boolean(process.env.ORCA_SYSTEM_NODE)
+ const SOURCE = 'native/provider-exec/provider-exec.c'
+ const WARNINGS = ['-std=c11', '-O2', '-Wall', '-Wextra', '-Werror']
+ const LINUX_HARDENING = [
+@@ -173,7 +177,10 @@
+       output
+     ])
+   } else if (toolchain === 'host') {
+-    invoke(process.env.CC || 'cc', [...WARNINGS, ...hostLinkFlags(parsed), source, '-o', output])
++    const flags = gentooBuild
++      ? ['-std=c11', ...gentooFlags('CPPFLAGS'), ...gentooFlags('CFLAGS'), ...gentooFlags('LDFLAGS')]
++      : [...WARNINGS, ...hostLinkFlags(parsed)]
++    invoke(process.env.CC || 'cc', [...flags, source, '-o', output])
+   } else {
+     const docker = (args) => invoke('docker', args)
+     const image = linuxNativeToolchainImage(root, docker)
+--- a/config/scripts/orcad-distribution/prebuilds/build-orcad-node.mjs
++++ b/config/scripts/orcad-distribution/prebuilds/build-orcad-node.mjs
+@@ -83,7 +83,9 @@
+   const outputDir = resolve(argument('--out-dir') ?? join(root, 'out', 'orcad'))
+   const isCurrent = target === currentTarget()
+   ensurePrebuildSlot(target, isCurrent)
+-  const runtimePath = isCurrent ? await placeRuntime(outputDir, target) : null
++  // Gentoo: orcad runs on the system Node, so the pinned one is neither fetched nor bundled.
++  const runtimePath =
++    isCurrent && !process.env.ORCA_SYSTEM_NODE ? await placeRuntime(outputDir, target) : null
+   const result = runProcessSync({
+     program: process.execPath,
+     args: [
+--- a/config/scripts/orcad-distribution/prebuilds/build-orcad-prebuilds.mjs
++++ b/config/scripts/orcad-distribution/prebuilds/build-orcad-prebuilds.mjs
+@@ -224,10 +224,13 @@
+     }
+     return { glibc: null }
+   }
+-  floor.verifyLinuxGlibcFloor(slotDir, {
+-    targetArch: process.arch,
+-    glibcFloor: slotGlibcFloor(slot)
+-  })
++  // Gentoo: the slot is built for the host glibc, not for the oldest one upstream supports.
++  if (!process.env.ORCA_SYSTEM_NODE) {
++    floor.verifyLinuxGlibcFloor(slotDir, {
++      targetArch: process.arch,
++      glibcFloor: slotGlibcFloor(slot)
++    })
++  }
+   const objdump = process.env.OBJDUMP || 'objdump'
+   const binaries = floor.collectNativeBinaries(slotDir)
+   if (isCompatSlot(slot)) {
+--- a/config/scripts/orcad-distribution/prebuilds/pinned-node-downloads.mjs
++++ b/config/scripts/orcad-distribution/prebuilds/pinned-node-downloads.mjs
+@@ -63,6 +63,10 @@
+ 
+ // Keep --nodedir per target: Windows links architecture-specific Release/node.lib absent from the headers tarball.
+ export async function preparePinnedNodeDir({ target, workDir, cacheDir = pinnedNodeCacheDir() }) {
++  // Gentoo: the addons build against the headers of the system Node; they target N-API 8.
++  if (process.env.ORCA_SYSTEM_NODEDIR) {
++    return process.env.ORCA_SYSTEM_NODEDIR
++  }
+   const { version, headers } = NODE_RUNTIME_PIN
+   const tarball = await fetchPinnedFile({
+     url: nodeRuntimeHeadersUrl(),
+--- a/config/scripts/orcad-distribution/server-artifact/pack-orcad-server-artifact.mjs
++++ b/config/scripts/orcad-distribution/server-artifact/pack-orcad-server-artifact.mjs
+@@ -16,6 +16,7 @@
+ import { c as createTar } from 'tar'
+ import {
+   ORCAD_NODE_RUNTIME_DIR_PREFIX,
++  ORCAD_NODE_RUNTIME_MARKER_FILENAME,
+   ORCAD_RUNTIMES_DIRNAME,
+   ORCAD_SERVER_ENTRY_FILENAME,
+   ORCAD_TEMPLATE_MANIFEST_FILENAME,
+@@ -113,6 +114,11 @@
+       isOrcadExecutableArtifact(filename)
+     )
+   }
++  // Gentoo: the slot runs on the system Node, so it names no pinned runtime; the template keeps
++  // the pinned reference that SSH deployments install on the remote host.
++  if (process.env.ORCA_SYSTEM_NODE) {
++    writeFileSync(join(slotDir, ORCAD_NODE_RUNTIME_MARKER_FILENAME), 'system\n')
++  }
+   // Hashed like a desktop slot without the optional browser, which this tarball omits.
+   const version = computeOrcadFullVersion(slotDir, { target, agentBrowserFilename: null })
+   writeFileSync(join(slotDir, ORCAD_VERSION_FILENAME), `${version}\n`)
+@@ -122,7 +128,7 @@
+ // Why sh: it must run before any Node exists on the host. ELECTRON_RUN_AS_NODE=1 is how the packaged
+ // app's CLI runs, and the CLI strips it from the server's environment; the other two would point
+ // `serve` at a desktop app this install does not have.
+-function launcherScript(nodeRelativePath) {
++function launcherScript(nodePath) {
+   return `#!/bin/sh
+ # Orca server-only launcher: runs the bundled Orca CLI under the bundled Node.
+ set -e
+@@ -131,7 +137,7 @@
+   self=$resolved
+ fi
+ root=$(CDPATH= cd -- "$(dirname -- "$self")/.." && pwd -P)
+-node="$root/${nodeRelativePath}"
++node="${nodePath}"
+ unset ORCA_APP_EXECUTABLE ORCA_SERVE_RUNTIME
+ ELECTRON_RUN_AS_NODE=1
+ export ELECTRON_RUN_AS_NODE
+@@ -207,25 +213,33 @@
+     `${ORCAD_NODE_RUNTIME_DIR_PREFIX}${runtimeAsset.executableSha256}`,
+     orcadNodeRuntimeExecutable(target)
+   ].join('/')
+-  copyVerified(
+-    await ensurePinnedNodeExecutable({ target }),
+-    join(staging, ...nodeRelativePath.split('/')),
+-    runtimeAsset.executableSha256,
+-    true
+-  )
++  // Gentoo: the launcher runs the system Node instead of a bundled copy of the pinned one.
++  const systemNode = process.env.ORCA_SYSTEM_NODE
++  if (!systemNode) {
++    copyVerified(
++      await ensurePinnedNodeExecutable({ target }),
++      join(staging, ...nodeRelativePath.split('/')),
++      runtimeAsset.executableSha256,
++      true
++    )
++  }
+   const launcher = join(staging, ...LAUNCHER.split('/'))
+   mkdirSync(dirname(launcher), { recursive: true })
+-  writeFileSync(launcher, launcherScript(nodeRelativePath), { mode: 0o755 })
++  writeFileSync(launcher, launcherScript(systemNode || `$root/${nodeRelativePath}`), {
++    mode: 0o755
++  })
+   chmodSync(launcher, 0o755)
+   const selectionEntry = join(staging, 'out', 'main', `${ORCAD_LOCAL_SERVE_SELECTION_ENTRY}.js`)
+   mkdirSync(dirname(selectionEntry), { recursive: true })
+   writeFileSync(selectionEntry, selectionEntryScript())
+   writeFileSync(
+     join(staging, 'VERSION'),
+-    `orca ${appVersion}\norcad ${orcadVersion}\nnode ${NODE_RUNTIME_PIN.version}\ntarget ${target}\n`
++    `orca ${appVersion}\norcad ${orcadVersion}\nnode ${systemNode ? process.versions.node : NODE_RUNTIME_PIN.version}\ntarget ${target}\n`
+   )
+   copyFileSync(join(root, 'LICENSE'), join(staging, 'LICENSE'))
+-  await copyNodeLicense(target, join(staging, ORCAD_RUNTIMES_DIRNAME, 'NODE-LICENSE'))
++  if (!systemNode) {
++    await copyNodeLicense(target, join(staging, ORCAD_RUNTIMES_DIRNAME, 'NODE-LICENSE'))
++  }
+ 
+   const archive = join(outDir, `${name}.tar.gz`)
+   rmSync(archive, { force: true })
+--- a/config/scripts/orcad-distribution/server-bundle/orcad-watcher-package.mjs
++++ b/config/scripts/orcad-distribution/server-bundle/orcad-watcher-package.mjs
+@@ -47,6 +47,10 @@
+ 
+ // Fetch only these small release assets; ordinary installs remain host-only.
+ export async function materializeWatcherPackage(target) {
++  // Gentoo: the platform package is already in node_modules; the build has no network.
++  if (process.env.ORCA_SYSTEM_NODE) {
++    return require.resolve(`@parcel/watcher-${target}/watcher.node`)
++  }
+   const { version } = require('@parcel/watcher/package.json')
+   const lockfile = parseWatcherLockfile(await readFile(join(root, 'pnpm-lock.yaml'), 'utf8'))
+   const { integrity, url } = watcherPackageIdentity(target, version, lockfile)
+--- a/config/scripts/orcad-distribution/template/verify-packaged-orcad-template.cjs
++++ b/config/scripts/orcad-distribution/template/verify-packaged-orcad-template.cjs
+@@ -160,6 +160,10 @@
+ function verifyPackagedOrcadTemplate(resourcesDir, targets = ORCAD_TEMPLATE_TARGETS) {
+   const templateDir = join(resourcesDir, 'orcad-template')
+   const manifest = requireRecord(readManifest(templateDir), 'manifest')
++  // Gentoo: the template has only the host target, the one that can be built here.
++  if (process.env.ORCA_SYSTEM_NODE && targets === ORCAD_TEMPLATE_TARGETS) {
++    targets = Object.keys(requireRecord(manifest.targets, 'targets'))
++  }
+   if (![TEMPLATE_SCHEMA_VERSION, 4].includes(manifest.schemaVersion)) {
+     throw new Error(
+       `[verify-packaged-orcad-template] manifest schemaVersion must be ${TEMPLATE_SCHEMA_VERSION} or 4`
+--- a/src/main/orcad/runtime-launch/orcad-bundled-runtime.ts
++++ b/src/main/orcad/runtime-launch/orcad-bundled-runtime.ts
+@@ -37,6 +37,10 @@
+     throw new OrcadBundledRuntimeError(`The bundled Orca runtime target is invalid: ${target}`)
+   }
+   const executableSha256 = readFileSync(markerPath, 'utf8').trim()
++  // Gentoo: a server slot built for the system Node records "system" and runs on that Node.
++  if (executableSha256 === 'system') {
++    return null
++  }
+   // Validate the exact runtime pin: this marker becomes a path segment.
+   if (executableSha256 !== asset.executableSha256) {
+     throw new OrcadBundledRuntimeError(

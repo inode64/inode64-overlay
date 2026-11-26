@@ -1,0 +1,30 @@
+[Unit]
+Description=Orca server of %i
+Documentation=https://www.onorca.dev/docs/remote-servers
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=900
+StartLimitBurst=5
+
+[Service]
+Type=simple
+# The server works with the repositories, the agent CLIs and the credentials
+# of the user, so it runs as the user and from its home.
+User=%i
+WorkingDirectory=~
+# Change the arguments with "systemctl edit orca-ide@<user>.service", for
+# example --bind <Tailscale address> --pairing-address <same address>. Do not
+# expose the port to the Internet.
+Environment="ORCA_OPTS=--bind 127.0.0.1"
+# --no-pairing: the journal must not record a live pairing link; pair with
+# "orca-ide pair" as the user instead.
+ExecStart=@ORCA_SERVER@ serve --supervise --no-pairing $ORCA_OPTS
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=90
+# As upstream: stop only the supervisor, which stops its server while the
+# terminal daemon, and the agents in it, keep running.
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

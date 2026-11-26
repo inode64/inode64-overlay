@@ -1,0 +1,53 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# One instance per user, named after it:
+#   ln -s orca-ide /etc/init.d/orca-ide.<user>
+# The server works with the repositories, the agent CLIs and the credentials
+# of that user, so it runs as the user and from its home.
+ORCA_USER="${RC_SVCNAME#*.}"
+
+description="Orca server (orca-ide serve) of the user the instance is named after"
+
+command="@ORCA_SERVER@"
+# --no-pairing: a service log must not record a live pairing link; pair with
+# "orca-ide pair" as the user instead.
+command_args="serve --supervise --no-pairing
+	${ORCA_PORT:+--port ${ORCA_PORT}}
+	${ORCA_BIND:+--bind ${ORCA_BIND}}
+	${ORCA_PAIRING_ADDRESS:+--pairing-address ${ORCA_PAIRING_ADDRESS}}
+	${ORCA_OPTS}"
+command_background="yes"
+command_user="${ORCA_USER}"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/orca-ide/${RC_SVCNAME}.log"
+error_log="/var/log/orca-ide/${RC_SVCNAME}.log"
+# Only the supervisor gets the signal, like KillMode=process upstream: it stops
+# its server while the terminal daemon, and the agents in it, keep running.
+retry="TERM/90/KILL/5"
+
+depend() {
+	need net
+	after logger
+}
+
+start_pre() {
+	if [ "${RC_SVCNAME}" = "orca-ide" ]; then
+		eerror "Run one instance per user: ln -s orca-ide /etc/init.d/orca-ide.<user>"
+		return 1
+	fi
+
+	local home
+	home=$(getent passwd "${ORCA_USER}" | cut -d: -f6)
+	if [ -z "${home}" ]; then
+		eerror "${ORCA_USER} is not a user of this system"
+		return 1
+	fi
+
+	checkpath -d -m 0755 -o root:root /var/log/orca-ide || return 1
+	checkpath -f -m 0640 -o "${ORCA_USER}" "${output_log}" || return 1
+
+	directory="${home}"
+	export HOME="${home}" USER="${ORCA_USER}" LOGNAME="${ORCA_USER}"
+}

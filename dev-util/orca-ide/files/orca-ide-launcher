@@ -1,0 +1,25 @@
+#!/bin/bash
+# Runs Orca on the system Electron. The upstream CLI, resources/bin/orca-ide,
+# runs this file as the Electron next to resources/ with ELECTRON_RUN_AS_NODE
+# set: then it is plain Electron running the CLI script.
+if [[ -n ${ELECTRON_RUN_AS_NODE} ]]; then
+	# The CLI opens the app with process.execPath, the bare Electron runtime,
+	# unless it is told to start this launcher, which adds app.asar.
+	export ORCA_APP_EXECUTABLE="${ORCA_APP_EXECUTABLE:-@APPDIR@/orca-ide}"
+	exec @ELECTRON@ "$@"
+fi
+
+# One Chromium or Electron flag per line, for example --ozone-platform=wayland.
+flags_file="${XDG_CONFIG_HOME:-${HOME}/.config}/orca-flags.conf"
+flags=()
+if [[ -f ${flags_file} ]]; then
+	while IFS= read -r line; do
+		[[ ${line} =~ ^[[:space:]]*(#|$) ]] || flags+=( "${line}" )
+	done < "${flags_file}"
+fi
+
+# The app resolves everything relative to process.resourcesPath, which would
+# otherwise be the resources directory of the Electron runtime.
+export ELECTRON_FORCE_IS_PACKAGED=1
+exec @ELECTRON@ --require @APPDIR@/resources/resources-path-override.cjs \
+	@APPDIR@/resources/app.asar "${flags[@]}" "$@"

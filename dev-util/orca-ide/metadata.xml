@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		Orca runs a fleet of coding agents (Claude Code, Codex, OpenCode and
+		others) in parallel, each in its own git worktree, and tracks their
+		terminals, diffs and sessions in one place. The desktop app runs on
+		dev-util/electron-bin. The server, orcad, runs on Node.js without any
+		desktop library, keeps the projects, terminals and agents of a user
+		running, and serves the desktop app, the web client and the mobile app
+		of other computers. The command is orca-ide, as /usr/bin/orca belongs
+		to the GNOME screen reader.
+	</longdescription>
+	<use>
+		<flag name="gui">Install the desktop app, which runs on
+			<pkg>dev-util/electron-bin</pkg></flag>
+		<flag name="server">Install the server alone (orcad on Node.js, without
+			Electron) with an OpenRC service and a systemd unit per user</flag>
+		<flag name="wayland">Build the helper that the desktop app uses for the
+			clipboard on native Wayland sessions</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/stablyai/orca/issues</bugs-to>
+		<doc>https://www.onorca.dev/docs</doc>
+		<remote-id type="github">stablyai/orca</remote-id>
+	</upstream>
+</pkgmetadata>
