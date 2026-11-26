@@ -81,11 +81,11 @@ src_compile() {
 
 	ego build -trimpath \
 		-ldflags "-X 'main.version=${PV}' -X 'main.commit=${PR}'" \
-		-o backrest ./cmd/backrest || die
+		-o backrest ./cmd/backrest
 }
 
 src_test() {
-	BACKREST_RESTIC_COMMAND=/usr/bin/restic ego test ./... || die "test failed"
+	BACKREST_RESTIC_COMMAND=/usr/bin/restic ego test ./...
 }
 
 src_install() {
