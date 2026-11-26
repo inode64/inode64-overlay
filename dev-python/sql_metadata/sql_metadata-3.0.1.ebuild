@@ -13,7 +13,7 @@ HOMEPAGE="https://github.com/macbre/sql-metadata"
 LICENSE="MIT"
 
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 
 RDEPEND=">=dev-python/sqlglot-30.12.0[${PYTHON_USEDEP}]
 	<dev-python/sqlglot-31[${PYTHON_USEDEP}]"
