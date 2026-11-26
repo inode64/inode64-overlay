@@ -117,6 +117,7 @@ src_install() {
 
 	keepdir /var/lib/vinyl-cache
 	keepdir /var/log/vinyl-cache
+	diropts -m0755
 
 	systemd_newunit "${FILESDIR}"/vinyld.service-r1 vinyld.service
 	systemd_dounit "${FILESDIR}"/vinylncsa.service
