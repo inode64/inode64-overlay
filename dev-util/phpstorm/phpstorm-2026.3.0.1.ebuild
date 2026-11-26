@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-inherit desktop wrapper xdg-utils
+inherit desktop wrapper xdg
 
 MY_PV="263.7307.352"
 MY_PN="PhpStorm"
@@ -108,31 +108,20 @@ src_install() {
 	doins -r *
 
 	# Set permissions for executables and libraries
-	find -type f -name "*.so*" | while read exe; do
-		fperms +x "${DIR}/${exe}"
-	done
-	find -type f -executable | while read exe; do
-		fperms +x "${DIR}/${exe}"
-	done
+	while IFS= read -r -d '' exe; do
+		fperms +x "${DIR}/${exe#./}"
+	done < <(find . -type f \( -name "*.so*" -o -executable \) -print0)
 
 	make_wrapper "${PN}" "${DIR}/bin/${PN}"
-	newicon "bin/${PN}.svg" "${PN}.svg"
+	newicon -s scalable "bin/${PN}.svg" "${PN}.svg"
 	make_desktop_entry "${PN}" "phpstorm" "${PN}" "Development;IDE;" "StartupWMClass=jetbrains-phpstorm"
 
 	# recommended by: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
 	dodir /usr/lib/sysctl.d/
-	echo "fs.inotify.max_user_watches = 524288" > "${D}/usr/lib/sysctl.d/30-${PN}-inotify-watches.conf" || die
+	echo "fs.inotify.max_user_watches = 524288" > "${ED}/usr/lib/sysctl.d/30-${PN}-inotify-watches.conf" || die
 
 	# create configuration for revdep-rebuild
 	echo "SEARCH_DIRS=\"${DIR}\"" > "${T}/80${PN}" || die
 	insinto "/etc/revdep-rebuild"
 	doins "${T}/80${PN}"
-}
-
-pkg_postinst() {
-	xdg_icon_cache_update
-}
-
-pkg_postrm() {
-	xdg_icon_cache_update
 }
