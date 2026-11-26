@@ -35,7 +35,7 @@ src_compile() {
 }
 
 src_test() {
-	ego test ./... || die "test failed"
+	ego test ./...
 }
 
 pkg_postinst() {
