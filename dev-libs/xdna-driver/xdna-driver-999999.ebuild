@@ -152,7 +152,7 @@ src_install() {
 		fi
 		# shellcheck disable=SC2086
 		find . -type f -print0 | \
-			xargs -0 -P $(makeopts_jobs) -I'{}' ${compressor} '{}'
+			xargs -0 -P $(get_makeopts_jobs) -I'{}' ${compressor} '{}'
 		assert
 
 		# Symlinks were copied verbatim by doins -r and now point at
