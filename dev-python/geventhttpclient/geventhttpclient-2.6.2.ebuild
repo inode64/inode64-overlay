@@ -7,7 +7,7 @@ DISTUTILS_EXT=1
 DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{11..14} )
 
-inherit distutils-r1 pypi
+inherit distutils-r1
 
 DESCRIPTION="Coroutine-based network library"
 HOMEPAGE="
@@ -37,7 +37,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}"/${P}-system-llhttp.patch
+	"${FILESDIR}"/${PN}-2.6.1-system-llhttp.patch
 )
 
 # The GitHub archive has no git metadata, so setuptools-scm would report 0.0.0.
