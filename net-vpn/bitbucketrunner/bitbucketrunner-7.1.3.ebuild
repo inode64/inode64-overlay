@@ -30,6 +30,7 @@ src_install() {
 	doins "${FILESDIR}"/logback.xml
 	insopts -m0600
 	doins "${FILESDIR}"/tunnel.cfg
+	insopts -m0644
 
 	exeinto /usr/libexec/bitbucketrunner
 	newexe "${FILESDIR}"/bitbucketrunner-cleanup.sh cleanup
@@ -44,11 +45,13 @@ src_install() {
 }
 
 pkg_postinst() {
-	if [[ ! -d /etc/ssl/certs/java/cacerts ]]; then
+	if [[ ! -f "${EROOT}/etc/ssl/certs/java/cacerts" ]]; then
 		# Java certificates is necessary for the runner to work properly
-		mkdir -p /etc/ssl/certs/java
+		mkdir -p "${EROOT}/etc/ssl/certs/java" || die
 	fi
-	update-ca-certificates -f
+	if [[ -z ${ROOT} ]]; then
+		update-ca-certificates -f
+	fi
 
 	einfo "The configuration file tunnel.cfg contains sensitive tokens and must be accessible only by the service user."
 	einfo "Ensure permissions are set to 600 and not accessible by other users."
