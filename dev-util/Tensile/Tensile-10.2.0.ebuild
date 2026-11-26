@@ -53,7 +53,6 @@ DEPEND="${RDEPEND}"
 BDEPEND="
 	test? (
 		dev-python/filelock[${PYTHON_USEDEP}]
-		dev-python/joblib[${PYTHON_USEDEP}]
 	)
 "
 
