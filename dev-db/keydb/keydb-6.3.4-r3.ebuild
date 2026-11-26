@@ -77,7 +77,7 @@ src_compile() {
 
 src_test() {
 	local runtestargs=(
-		--clients "$(makeopts_jobs)" # see bug #649868
+		--clients "$(get_makeopts_jobs)" # see bug #649868
 		--skipunit unit/oom-score-adj # see bug #756382
 		--skipunit unit/expire
 		--skipunit integration/replication-active
