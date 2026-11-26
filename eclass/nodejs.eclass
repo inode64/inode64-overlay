@@ -22,11 +22,18 @@
 #   npm:
 #       npm install --audit false --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
+#   pnpm:
+#       CI=true pnpm install --frozen-lockfile --ignore-scripts
+#
 #   yarn:
 #       yarn install --color false --foreground-scripts --progress false --verbose --ignore-scripts
 #
 #   Create archive in tar:
 #       tar --create --auto-compress --file foo-1-node_modules.tar.xz foo-1/node_modules/
+#
+# livecheck builds the archive with every node_modules the installs create,
+# and with nodejs_archive set to "lockfile" names it after the lockfiles, see
+# nodejs_unpack.
 
 if [[ -z ${_NODEJS_ECLASS} ]]; then
 	_NODEJS_ECLASS=1
@@ -39,7 +46,7 @@ esac
 # @ECLASS_VARIABLE: NODEJS_MANAGER
 # @PRE_INHERIT
 # @DESCRIPTION:
-# Specify a NodeJS package manager to use. ( npm | yarn )
+# Specify a NodeJS package manager to use. ( npm | pnpm | yarn )
 # The default is set to "npm".
 : "${NODEJS_MANAGER:=npm}"
 
@@ -68,12 +75,16 @@ NODEJS_FILES="babel.config.js babel.config.json bin cli.js dist index.js lib nod
 # @ECLASS_VARIABLE: mynpmargs
 # @DEFAULT_UNSET
 # @DESCRIPTION:
-# Optional array of extra arguments that the ebuild passes to every npm or
-# yarn invocation made through enpm.
+# Optional array of extra arguments that the ebuild passes to every npm, pnpm
+# or yarn invocation made through enpm.
 
 case ${NODEJS_MANAGER} in
     npm)
         BDEPEND+=" net-libs/nodejs[npm]"
+        ;;
+    pnpm)
+        # pnpm already depends on the node it runs the scripts with.
+        BDEPEND+=" sys-apps/pnpm"
         ;;
     yarn)
         BDEPEND+=" || ( net-libs/nodejs[corepack] sys-apps/yarn )"
@@ -478,6 +489,21 @@ enpm() {
             npmargs+=( --audit false )
             set -- npm "$@" "${npmargs[@]}"
             ;;
+        pnpm)
+            if ! type -P pnpm >/dev/null; then
+                eerror "pnpm is required but not installed or not in PATH"
+                die "pnpm not available"
+            fi
+            # Settings go through the environment: pnpm hands whatever
+            # follows "run <script>" to the script. Without them pnpm fetches
+            # the version pinned in packageManager, and before every script
+            # checks node_modules with an install that, as the unpacked tree
+            # was made with another store, purges it and fails offline.
+            set -- env pnpm_config_offline=true \
+                pnpm_config_manage_package_manager_versions=false \
+                pnpm_config_verify_deps_before_run=false \
+                pnpm "${mynpmargs[@]}" "$@"
+            ;;
         yarn)
             if ! type -P yarn >/dev/null; then
                 eerror "yarn is required but not installed or not in PATH"
@@ -493,6 +519,38 @@ enpm() {
     "$@"
 }
 
+# @FUNCTION: nodejs_unpack
+# @USAGE: [directory]
+# @DESCRIPTION:
+# Unpack ${A} in ${WORKDIR}, except for the *-node_modules.tar.xz archives,
+# which go into the given directory (${S} by default). It is meant for an
+# ebuild whose livecheck.json sets "nodejs_archive": "lockfile". livecheck
+# then names the archive after the lockfiles,
+# ${PN}-<digest>-node_modules.tar.xz, so that versions with the same
+# dependencies share it, and stores its paths relative to the directory of
+# package.json instead of ${WORKDIR}. livecheck unpacks a new version without
+# the archive, which may then be missing.
+nodejs_unpack() {
+    debug-print-function "${FUNCNAME}" "${@}"
+
+    local dir=${1:-${S}} archive
+    local -a archives=()
+
+    for archive in ${A}; do
+        if [[ ${archive} == *-node_modules.tar.xz ]]; then
+            archives+=( "${archive}" )
+        else
+            unpack "${archive}"
+        fi
+    done
+
+    (( ${#archives[@]} )) || return 0
+
+    pushd "${dir}" >/dev/null || die "Failed to change to ${dir} directory"
+    unpack "${archives[@]}"
+    popd >/dev/null || die
+}
+
 # @FUNCTION: enpm_clean
 # @DESCRIPTION:
 # Delete all unnecessary files
@@ -506,6 +564,9 @@ enpm_clean() {
     case ${NODEJS_MANAGER} in
         npm)
             enpm prune --omit=dev || die "npm prune failed"
+            ;;
+        pnpm)
+            enpm prune --prod || die "pnpm prune failed"
             ;;
         yarn)
             enpm install --production || die "yarn install production failed"
