@@ -84,8 +84,8 @@ PATCHES=(
 	# https://github.com/networkupstools/nut/pull/3499
 	"${WORKDIR}/patches"
 	# https://github.com/networkupstools/nut/commit/0e051f9f6853e9ae0087b388b70840c9651a5eed
-	"${FILESDIR}/${P}-pynut-eof.patch"
-	"${FILESDIR}/${P}-monitor-qt6.patch"
+	"${FILESDIR}/${PN}-2.8.5-pynut-eof.patch"
+	"${FILESDIR}/${PN}-2.8.5-monitor-qt6.patch"
 )
 
 pkg_pretend() {
