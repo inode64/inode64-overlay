@@ -25,22 +25,17 @@ IUSE="systemd"
 
 DEPEND="
 	|| ( >=gui-libs/gtk-4.0.1:4 >=x11-libs/gtk+-3.24.22:3 )
-	>=x11-libs/cairo-1.0
 	dev-cpp/fast_float
-	>=dev-libs/fribidi-1.0.0
-	>=dev-libs/glib-2.60:2
 	>=x11-libs/pango-1.22.0
 	>=dev-libs/libpcre2-10.21
 	systemd? ( >=sys-apps/systemd-220:= )
 	>=app-arch/lz4-1.9
-	x11-libs/pango
 "
 BDEPEND="
 	${PYTHON_DEPS}
 	dev-libs/libxml2:2
 	dev-util/glib-utils
 	>=sys-devel/gettext-0.19.8
-	virtual/pkgconfig
 "
 
 src_prepare() {
