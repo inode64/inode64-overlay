@@ -22,7 +22,7 @@ SLOT="0"
 
 # Cargo (inside tokenizers-cpp/rust) fetches crates at build time.
 PROPERTIES="live"
-RESTRICT="bindist"
+RESTRICT="bindist network-sandbox"
 
 BDEPEND="
 	dev-build/ninja
