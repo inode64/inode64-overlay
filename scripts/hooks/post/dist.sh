@@ -33,7 +33,7 @@ if [ "$cp" == "app-backup/backrest" ] || \
 	upload "${ebuild}-${new_version}-node_modules.tar.xz"
 fi
 
-# With "nodejs_archive": "lockfile" the archive is ${PN}-<digest>-node_modules.tar.xz
+# With "archive_mode": "lockfile" the archive is ${PN}-<digest>-node_modules.tar.xz
 # and versions with the same dependencies share it. rsync skips one that is
 # already published.
 if [ "$cp" == "dev-util/orca-ide" ]; then
