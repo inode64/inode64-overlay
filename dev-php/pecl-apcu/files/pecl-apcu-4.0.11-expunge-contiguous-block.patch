@@ -1,0 +1,59 @@
+From 4ab2a7840c0cfc1427535dc003f2627ad7eb6a53 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:55:30 +0100
+Subject: [PATCH 5/6] Look for a contiguous free block in
+ apc_sma_api_get_avail_size()
+
+With apc.ttl set, the default expunge removes expired entries and then
+asks apc_sma_api_get_avail_size() whether the pending allocation fits,
+to decide whether a full expunge is still needed. The function only
+compared the total free memory, which after removing small expired
+entries is usually split in holes that are all too small: the expunge
+kept the cache, the allocation failed again and apcu_store() returned
+false although the expunge was supposed to make room.
+
+Walk the free list for a single block that is large enough, as the 5.x
+branch does since f26d563.
+
+Based on krakjoe/apcu commit f26d563 by Arndt Kaiser.
+---
+ apc_sma.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/apc_sma.c b/apc_sma.c
+index cdcda4a..9ffe0ae 100644
+--- a/apc_sma.c
++++ b/apc_sma.c
+@@ -644,9 +644,27 @@ PHP_APCU_API zend_bool apc_sma_api_get_avail_size(apc_sma_t* sma, size_t size) {
+ 
+     for (i = 0; i < sma->num; i++) {
+     	sma_header_t* header = SMA_HDR(sma, i);
+-		if (header->avail > size) {
+-			return 1;
++		void* shmaddr = header;
++		block_t* cur;
++
++		/* not enough free memory in total, no need to walk the free list */
++		if (header->avail < size) {
++			continue;
++		}
++
++		/* An allocation needs a single free block: the total alone may be
++		   split in holes that are all too small. The size requested by the
++		   expunge (n + MINBLOCKSIZE) already covers the block header. */
++		RLOCK(&SMA_LCK(sma, i));
++		cur = BLOCKAT(ALIGNWORD(sizeof(sma_header_t)));
++		while (cur->fnext) {
++			cur = BLOCKAT(cur->fnext);
++			if (cur->size >= size) {
++				RUNLOCK(&SMA_LCK(sma, i));
++				return 1;
++			}
+ 		}
++		RUNLOCK(&SMA_LCK(sma, i));
+     }
+     return 0;
+ }
+-- 
+2.56.1
+

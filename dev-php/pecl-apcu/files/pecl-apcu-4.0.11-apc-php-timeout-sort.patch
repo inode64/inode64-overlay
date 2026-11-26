@@ -1,0 +1,30 @@
+From 40d780cecbf46a3d1295909c3c71889b9b429485 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:55:38 +0100
+Subject: [PATCH 6/6] Fix the "Timeout" sort option of apc.php
+
+The "Timeout" entry of the user cache sort dropdown submitted SORT1=D,
+so choosing it sorted by deletion time instead, and the option was never
+shown as selected. Submit T, which the sorting code already handles.
+
+Based on krakjoe/apcu commit 64b4a55 by Dennis Birkholz.
+---
+ apc.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apc.php b/apc.php
+index a514082..ec41380 100644
+--- a/apc.php
++++ b/apc.php
+@@ -936,7 +936,7 @@ EOB;
+ 		"<option value=C",$MYREQUEST['SORT1']=='C' ? " selected":"",">Created at</option>",
+ 		"<option value=D",$MYREQUEST['SORT1']=='D' ? " selected":"",">Deleted at</option>";
+ 	if($fieldname=='info') echo
+-		"<option value=D",$MYREQUEST['SORT1']=='T' ? " selected":"",">Timeout</option>";
++		"<option value=T",$MYREQUEST['SORT1']=='T' ? " selected":"",">Timeout</option>";
+ 	echo
+ 		'</select>',
+ 		'<select name=SORT2>',
+-- 
+2.56.1
+

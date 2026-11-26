@@ -1,0 +1,179 @@
+From 4fe78a61450aa2a321b8d746b69fb710dfa92518 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 18:27:41 +0100
+Subject: [PATCH] Do not unserialize APCIterator values while holding the cache
+ lock
+
+APCIterator built each item, copying out and so unserializing the stored
+value, with the cache read lock held. Objects are always stored
+serialized, so __wakeup() and Serializable::unserialize() ran under that
+lock: a write to apcu from there requested the write lock while the same
+process held the read lock and blocked forever, stalling the writes of
+every other process too. With the recursive mutex locks the nested write
+went through instead and could free entries in the middle of the walk.
+
+Under the lock only collect the matching entries and take a reference
+on each, as apc_cache_find() does; build the items once the lock is
+released and drop the references afterwards, also on bailout. The
+reported ref_count leaves out the iterator's own reference.
+
+Based on krakjoe/apcu commit bc9e296 by Ilia Alshanetsky (master, not
+released yet).
+---
+ apc_iterator.c | 77 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 64 insertions(+), 13 deletions(-)
+
+diff --git a/apc_iterator.c b/apc_iterator.c
+index 04e676f..2c114dd 100644
+--- a/apc_iterator.c
++++ b/apc_iterator.c
+@@ -31,9 +31,8 @@ zend_class_entry *apc_iterator_ce;
+ zend_object_handlers apc_iterator_object_handlers;
+ 
+ /* {{{ apc_iterator_item */
+-static apc_iterator_item_t* apc_iterator_item_ctor(apc_iterator_t *iterator, apc_cache_slot_t **slot_pp TSRMLS_DC) {
++static apc_iterator_item_t* apc_iterator_item_ctor(apc_iterator_t *iterator, apc_cache_slot_t *slot TSRMLS_DC) {
+     zval *zvalue;
+-    apc_cache_slot_t *slot = *slot_pp;
+     apc_context_t ctxt = {0, };
+     apc_iterator_item_t *item = ecalloc(1, sizeof(apc_iterator_item_t));
+ 
+@@ -78,7 +77,8 @@ static apc_iterator_item_t* apc_iterator_item_ctor(apc_iterator_t *iterator, apc
+         add_assoc_long(item->value, "access_time", slot->atime);
+     }
+     if (APC_ITER_REFCOUNT & iterator->format) {
+-        add_assoc_long(item->value, "ref_count", slot->value->ref_count);
++        /* leave out the reference the iterator holds while building the item */
++        add_assoc_long(item->value, "ref_count", slot->value->ref_count - 1);
+     }
+     if (APC_ITER_MEM_SIZE & iterator->format) {
+         add_assoc_long(item->value, "mem_size", slot->value->mem_size);
+@@ -221,11 +221,54 @@ static int apc_iterator_check_expiry(apc_cache_t* cache, apc_cache_slot_t **slot
+ }
+ /* }}} */
+ 
++/* {{{ apc_iterator_pin
++ Takes a reference on an entry, as apc_cache_find() does, so that it is not freed
++ between releasing the cache lock and building its item. Called with the lock held. */
++static void apc_iterator_pin(apc_stack_t *pinned, apc_cache_slot_t *slot TSRMLS_DC) {
++    ATOMIC_INC(apc_user_cache, slot->value->ref_count);
++    apc_stack_push(pinned, slot TSRMLS_CC);
++}
++/* }}} */
++
++/* {{{ apc_iterator_build_items
++ Builds the items of the pinned entries. It must run without the cache lock: copying
++ a value out may unserialize it and run __wakeup() or Serializable::unserialize(),
++ which can write to the cache. Returns 1 if a bailout happened. */
++static zend_bool apc_iterator_build_items(apc_iterator_t *iterator, apc_stack_t *pinned TSRMLS_DC) {
++    zend_bool bailout = 0;
++
++    zend_try {
++        int i;
++
++        for (i = 0; i < apc_stack_size(pinned); i++) {
++            apc_iterator_item_t *item = apc_iterator_item_ctor(iterator, apc_stack_get(pinned, i) TSRMLS_CC);
++            if (item) {
++                apc_stack_push(iterator->stack, item TSRMLS_CC);
++            }
++        }
++    } zend_catch {
++        bailout = 1;
++    } zend_end_try();
++
++    return bailout;
++}
++/* }}} */
++
++/* {{{ apc_iterator_unpin */
++static void apc_iterator_unpin(apc_stack_t *pinned TSRMLS_DC) {
++    while (apc_stack_size(pinned) > 0) {
++        apc_cache_slot_t *slot = apc_stack_pop(pinned);
++        apc_cache_release(apc_user_cache, slot->value TSRMLS_CC);
++    }
++    apc_stack_destroy(pinned TSRMLS_CC);
++}
++/* }}} */
++
+ /* {{{ apc_iterator_fetch_active */
+ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+     int count=0;
+     apc_cache_slot_t **slot;
+-    apc_iterator_item_t *item;
++    apc_stack_t *pinned;
+     time_t t;
+ 	zend_bool bailout = 0;
+ 
+@@ -235,6 +278,8 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+         apc_iterator_item_dtor(apc_stack_pop(iterator->stack));
+     }
+ 
++	pinned = apc_stack_create(iterator->chunk_size TSRMLS_CC);
++
+ 	APC_RLOCK(apc_user_cache->header);
+ 
+     zend_try {
+@@ -244,10 +289,7 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+ 		        if (apc_iterator_check_expiry(apc_user_cache, slot, t)) {
+ 		            if (apc_iterator_search_match(iterator, slot)) {
+ 		                count++;
+-		                item = apc_iterator_item_ctor(iterator, slot TSRMLS_CC);
+-		                if (item) {
+-		                    apc_stack_push(iterator->stack, item TSRMLS_CC);
+-		                }
++		                apc_iterator_pin(pinned, *slot TSRMLS_CC);
+ 		            }
+ 		        }
+ 		        slot = &(*slot)->next;
+@@ -260,6 +302,11 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+ 
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
++	if (!bailout) {
++		bailout = apc_iterator_build_items(iterator, pinned TSRMLS_CC);
++	}
++	apc_iterator_unpin(pinned TSRMLS_CC);
++
+     iterator->stack_idx = 0;
+ 
+ 	if (bailout) {
+@@ -274,9 +321,11 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+     int count=0;
+     apc_cache_slot_t **slot;
+-    apc_iterator_item_t *item;
++    apc_stack_t *pinned;
+ 	zend_bool bailout = 0;
+ 
++	pinned = apc_stack_create(iterator->chunk_size TSRMLS_CC);
++
+ 	APC_RLOCK(apc_user_cache->header);
+ 
+ 	zend_try {
+@@ -289,10 +338,7 @@ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+ 		while ((*slot) && count < iterator->chunk_size) {
+ 		    if (apc_iterator_search_match(iterator, slot)) {
+ 		        count++;
+-		        item = apc_iterator_item_ctor(iterator, slot TSRMLS_CC);
+-		        if (item) {
+-		            apc_stack_push(iterator->stack, item TSRMLS_CC);
+-		        }
++		        apc_iterator_pin(pinned, *slot TSRMLS_CC);
+ 		    }
+ 		    slot = &(*slot)->next;
+ 		}
+@@ -304,6 +350,11 @@ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+     iterator->stack_idx = 0;
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
++	if (!bailout) {
++		bailout = apc_iterator_build_items(iterator, pinned TSRMLS_CC);
++	}
++	apc_iterator_unpin(pinned TSRMLS_CC);
++
+ 	if (bailout) {
+ 		zend_bailout();
+ 	}
+-- 
+2.56.1
+

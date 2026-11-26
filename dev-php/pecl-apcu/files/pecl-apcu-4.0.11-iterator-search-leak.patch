@@ -1,0 +1,32 @@
+From c5a50b332fa75c004a64e2dab4f58cc4c3cb2e4b Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:54:40 +0100
+Subject: [PATCH 4/6] Fix leak of the search array passed to APCIterator
+
+APCIterator::__construct() added a reference to an array search argument
+that nothing ever released. The iterator only keeps the flipped copy
+built by apc_flip_hash(), so every APCIterator created with an array
+leaked that array until the end of the request.
+
+Drop the reference, as the 5.x branch does since a6043d0.
+
+Based on krakjoe/apcu commit a6043d0 by Nikita Popov.
+---
+ apc_iterator.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/apc_iterator.c b/apc_iterator.c
+index d1f17e6..04e676f 100644
+--- a/apc_iterator.c
++++ b/apc_iterator.c
+@@ -425,7 +425,6 @@ PHP_METHOD(apc_iterator, __construct) {
+         apc_error("Regular expressions support is not enabled, please enable PCRE for APCIterator regex support" TSRMLS_CC);
+ #endif
+     } else if (search && Z_TYPE_P(search) == IS_ARRAY) {
+-        Z_ADDREF_P(search);
+         iterator->search_hash = apc_flip_hash(Z_ARRVAL_P(search));
+     }
+     iterator->initialized = 1;
+-- 
+2.56.1
+

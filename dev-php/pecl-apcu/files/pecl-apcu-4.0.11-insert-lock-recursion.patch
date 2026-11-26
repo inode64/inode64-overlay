@@ -1,0 +1,81 @@
+From 7b9fe23e50a7922e2e48be44d21a7932387db603 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:53:16 +0100
+Subject: [PATCH 2/6] Allocate the cache slot before taking the header lock in
+ apc_cache_insert()
+
+make_slot() allocates the slot and a copy of the key from the entry pool
+while apc_cache_insert() holds the header write lock. When the pool needs
+a new block and the SMA is full, apc_sma_malloc() calls the default
+expunge, which takes the same write lock again. With pthread rwlocks the
+second wrlock fails with EDEADLK, which is ignored: the expunge runs
+anyway, its unlock releases the caller's lock and the caller's own
+unlock then corrupts the shared rwlock, so the next store blocks forever
+in every process attached to the cache. Mutex and spin locks simply
+self-deadlock.
+
+Create the slot before locking, as the 5.x branch does since d9c376c
+("Fix #259"), and only link it in under the lock. A slot that is not
+inserted stays in the entry pool, which the caller already destroys on
+failure.
+
+Based on krakjoe/apcu commit d9c376c by Nikita Popov.
+---
+ apc_cache.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/apc_cache.c b/apc_cache.c
+index 0384bc9..d173ae8 100644
+--- a/apc_cache.c
++++ b/apc_cache.c
+@@ -734,6 +734,7 @@ PHP_APCU_API zend_bool apc_cache_insert(apc_cache_t* cache,
+                                         zend_bool exclusive TSRMLS_DC)
+ {
+     zend_bool result = 0;
++	apc_cache_slot_t* new_slot;
+ 
+ 	/* at least */
+ 	if (!value) {
+@@ -745,6 +746,13 @@ PHP_APCU_API zend_bool apc_cache_insert(apc_cache_t* cache,
+ 		return result;
+ 	}
+ 
++	/* The slot must be allocated before taking the header lock: a failed
++	   SMA allocation runs the expunge, which takes the same lock. On failure
++	   the caller destroys the context and its pool, slot included. */
++	if ((new_slot = make_slot(cache, &key, value, NULL, t TSRMLS_CC)) == NULL) {
++		return result;
++	}
++
+ 	/* lock header */
+ 	APC_LOCK(cache->header);
+ 
+@@ -799,16 +807,16 @@ PHP_APCU_API zend_bool apc_cache_insert(apc_cache_t* cache,
+             slot = &(*slot)->next;      
+ 		}
+ 
+-		if ((*slot = make_slot(cache, &key, value, *slot, t TSRMLS_CC)) != NULL) {
+-            /* set value size from pool size */
+-            value->mem_size = ctxt->pool->size;
++		/* link in new slot */
++		new_slot->next = *slot;
++		*slot = new_slot;
+ 
+-            cache->header->mem_size += ctxt->pool->size;
+-            cache->header->nentries++;
+-            cache->header->ninserts++;
+-		} else {
+-			goto nothing;
+-		}
++		/* set value size from pool size */
++		value->mem_size = ctxt->pool->size;
++
++		cache->header->mem_size += ctxt->pool->size;
++		cache->header->nentries++;
++		cache->header->ninserts++;
+ 	}
+ 
+     /* unlock and return succesfull */	
+-- 
+2.56.1
+

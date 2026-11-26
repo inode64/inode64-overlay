@@ -1,0 +1,51 @@
+From 5ea576c3d0c5074c8bf832169cb9e808271eda72 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:52:51 +0100
+Subject: [PATCH 1/6] Do not return from inside zend_try in apc_cache_update()
+
+apc_cache_update() returned from inside its zend_try block when the key
+was found, so EG(bailout) kept pointing to a jmp_buf in a stack frame
+that no longer exists. The next bailout of the request (exit(), a fatal
+error) longjmp()ed into that dead frame and crashed the process. Every
+apcu_inc(), apcu_dec() and apcu_cas() on an existing key took this path.
+
+The zend_try was added by 4314aad7 ("more on #19") from the PHP5 branch;
+the 5.x branch fixed the same mistake in 4ea1e6c ("fix #203", PHP bug
+#73286), which never reached the PHP5 branch. Leave the loop with break
+instead, so zend_end_try() restores EG(bailout).
+
+Based on krakjoe/apcu commit 4ea1e6c by Joe Watkins.
+---
+ apc_cache.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/apc_cache.c b/apc_cache.c
+index 2ce2618..0384bc9 100644
+--- a/apc_cache.c
++++ b/apc_cache.c
+@@ -1040,10 +1040,10 @@ PHP_APCU_API zend_bool apc_cache_update(apc_cache_t* cache, char *strkey, zend_u
+ 		            }
+ 		            break;
+ 		        }
+-				/* unlock header */
+-				APC_UNLOCK(cache->header);
+ 
+-		        return retval;
++				/* leave through zend_end_try(): returning from inside zend_try
++				   would leave EG(bailout) pointing into this stack frame */
++		        break;
+ 		    }
+ 
+ 			/* set next slot */
+@@ -1060,7 +1060,7 @@ PHP_APCU_API zend_bool apc_cache_update(apc_cache_t* cache, char *strkey, zend_u
+ 		zend_bailout();
+ 	}
+ 
+-    return 0;
++    return retval;
+ }
+ /* }}} */
+ 
+-- 
+2.56.1
+

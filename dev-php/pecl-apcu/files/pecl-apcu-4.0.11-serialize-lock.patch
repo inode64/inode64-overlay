@@ -1,0 +1,70 @@
+From d9e46b2be9f0a6bc9bb65d7eac9cb8f50c543f8c Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 17:53:51 +0100
+Subject: [PATCH 3/6] Do not share the outer (un)serialization context in the
+ php serializer
+
+When apcu_store() or apcu_fetch() run inside Serializable::serialize(),
+Serializable::unserialize(), __sleep() or __wakeup(), PHP_VAR_SERIALIZE_INIT
+and PHP_VAR_UNSERIALIZE_INIT reuse the var_hash of the outer
+(un)serialization. The cached value is unrelated to it, so its r:/R:
+back-references resolve to entries of the outer value: the fetched data
+is silently wrong (PHP bug #76145).
+
+Hold BG(serialize_lock) around the (un)serialization, as the 5.x branch
+does since a883152, so that a private var_hash is used.
+
+Based on krakjoe/apcu commit a883152 by Nikita Popov.
+---
+ apc_cache.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/apc_cache.c b/apc_cache.c
+index d173ae8..c0c758c 100644
+--- a/apc_cache.c
++++ b/apc_cache.c
+@@ -237,9 +237,15 @@ PHP_APCU_API int APC_SERIALIZER_NAME(php) (APC_SERIALIZER_ARGS)
+ {
+     smart_str strbuf = {0};
+     php_serialize_data_t var_hash;
++
++    /* Lock in case apcu is accessed inside Serializable::serialize() or __sleep():
++       otherwise this serialization would share the outer var_hash */
++    BG(serialize_lock)++;
+     PHP_VAR_SERIALIZE_INIT(var_hash);
+     php_var_serialize(&strbuf, (zval**)&value, &var_hash TSRMLS_CC);
+     PHP_VAR_SERIALIZE_DESTROY(var_hash);
++    BG(serialize_lock)--;
++
+     if(strbuf.c) {
+         *buf = (unsigned char*)strbuf.c;
+         *buf_len = strbuf.len;
+@@ -254,15 +260,22 @@ PHP_APCU_API int APC_UNSERIALIZER_NAME(php) (APC_UNSERIALIZER_ARGS)
+ {
+     const unsigned char *tmp = buf;
+     php_unserialize_data_t var_hash;
++    int result;
++
++    /* Lock in case apcu is accessed inside Serializable::unserialize() or __wakeup():
++       otherwise back-references would resolve against the outer var_hash */
++    BG(serialize_lock)++;
+     PHP_VAR_UNSERIALIZE_INIT(var_hash);
+-    if(!php_var_unserialize(value, &tmp, buf + buf_len, &var_hash TSRMLS_CC)) {
+-        PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
++    result = php_var_unserialize(value, &tmp, buf + buf_len, &var_hash TSRMLS_CC);
++    PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
++    BG(serialize_lock)--;
++
++    if (!result) {
+         zval_dtor(*value);
+         php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Error at offset %ld of %ld bytes", (long)(tmp - buf), (long)buf_len);
+         (*value)->type = IS_NULL;
+         return 0;
+     }
+-    PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
+     return 1;
+ } /* }}} */
+ 
+-- 
+2.56.1
+
