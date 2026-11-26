@@ -41,7 +41,6 @@ RESTRICT="!test? ( test )"
 REQUIRED_USE="tproxy? ( caps ) qos? ( caps ) ssl-crtd? ( ssl )"
 
 DEPEND="
-	acct-group/squid
 	acct-user/squid
 	dev-libs/libltdl
 	sys-libs/tdb
@@ -83,7 +82,6 @@ RDEPEND="
 DEPEND+=" valgrind? ( dev-debug/valgrind )"
 BDEPEND="
 	dev-lang/perl
-	ecap? ( virtual/pkgconfig )
 	test? ( dev-util/cppunit )
 	verify-sig? ( sec-keys/openpgp-keys-squid )
 "
