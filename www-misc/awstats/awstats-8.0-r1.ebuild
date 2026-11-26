@@ -67,8 +67,6 @@ src_prepare() {
 	fi
 
 	find "${S}" '(' -type f -not -name '*.pl' ')' -exec chmod -x {} + || die
-
-	eapply_user
 }
 
 src_install() {
@@ -88,9 +86,9 @@ src_install() {
 
 	insinto /usr/share/awstats
 	doins -r wwwroot
-	chmod +x "${D}"/usr/share/awstats/wwwroot/cgi-bin/*.pl
+	chmod +x "${ED}"/usr/share/awstats/wwwroot/cgi-bin/*.pl || die
 
-	cd "${S}"/tools
+	cd "${S}"/tools || die
 	dobin awstats_buildstaticpages.pl awstats_exportlib.pl \
 		awstats_updateall.pl
 	newbin logresolvemerge.pl awstats_logresolvemerge.pl
