@@ -306,7 +306,7 @@ src_prepare() {
 	#  * https://github.com/php/php-src/issues/19706
 	#
 	if ! use cdb; then
-		rm ext/dba/tests/gh19706.phpt
+		rm ext/dba/tests/gh19706.phpt || die
 	fi
 
 	# Test fails, investigating. Currently skipping since

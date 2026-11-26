@@ -304,7 +304,7 @@ src_prepare() {
 	#  * https://github.com/php/php-src/issues/19706
 	#
 	if ! use cdb; then
-		rm ext/dba/tests/gh19706.phpt
+		rm ext/dba/tests/gh19706.phpt || die
 	fi
 
 	local virt=$(systemd-detect-virt 2>/dev/null)
