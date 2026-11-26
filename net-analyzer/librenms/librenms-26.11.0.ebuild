@@ -3,6 +3,8 @@
 
 EAPI=8
 
+inherit shell-completion
+
 DESCRIPTION="A fully featured network monitoring system"
 HOMEPAGE="https://www.librenms.org"
 
@@ -60,14 +62,14 @@ src_compile() {
 src_install() {
 	diropts -m 0770
 	dodir "${LIBRENMS_HOME}"
+	diropts -m0755
 
 	dosym "${LIBRENMS_HOME}/lnms" /usr/bin/lnms
 
 	insinto /etc/logrotate.d/
 	newins misc/librenms.logrotate librenms
 
-	insinto /etc/bash_completion.d
-	doins misc/lnms-completion.bash
+	newbashcomp misc/lnms-completion.bash lnms
 
 	einstalldocs
 
@@ -95,8 +97,6 @@ pkg_postinst() {
 	einfo "> CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 	einfo "> GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';"
 	einfo "> FLUSH PRIVILEGES;"
-	einfo
-	sleep 5
 	einfo
 	einfo "Run 'emerge --config =${CATEGORY}/${PF}' to finish setup."
 	einfo
