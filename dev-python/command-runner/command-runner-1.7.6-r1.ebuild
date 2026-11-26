@@ -22,4 +22,8 @@ KEYWORDS="~amd64 ~x86"
 
 RDEPEND=">=dev-python/psutil-5.6.0[${PYTHON_USEDEP}]"
 
+PATCHES=(
+	"${FILESDIR}/${P}-no-pkg-resources.patch"
+)
+
 DOCS=( CHANGELOG.md README.md )

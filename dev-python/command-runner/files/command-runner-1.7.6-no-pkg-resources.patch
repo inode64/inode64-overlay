@@ -1,0 +1,27 @@
+Let setuptools parse install_requires without importing pkg_resources, which
+is no longer bundled with current setuptools. Keep the requirements file's
+version constraints instead of hard-coding psutil as in Debian's fix:
+https://sources.debian.org/src/python-command-runner/1.7.6-1/debian/patches/pkg_resources.patch/
+
+--- a/setup.py
++++ b/setup.py
+@@ -17,7 +17,6 @@
+ import sys
+ import os
+ 
+-import pkg_resources
+ import setuptools
+ 
+ 
+@@ -64,10 +63,7 @@
+     """
+     try:
+         requirements_txt = _read_file(filename)
+-        install_requires = [
+-            str(requirement)
+-            for requirement in pkg_resources.parse_requirements(requirements_txt)
+-        ]
++        install_requires = requirements_txt.splitlines()
+         return install_requires
+     except OSError:
+         print(
