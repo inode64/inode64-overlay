@@ -14,7 +14,6 @@ KEYWORDS="amd64 arm arm64 ~loong ppc64 ~riscv x86"
 # The unslotted net-libs/nodejs installs /etc/env.d/50npm too, and this
 # package is merged before the slot that blocks it.
 RDEPEND="
-	app-admin/eselect
 	!!net-libs/nodejs:0
 "
 
