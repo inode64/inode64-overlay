@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person" proxied="yes">
+		<email>web@inode64.com</email>
+		<name>Fco. Javier Félix</name>
+	</maintainer>
+	<maintainer type="project" proxied="proxy">
+		<email>proxy-maint@gentoo.org</email>
+		<name>Proxy Maintainers</name>
+	</maintainer>
+	<longdescription lang="en">
+		The official Electron release binaries, slotted by major version and
+		installed in /opt/electron-bin-SLOT, with the matching Node.js headers
+		in node_headers to build native addons against them. Electron
+		applications built from source run on it instead of bundling their own
+		copy.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/electron/electron/issues</bugs-to>
+		<doc>https://www.electronjs.org/docs</doc>
+		<remote-id type="github">electron/electron</remote-id>
+	</upstream>
+</pkgmetadata>
