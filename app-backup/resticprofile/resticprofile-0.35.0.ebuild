@@ -17,13 +17,13 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~riscv"
 
 RDEPEND="app-backup/restic"
-BDEPEND=">=dev-lang/go-1.26.2"
+BDEPEND=">=dev-lang/go-1.27.3"
 
 src_compile() {
 	# main.go carries the next development version, the release one comes from
 	# the linker. Updates belong to Portage, so leave "self-update" out.
 	ego build -trimpath -tags no_self_update \
-		-ldflags "-X main.version=${PV} -X main.builtBy=portage" || die
+		-ldflags "-X main.version=${PV} -X main.builtBy=portage"
 }
 
 src_test() {
@@ -32,7 +32,7 @@ src_test() {
 	local skip="TestCannotStartTwice|TestCaffeinate|TestCreateTempDir|TestCurrentUser"
 	skip+="|TestDownloadBinary|TestFixUnixPaths|TestMemFS|TestReadingSystemdScheduled"
 	skip+="|TestStartProcessWithIOPriority|TestUpdate"
-	ego test -skip "^(${skip})\$" ./... || die "test failed"
+	ego test -skip "^(${skip})\$" ./...
 }
 
 src_install() {
