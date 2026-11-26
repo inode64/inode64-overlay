@@ -19,7 +19,7 @@ KEYWORDS="~amd64"
 RDEPEND="
 	acct-user/mcp-grafana
 "
-BDEPEND=">=dev-lang/go-1.26.10"
+BDEPEND=">=dev-lang/go-1.26.11"
 
 src_compile() {
 	# Without cgo, as upstream does: the binary links no shared library.
