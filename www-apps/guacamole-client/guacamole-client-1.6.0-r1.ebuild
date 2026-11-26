@@ -57,10 +57,6 @@ MY_PV="$(ver_cut 1-3)"
 GUACAMOLE_HOME="/etc/${MY_PN}"
 CLASSPATH="${GUACAMOLE_HOME}/lib"
 
-# Maven/frontend plugins may still fetch artifacts missing from the vendor
-# archives. Keep this exception until a complete offline build is verified.
-RESTRICT+=" network-sandbox"
-
 src_unpack() {
 	if [[ "${PV}" == *9999 ]] ; then
 		git-r3_src_unpack
