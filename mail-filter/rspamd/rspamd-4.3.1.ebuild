@@ -37,7 +37,6 @@ RDEPEND="
 		dev-lua/LuaBitOp[${LUA_USEDEP}]
 		dev-lua/lua-argparse[${LUA_USEDEP}]
 	')
-	acct-group/rspamd
 	acct-user/rspamd
 	app-arch/libarchive:=
 	app-arch/zstd:=
@@ -66,7 +65,6 @@ DEPEND="
 BDEPEND="
 	dev-lang/perl
 	dev-util/ragel
-	virtual/pkgconfig
 	test? ( hyperscan? ( ${PYTHON_DEPS} ) )
 "
 
