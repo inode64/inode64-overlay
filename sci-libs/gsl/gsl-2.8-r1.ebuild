@@ -20,10 +20,10 @@ DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
-	"${FILESDIR}"/${P}-cblas.patch
+	"${FILESDIR}"/${PN}-2.8-cblas.patch
 	"${FILESDIR}"/${PN}-2.7.1-test-tolerance.patch
-	"${FILESDIR}/${P}-CVE-2024-50610.patch"
-	"${FILESDIR}/${P}-bspline-eval-nonzero.patch"
+	"${FILESDIR}/${PN}-2.8-CVE-2024-50610.patch"
+	"${FILESDIR}/${PN}-2.8-bspline-eval-nonzero.patch"
 )
 
 src_prepare() {
