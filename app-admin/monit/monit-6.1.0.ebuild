@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit pam shell-completion systemd
+inherit pam systemd
 
 DESCRIPTION="Monitoring and managing daemons or similar programs running on a Unix system"
 HOMEPAGE="https://mmonit.com/monit/"
@@ -25,8 +25,6 @@ BDEPEND="
 	app-alternatives/lex
 "
 
-PATCHES=( "${FILESDIR}/${P}-succeeded-without-failure.patch" )
-
 src_prepare() {
 	default
 	sed -i -e '/^INSTALL_PROG/s/-s//' Makefile.in || die
@@ -47,13 +45,15 @@ src_install() {
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}"/monit.logrotate monit
 
-	insinto /etc; insopts -m600; doins monitrc
+	insinto /etc
+	insopts -m0600
+	doins monitrc
+	insopts -m0644
+
 	newinitd "${FILESDIR}"/monit.initd-5.0-r1 monit
 	systemd_dounit system/startup/${PN}.service
 
 	use pam && newpamd "${FILESDIR}"/${PN}.pamd ${PN}
-
-	dobashcomp system/bash/monit
 }
 
 pkg_postinst() {

@@ -50,7 +50,11 @@ src_install() {
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}"/monit.logrotate monit
 
-	insinto /etc; insopts -m600; doins monitrc
+	insinto /etc
+	insopts -m0600
+	doins monitrc
+	insopts -m0644
+
 	newinitd "${FILESDIR}"/monit.initd-5.0-r1 monit
 	systemd_dounit system/startup/${PN}.service
 
