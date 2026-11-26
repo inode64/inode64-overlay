@@ -35,8 +35,8 @@ BDEPEND="
 
 # 3.13.7 is the last public 3.13 release, so these fixes cannot come from a bump.
 PATCHES=(
-	"${FILESDIR}/${P}-CVE-2025-30219.patch"
-	"${FILESDIR}/${P}-CVE-2025-50200.patch"
+	"${FILESDIR}/${PN}-3.13.7-CVE-2025-30219.patch"
+	"${FILESDIR}/${PN}-3.13.7-CVE-2025-50200.patch"
 )
 
 DOCS=( deps/rabbit/README.md )
@@ -66,6 +66,7 @@ src_install() {
 	chmod +x escript/* || die
 	insopts -m0755
 	doins -r deps/rabbit/ebin deps/rabbit/include deps/rabbit/priv escript plugins
+	insopts -m0644
 
 	einfo "Installing server scripts to /usr/sbin"
 	exeinto /usr/libexec/rabbitmq
