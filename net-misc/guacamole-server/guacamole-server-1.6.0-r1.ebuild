@@ -70,7 +70,7 @@ BDEPEND="
 "
 
 # inet_pton() got a 4-byte buffer for AF_INET6, which _FORTIFY_SOURCE aborts on
-PATCHES=( "${FILESDIR}/${P}-wol-sockaddr.patch" )
+PATCHES=( "${FILESDIR}/${PN}-1.6.0-wol-sockaddr.patch" )
 
 src_prepare() {
 	default
