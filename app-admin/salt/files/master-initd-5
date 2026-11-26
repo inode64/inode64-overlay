@@ -4,8 +4,8 @@
 
 command="/usr/bin/salt-master"
 command_args="${SALT_OPTS}"
-pidfile="/var/run/supervisor-salt-master.pid"
-daemon_pidfile="/var/run/salt-master.pid"
+pidfile="/run/supervisor-salt-master.pid"
+daemon_pidfile="/run/salt-master.pid"
 command_args_background="--daemon --pid-file=\"${daemon_pidfile}\""
 name="SALT master daemon"
 retry="20"
