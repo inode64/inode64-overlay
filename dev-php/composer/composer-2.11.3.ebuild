@@ -14,10 +14,12 @@ EGIT_COMMIT="e4a580d4d41edb0eb5a470f441c9780ba49df75f"
 EGIT_BRANCH="main"
 
 LICENSE="MIT"
+# Dependent licenses
+LICENSE+=" BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="doc"
-DOCS="CHANGELOG.md README.md"
+DOCS=( CHANGELOG.md README.md )
 
 RDEPEND="
 	app-arch/unzip
@@ -27,13 +29,15 @@ BDEPEND="${RDEPEND}"
 
 src_unpack() {
 	git-r3_src_unpack
-	unpack ${P}-vendor.tar.xz
+	if has ${P}-vendor.tar.xz ${A}; then
+		unpack ${P}-vendor.tar.xz
+	fi
 }
 
 src_compile() {
 	php --define memory_limit=-1 -d phar.readonly=Off bin/compile || die
-	mv composer.phar composer
-	chmod +x composer
+	mv composer.phar composer || die
+	chmod +x composer || die
 	./composer completion bash > completion.bash || die
 }
 
@@ -45,8 +49,8 @@ src_test() {
 		return 0;
 	fi
 
-	mkdir integration-test
-	cd integration-test
+	mkdir integration-test || die
+	cd integration-test || die
 
 	../composer init \
 		--no-interaction \
