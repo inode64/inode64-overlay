@@ -68,8 +68,8 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/${P}-meson-install.patch"
-	"${FILESDIR}/${P}-services.patch"
+	"${FILESDIR}/${PN}-1.0.0-meson-install.patch"
+	"${FILESDIR}/${PN}-1.0.0-services.patch"
 )
 
 pkg_setup() {
