@@ -58,7 +58,6 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 BDEPEND="test? (
 	dev-cpp/gtest
-	>=dev-build/cmake-3.22
 	$(python_gen_any_dep "dev-python/pyyaml[\${PYTHON_USEDEP}]")
 )
 "
