@@ -46,6 +46,8 @@ PATCHES=(
 	"${FILESDIR}/${PN}-4.0.11-expunge-contiguous-block.patch"
 	"${FILESDIR}/${PN}-4.0.11-apc-php-timeout-sort.patch"
 	"${FILESDIR}/${PN}-4.0.11-iterator-unlocked-unserialize.patch"
+	# Not fixed upstream yet; also prepared for the 5.x branch
+	"${FILESDIR}/${PN}-4.0.11-iterator-deleted-list.patch"
 )
 
 pkg_setup() {

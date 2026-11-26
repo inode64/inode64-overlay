@@ -1,0 +1,76 @@
+From 7be575ec9d2684cfaf3544f72cf4abc3b4c2a8b3 Mon Sep 17 00:00:00 2001
+From: INODE64 <ffelix@inode64.com>
+Date: Thu, 26 Nov 2026 18:41:38 +0100
+Subject: [PATCH] Fix APCIterator iteration of the deleted list
+
+apc_iterator_fetch_deleted() had three bugs that made iterating
+APC_LIST_DELETED unusable:
+
+- It did not free the items of the previous chunk, unlike
+  apc_iterator_fetch_active(). Once the first chunk had been consumed,
+  valid() fetched again, got no new items, reset stack_idx and returned
+  the old items again, so the iteration never ended.
+- The skip loop used count <= slot_idx and so skipped one entry too
+  many: the first entry of the list was never returned.
+- slot_idx was advanced by the number of matching entries instead of
+  the number of entries walked, so with a search filter the next chunk
+  started too early and returned entries again.
+
+Free the items of the previous chunk, skip exactly slot_idx entries and
+count every entry walked in slot_idx. The same code is still in the 5.x
+branch; this is the 4.x version of the fix prepared for upstream.
+---
+ apc_iterator.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/apc_iterator.c b/apc_iterator.c
+index 2c114dd..4ab7196 100644
+--- a/apc_iterator.c
++++ b/apc_iterator.c
+@@ -320,33 +320,39 @@ static int apc_iterator_fetch_active(apc_iterator_t *iterator TSRMLS_DC) {
+ /* {{{ apc_iterator_fetch_deleted */
+ static int apc_iterator_fetch_deleted(apc_iterator_t *iterator TSRMLS_DC) {
+     int count=0;
++    long skipped=0;
+     apc_cache_slot_t **slot;
+     apc_stack_t *pinned;
+ 	zend_bool bailout = 0;
+ 
++    while (apc_stack_size(iterator->stack) > 0) {
++        apc_iterator_item_dtor(apc_stack_pop(iterator->stack));
++    }
++
+ 	pinned = apc_stack_create(iterator->chunk_size TSRMLS_CC);
+ 
+ 	APC_RLOCK(apc_user_cache->header);
+ 
+ 	zend_try {
+ 		slot = &apc_user_cache->header->gc;
+-		while ((*slot) && count <= iterator->slot_idx) {
+-		    count++;
++		/* slot_idx is the number of list entries walked by the previous chunks,
++		   matching or not, so that a search filter does not shift the position */
++		while ((*slot) && skipped < iterator->slot_idx) {
++		    skipped++;
+ 		    slot = &(*slot)->next;
+ 		}
+-		count = 0;
+ 		while ((*slot) && count < iterator->chunk_size) {
+ 		    if (apc_iterator_search_match(iterator, slot)) {
+ 		        count++;
+ 		        apc_iterator_pin(pinned, *slot TSRMLS_CC);
+ 		    }
+ 		    slot = &(*slot)->next;
++		    iterator->slot_idx++;
+ 		}
+ 	} zend_catch {
+ 		bailout = 1;
+ 	} zend_end_try();
+ 
+-    iterator->slot_idx += count;
+     iterator->stack_idx = 0;
+ 	APC_RUNLOCK(apc_user_cache->header);
+ 
+-- 
+2.56.1
+
