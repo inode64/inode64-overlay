@@ -36,13 +36,12 @@ src_compile() {
 }
 
 src_test() {
-	ego test || die "test failed"
+	ego test
 }
 
 src_install() {
 	default
 
-	insinto /usr/bin
 	dobin go2rtc
 
 	insinto /etc/logrotate.d
