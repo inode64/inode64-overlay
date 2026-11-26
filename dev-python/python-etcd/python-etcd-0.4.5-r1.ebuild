@@ -31,9 +31,9 @@ BDEPEND="
 
 PATCHES=(
 	# Unit test fixes from Debian 0.4.5-7
-	"${FILESDIR}/${P}-fix_mock_InvalidSpecError.patch"
-	"${FILESDIR}/${P}-ignore_urllib3.patch"
-	"${FILESDIR}/${P}-pytest8.4.patch"
+	"${FILESDIR}/${PN}-0.4.5-fix_mock_InvalidSpecError.patch"
+	"${FILESDIR}/${PN}-0.4.5-ignore_urllib3.patch"
+	"${FILESDIR}/${PN}-0.4.5-pytest8.4.patch"
 )
 
 EPYTEST_PLUGINS=()
