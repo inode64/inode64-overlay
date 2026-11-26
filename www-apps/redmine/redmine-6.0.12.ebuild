@@ -67,6 +67,7 @@ RDEPEND+="
 		media-gfx/imagemagick
 	)
 "
+DEPEND+=" acct-user/redmine"
 
 REDMINE_DIR="/var/lib/${PN}"
 

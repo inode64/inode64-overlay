@@ -8,7 +8,7 @@ REDMINE_ADDRESS=${REDMINE_ADDRESS:-localhost}
 REDMINE_PORT=${REDMINE_PORT:-3000}
 REDMINE_USER=${REDMINE_USER:-redmine}
 REDMINE_GROUP=${REDMINE_GROUP:-redmine}
-REDMINE_PIDFILE="/var/run/redmine/server.pid"
+REDMINE_PIDFILE="/run/redmine/server.pid"
 
 depend() {
 	use git-daemon mysql net postgresql svnserve
@@ -22,7 +22,7 @@ start_pre() {
 		eerror
 		return 1
 	fi
-	checkpath -q -d -m 0755 -o redmine:redmine /var/run/redmine
+	checkpath -q -d -m 0755 -o redmine:redmine /run/redmine
 }
 
 start() {

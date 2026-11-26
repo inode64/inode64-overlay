@@ -72,6 +72,9 @@ RDEPEND+="
 		media-gfx/imagemagick
 	)
 "
+DEPEND+="
+	acct-user/redmine
+"
 
 REDMINE_DIR="/var/lib/${PN}"
 
@@ -111,7 +114,7 @@ all_ruby_prepare() {
 	fi
 	if ! use ldap ; then
 		# remove ldap stuff module if disabled to avoid #413779
-		use ldap || rm app/models/auth_source_ldap.rb || die
+		rm app/models/auth_source_ldap.rb || die
 		sed -i -e "/group :ldap do/,/^end$/d" Gemfile || die
 	fi
 	# Additional dependency for Gemfile (#657156)
