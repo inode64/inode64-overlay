@@ -376,6 +376,7 @@ src_install() {
 	keepdir "${PKG_HOME}/"{"Resolve Disk Database",.crashreport,.license,.LUT,"Apple Immersive/Calibration"}
 
 	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
+	diropts -m0755
 
 	# Install desktop shortcut
 	newmenu share/DaVinciControlPanelsSetup.desktop com.blackmagicdesign.resolve-Panels.desktop
