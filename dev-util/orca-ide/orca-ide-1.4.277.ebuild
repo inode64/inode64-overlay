@@ -189,6 +189,8 @@ orca_link_ripgrep() {
 src_install() {
 	local dir="/usr/$(get_libdir)/${PN}"
 
+	einstalldocs
+
 	if use server; then
 		dodir "${dir}"
 		cp -a "${WORKDIR}"/server "${ED}${dir}"/server || die

@@ -1,6 +1,6 @@
 {
+  "archive_mode": "lockfile",
   "nodejs": true,
-  "nodejs_archive": "lockfile",
   "nodejs_package_manager": "pnpm",
-  "nodejs_workspaces": ["mobile"]
+  "nodejs_path": ["", "mobile"]
 }
