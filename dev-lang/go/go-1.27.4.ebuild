@@ -1,7 +1,7 @@
 # Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=9
+EAPI=8
 
 export CBUILD=${CBUILD:-${CHOST}}
 export CTARGET=${CTARGET:-${CHOST}}
@@ -110,7 +110,7 @@ src_compile() {
 	use arm && export GOARM=$(go-env_goarm)
 	use x86 && export GO386=$(go-env_go386)
 
-	cd src
+	cd src || die
 	bash -x ./make.bash || die "build failed"
 }
 
@@ -128,7 +128,7 @@ src_test() {
 src_install() {
 	dodir /usr/lib/go
 	# The use of cp is deliberate in order to retain permissions
-	cp -R . "${ED}"/usr/lib/go
+	cp -R . "${ED}"/usr/lib/go || die
 	einstalldocs
 
 	# testdata directories are not needed on the installed system
