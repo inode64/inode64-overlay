@@ -59,8 +59,12 @@ PATCH_URIS=(
 
 DESCRIPTION="Mozilla's JavaScript engine written in C and C++"
 HOMEPAGE="https://spidermonkey.dev https://firefox-source-docs.mozilla.org/js/index.html"
-SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}.source.tar.xz
-	${PATCH_URIS[@]}"
+if [[ -n ${MOZ_PV_SUFFIX} ]] ; then
+	SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}.source.tar.xz"
+else
+	SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz"
+fi
+SRC_URI+=" ${PATCH_URIS[@]}"
 S="${WORKDIR}/firefox-${PV%_*}"
 LICENSE="MPL-2.0"
 SLOT="$(ver_cut 1)/140.11.0"
@@ -232,7 +236,7 @@ src_prepare() {
 	default
 
 	# Make cargo respect MAKEOPTS
-	export CARGO_BUILD_JOBS="$(makeopts_jobs)"
+	export CARGO_BUILD_JOBS="$(get_makeopts_jobs)"
 
 	# Workaround for bgo #915651,915651,929013 on musl
 	if ! use elibc_glibc ; then
