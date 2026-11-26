@@ -3,7 +3,6 @@
   SYSTEM 'http://www.gentoo.org/dtd/metadata.dtd'>
 <pkgmetadata>
   <use>
-    <flag name="promtail">Build the promtail log gathering agent</flag>
     <flag name="server">Build the loki server</flag>
     <flag name="tools">Build the loki tools logcli, loki-canary and lokitool</flag>
   </use>

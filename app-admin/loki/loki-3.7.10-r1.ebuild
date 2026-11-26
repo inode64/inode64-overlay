@@ -15,7 +15,7 @@ LICENSE+=" BSD BSD-2 Boost-1.0 ISC MIT MIT-0 MPL-2.0 Unlicense"
 SLOT="0"
 KEYWORDS="~amd64"
 
-IUSE="+server tools systemd"
+IUSE="+server tools"
 REQUIRED_USE="|| ( server tools )"
 
 RESTRICT="mirror"
@@ -44,18 +44,18 @@ src_configure() {
 src_compile() {
 	if use server; then
 		einfo "Building cmd/${PN}/${PN}..."
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN} || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags cgo,linux,netgo -mod vendor -o cmd/${PN}/${PN} ./cmd/${PN}
 	fi
 
 	if use tools; then
 		einfo "Building cmd/logcli/logcli..."
-		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor -o cmd/logcli/logcli ./cmd/logcli || die
+		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor -o cmd/logcli/logcli ./cmd/logcli
 		einfo "Building cmd/${PN}tool/${PN}tool..."
 		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor \
-			-o cmd/${PN}tool/${PN}tool ./cmd/${PN}tool || die
+			-o cmd/${PN}tool/${PN}tool ./cmd/${PN}tool
 		einfo "Building cmd/${PN}-canary/${PN}-canary..."
 		ego build -trimpath -ldflags "${EGO_LDFLAGS}" -tags netgo -mod vendor \
-			-o cmd/${PN}-canary/${PN}-canary ./cmd/${PN}-canary || die
+			-o cmd/${PN}-canary/${PN}-canary ./cmd/${PN}-canary
 	fi
 }
 
@@ -65,7 +65,7 @@ src_install() {
 
 		newconfd "${FILESDIR}/${PN}.confd" "${PN}"
 		newinitd "${FILESDIR}/${PN}.initd" "${PN}"
-		use systemd && systemd_newunit "${FILESDIR}"/${PN}.service ${PN}.service
+		systemd_newunit "${FILESDIR}"/${PN}.service ${PN}.service
 
 		insinto "/etc/${PN}"
 		doins "${S}/cmd/${PN}/${PN}-local-config.yaml"
