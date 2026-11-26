@@ -24,8 +24,7 @@ LICENSE="MIT"
 SLOT="0/$(ver_cut 1-2)"
 IUSE="debug"
 
-COMMON_DEPEND="dev-libs/elfutils
-	x11-libs/libdrm[video_cards_amdgpu]"
+COMMON_DEPEND="dev-libs/elfutils"
 DEPEND="${COMMON_DEPEND}
 	dev-libs/roct-thunk-interface:${SLOT}
 	dev-libs/rocm-device-libs:${SLOT}
