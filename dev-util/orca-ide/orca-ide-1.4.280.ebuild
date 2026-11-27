@@ -19,7 +19,7 @@ HOMEPAGE="
 # their lockfiles: livecheck reuses it while the dependencies do not change.
 SRC_URI="
 	https://github.com/stablyai/orca/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://www.inode64.com/dist/${PN}-1ce934fcd7143d70-node_modules.tar.xz
+	https://www.inode64.com/dist/${PN}-20f1358cfc3e91ec-node_modules.tar.xz
 "
 S="${WORKDIR}/orca-${PV}"
 
