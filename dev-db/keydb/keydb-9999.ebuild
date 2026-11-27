@@ -17,13 +17,12 @@ SRC_URI="https://www.inode64.com/dist/${PATCH_TARBALL}"
 
 LICENSE="BSD"
 SLOT="0"
-IUSE="curl flash ssl systemd test"
+IUSE="flash ssl systemd test"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
 	dev-libs/openssl:0=
 	virtual/zlib:=
-	curl? ( net-misc/curl )
 	flash? (
 		app-arch/lz4
 		app-arch/snappy
@@ -63,13 +62,13 @@ src_unpack() {
 src_compile() {
 	# Upstream defaults to BUILD_TLS=yes and OPTIMIZATION="-O2 -flto": without
 	# these, USE=-ssl would be ignored and CFLAGS could not turn off LTO.
-	local myconf="BUILD_TLS=$(usex ssl) OPTIMIZATION= V=1"
+	# Without NO_MOTD, keydb-server and keydb-cli fetch a "message of the day"
+	# over plain HTTP from api.keydb.dev when they start (cached for four hours)
+	# and keydb-server writes it to its log; upstream is no longer maintained.
+	local myconf="BUILD_TLS=$(usex ssl) OPTIMIZATION= NO_MOTD=yes V=1"
 
 	if use flash; then
 		myconf+=" ENABLE_FLASH=yes"
-	fi
-	if ! use curl; then
-		myconf+=" NO_MOTD=yes"
 	fi
 
 	export USE_SYSTEMD=$(usex systemd)
