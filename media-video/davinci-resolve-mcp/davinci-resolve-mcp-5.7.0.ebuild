@@ -30,7 +30,7 @@ DEPEND="${RDEPEND}"
 BDEPEND="test? ( $(python_gen_cond_dep 'dev-python/pytest[${PYTHON_USEDEP}]') )"
 
 PATCHES=(
-	"${FILESDIR}/${PN}-4.8.26-user-state.patch"
+	"${FILESDIR}/${PN}-5.7.0-user-state.patch"
 	"${FILESDIR}/${PN}-4.8.26-offline-path-tests.patch"
 )
 
