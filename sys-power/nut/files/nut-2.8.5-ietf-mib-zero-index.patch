@@ -17,8 +17,11 @@ as invalid. The bypass current and power keep their zeros: 0 is the
 normal reading while the load runs on the inverter.
 
 Bump IETF_MIB_VERSION to 1.56.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
-Upstream: not submitted yet. Overlay copy of the commit proposed to NUT.
+Upstream: proposed to NUT from branch snmp-ups-ietf-zero-index of github.com/inode64/nut.
+Overlay copy of that commit without its NEWS.adoc and docs/nut.dict hunks.
 
  drivers/ietf-mib.c | 19 ++++++++++++++++++-
  1 file changed, 18 insertions(+), 1 deletion(-)

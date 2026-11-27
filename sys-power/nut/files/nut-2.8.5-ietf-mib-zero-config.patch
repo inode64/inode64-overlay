@@ -13,8 +13,11 @@ limits. upsConfigLowBattTime keeps its zero, which can be a real
 setting.
 
 Bump IETF_MIB_VERSION to 1.57.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
-Upstream: not submitted yet. Overlay copy of the commit proposed to NUT.
+Upstream: proposed to NUT from branch snmp-ups-ietf-zero-index of github.com/inode64/nut.
+Overlay copy of that commit without its NEWS.adoc and docs/nut.dict hunks.
 
  drivers/ietf-mib.c | 22 +++++++++++++---------
  1 file changed, 13 insertions(+), 9 deletions(-)

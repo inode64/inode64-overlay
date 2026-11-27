@@ -17,24 +17,26 @@ Read those two instances as well. Whichever instance does not answer
 is disabled at startup, and the regular entry stays last so that it
 wins on an agent answering both.
 
-Bump MGE_MIB_VERSION to 0.56.
+Bump MGE_MIB_VERSION to 0.57.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
-Upstream: not submitted yet. Overlay copy of the commit proposed to NUT,
-without its NEWS.adoc entry.
+Upstream: proposed to NUT from branch snmp-ups-mge-input-scalar-instance of github.com/inode64/nut.
+Overlay copy of that commit without its NEWS.adoc and docs/nut.dict hunks.
 
  drivers/mge-mib.c | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/mge-mib.c b/drivers/mge-mib.c
-index e4b291c..b4fb8fc 100644
+index 8895f6d88..1a6e9b062 100644
 --- a/drivers/mge-mib.c
 +++ b/drivers/mge-mib.c
 @@ -27,7 +27,7 @@
  
  #include "mge-mib.h"
  
--#define MGE_MIB_VERSION	"0.55"
-+#define MGE_MIB_VERSION	"0.56"
+-#define MGE_MIB_VERSION	"0.56"
++#define MGE_MIB_VERSION	"0.57"
  
  /* TODO:
   * - MGE PDU MIB and sysOID (".1.3.6.1.4.1.705.2") */
@@ -57,6 +59,3 @@ index e4b291c..b4fb8fc 100644
  	snmp_info_default("input.frequency", 0, 0.1, ".1.3.6.1.4.1.705.1.6.2.1.3.1", "", SU_INPUT_1, NULL),
  	snmp_info_default("input.L1.frequency", 0, 0.1, ".1.3.6.1.4.1.705.1.6.2.1.3.1", "", SU_INPUT_3, NULL),
  	snmp_info_default("input.L2.frequency", 0, 0.1, ".1.3.6.1.4.1.705.1.6.2.1.3.2", "", SU_INPUT_3, NULL),
--- 
-2.56.1
-
