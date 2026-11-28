@@ -1,0 +1,82 @@
+From 49a1f78ca00f74bd28f73f44d4ac2f2f3be6b6b2 Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Sat, 28 Nov 2026 11:21:19 +0100
+Subject: [PATCH] ras-mc-ctl: don't fail label registration on boards without
+ labels
+
+ras-mc-ctl.service runs "ras-mc-ctl dimm --register-labels" at every
+boot. Since the dimm subcommand was introduced, a board without an
+entry in the label database makes the command exit with status 1, so
+the unit fails on most systems, for instance:
+
+  ras-mc-ctl: No dimm labels for MSI model S3661
+
+The Perl ras-mc-ctl printed the same message but ignored the result of
+register_dimm_labels(), so the service succeeded. A board without
+labels has nothing to register, which is not an error: keep the
+message and return success. --print-labels still fails when there are
+no labels to print.
+
+Fixes: 9fc53780d112 ("ras-mc-ctl: better dimm commands and add a migration description")
+Assisted-by: Claude Code:claude-opus-5-5
+Claude-Session: https://claude.ai/code/session_01N8fTR7RSGxCPFY1jAm8PH3
+---
+ tests/test_ras_dimm.py | 25 +++++++++++++++++++++++++
+ util/ras_dimm.py       |  5 ++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_ras_dimm.py b/tests/test_ras_dimm.py
+index 3834efe..24e3b15 100644
+--- a/tests/test_ras_dimm.py
++++ b/tests/test_ras_dimm.py
+@@ -315,6 +315,31 @@ class RasMemoryDimmTest(unittest.TestCase):
+             with self.assertRaises(SystemExit):
+                 self.dimm.run(None, args)
+ 
++    def test_register_labels_without_board_entry_succeeds(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root = pathlib.Path(directory)
++            labels = root / "labels.db"
++            labels.write_text(
++                "Vendor: Acme\n"
++                "  Model: Board 1\n"
++                "    A1: 0.0.0;\n",
++                encoding="utf-8",
++            )
++            self.dimm.label_db = os.fspath(labels)
++            self.dimm.label_dir = None
++            self.dimm.DMI_DIR = os.fspath(root / "dmi")
++            self.dimm.SYSFS_DIR = os.fspath(root / "edac")
++
++            args = self.parser.parse_args([
++                "dimm", "--register-labels",
++                "--vendor", "Other", "--model", "Board 2",
++            ])
++            errors = io.StringIO()
++            with contextlib.redirect_stderr(errors):
++                self.assertEqual(self.dimm.run(None, args), 0)
++            self.assertIn("No dimm labels for Other model Board 2",
++                          errors.getvalue())
++
+     def test_failed_status_sets_command_exit_status(self):
+         args = self.parser.parse_args(["dimm", "--status"])
+         with mock.patch.object(self.dimm, "print_status", return_value=False):
+diff --git a/util/ras_dimm.py b/util/ras_dimm.py
+index 114d4bb..8eade95 100644
+--- a/util/ras_dimm.py
++++ b/util/ras_dimm.py
+@@ -486,7 +486,10 @@ class RasMemoryDimm:
+                 f"{self.prog}: No dimm labels for {self.mainboard_vendor} "
+                 f"model {self.mainboard_model}\n"
+             )
+-            return False
++            # Most boards have no entry in the label database, and
++            # ras-mc-ctl.service runs this at every boot: there is nothing
++            # to register, which is not a failure.
++            return True
+         nodes = self._parse_dimm_nodes()
+         time.sleep(self.delay)
+         layers = entry["layers"]
+-- 
+2.56.1
+

@@ -75,6 +75,9 @@ PATCHES=(
 	"${FILESDIR}/${PN}-1.0.0-erst-open-db-first.patch"
 	"${FILESDIR}/${PN}-1.0.0-smca-bank-type.patch"
 	"${FILESDIR}/${PN}-1.0.0-intel-sb-rank.patch"
+	# Pending upstream: a board without DIMM labels made ras-mc-ctl.service
+	# fail at every boot.
+	"${FILESDIR}/${PN}-1.0.0-ras-mc-ctl-no-labels.patch"
 )
 
 pkg_setup() {
