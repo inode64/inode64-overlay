@@ -1,0 +1,32 @@
+From c91f29b0eb7446774521e190272af502a77374c5 Mon Sep 17 00:00:00 2001
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Date: Mon, 9 Nov 2026 11:55:17 +0100
+Subject: [PATCH] mce-amd-smca: avoid using a non-initialized bank type
+
+As reported by Coverity:
+ CID 1685827: (#1 of 1): Uninitialized scalar variable (UNINIT)
+	12. uninit_use: Using uninitialized value bank_type.
+
+the logic may end checking if bank_type >= N_SMCA_BANK_TYPES after
+a loop that might not have initialized it.
+
+Fix it by initializing the variable with N_SMCA_BANK_TYPES.
+
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ events-arch-x86/mce-amd-smca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/events-arch-x86/mce-amd-smca.c b/events-arch-x86/mce-amd-smca.c
+index ac808c0..1041a3b 100644
+--- a/events-arch-x86/mce-amd-smca.c
++++ b/events-arch-x86/mce-amd-smca.c
+@@ -918,7 +918,7 @@ static inline void fixup_hwid(struct mce_priv *m, uint32_t *hwid_mcatype)
+ /* Decode extended errors according to Scalable MCA specification */
+ void decode_smca_error(struct mce_event *e, struct mce_priv *m)
+ {
+-	enum smca_bank_types bank_type;
++	enum smca_bank_types bank_type = N_SMCA_BANK_TYPES;
+ 	const char *ip_name;
+ 	uint32_t mcatype_hwid = 0;
+ 	unsigned short xec = (e->status >> 16) & 0x3f;

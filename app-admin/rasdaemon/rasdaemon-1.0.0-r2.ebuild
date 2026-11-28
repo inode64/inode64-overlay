@@ -70,6 +70,11 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-1.0.0-meson-install.patch"
 	"${FILESDIR}/${PN}-1.0.0-services.patch"
+	# Upstream fixes after 1.0.0: store the ERST records read at startup,
+	# and two MCE decoder fixes (AMD SMCA bank type, Sandy Bridge ranks).
+	"${FILESDIR}/${PN}-1.0.0-erst-open-db-first.patch"
+	"${FILESDIR}/${PN}-1.0.0-smca-bank-type.patch"
+	"${FILESDIR}/${PN}-1.0.0-intel-sb-rank.patch"
 )
 
 pkg_setup() {
