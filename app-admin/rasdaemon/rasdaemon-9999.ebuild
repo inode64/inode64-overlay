@@ -69,9 +69,11 @@ BDEPEND="
 
 # The 1.0.0 backports (ERST, SMCA bank type, Sandy Bridge ranks), the
 # ras-mc-ctl unit, the label file, the tests option and the systemd unit
-# directory are upstream since 1.0.0. These three are proposed in
+# directory are upstream since 1.0.0. The ras-mc-ctl fix for boards without
+# labels is shared with 1.0.0-r3; the 9999 ones are proposed in
 # https://github.com/mchehab/rasdaemon/pull/276: drop each one once merged.
 PATCHES=(
+	"${FILESDIR}/${PN}-1.0.0-ras-mc-ctl-no-labels.patch"
 	"${FILESDIR}/${PN}-9999-docs-option.patch"
 	"${FILESDIR}/${PN}-9999-private-python-dir.patch"
 	"${FILESDIR}/${PN}-9999-tracefs-unit.patch"
