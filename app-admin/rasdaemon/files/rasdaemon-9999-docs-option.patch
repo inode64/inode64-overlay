@@ -1,0 +1,64 @@
+https://github.com/mchehab/rasdaemon/pull/276
+
+From 4b532736d3ec504339c4c26537c45797f4acee52 Mon Sep 17 00:00:00 2001
+From: Fco Javier Felix <ffelix@inode64.com>
+Date: Sat, 28 Nov 2026 14:12:31 +0100
+Subject: [PATCH 2/4] meson.build: add a docs option
+
+The HTML API documentation is built whenever sphinx-build is found, so
+whether a package build runs Sphinx depends on what happens to be
+installed on the build host, and a packager cannot turn it off. The
+output is not installed, so a distribution build only spends time on
+it, and with -W any Sphinx warning fails the whole build.
+
+Add a boolean "docs" option, true by default: Sphinx is used when
+found, as before. With -Ddocs=false it is not looked up. As with the
+"tests" option, a boolean rather than a feature keeps
+--auto-features=enabled, as used by Fedora's %meson, from making Sphinx
+a hard requirement.
+
+Assisted-by: Claude Code:claude-opus-5-5
+Claude-Session: https://claude.ai/code/session_01N8fTR5eZWWPFd2fewTXKDt
+Signed-off-by: Fco Javier Felix <ffelix@inode64.com>
+---
+ docs/meson.build  | 11 ++++++++---
+ meson_options.txt |  3 +++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/docs/meson.build b/docs/meson.build
+index fcb4503..892a7e7 100644
+--- a/docs/meson.build
++++ b/docs/meson.build
+@@ -2,10 +2,15 @@
+ #
+ # Copyright (C) 2026 Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+ 
+-sphinx = find_program('sphinx-build', required: false)
++enable_sphinx = false
++if get_option('docs')
++    sphinx = find_program('sphinx-build', required: false)
++    enable_sphinx = sphinx.found()
++endif
+ 
+-enable_sphinx = sphinx.found()
+-if not enable_sphinx
++if not get_option('docs')
++    message('Documentation build disabled')
++elif not enable_sphinx
+     message('Sphinx not found. Skipping documentation build')
+ else
+     sphinx_sources += [
+diff --git a/meson_options.txt b/meson_options.txt
+index 142f1eb..f43d3c2 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -8,6 +8,9 @@
+ option('disable-all', type : 'boolean', value: false,
+         description: 'disable all features. Useful to check broken deps')
+ 
++option('docs', type : 'boolean', value : true,
++       description : 'build the HTML API documentation when Sphinx is found')
++
+ option('enable-arch', type : 'combo', choices : ['auto', 'all', 'x86', 'arm', 'riscv'],
+        value : 'all',
+        description : 'select the architecture-specific event family (or all for testing)')
