@@ -6,7 +6,7 @@ EAPI=8
 PYTHON_COMPAT=( python3_{12..15} )
 PYTHON_REQ_USE="sqlite"
 
-inherit flag-o-matic linux-info meson python-single-r1 systemd
+inherit flag-o-matic linux-info meson python-single-r1
 
 DESCRIPTION="Reliability, Availability and Serviceability logging tool"
 HOMEPAGE="https://github.com/mchehab/rasdaemon"
@@ -67,16 +67,9 @@ BDEPEND="
 	')
 "
 
+# A board without DIMM labels makes ras-mc-ctl.service fail at every boot;
+# proposed in https://github.com/mchehab/rasdaemon/pull/277.
 PATCHES=(
-	"${FILESDIR}/${PN}-1.0.0-meson-install.patch"
-	"${FILESDIR}/${PN}-1.0.0-services.patch"
-	# Upstream fixes after 1.0.0: store the ERST records read at startup,
-	# and two MCE decoder fixes (AMD SMCA bank type, Sandy Bridge ranks).
-	"${FILESDIR}/${PN}-1.0.0-erst-open-db-first.patch"
-	"${FILESDIR}/${PN}-1.0.0-smca-bank-type.patch"
-	"${FILESDIR}/${PN}-1.0.0-intel-sb-rank.patch"
-	# Pending upstream: a board without DIMM labels made ras-mc-ctl.service
-	# fail at every boot.
 	"${FILESDIR}/${PN}-1.0.0-ras-mc-ctl-no-labels.patch"
 )
 
@@ -97,6 +90,8 @@ pkg_setup() {
 	elif use rasdaemon_features_memory-failure; then
 		CONFIG_CHECK+=" ~MEMORY_FAILURE"
 	fi
+	# TRACING has no prompt in menuconfig, so name the options that select it.
+	local WARNING_TRACING="CONFIG_TRACING is not set: rasdaemon reads every event from tracefs and exits without it. Enable CONFIG_FTRACE and CONFIG_ENABLE_DEFAULT_TRACERS, which select it."
 	local WARNING_DEBUG_FS="CONFIG_DEBUG_FS is not set: ACPI EXTLOG needs debugfs ras/daemon_active."
 	local WARNING_MEMORY_HOTPLUG="CONFIG_MEMORY_HOTPLUG is not set: page and row offlining need its sysfs files."
 	check_extra_config
@@ -119,10 +114,9 @@ src_configure() {
 		-Dsqlite3=enabled
 		-Dmysql=disabled
 		-Dpostgresql=disabled
-		-Ddocs=disabled
-		-Dsystemd-unit-dir="$(systemd_get_systemunitdir)"
+		-Ddocs=false
 		-Dsqlite3-database="${EPREFIX}/var/lib/${PN}/ras-mc_event.db"
-		$(meson_feature test tests)
+		$(meson_use test tests)
 	)
 	local feature
 	for feature in "${RASDAEMON_DEFAULT_FEATURES[@]}" "${RASDAEMON_OPTIONAL_FEATURES[@]}"; do
@@ -134,6 +128,9 @@ src_configure() {
 src_install() {
 	meson_src_install
 	python_optimize "${ED}/usr/share/${PN}"
+	# The syslog-ng snippet logs from a source named s_sys, which Gentoo's
+	# syslog-ng.conf does not define, and that file does not include conf.d.
+	rm -r "${ED}/etc/syslog-ng" || die
 	keepdir "/var/lib/${PN}"
 
 	newinitd "${FILESDIR}/rasdaemon.openrc" rasdaemon
